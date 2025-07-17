@@ -32,7 +32,7 @@ const MobileVerifiedScreen = ({ navigation }: any) => {
         We have successfully verified your mobile number you can now give few personal details to access your dashboard.
       </Text>
       {/* Next Button */}
-      <TouchableOpacity style={styles.nextButton} onPress={() => {navigation.navigate('OnboardingStep1');}}>
+              <TouchableOpacity style={styles.nextButton} onPress={() => {navigation.navigate('CreatorPreferences');}}>
         <Text style={styles.nextText}>Next</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
       </TouchableOpacity>

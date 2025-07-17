@@ -16,42 +16,33 @@
     "check:env": "node -e \"console.log('Environment check:'); console.log('API_URL:', process.env.EXPO_PUBLIC_API_URL); console.log('GOOGLE_CLIENT_ID:', process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ? 'Set' : 'Not set');\""
   },
   "dependencies": {
-    "@babel/runtime": "^7.24.0",
-    "@expo/vector-icons": "^14.0.0",
-    "@react-navigation/native": "^6.1.9",
-    "@react-navigation/native-stack": "^6.9.17",
+    "@expo/vector-icons": "^14.1.0",
+    "@react-navigation/native": "^7.1.6",
+    "@react-navigation/native-stack": "^7.1.6",
+    "@react-native-google-signin/google-signin": "^11.0.0",
     "@reduxjs/toolkit": "^2.5.0",
-    "expo": "~53.0.18",
+    "expo": "~53.0.17",
     "expo-constants": "~17.1.7",
-    "expo-crypto": "~14.1.5",
-    "expo-dev-client": "~5.0.8",
-    "expo-document-picker": "^13.1.6",
-    "expo-font": "~13.3.2",
+    "expo-dev-client": "~5.2.4",
+    "expo-document-picker": "~13.1.6",
     "expo-linking": "~7.1.7",
-    "expo-navigation-bar": "^4.2.7",
+    "expo-navigation-bar": "~4.2.7",
     "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
-    "expo-web-browser": "^14.2.0",
-    "react": "19.1.0",
-    "react-native": "0.79.0",
+    "expo-web-browser": "~14.2.0",
+    "react": "19.0.0",
+    "react-native": "0.79.5",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
-    "react-native-url-polyfill": "^2.0.0",
     "react-redux": "^9.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
-    "@types/node": "^24.0.13",
-    "@types/react": "~19.1.0",
-    "@types/react-native": "~0.73.0",
-    "babel-plugin-module-resolver": "^5.0.2",
-    "metro": "^0.82.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "@babel/core": "^7.25.2",
+    "@types/react": "~19.0.10",
+    "eslint": "^9.25.0",
+    "eslint-config-expo": "~9.2.0",
+    "typescript": "~5.8.3"
   },
-  "private": true,
-  "overrides": {
-    "react": "19.1.0"
-  }
+  "private": true
 }

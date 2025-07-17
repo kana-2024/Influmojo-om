@@ -27,10 +27,7 @@ export default {
       permissions: [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
-      ],
-      compileSdkVersion: 34,
-      targetSdkVersion: 34,
-      minSdkVersion: 21
+      ]
     },
     web: {
       favicon: "./assets/Asset37.png"
@@ -38,11 +35,9 @@ export default {
     scheme: "influ-mojo",
     extra: {
       eas: {
-        projectId: "8afc029b-edd3-4998-a46a-7e7f70d7aed8"
-      }
-    },
-    plugins: [
-      "expo-dev-client"
-    ]
+        projectId: "8f28fa05-e2fd-43ad-b3f4-bdbc04c36329"
+      },
+      googleClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID
+    }
   }
 }; 

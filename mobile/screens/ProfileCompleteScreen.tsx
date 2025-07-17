@@ -142,7 +142,7 @@ const ConfettiCheckmark = () => {
   );
 };
 
-const ObCompleted = ({ navigation }: any) => {
+const ProfileCompleteScreen = ({ navigation }: any) => {
   useEffect(() => {
   }, []);
 
@@ -242,4 +242,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ObCompleted; 
+export default ProfileCompleteScreen; 

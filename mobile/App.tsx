@@ -1,4 +1,3 @@
-import 'react-native-url-polyfill/auto';
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text } from 'react-native';
@@ -8,16 +7,16 @@ import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { registerRootComponent } from 'expo';
-import OnboardingScreen1 from './screens/OnboardingScreen1';
-import OnboardingScreen2 from './screens/OnboardingScreen2';
-import OnboardingScreen3 from './screens/OnboardingScreen3';
+import WelcomeScreen from './screens/WelcomeScreen';
+import UserRoleScreen from './screens/UserRoleScreen';
+import SignUpScreen from './screens/SignUpScreen';
 import OtpVerificationScreen from './screens/OtpVerificationScreen';
 import MobileVerifiedScreen from './screens/MobileVerifiedScreen';
 import GoogleVerifiedScreen from './screens/GoogleVerifiedScreen';
-import OnboardingStep1 from './screens/OnboardingStep1';
-import ObStep2 from './screens/ObStep2';
+import CreatorPreferencesScreen from './screens/CreatorPreferencesScreen';
+import ProfileSetupScreen from './screens/ProfileSetupScreen';
 import Profile from './screens/Profile';
-import ObCompleted from './screens/ObCompleted';
+import ProfileCompleteScreen from './screens/ProfileCompleteScreen';
 import CreatePackageScreen from './screens/CreatePackageScreen';
 import * as NavigationBar from 'expo-navigation-bar';
 import SplashScreen from './screens/SplashScreen';
@@ -28,7 +27,7 @@ if (__DEV__) {
   const { LogBox } = require('react-native');
   LogBox.ignoreLogs(['Require cycle:']);
   
-  // Enhanced error logging with stack traces
+  // Error logging with stack traces
   const originalConsoleError = console.error;
   console.error = (...args) => {
     originalConsoleError(...args);
@@ -50,6 +49,10 @@ if (__DEV__) {
   // Log module loading
   console.log('App.tsx loading...');
 }
+
+// Add debug logging
+console.log('=== App.tsx Loading ===');
+console.log('App component is being rendered');
 
 const Stack = createNativeStackNavigator();
 
@@ -88,7 +91,6 @@ export default function App() {
     NavigationBar.setButtonStyleAsync('dark');
     
     // Only set background color if edge-to-edge is not enabled
-    // This prevents the warning on newer Android versions
     try {
       NavigationBar.setBackgroundColorAsync('#F8F9FB');
     } catch (error) {
@@ -108,16 +110,16 @@ export default function App() {
             }}
           >
             <Stack.Screen name="SplashScreen" component={SplashScreen} />
-            <Stack.Screen name="Onboarding1" component={OnboardingScreen1} />
-            <Stack.Screen name="Onboarding2" component={OnboardingScreen2} />
-            <Stack.Screen name="Onboarding3" component={OnboardingScreen3} />
-            <Stack.Screen name="OtpVerificationScreen" component={OtpVerificationScreen} />
-            <Stack.Screen name="MobileVerifiedScreen" component={MobileVerifiedScreen} />
-            <Stack.Screen name="GoogleVerifiedScreen" component={GoogleVerifiedScreen} />
-            <Stack.Screen name="OnboardingStep1" component={OnboardingStep1} />
-            <Stack.Screen name="ObStep2" component={ObStep2} />
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="UserRole" component={UserRoleScreen} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="OtpVerification" component={OtpVerificationScreen} />
+            <Stack.Screen name="MobileVerification" component={MobileVerifiedScreen} />
+            <Stack.Screen name="GoogleVerification" component={GoogleVerifiedScreen} />
+            <Stack.Screen name="CreatorPreferences" component={CreatorPreferencesScreen} />
+            <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
             <Stack.Screen name="Profile" component={Profile} />
-            <Stack.Screen name="ObCompleted" component={ObCompleted} />
+            <Stack.Screen name="ProfileComplete" component={ProfileCompleteScreen} />
             <Stack.Screen name="CreatePackage" component={CreatePackageScreen} />
           </Stack.Navigator>
         </NavigationContainer>

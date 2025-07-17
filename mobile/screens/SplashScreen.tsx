@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Image, Animated, Easing, ActivityIndicator } from 'react-native';
 
+// Add debug logging
+console.log('=== SplashScreen Loading ===');
+console.log('SplashScreen component is being rendered');
+
 const SplashScreen = ({ navigation }: any) => {
   const logoAnim = useRef(new Animated.Value(0)).current;
   const textAnim = useRef(new Animated.Value(0)).current;
@@ -28,7 +32,7 @@ const SplashScreen = ({ navigation }: any) => {
       })
     ]).start(() => {
       setTimeout(() => {
-        navigation.replace('Onboarding1');
+        navigation.replace('Welcome');
       }, 1500);
     });
   }, []);

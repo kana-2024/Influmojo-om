@@ -31,8 +31,8 @@ const GoogleVerifiedScreen = ({ navigation }: any) => {
         You can now provide a few personal details to access your dashboard.
       </Text>
       {/* Next Button */}
-      <TouchableOpacity style={styles.nextButton} onPress={() => {/* navigation to next onboarding step */}}>
-        <Text style={styles.nextText}>Next</Text>
+      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('CreatorPreferences')}>
+        <Text style={styles.nextText}>Continue Setup</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
       </TouchableOpacity>
       {/* Login Link */}

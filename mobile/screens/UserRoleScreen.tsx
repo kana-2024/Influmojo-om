@@ -3,12 +3,12 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Platform, SafeAreaView
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 
-interface OnboardingScreen2Props {
+interface UserRoleScreenProps {
   navigation: any;
   route: { params?: { mode?: 'signup' | 'login' } };
 }
 
-const OnboardingScreen2 = ({ navigation, route }: OnboardingScreen2Props) => {
+const UserRoleScreen = ({ navigation, route }: UserRoleScreenProps) => {
   useEffect(() => {
   }, []);
 
@@ -52,7 +52,7 @@ const OnboardingScreen2 = ({ navigation, route }: OnboardingScreen2Props) => {
             style={[styles.continueButton, !selected && { opacity: 0.5 }]}
             disabled={!selected}
             onPress={() => {
-              if (selected === 'creator') navigation.navigate('Onboarding3');
+              if (selected === 'creator') navigation.navigate('SignUp');
               // else if (selected === 'brand') navigation.navigate('BrandOnboarding'); // To be implemented later
             }}
           >
@@ -64,7 +64,7 @@ const OnboardingScreen2 = ({ navigation, route }: OnboardingScreen2Props) => {
               if (mode === 'signup') {
                 navigation.navigate('Login');
               } else {
-                navigation.navigate('Onboarding1');
+                navigation.navigate('Welcome');
               }
             }}
           >
@@ -198,4 +198,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OnboardingScreen2; 
+export default UserRoleScreen; 

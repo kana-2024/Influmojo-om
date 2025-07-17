@@ -16,7 +16,7 @@ const HIGHLIGHTED = ['Beauty', 'Lifestyle', 'Entertainment', 'virtual'];
 
 const LANGUAGES = ['Hindi', 'English', 'Telugu'];
 
-export default function OnboardingStep1({ navigation }: any) {
+export default function CreatorPreferencesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [about, setAbout] = useState('');
@@ -59,7 +59,7 @@ export default function OnboardingStep1({ navigation }: any) {
         {/* Title & Subtitle */}
         <Text style={styles.title}>Welcome to the creator community!</Text>
         <Text style={styles.subtitle}>
-          We’ll just collect a few essential details for now.{"\n"}
+          We'll just collect a few essential details for now.{"\n"}
           You can complete your full profile anytime later.
         </Text>
 
@@ -133,7 +133,7 @@ export default function OnboardingStep1({ navigation }: any) {
         {/* Next Button */}
         <TouchableOpacity
           style={styles.nextButton}
-          onPress={() => navigation.navigate('ObStep2')}
+          onPress={() => navigation.navigate('ProfileSetup')}
         >
           <Text style={styles.nextButtonText}>Next 1 / 1</Text>
           <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
@@ -178,9 +178,12 @@ const styles = StyleSheet.create({
   categoryChipSelected: {
     backgroundColor: '#FF6B2C22', borderColor: '#FF6B2C', borderWidth: 1,
   },
-
+  categoryChipHighlighted: {
+    backgroundColor: '#FF6B2C11',
+  },
   categoryText: { color: '#1A1D1F', fontSize: 14 },
   categoryTextSelected: { color: '#FF6B2C', fontWeight: '600' },
+  categoryTextHighlighted: { color: '#FF6B2C', fontWeight: '500' },
   aboutInput: {
     backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
     paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, marginBottom: 8, marginTop: 12, minHeight: 48,

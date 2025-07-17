@@ -5,11 +5,10 @@ import { useAppSelector } from '../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useEffect } from 'react';
-import BottomNavBar from './BottomNavBar';
+import { BottomNavBar, KycModal } from '../components';
 import { useNavigation } from '@react-navigation/native';
 import CreatePackageScreen from './CreatePackageScreen';
 import CreatePortfolioScreen from './CreatePortfolioScreen';
-import KycModal from './KycModal';
 import AnimatedModalOverlay from '../components/AnimatedModalOverlay';
 import CustomDropdown from '../components/CustomDropdown';
 
@@ -234,7 +233,7 @@ const Profile = () => {
           <KycModal onClose={() => setShowKycModal(false)} onBack={() => setShowKycModal(false)} onNext={() => setShowKycModal(false)} />
         </AnimatedModalOverlay>
       </Modal>
-      <BottomNavBar />
+              <BottomNavBar navigation={navigation} currentRoute="profile" />
     </SafeAreaView>
   );
 };

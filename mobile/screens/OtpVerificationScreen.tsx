@@ -62,7 +62,7 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
         return;
       }
       setLoading(false);
-      navigation.navigate('MobileVerifiedScreen');
+              navigation.navigate('MobileVerification');
     } catch (err) {
       setError('Network error. Please try again.');
       setLoading(false);

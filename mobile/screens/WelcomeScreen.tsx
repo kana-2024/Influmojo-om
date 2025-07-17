@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useEffect } from 'react';
 
-const OnboardingScreen1 = ({ navigation }: any) => {
+const WelcomeScreen = ({ navigation }: any) => {
   useEffect(() => {
   }, []);
   const insets = useSafeAreaInsets();
@@ -32,13 +32,13 @@ const OnboardingScreen1 = ({ navigation }: any) => {
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.signupButton}
-              onPress={() => navigation.navigate('Onboarding2', { mode: 'signup' })}
+              onPress={() => navigation.navigate('UserRole', { mode: 'signup' })}
             >
               <Text style={styles.signupText}>Sign up</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.loginButton}
-              onPress={() => navigation.navigate('Onboarding2', { mode: 'login' })}
+              onPress={() => navigation.navigate('UserRole', { mode: 'login' })}
             >
               <Text style={styles.loginText}>Log In</Text>
             </TouchableOpacity>
@@ -154,4 +154,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OnboardingScreen1; 
+export default WelcomeScreen; 

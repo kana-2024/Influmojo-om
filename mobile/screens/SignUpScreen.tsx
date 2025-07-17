@@ -2,11 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, SafeAreaView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ENV, API_ENDPOINTS } from '../config/env';
+
+// Test backend connectivity
+const testBackendConnection = async () => {
+  try {
+    console.log('Testing backend health check...');
+    const response = await fetch(API_ENDPOINTS.HEALTH);
+    console.log('Backend health check response:', response.status);
+    return response.ok;
+  } catch (error) {
+    console.error('Backend health check failed:', error);
+    return false;
+  }
+};
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StatusBar } from 'react-native';
 import googleAuthService from '../services/googleAuth';
 
-const OnboardingScreen3 = ({ navigation }: any) => {
+// Debug import
+console.log('SignUpScreen: googleAuthService imported:', !!googleAuthService);
+
+const SignUpScreen = ({ navigation }: any) => {
   useEffect(() => {
     // NavigationBar.setBackgroundColorAsync('#F8F9FB'); // Removed as per edit hint
     // NavigationBar.setButtonStyleAsync('dark'); // Removed as per edit hint
@@ -22,21 +38,35 @@ const OnboardingScreen3 = ({ navigation }: any) => {
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleGoogleAuth = async () => {
+    console.log('=== Google Auth Button Pressed ===');
+    console.log('API Base URL:', ENV.API_BASE_URL);
     setWarning('');
     setGoogleLoading(true);
+    
+    // Test backend connectivity first
+    const backendOk = await testBackendConnection();
+    console.log('Backend connectivity:', backendOk);
+    
     try {
+      console.log('Starting Google sign-in process...');
+      console.log('googleAuthService imported:', !!googleAuthService);
       const result = await googleAuthService.signIn();
+      console.log('Google sign-in result:', result);
+      
       if (result.success && result.user) {
         setGoogleLoading(false);
+        console.log('Google sign-in successful, navigating to verification...');
         // Navigate to the next screen on successful Google auth
-        navigation.navigate('GoogleVerifiedScreen');
+        navigation.navigate('GoogleVerification');
       } else {
         setGoogleLoading(false);
-        setWarning(result.error || 'Google sign-in failed.');
+        console.log('Google sign-in failed:', result.error);
+        setWarning(result.error || 'Google sign-in failed. Please try again.');
       }
     } catch (error) {
       setGoogleLoading(false);
-      setWarning(error instanceof Error ? error.message : 'Google sign-in failed.');
+      console.error('Google sign-in error:', error);
+      setWarning(error instanceof Error ? error.message : 'Google sign-in failed. Please try again.');
     }
   };
 
@@ -52,6 +82,11 @@ const OnboardingScreen3 = ({ navigation }: any) => {
       return;
     }
     setLoading(true);
+    
+    // Test backend connectivity first
+    console.log('Testing backend connectivity...');
+    console.log('API URL:', API_ENDPOINTS.SEND_OTP);
+    
     try {
       const response = await fetch(API_ENDPOINTS.SEND_OTP, {
         method: 'POST',
@@ -69,9 +104,10 @@ const OnboardingScreen3 = ({ navigation }: any) => {
         return;
       }
       setLoading(false);
-      navigation.navigate('OtpVerificationScreen', { phone: `+91${mobile}` });
+      navigation.navigate('OtpVerification', { phone: `+91${mobile}` });
     } catch (err) {
-      setWarning('Network error. Please try again.');
+      console.error('Network error details:', err);
+      setWarning('Network error. Please check your connection and try again.');
       setLoading(false);
     }
   };
@@ -102,9 +138,12 @@ const OnboardingScreen3 = ({ navigation }: any) => {
           </View>
           {/* Title */}
           <Text style={styles.title}>Create your Influ Mojo account</Text>
+          <Text style={styles.subtitle}>
+            Choose your preferred sign-up method below
+          </Text>
           {/* Social Buttons */}
           <TouchableOpacity 
-            style={styles.socialButton} 
+            style={[styles.socialButton, googleLoading && styles.socialButtonDisabled]} 
             onPress={handleGoogleAuth}
             disabled={googleLoading}
           >
@@ -115,7 +154,7 @@ const OnboardingScreen3 = ({ navigation }: any) => {
                 <Ionicons name="logo-google" size={24} color="#4285F4" style={styles.socialIcon} />
               )}
               <Text style={[styles.socialText, { marginLeft: 12 }]}>
-                {googleLoading ? 'Signing in...' : 'Sign up with Google'}
+                {googleLoading ? 'Opening Google Sign-In...' : 'Sign up with Google'}
               </Text>
             </View>
           </TouchableOpacity>
@@ -212,6 +251,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1A1D1F',
     textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
     marginBottom: 24,
   },
   socialButton: {
@@ -238,6 +283,9 @@ const styles = StyleSheet.create({
     color: '#1A1D1F',
     fontWeight: '500',
   },
+  socialButtonDisabled: {
+    opacity: 0.6,
+  },
   dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -249,15 +297,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5E7EB',
   },
   dividerText: {
-    marginHorizontal: 8,
     color: '#6B7280',
-    fontSize: 13,
+    fontSize: 14,
+    marginHorizontal: 16,
   },
   inputLabel: {
     fontSize: 15,
+    fontWeight: '600',
     color: '#1A1D1F',
-    fontWeight: '500',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   input: {
     backgroundColor: '#fff',
@@ -267,44 +315,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 15,
-    marginBottom: 4,
-  },
-  errorText: {
-    color: '#FF3B30',
-    fontSize: 13,
     marginBottom: 8,
+    minHeight: 48,
   },
   mobileRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
   },
   countryCodeBox: {
     backgroundColor: '#F3F4F6',
     borderRadius: 8,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    minHeight: 48,
+    justifyContent: 'center',
   },
   countryCode: {
     fontSize: 15,
     color: '#1A1D1F',
+    fontWeight: '500',
   },
   infoText: {
-    color: '#6B7280',
     fontSize: 13,
-    marginBottom: 12,
+    color: '#6B7280',
+    marginBottom: 16,
   },
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#FC5213',
     borderRadius: 8,
     paddingVertical: 14,
     marginTop: 8,
-    marginBottom: 8,
+    marginBottom: 16,
   },
   createButtonText: {
     color: '#fff',
@@ -313,54 +357,51 @@ const styles = StyleSheet.create({
   },
   checkboxRow: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  customCheckbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
     alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'center',
+    marginRight: 8,
+    marginTop: 2,
+  },
+  customCheckboxChecked: {
+    backgroundColor: '#FC5213',
+    borderColor: '#FC5213',
   },
   checkboxText: {
-    color: '#6B7280',
     fontSize: 13,
-    marginLeft: 8,
+    color: '#6B7280',
     flex: 1,
-    flexWrap: 'wrap',
+    lineHeight: 18,
   },
   link: {
-    color: '#2563EB',
-    textDecorationLine: 'underline',
+    color: '#FC5213',
     fontWeight: '500',
   },
   loginRow: {
     alignItems: 'center',
-    marginTop: '35%',
   },
   loginText: {
-    color: '#6B7280',
     fontSize: 14,
+    color: '#6B7280',
     textAlign: 'center',
   },
   loginLink: {
     color: '#2563EB',
     fontWeight: '500',
   },
-  customCheckbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: '#B0B0B0',
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 1 },
-  },
-  customCheckboxChecked: {
-    backgroundColor: '#FF6B2C',
-    borderColor: '#FF6B2C',
-    borderWidth: 2,
+  errorText: {
+    color: '#FF3B30',
+    fontSize: 13,
+    marginBottom: 8,
   },
 });
 
-export default OnboardingScreen3; 
+export default SignUpScreen; 

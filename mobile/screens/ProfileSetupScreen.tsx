@@ -7,7 +7,7 @@ import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context'
 import * as NavigationBar from 'expo-navigation-bar';
 import CustomDropdown from '../components/CustomDropdown';
 
-export default function OnboardingStep2({ navigation }: any) {
+export default function ProfileSetupScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const [scrolled, setScrolled] = useState(false);
   const [gender, setGender] = useState('Male');
@@ -131,7 +131,7 @@ export default function OnboardingStep2({ navigation }: any) {
         {/* Next Button */}
         <TouchableOpacity
           style={styles.nextButton}
-          onPress={() => {navigation.navigate('ObCompleted')}}
+          onPress={() => {navigation.navigate('ProfileComplete')}}
         >
           <Text style={styles.nextButtonText}>Next 2 / 2</Text>
           <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
@@ -201,4 +201,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#1A1D1F',
   },
-});
+}); 

@@ -1,7 +1,7 @@
 // Environment configuration for frontend
 export const ENV = {
   // API Configuration
-  API_BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3002',
+  API_BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.31.57:3002',
   
   // Google OAuth
   GOOGLE_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '',
@@ -11,6 +11,13 @@ export const ENV = {
   APP_NAME: 'Influ Mojo',
   APP_VERSION: '1.0.0',
 };
+
+// Debug environment variables
+console.log('=== Environment Variables Debug ===');
+console.log('EXPO_PUBLIC_API_URL:', process.env.EXPO_PUBLIC_API_URL);
+console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID exists:', !!process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID);
+console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID length:', process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID?.length || 0);
+console.log('ENV.GOOGLE_CLIENT_ID:', ENV.GOOGLE_CLIENT_ID);
 
 // API endpoints
 export const API_ENDPOINTS = {
