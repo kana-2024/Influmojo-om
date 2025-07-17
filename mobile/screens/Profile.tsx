@@ -240,7 +240,7 @@ const Profile = () => {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff'},
-  scrollContent: { paddingBottom: 32 },
+  scrollContent: { paddingBottom: 12 },
   headerRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Dimensions.get('window').width * 0.04, marginTop: Dimensions.get('window').width * 0.06, marginBottom: Dimensions.get('window').width * 0.05  },
   headerIconBtn: { padding: 4 },

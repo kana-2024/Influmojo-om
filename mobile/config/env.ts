@@ -12,13 +12,6 @@ export const ENV = {
   APP_VERSION: '1.0.0',
 };
 
-// Debug environment variables
-console.log('=== Environment Variables Debug ===');
-console.log('EXPO_PUBLIC_API_URL:', process.env.EXPO_PUBLIC_API_URL);
-console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID exists:', !!process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID);
-console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID length:', process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID?.length || 0);
-console.log('ENV.GOOGLE_CLIENT_ID:', ENV.GOOGLE_CLIENT_ID);
-
 // API endpoints
 export const API_ENDPOINTS = {
   // Auth endpoints
@@ -29,4 +22,13 @@ export const API_ENDPOINTS = {
   
   // Health check
   HEALTH: `${ENV.API_BASE_URL}/api/health`,
-}; 
+};
+
+// Debug environment variables
+console.log('=== Environment Variables Debug ===');
+console.log('EXPO_PUBLIC_API_URL:', process.env.EXPO_PUBLIC_API_URL);
+console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID exists:', !!process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID);
+console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID length:', process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID?.length || 0);
+console.log('ENV.GOOGLE_CLIENT_ID:', ENV.GOOGLE_CLIENT_ID);
+console.log('ENV.API_BASE_URL:', ENV.API_BASE_URL);
+console.log('API_ENDPOINTS.SEND_OTP:', API_ENDPOINTS.SEND_OTP); 

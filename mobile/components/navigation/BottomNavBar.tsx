@@ -10,9 +10,8 @@ interface BottomNavBarProps {
 const BottomNavBar = ({ navigation, currentRoute = 'home' }: BottomNavBarProps) => {
   const navItems = [
     { name: 'home', icon: 'home-outline', label: 'Home' },
-    { name: 'discover', icon: 'search-outline', label: 'Discover' },
-    { name: 'create', icon: 'add-circle-outline', label: 'Create' },
-    { name: 'messages', icon: 'chatbubble-outline', label: 'Messages' },
+    { name: 'insights', icon: 'analytics-outline', label: 'Insights' },
+    { name: 'orders', icon: 'list-outline', label: 'Orders' },
     { name: 'profile', icon: 'person-outline', label: 'Profile' },
   ];
 
@@ -27,12 +26,12 @@ const BottomNavBar = ({ navigation, currentRoute = 'home' }: BottomNavBarProps) 
           <Ionicons
             name={item.icon as any}
             size={24}
-            color={currentRoute === item.name ? '#FF6B2C' : '#6B7280'}
+            color={currentRoute === item.name ? '#007AFF' : '#8E8E93'}
           />
           <Text
             style={[
               styles.navLabel,
-              { color: currentRoute === item.name ? '#FF6B2C' : '#6B7280' }
+              { color: currentRoute === item.name ? '#007AFF' : '#8E8E93' }
             ]}
           >
             {item.label}
@@ -47,8 +46,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopWidth: 0.5,
+    borderTopColor: '#C6C6C8',
     paddingVertical: 8,
     paddingHorizontal: 16,
     paddingBottom: 20, // Extra padding for safe area
@@ -60,9 +59,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   navLabel: {
-    fontSize: 12,
-    marginTop: 4,
-    fontWeight: '500',
+    fontSize: 10,
+    marginTop: 2,
+    fontWeight: '400',
   },
 });
 
