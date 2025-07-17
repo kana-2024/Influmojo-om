@@ -3,7 +3,12 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+// Load environment variables
+try {
+  require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+} catch (error) {
+  console.log('dotenv not available, using default values');
+}
 
 const { PrismaClient } = require('./generated/client');
 
@@ -21,10 +26,22 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.'
 });
 
+// Trust proxy for ngrok
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://192.168.31.75:3000', 'exp://192.168.31.75:8081'],
+  origin: [
+    'http://localhost:3000', 
+    'http://192.168.31.75:3000', 
+    'http://192.168.31.57:3000',
+    'http://192.168.31.57:3002',
+    'exp://192.168.31.75:8081',
+    'exp://192.168.31.57:8081',
+    'http://localhost:8081',
+    'exp://localhost:8081'
+  ],
   credentials: true
 }));
 app.use(morgan('combined'));
@@ -64,9 +81,10 @@ async function startServer() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
     
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📱 Health check: http://localhost:${PORT}/api/health`);
+      console.log(`📱 Network access: http://192.168.31.57:${PORT}/api/health`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

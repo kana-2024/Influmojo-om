@@ -35,7 +35,7 @@ export default {
     scheme: "influ-mojo",
     extra: {
       eas: {
-        projectId: "8f28fa05-e2fd-43ad-b3f4-bdbc04c36329"
+        projectId: "18ad0b63-061b-4159-ac61-9eedeada6db4"
       },
       googleClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID
     }
