@@ -20,6 +20,7 @@ import ProfileCompleteScreen from './screens/ProfileCompleteScreen';
 import CreatePackageScreen from './screens/CreatePackageScreen';
 import * as NavigationBar from 'expo-navigation-bar';
 import SplashScreen from './screens/SplashScreen';
+import { ENV } from './config/env';
 
 
 
@@ -153,6 +154,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
+console.log("🔍 API_BASE_URL:", ENV.API_BASE_URL);
 // Register the app component
 registerRootComponent(App);

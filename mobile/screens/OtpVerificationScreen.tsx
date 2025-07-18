@@ -7,7 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 const OTP_LENGTH = 6;
 const RESEND_TIME = 30;
-
+console.log("🚀 Hitting OTP API:", API_ENDPOINTS.SEND_OTP);
 const OtpVerificationScreen = ({ navigation, route }: any) => {
   useEffect(() => {
     // NavigationBar.setBackgroundColorAsync('#F8F9FB'); // Removed as per edit hint

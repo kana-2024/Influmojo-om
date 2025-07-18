@@ -1,10 +1,13 @@
+import Constants from 'expo-constants';
 // Environment configuration for frontend
+const extra = Constants.expoConfig?.extra || {};
 export const ENV = {
   // API Configuration
-  API_BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.31.57:3002',
   
+  API_BASE_URL: extra.apiBaseUrl || 'http://192.168.1.1:3002',
+  GOOGLE_CLIENT_ID: extra.googleClientId || '',
   // Google OAuth
-  GOOGLE_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '',
+ 
   GOOGLE_CLIENT_SECRET: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || '',
   
   // App Configuration
