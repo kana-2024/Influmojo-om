@@ -5,7 +5,7 @@
   "build": {
     "development": {
       "env": {
-       "EXPO_PUBLIC_API_URL": "https://bdcd56f11307.ngrok-free.app",
+       "EXPO_PUBLIC_API_URL": "https://7d582f61cbae.ngrok-free.app",
         "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com"
       },
       "distribution": "internal",
