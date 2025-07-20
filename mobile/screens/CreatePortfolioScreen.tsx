@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Platform, Image, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Platform, Image, Dimensions, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import CustomDropdownDefault from '../components/CustomDropdown';
+import { profileAPI } from '../services/apiService';
 
 interface CreatePortfolioScreenProps {
   onClose: () => void;
@@ -16,6 +17,7 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
   const [file, setFile] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   const pickFile = async () => {
     const result = await DocumentPicker.getDocumentAsync({
@@ -63,6 +65,38 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
         setUploading(false);
       }
     }, 400);
+  };
+
+  // Save portfolio item to database
+  const handleSubmitPortfolio = async () => {
+    if (!file) {
+      Alert.alert('Error', 'Please select a file first');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // In a real app, you would upload the file to a cloud storage service first
+      // For now, we'll simulate the upload URL
+      const mediaUrl = `https://example.com/uploads/${file.name}`;
+      
+      await profileAPI.createPortfolio({
+        mediaUrl,
+        mediaType: getFileType(file.mimeType || ''),
+        fileName: file.name,
+        fileSize: file.size || 0,
+        mimeType: file.mimeType
+      });
+
+      Alert.alert('Success', 'Portfolio item created successfully!', [
+        { text: 'OK', onPress: () => onClose() }
+      ]);
+    } catch (error) {
+      console.error('Create portfolio error:', error);
+      Alert.alert('Error', 'Failed to create portfolio item. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -166,8 +200,14 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
             <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.submitBtn} disabled={!file || uploading}>
-              <Text style={styles.submitBtnText}>Submit</Text>
+            <TouchableOpacity 
+              style={[styles.submitBtn, (!file || uploading || saving) && { opacity: 0.7 }]}
+              onPress={handleSubmitPortfolio}
+              disabled={!file || uploading || saving}
+            >
+              <Text style={styles.submitBtnText}>
+                {saving ? 'Saving...' : 'Submit'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

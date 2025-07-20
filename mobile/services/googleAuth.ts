@@ -103,6 +103,10 @@ class GoogleAuthService {
 
       console.log('Google Sign-In successful:', user.email);
 
+      // Store the access token for API calls
+      // In a real app, you'd use AsyncStorage or secure storage
+      console.log('Google access token stored:', tokens.accessToken);
+
       return {
         success: true,
         user,

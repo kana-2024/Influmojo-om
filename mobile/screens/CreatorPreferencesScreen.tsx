@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, TextInput, SafeAreaView, ScrollView, StatusBar
+  View, Text, StyleSheet, TouchableOpacity, TextInput, SafeAreaView, ScrollView, StatusBar, Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { profileAPI } from '../services/apiService';
 
 const CATEGORIES = [
   'Gaming', 'Travel', 'Food', 'Education', 'Pet', 'Beauty',
@@ -22,6 +23,7 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
   const [about, setAbout] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState(LANGUAGES);
   const [scrolled, setScrolled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Category selection logic
   const toggleCategory = (cat: string) => {
@@ -29,6 +31,37 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
       setSelectedCategories(selectedCategories.filter(c => c !== cat));
     } else if (selectedCategories.length < 5) {
       setSelectedCategories([...selectedCategories, cat]);
+    }
+  };
+
+  // Save preferences to database
+  const handleSavePreferences = async () => {
+    if (selectedCategories.length === 0) {
+      Alert.alert('Error', 'Please select at least one category');
+      return;
+    }
+
+    if (!about.trim()) {
+      Alert.alert('Error', 'Please add a brief description about your work');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await profileAPI.updatePreferences({
+        categories: selectedCategories,
+        about: about.trim(),
+        languages: selectedLanguages
+      });
+
+      Alert.alert('Success', 'Preferences saved successfully!', [
+        { text: 'OK', onPress: () => navigation.navigate('ProfileSetup') }
+      ]);
+    } catch (error) {
+      console.error('Save preferences error:', error);
+      Alert.alert('Error', 'Failed to save preferences. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,11 +165,14 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
 
         {/* Next Button */}
         <TouchableOpacity
-          style={styles.nextButton}
-          onPress={() => navigation.navigate('ProfileSetup')}
+          style={[styles.nextButton, loading && { opacity: 0.7 }]}
+          onPress={handleSavePreferences}
+          disabled={loading}
         >
-          <Text style={styles.nextButtonText}>Next 1 / 1</Text>
-          <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
+          <Text style={styles.nextButtonText}>
+            {loading ? 'Saving...' : 'Next 1 / 1'}
+          </Text>
+          {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

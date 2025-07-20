@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, TextInput, StatusBar, ScrollView
+  View, Text, StyleSheet, TouchableOpacity, TextInput, StatusBar, ScrollView, Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import CustomDropdown from '../components/CustomDropdown';
+import { profileAPI } from '../services/apiService';
 
 export default function ProfileSetupScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -18,6 +19,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
   const [pincode, setPincode] = useState('500023');
   const [showStatePicker, setShowStatePicker] = useState(false);
   const [showCityPicker, setShowCityPicker] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
   }, []);
@@ -30,6 +32,55 @@ export default function ProfileSetupScreen({ navigation }: any) {
     'Karnataka': ['Bangalore', 'Mysore', 'Hubli'],
     'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai'],
     'Kerala': ['Thiruvananthapuram', 'Kochi', 'Kozhikode']
+  };
+
+  // Save basic info to database
+  const handleSaveBasicInfo = async () => {
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email address');
+      return;
+    }
+
+    if (!dob.trim()) {
+      Alert.alert('Error', 'Please enter your date of birth');
+      return;
+    }
+
+    if (!state.trim()) {
+      Alert.alert('Error', 'Please select your state');
+      return;
+    }
+
+    if (!city.trim()) {
+      Alert.alert('Error', 'Please select your city');
+      return;
+    }
+
+    if (!pincode.trim()) {
+      Alert.alert('Error', 'Please enter your pincode');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await profileAPI.updateBasicInfo({
+        gender,
+        email: email.trim(),
+        dob: dob.trim(),
+        state: state.trim(),
+        city: city.trim(),
+        pincode: pincode.trim()
+      });
+
+      Alert.alert('Success', 'Basic info saved successfully!', [
+        { text: 'OK', onPress: () => navigation.navigate('ProfileComplete') }
+      ]);
+    } catch (error) {
+      console.error('Save basic info error:', error);
+      Alert.alert('Error', 'Failed to save basic info. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -130,11 +181,14 @@ export default function ProfileSetupScreen({ navigation }: any) {
 
         {/* Next Button */}
         <TouchableOpacity
-          style={styles.nextButton}
-          onPress={() => {navigation.navigate('ProfileComplete')}}
+          style={[styles.nextButton, loading && { opacity: 0.7 }]}
+          onPress={handleSaveBasicInfo}
+          disabled={loading}
         >
-          <Text style={styles.nextButtonText}>Next 2 / 2</Text>
-          <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
+          <Text style={styles.nextButtonText}>
+            {loading ? 'Saving...' : 'Next 2 / 2'}
+          </Text>
+          {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

@@ -195,10 +195,11 @@ router.post('/send-phone-verification-code', [
 // Verify phone code
 router.post('/verify-phone-code', [
   body('phone').isMobilePhone().withMessage('Valid phone number is required'),
-  body('code').isLength({ min: 6, max: 6 }).withMessage('6-digit code is required')
+  body('code').isLength({ min: 6, max: 6 }).withMessage('6-digit code is required'),
+  body('fullName').optional().isString().withMessage('Full name must be a string')
 ], validateRequest, async (req, res) => {
   try {
-    const { phone, code } = req.body;
+    const { phone, code, fullName } = req.body;
 
     // Verify with Twilio Verify (if configured)
     let twilioVerification = false;
@@ -266,14 +267,14 @@ router.post('/verify-phone-code', [
     });
 
     if (!user) {
-      // Create new user or update existing one
+      // Create new user with full name
       user = await prisma.user.create({
         data: {
           phone,
           phone_verified: true,
           user_type: 'creator', // Default to creator
           status: 'active',
-          name: 'User' // Will be updated in next step
+          name: fullName || 'User' // Use provided full name or default
         }
       });
     } else {
@@ -282,7 +283,8 @@ router.post('/verify-phone-code', [
         where: { id: user.id },
         data: { 
           phone_verified: true,
-          last_login_at: new Date()
+          last_login_at: new Date(),
+          ...(fullName && { name: fullName }) // Update name if provided
         }
       });
     }
@@ -306,6 +308,45 @@ router.post('/verify-phone-code', [
     console.error('Verify OTP error:', error);
     res.status(500).json({ 
       error: 'Phone verification failed',
+      message: error.message 
+    });
+  }
+});
+
+// Update user name (for phone signup flow)
+router.post('/update-name', [
+  body('name').notEmpty().withMessage('Name is required')
+], validateRequest, async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const { name } = req.body;
+
+    const user = await prisma.user.update({
+      where: { id: decoded.userId },
+      data: { name }
+    });
+
+    res.json({
+      success: true,
+      message: 'Name updated successfully',
+      user: {
+        id: user.id.toString(),
+        name: user.name,
+        email: user.email,
+        phone: user.phone
+      }
+    });
+
+  } catch (error) {
+    console.error('Update name error:', error);
+    res.status(500).json({ 
+      error: 'Failed to update name',
       message: error.message 
     });
   }

@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { profileAPI } from '../../services/apiService';
 
 interface KycModalProps {
   onClose: () => void;
@@ -15,6 +16,7 @@ const KycModal: React.FC<KycModalProps> = ({ onClose, onBack }) => {
   const [selected, setSelected] = useState<'aadhaar' | 'pan' | null>(null);
   const [frontUploaded, setFrontUploaded] = useState(false);
   const [backUploaded, setBackUploaded] = useState(false);
+  const [saving, setSaving] = useState(false);
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const goToStep = (nextStep: 1 | 2) => {
@@ -36,6 +38,42 @@ const KycModal: React.FC<KycModalProps> = ({ onClose, onBack }) => {
   const handleUpload = (side: 'front' | 'back') => {
     if (side === 'front') setFrontUploaded(true);
     if (side === 'back') setBackUploaded(true);
+  };
+
+  // Submit KYC to database
+  const handleSubmitKYC = async () => {
+    if (!selected) {
+      Alert.alert('Error', 'Please select a document type');
+      return;
+    }
+
+    if (!frontUploaded || !backUploaded) {
+      Alert.alert('Error', 'Please upload both front and back images');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // In a real app, you would upload the images to a cloud storage service first
+      // For now, we'll simulate the upload URLs
+      const frontImageUrl = `https://example.com/kyc/${selected}_front.jpg`;
+      const backImageUrl = `https://example.com/kyc/${selected}_back.jpg`;
+      
+      await profileAPI.submitKYC({
+        documentType: selected,
+        frontImageUrl,
+        backImageUrl
+      });
+
+      Alert.alert('Success', 'KYC submitted successfully!', [
+        { text: 'OK', onPress: () => onClose() }
+      ]);
+    } catch (error) {
+      console.error('Submit KYC error:', error);
+      Alert.alert('Error', 'Failed to submit KYC. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Step 1: Choose ID proof
@@ -124,11 +162,13 @@ const KycModal: React.FC<KycModalProps> = ({ onClose, onBack }) => {
           <Text style={styles.cancelBtnText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.submitBtn, !(frontUploaded && backUploaded) && { opacity: 0.5 }]}
-          onPress={() => (frontUploaded && backUploaded) && onClose()}
-          disabled={!(frontUploaded && backUploaded)}
+          style={[styles.submitBtn, (!(frontUploaded && backUploaded) || saving) && { opacity: 0.5 }]}
+          onPress={handleSubmitKYC}
+          disabled={!(frontUploaded && backUploaded) || saving}
         >
-          <Text style={styles.submitBtnText}>Upload</Text>
+          <Text style={styles.submitBtnText}>
+            {saving ? 'Submitting...' : 'Upload'}
+          </Text>
         </TouchableOpacity>
       </View>
     </>

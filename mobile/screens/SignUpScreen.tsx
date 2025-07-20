@@ -18,6 +18,7 @@ const testBackendConnection = async () => {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StatusBar } from 'react-native';
 import googleAuthService from '../services/googleAuth';
+import { authAPI } from '../services/apiService';
 
 // Debug import
 console.log('SignUpScreen: googleAuthService imported:', !!googleAuthService);
@@ -55,9 +56,22 @@ const SignUpScreen = ({ navigation }: any) => {
       
       if (result.success && result.user) {
         setGoogleLoading(false);
-        console.log('Google sign-in successful, navigating to verification...');
-        // Navigate to the next screen on successful Google auth
-        navigation.navigate('GoogleVerification');
+        console.log('Google sign-in successful, calling backend API...');
+        
+        try {
+          // Call backend API with Google token
+          const apiResult = await authAPI.googleAuth(result.accessToken);
+          console.log('Backend API response:', apiResult);
+          
+          if (apiResult.success) {
+            navigation.navigate('GoogleVerification');
+          } else {
+            setWarning(apiResult.error || 'Backend authentication failed. Please try again.');
+          }
+        } catch (apiError) {
+          console.error('Backend API error:', apiError);
+          setWarning('Backend authentication failed. Please try again.');
+        }
       } else {
         setGoogleLoading(false);
         console.log('Google sign-in failed:', result.error);
@@ -88,26 +102,19 @@ const SignUpScreen = ({ navigation }: any) => {
     console.log('API URL:', API_ENDPOINTS.SEND_OTP);
     
     try {
-      const response = await fetch(API_ENDPOINTS.SEND_OTP, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: `+91${mobile}` })
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        if (response.status === 429) {
-          setWarning('Please wait 1 minute before requesting another code.');
-        } else {
-        setWarning(data.error || 'Failed to send verification code.');
-        }
-        setLoading(false);
-        return;
-      }
+      const result = await authAPI.sendOTP(`+91${mobile}`);
       setLoading(false);
-      navigation.navigate('OtpVerification', { phone: `+91${mobile}` });
+      navigation.navigate('OtpVerification', { 
+        phone: `+91${mobile}`,
+        fullName: fullName.trim()
+      });
     } catch (err) {
       console.error('Network error details:', err);
-      setWarning('Network error. Please check your connection and try again.');
+      if (err.message?.includes('429')) {
+        setWarning('Please wait 1 minute before requesting another code.');
+      } else {
+        setWarning('Network error. Please check your connection and try again.');
+      }
       setLoading(false);
     }
   };

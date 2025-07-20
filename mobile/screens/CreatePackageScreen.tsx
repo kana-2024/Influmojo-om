@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect, FC } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Modal, StatusBar, Platform, Pressable, Dimensions, LayoutRectangle, findNodeHandle, UIManager } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Modal, StatusBar, Platform, Pressable, Dimensions, LayoutRectangle, findNodeHandle, UIManager, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomDropdownDefault from '../components/CustomDropdown';
+import { profileAPI } from '../services/apiService';
 
 const platforms = ['Instagram', 'Facebook', 'Youtube', 'Snapchat'];
 const contentTypes = ['Reel', 'Story', 'Feed post', 'Carousel Post'];
@@ -30,8 +31,55 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
   const [duration2, setDuration2] = useState('30 Seconds');
   const [price, setPrice] = useState('50000');
   const [desc, setDesc] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const Dropdown = CustomDropdown || CustomDropdownDefault;
+
+  // Save package to database
+  const handleCreatePackage = async () => {
+    if (!platform.trim()) {
+      Alert.alert('Error', 'Please select a platform');
+      return;
+    }
+
+    if (!contentType.trim()) {
+      Alert.alert('Error', 'Please select a content type');
+      return;
+    }
+
+    if (!quantity.trim() || parseInt(quantity) < 1) {
+      Alert.alert('Error', 'Please enter a valid quantity');
+      return;
+    }
+
+    if (!price.trim() || parseFloat(price) <= 0) {
+      Alert.alert('Error', 'Please enter a valid price');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await profileAPI.createPackage({
+        platform: platform.trim(),
+        contentType: contentType.trim(),
+        quantity: quantity.trim(),
+        revisions: revisions.trim() || '0',
+        duration1: duration1.trim(),
+        duration2: duration2.trim(),
+        price: price.trim(),
+        description: desc.trim()
+      });
+
+      Alert.alert('Success', 'Package created successfully!', [
+        { text: 'OK', onPress: () => onClose() }
+      ]);
+    } catch (error) {
+      console.error('Create package error:', error);
+      Alert.alert('Error', 'Failed to create package. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.3)' }}>
@@ -95,8 +143,14 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
               <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
                 <Text style={styles.cancelBtnText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.submitBtn}>
-                <Text style={styles.submitBtnText}>Submit</Text>
+              <TouchableOpacity 
+                style={[styles.submitBtn, loading && { opacity: 0.7 }]}
+                onPress={handleCreatePackage}
+                disabled={loading}
+              >
+                <Text style={styles.submitBtnText}>
+                  {loading ? 'Creating...' : 'Submit'}
+                </Text>
               </TouchableOpacity>
             </View>
           </ScrollView>

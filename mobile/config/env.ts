@@ -21,7 +21,16 @@ export const API_ENDPOINTS = {
   GOOGLE_AUTH: `${ENV.API_BASE_URL}/api/auth/google-mobile`,
   SEND_OTP: `${ENV.API_BASE_URL}/api/auth/send-phone-verification-code`,
   VERIFY_OTP: `${ENV.API_BASE_URL}/api/auth/verify-phone-code`,
+  UPDATE_NAME: `${ENV.API_BASE_URL}/api/auth/update-name`,
   USER_PROFILE: `${ENV.API_BASE_URL}/api/auth/profile`,
+  
+  // Profile endpoints
+  UPDATE_BASIC_INFO: `${ENV.API_BASE_URL}/api/profile/update-basic-info`,
+  UPDATE_PREFERENCES: `${ENV.API_BASE_URL}/api/profile/update-preferences`,
+  CREATE_PACKAGE: `${ENV.API_BASE_URL}/api/profile/create-package`,
+  CREATE_PORTFOLIO: `${ENV.API_BASE_URL}/api/profile/create-portfolio`,
+  SUBMIT_KYC: `${ENV.API_BASE_URL}/api/profile/submit-kyc`,
+  GET_PROFILE: `${ENV.API_BASE_URL}/api/profile/profile`,
   
   // Health check
   HEALTH: `${ENV.API_BASE_URL}/api/health`,

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { API_ENDPOINTS } from '../config/env';
 import * as NavigationBar from 'expo-navigation-bar';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { authAPI } from '../services/apiService';
 
 const OTP_LENGTH = 6;
 const RESEND_TIME = 30;
@@ -14,7 +15,7 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
     // NavigationBar.setButtonStyleAsync('dark'); // Removed as per edit hint
   }, []);
 
-  const { phone } = route.params;
+  const { phone, fullName } = route.params;
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(''));
   const [timer, setTimer] = useState(RESEND_TIME);
   const [loading, setLoading] = useState(false);
@@ -50,21 +51,11 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
     }
     setLoading(true);
     try {
-      const response = await fetch(API_ENDPOINTS.VERIFY_OTP, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code: otp.join('') })
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setLoading(false);
-        setError(data.error || 'Invalid OTP.');
-        return;
-      }
+      const result = await authAPI.verifyOTP(phone, otp.join(''), fullName);
       setLoading(false);
-              navigation.navigate('MobileVerification');
+      navigation.navigate('MobileVerification');
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError(err.message || 'Network error. Please try again.');
       setLoading(false);
     }
   };
@@ -73,28 +64,15 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
     setError('');
     setTimer(RESEND_TIME);
     try {
-      const response = await fetch(API_ENDPOINTS.SEND_OTP, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        if (response.status === 429) {
-          setError('Please wait 1 minute before requesting another code.');
-          setTimer(60); // Set timer to 60 seconds for rate limit
-        } else {
-          setError(data.error || 'Failed to resend OTP.');
-        }
-        return;
-      }
-      
-      // Success - OTP sent
+      await authAPI.sendOTP(phone);
       console.log('OTP resent successfully');
     } catch (err) {
-      setError('Network error. Please try again.');
+      if (err.message?.includes('429')) {
+        setError('Please wait 1 minute before requesting another code.');
+        setTimer(60); // Set timer to 60 seconds for rate limit
+      } else {
+        setError(err.message || 'Failed to resend OTP.');
+      }
     }
   };
 
