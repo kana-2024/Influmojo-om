@@ -1,16 +1,16 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, StatusBar, Platform, Dimensions, Modal } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useAppSelector } from '../store/hooks';
+import { useAppSelector } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
-import { useEffect } from 'react';
-import { BottomNavBar, KycModal } from '../components';
+import { BottomNavBar, KycModal } from '../../components';
 import { useNavigation } from '@react-navigation/native';
 import CreatePackageScreen from './CreatePackageScreen';
 import CreatePortfolioScreen from './CreatePortfolioScreen';
-import AnimatedModalOverlay from '../components/AnimatedModalOverlay';
-import CustomDropdown from '../components/CustomDropdown';
+import AnimatedModalOverlay from '../../components/AnimatedModalOverlay';
+import CustomDropdown from '../../components/CustomDropdown';
+import { profileAPI } from '../../services/apiService';
 
 const categories = ['Technology', 'Science', 'Training'];
 const languages = ['English', 'Hindi', 'Telugu', 'Marathi'];
@@ -24,7 +24,7 @@ const tabList = [
   { key: 'Payments', label: 'Payments' },
 ];
 
-const Profile = () => {
+const CreatorProfile = () => {
   const user = useAppSelector(state => state.auth.user);
   const insets = useSafeAreaInsets();
   const [scrolled, setScrolled] = useState(false);
@@ -34,9 +34,45 @@ const Profile = () => {
   const [showCreatePortfolio, setShowCreatePortfolio] = useState(false);
   const [showKycModal, setShowKycModal] = useState(false);
   const scrollViewRef = useRef(null);
+  const [creatorProfile, setCreatorProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    loadCreatorProfile();
   }, []);
+
+  const loadCreatorProfile = async () => {
+    try {
+      setLoading(true);
+      console.log('🔍 Loading creator profile...');
+      const response = await profileAPI.getCreatorProfile();
+      console.log('✅ Creator profile response:', response);
+      if (response.success) {
+        setCreatorProfile(response.data);
+      } else {
+        console.error('❌ Creator profile failed:', response.error);
+      }
+    } catch (error) {
+      console.error('❌ Error loading creator profile:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack
+      });
+      // Set a default profile to prevent crashes
+      setCreatorProfile({
+        user: { name: 'User', email: '', phone: '' },
+        bio: '',
+        location_city: '',
+        location_state: '',
+        content_categories: [],
+        interests: [],
+        portfolio_items: [],
+        social_media_accounts: []
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -65,7 +101,7 @@ const Profile = () => {
           <TouchableOpacity style={styles.headerIconBtn}>
             <Ionicons name="arrow-back" size={22} color="#1A1D1F" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>My Profile</Text>
+          <Text style={styles.headerTitle}>Creator Profile</Text>
           <TouchableOpacity style={styles.headerIconBtn}>
             <Ionicons name="ellipsis-vertical" size={22} color="#1A1D1F" />
           </TouchableOpacity>
@@ -91,28 +127,47 @@ const Profile = () => {
         <View style={{ height: 48 }} />
         {/* User Info */}
         <View style={styles.infoSection}>
-          <Text style={styles.name}>Mohammed Azhar</Text>
+          <Text style={styles.name}>{creatorProfile?.user?.name || user?.name || 'Creator Name'}</Text>
           <View style={styles.infoRowIcon}>
             <MaterialIcons name="female" size={15} color="#B0B0B0" style={styles.infoIcon} />
-            <Text style={styles.infoGray}>Male 34</Text>
+            <Text style={styles.infoGray}>
+              {creatorProfile?.gender || 'Not specified'} {creatorProfile?.date_of_birth ? new Date().getFullYear() - new Date(creatorProfile.date_of_birth).getFullYear() : ''}
+            </Text>
           </View>
+          {creatorProfile?.date_of_birth && (
+            <View style={styles.infoRowIcon}>
+              <Ionicons name="calendar-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
+              <Text style={styles.infoGray}>
+                {new Date(creatorProfile.date_of_birth).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </Text>
+            </View>
+          )}
           <View style={styles.infoRowIcon}>
             <Ionicons name="location-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-            <Text style={styles.infoGray}>Telangana, Hyderabad 500023</Text>
+            <Text style={styles.infoGray}>
+              {creatorProfile?.location_state ? `${creatorProfile.location_state}, ` : ''}
+              {creatorProfile?.location_city || 'City'}{creatorProfile?.location_pincode ? ` ${creatorProfile.location_pincode}` : ''}
+            </Text>
           </View>
           <View style={styles.infoRowIcon}>
             <Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-            <Text style={styles.infoGray}>English, Hindi & Telugu</Text>
+            <Text style={styles.infoGray}>
+              {creatorProfile?.interests ? JSON.parse(creatorProfile.interests).join(', ') : 'Languages not specified'}
+            </Text>
           </View>
           <View style={styles.infoRowIcon}>
             <Ionicons name="time-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
             <View style={styles.quickResponderTag}>
               <Text style={styles.quickResponderText}>Quick Responder</Text>
             </View>
-            <Text style={[styles.infoGray, { alignSelf: 'center' }]}> • 2-4 hours</Text>
+            <Text style={[styles.infoGray, { alignSelf: 'center' }]}> • {creatorProfile?.average_response_time || '2-4 hours'}</Text>
           </View>
           <View style={styles.ratingRow}>
-            <Text style={styles.ratingValue}>4.5</Text>
+            <Text style={styles.ratingValue}>{creatorProfile?.rating || '0.0'}</Text>
             <Ionicons name="star" size={16} color="#FFD600" />
             <Ionicons name="star" size={16} color="#FFD600" />
             <Ionicons name="star" size={16} color="#FFD600" />
@@ -127,7 +182,17 @@ const Profile = () => {
           <Ionicons name="chevron-forward" size={18} color="#6B7280" style={{ marginBottom: 6 }} />
         </TouchableOpacity>
         <View style={styles.categoryRow}>
-          {categories.map((cat, index) => (
+          {creatorProfile?.content_categories ? JSON.parse(creatorProfile.content_categories).map((cat: string, index: number) => (
+            <View 
+              key={cat} 
+              style={[
+                styles.categoryChip,
+                { backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D' }
+              ]}
+            >
+              <Text style={[styles.categoryText, { color: '#000' }]}>{cat}</Text>
+            </View>
+          )) : categories.map((cat, index) => (
             <View 
               key={cat} 
               style={[
@@ -145,7 +210,7 @@ const Profile = () => {
           <Ionicons name="chevron-forward" size={18} color="#6B7280" style={{ marginBottom: 6 }} />
         </TouchableOpacity>
         <Text style={styles.aboutText}>
-          I'm Mohammed Azhar Uddin, a passionate tech influencer with a sharp eye for innovation and user experience. I specialize in reviewing the latest gadgets, smartphones, apps, and tech accessories—breaking down complex features into simple, honest insights for my audience. Whether it's a deep-dive into performance or hands-on usability, my goal is to help you make informed decisions in today's fast-moving tech world.
+          {creatorProfile?.bio || 'No bio available yet.'}
         </Text>
         {/* Tabs */}
         <View style={styles.tabRow}>
@@ -203,142 +268,250 @@ const Profile = () => {
           )}
         </View>
       </ScrollView>
-      <Modal
+
+      {/* Modals */}
+      <AnimatedModalOverlay
         visible={showCreatePackage}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowCreatePackage(false)}
       >
-        <AnimatedModalOverlay visible={showCreatePackage} onRequestClose={() => setShowCreatePackage(false)}>
-          <CreatePackageScreen onClose={() => setShowCreatePackage(false)} CustomDropdown={CustomDropdown} />
-        </AnimatedModalOverlay>
-      </Modal>
-      <Modal
+        <CreatePackageScreen onClose={() => setShowCreatePackage(false)} />
+      </AnimatedModalOverlay>
+
+      <AnimatedModalOverlay
         visible={showCreatePortfolio}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowCreatePortfolio(false)}
       >
-        <AnimatedModalOverlay visible={showCreatePortfolio} onRequestClose={() => setShowCreatePortfolio(false)}>
-          <CreatePortfolioScreen onClose={() => setShowCreatePortfolio(false)} onBack={() => setShowCreatePortfolio(false)} CustomDropdown={CustomDropdown} />
-        </AnimatedModalOverlay>
-      </Modal>
-      <Modal
-        visible={showKycModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowKycModal(false)}
-      >
-        <AnimatedModalOverlay visible={showKycModal} onRequestClose={() => setShowKycModal(false)}>
-          <KycModal onClose={() => setShowKycModal(false)} onBack={() => setShowKycModal(false)} onNext={() => setShowKycModal(false)} />
-        </AnimatedModalOverlay>
-      </Modal>
-              <BottomNavBar navigation={navigation} currentRoute="profile" />
+        <CreatePortfolioScreen onClose={() => setShowCreatePortfolio(false)} onBack={() => setShowCreatePortfolio(false)} />
+      </AnimatedModalOverlay>
+
+      <KycModal
+        onClose={() => setShowKycModal(false)}
+        onBack={() => setShowKycModal(false)}
+      />
+
+      <BottomNavBar navigation={navigation} />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fff'},
-  scrollContent: { paddingBottom: 12 },
+  safeArea: { flex: 1, backgroundColor: '#F8F9FB' },
+  scrollContent: { paddingHorizontal: 20 },
   headerRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Dimensions.get('window').width * 0.04, marginTop: Dimensions.get('window').width * 0.06, marginBottom: Dimensions.get('window').width * 0.05  },
-  headerIconBtn: { padding: 4 },
-  headerTitle: { fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center', flex: 1 },
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  headerIconBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerTitle: { fontSize: 18, fontWeight: '600', color: '#1A1D1F' },
   coverContainer: {
-    marginHorizontal: Dimensions.get('window').width * 0.03, marginBottom: Dimensions.get('window').width * 0.04, marginTop: 0, position: 'relative',
-    height: Dimensions.get('window').width * 0.32,
+    position: 'relative',
+    height: 200,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 16,
   },
   coverImage: {
-    width: '100%', height: '100%', borderRadius: 8, backgroundColor: '#FF6B2C',
-  },
-  coverEditBtn: {
-    position: 'absolute', top: 8, right: 16, backgroundColor: '#FF6B2C', borderRadius: 16, padding: 4, zIndex: 2
+    width: '100%',
+    height: '100%',
   },
   avatarInfoRow: {
-    position: 'absolute', left: Dimensions.get('window').width * 0.02, right: Dimensions.get('window').width * 0.06, bottom: -Dimensions.get('window').width * 0.17, flexDirection: 'row', alignItems: 'center',
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
   avatarWrapper: {
-    width: Dimensions.get('window').width * 0.24 + 4, height: Dimensions.get('window').width * 0.24 + 4, borderRadius: (Dimensions.get('window').width * 0.24 + 4) / 2, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff', elevation: 2, zIndex: 3, marginRight: -((Dimensions.get('window').width * 0.24 + 4) / 2), position: 'relative',
+    position: 'relative',
+    marginRight: 12,
   },
   avatarImg: {
-    width: Dimensions.get('window').width * 0.24, height: Dimensions.get('window').width * 0.24, borderRadius: (Dimensions.get('window').width * 0.24) / 2, resizeMode: 'cover',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 3,
+    borderColor: '#fff',
   },
   avatarEditBtn: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#FF6B2C',
+    width: 24,
+    height: 24,
     borderRadius: 12,
-    padding: 4,
-    zIndex: 4,
+    backgroundColor: '#FF6B2C',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 2,
     borderColor: '#fff',
-    elevation: 3,
   },
-  infoSection: { flex: 1, alignItems: 'flex-start', justifyContent: 'center', marginLeft: '33%', marginTop: '-13%' },
-  name: { fontSize: 17, fontWeight: '700', color: '#1A1D1F', marginBottom: 2, textAlign: 'left', alignSelf: 'stretch' },
-  email: { fontSize: 13, color: '#6B7280', marginBottom: 2, textAlign: 'left', alignSelf: 'stretch' },
-  infoRowIcon: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
-  infoIcon: { marginRight: 6 },
-  infoGray: { fontSize: 13, color: '#B0B0B0', textAlign: 'left', alignSelf: 'stretch' },
-  ratingRow: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
-  ratingValue: { fontSize: 15, fontWeight: '600', color: '#1A1D1F', marginRight: 4 },
-  divider: { height: 2, width: '90%', alignSelf: 'center', backgroundColor: '#E5E7EB', marginVertical: 16, marginHorizontal: 0 },
-  header: {
-    fontSize: 22, fontWeight: '700', textAlign: 'center', marginTop: 16, marginBottom: 12
+  coverEditBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  avatarContainer: {
-    position: 'absolute', left: 16, bottom: -28, width: 56, height: 56, borderRadius: 28, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff', elevation: 2
+  infoSection: {
+    marginBottom: 24,
   },
-  infoRow: {
-    flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#fff', marginHorizontal: 16, marginTop: 8, borderRadius: 12, padding: 16, elevation: 1, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }
+  name: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1A1D1F',
+    marginBottom: 8,
   },
-  sectionRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 24, marginBottom: 4
+  infoRowIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
   },
-  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
-  categoryRow: { flexDirection: 'row', gap: 8, marginHorizontal: 16, marginBottom: 8 },
-  categoryChip: { backgroundColor: '#F3F4F6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, marginRight: 8 },
-  categoryText: { color: '#1A1D1F', fontSize: 13, fontWeight: '500' },
-  aboutText: { fontSize: 14, color: '#6B7280', marginHorizontal: 16, marginBottom: 8, marginTop: 2, lineHeight: 20 },
-  tabRow: { flexDirection: 'row', backgroundColor: '#F8F9FB', borderRadius: 12, marginHorizontal: 16, marginTop: 12, marginBottom: 8, padding: 6 },
-  tabBtn: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 8 },
-  tabBtnActive: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 8, backgroundColor: '#fff', elevation: 1 },
-  tabBtnText: { color: '#6B7280', fontWeight: '500', fontSize: 14 },
-  tabBtnTextActive: { color: '#FF6B2C', fontWeight: '700', fontSize: 14 },
-  emptyState: { alignItems: 'center', marginTop: 32, marginHorizontal: 16, backgroundColor: '#fff', borderRadius: 12, padding: 24, elevation: 1 },
-  emptyTitle: { color: '#1A1D1F', fontWeight: '600', fontSize: 15, textAlign: 'center', marginBottom: 8 },
-  emptyDesc: { color: '#6B7280', fontSize: 13, textAlign: 'center' },
-  createPackageBtn: {
-    marginTop: 18,
-    marginBottom: 18,
-    borderWidth: 1.5,
-    borderColor: '#FF6B2C',
-    borderRadius: 22,
-    paddingHorizontal: 28,
-    paddingVertical: 8,
-    alignSelf: 'center',
-    backgroundColor: '#fff',
-  },
-  createPackageBtnText: {
-    color: '#FF6B2C',
-    fontWeight: '600',
-    fontSize: 15,
-  },
+  infoIcon: { marginRight: 8 },
+  infoGray: { fontSize: 14, color: '#6B7280' },
   quickResponderTag: {
-    backgroundColor: '#FFE5D9',
+    backgroundColor: '#FF6B2C',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: '#FF6B2C',
+    marginRight: 4,
   },
   quickResponderText: {
-    color: '#FF6B2C',
-    fontSize: 13,
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  ratingValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A1D1F',
+    marginRight: 4,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginBottom: 24,
+  },
+  sectionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A1D1F',
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 24,
+  },
+  categoryChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  categoryText: {
+    fontSize: 14,
     fontWeight: '500',
+  },
+  aboutText: {
+    fontSize: 15,
+    color: '#6B7280',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  tabRow: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tabBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  tabBtnActive: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: '#FF6B2C',
+  },
+  tabBtnText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#6B7280',
+  },
+  tabBtnTextActive: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A1D1F',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptyDesc: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 24,
+    paddingHorizontal: 20,
+  },
+  createPackageBtn: {
+    backgroundColor: '#FF6B2C',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  createPackageBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
 
-export default Profile; 
+export default CreatorProfile; 

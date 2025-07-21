@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated, Easing } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppSelector } from '../store/hooks';
 import * as NavigationBar from 'expo-navigation-bar';
+import { authAPI } from '../services/apiService';
 
 // Animated Confetti Dot (pop in, fixed position)
 const ConfettiDot = ({ x, y, color, size, delay }: { x: number; y: number; color: string; size: number; delay: number }) => {
@@ -143,22 +144,53 @@ const ConfettiCheckmark = () => {
 };
 
 const ProfileCompleteScreen = ({ navigation }: any) => {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+    loadUserProfile();
   }, []);
 
-  const user = useAppSelector(state => state.auth.user);
+  const loadUserProfile = async () => {
+    try {
+      const response = await authAPI.getUserProfile();
+      setUser(response.user);
+    } catch (error) {
+      console.error('Failed to load user profile:', error);
+      // Default to creator if profile loading fails
+      setUser({ user_type: 'creator' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleViewProfile = () => {
-    navigation.navigate('Profile');
+    // Navigate to appropriate profile based on user type
+    const userType = user?.user_type || 'creator';
+    if (userType === 'brand') {
+      navigation.navigate('BrandProfile');
+    } else {
+      navigation.navigate('CreatorProfile');
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        {/* Progress Bar */}
+        <View style={styles.progressBarContainer}>
+          <View style={styles.progressBarBg} />
+          <View style={styles.progressBarFill} />
+        </View>
+        <Text style={styles.progressPercent}>100%</Text>
+        
         <ConfettiCheckmark />
         <Text style={styles.title}>Your basic profile has been completed!</Text>
         <Text style={styles.subtitle}>
-          You're now ready to explore your creator space. Start growing your presence and get discovered by the right brands.
+          {(user?.user_type === 'brand') 
+            ? "You're now ready to explore your brand space. Start connecting with creators and grow your brand presence."
+            : "You're now ready to explore your creator space. Start growing your presence and get discovered by the right brands."
+          }
         </Text>
         <TouchableOpacity style={styles.button} onPress={handleViewProfile}>
           <Text style={styles.buttonText}>View Profile</Text>
@@ -239,6 +271,37 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
     letterSpacing: 1,
+  },
+  progressBarContainer: { 
+    height: 8, 
+    width: '100%', 
+    marginBottom: 4, 
+    position: 'relative' 
+  },
+  progressBarBg: {
+    position: 'absolute', 
+    left: 0, 
+    top: 0, 
+    height: 8, 
+    width: '100%',
+    backgroundColor: '#E5E7EB', 
+    borderRadius: 4,
+  },
+  progressBarFill: {
+    position: 'absolute', 
+    left: 0, 
+    top: 0, 
+    height: 8, 
+    width: '100%',
+    backgroundColor: '#FF6B2C', 
+    borderRadius: 4, 
+    zIndex: 1,
+  },
+  progressPercent: { 
+    alignSelf: 'flex-end', 
+    color: '#6B7280', 
+    fontSize: 13, 
+    marginBottom: 12 
   },
 });
 

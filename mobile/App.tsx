@@ -10,14 +10,18 @@ import { registerRootComponent } from 'expo';
 import WelcomeScreen from './screens/WelcomeScreen';
 import UserRoleScreen from './screens/UserRoleScreen';
 import SignUpScreen from './screens/SignUpScreen';
+import LoginScreen from './screens/LoginScreen';
 import OtpVerificationScreen from './screens/OtpVerificationScreen';
 import MobileVerifiedScreen from './screens/MobileVerifiedScreen';
 import GoogleVerifiedScreen from './screens/GoogleVerifiedScreen';
-import CreatorPreferencesScreen from './screens/CreatorPreferencesScreen';
+import CreatorPreferencesScreen from './screens/creator/CreatorPreferencesScreen';
+import BrandPreferencesScreen from './screens/brand/BrandPreferencesScreen';
 import ProfileSetupScreen from './screens/ProfileSetupScreen';
-import Profile from './screens/Profile';
+
+import CreatorProfile from './screens/creator/CreatorProfile';
+import BrandProfile from './screens/brand/BrandProfile';
 import ProfileCompleteScreen from './screens/ProfileCompleteScreen';
-import CreatePackageScreen from './screens/CreatePackageScreen';
+import CreatePackageScreen from './screens/creator/CreatePackageScreen';
 import * as NavigationBar from 'expo-navigation-bar';
 import SplashScreen from './screens/SplashScreen';
 import { ENV } from './config/env';
@@ -109,17 +113,22 @@ export default function App() {
             screenOptions={{
               headerShown: false
             }}
+            id={undefined}
           >
             <Stack.Screen name="SplashScreen" component={SplashScreen} />
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="UserRole" component={UserRoleScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
             <Stack.Screen name="OtpVerification" component={OtpVerificationScreen} />
             <Stack.Screen name="MobileVerification" component={MobileVerifiedScreen} />
             <Stack.Screen name="GoogleVerification" component={GoogleVerifiedScreen} />
             <Stack.Screen name="CreatorPreferences" component={CreatorPreferencesScreen} />
+            <Stack.Screen name="BrandPreferences" component={BrandPreferencesScreen} />
             <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
-            <Stack.Screen name="Profile" component={Profile} />
+
+            <Stack.Screen name="CreatorProfile" component={CreatorProfile} />
+            <Stack.Screen name="BrandProfile" component={BrandProfile} />
             <Stack.Screen name="ProfileComplete" component={ProfileCompleteScreen} />
             <Stack.Screen name="CreatePackage" component={CreatePackageScreen} />
           </Stack.Navigator>

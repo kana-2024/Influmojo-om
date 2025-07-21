@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Image, Animated, Easing, ActivityIndicator } from 'react-native';
 
-// Add debug logging
+// debug logging
 console.log('=== SplashScreen Loading ===');
 console.log('SplashScreen component is being rendered');
 

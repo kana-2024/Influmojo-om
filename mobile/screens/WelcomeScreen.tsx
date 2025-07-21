@@ -38,7 +38,7 @@ const WelcomeScreen = ({ navigation }: any) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.loginButton}
-              onPress={() => navigation.navigate('UserRole', { mode: 'login' })}
+              onPress={() => navigation.navigate('Login')}
             >
               <Text style={styles.loginText}>Log In</Text>
             </TouchableOpacity>

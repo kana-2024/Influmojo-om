@@ -20,10 +20,12 @@ import { StatusBar } from 'react-native';
 import googleAuthService from '../services/googleAuth';
 import { authAPI } from '../services/apiService';
 
-// Debug import
-console.log('SignUpScreen: googleAuthService imported:', !!googleAuthService);
+// Debug import (only in development)
+if (__DEV__) {
+  console.log('SignUpScreen: googleAuthService imported:', !!googleAuthService);
+}
 
-const SignUpScreen = ({ navigation }: any) => {
+const SignUpScreen = ({ navigation, route }: any) => {
   useEffect(() => {
     // NavigationBar.setBackgroundColorAsync('#F8F9FB'); // Removed as per edit hint
     // NavigationBar.setButtonStyleAsync('dark'); // Removed as per edit hint
@@ -37,33 +39,47 @@ const SignUpScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const userType = route.params?.userType || 'creator'; // Get user type from navigation params
 
   const handleGoogleAuth = async () => {
-    console.log('=== Google Auth Button Pressed ===');
-    console.log('API Base URL:', ENV.API_BASE_URL);
+    if (__DEV__) {
+      console.log('=== Google Auth Button Pressed ===');
+      console.log('API Base URL:', ENV.API_BASE_URL);
+    }
     setWarning('');
     setGoogleLoading(true);
     
     // Test backend connectivity first
     const backendOk = await testBackendConnection();
-    console.log('Backend connectivity:', backendOk);
+    if (__DEV__) {
+      console.log('Backend connectivity:', backendOk);
+    }
     
-    try {
-      console.log('Starting Google sign-in process...');
-      console.log('googleAuthService imported:', !!googleAuthService);
-      const result = await googleAuthService.signIn();
-      console.log('Google sign-in result:', result);
-      
-      if (result.success && result.user) {
-        setGoogleLoading(false);
-        console.log('Google sign-in successful, calling backend API...');
+          try {
+        if (__DEV__) {
+          console.log('Starting Google sign-in process...');
+          console.log('googleAuthService imported:', !!googleAuthService);
+        }
+        const result = await googleAuthService.signIn();
+        if (__DEV__) {
+          console.log('Google sign-in result:', result);
+        }
         
-        try {
-          // Call backend API with Google token
-          const apiResult = await authAPI.googleAuth(result.accessToken);
-          console.log('Backend API response:', apiResult);
+        if (result.success && result.user && result.idToken) {
+          setGoogleLoading(false);
+          if (__DEV__) {
+            console.log('Google sign-in successful, calling backend API...');
+          }
+          
+          try {
+            // Call backend API with Google ID token for signup
+            const apiResult = await authAPI.googleAuth(result.idToken, true, userType); // isSignup = true, userType
+            if (__DEV__) {
+              console.log('Backend API response:', apiResult);
+            }
           
           if (apiResult.success) {
+            // New user created successfully, proceed to verification
             navigation.navigate('GoogleVerification');
           } else {
             setWarning(apiResult.error || 'Backend authentication failed. Please try again.');
@@ -72,11 +88,13 @@ const SignUpScreen = ({ navigation }: any) => {
           console.error('Backend API error:', apiError);
           setWarning('Backend authentication failed. Please try again.');
         }
-      } else {
-        setGoogleLoading(false);
-        console.log('Google sign-in failed:', result.error);
-        setWarning(result.error || 'Google sign-in failed. Please try again.');
-      }
+              } else {
+          setGoogleLoading(false);
+          if (__DEV__) {
+            console.log('Google sign-in failed:', result.error);
+          }
+          setWarning(result.error || 'Google sign-in failed. Please try again.');
+        }
     } catch (error) {
       setGoogleLoading(false);
       console.error('Google sign-in error:', error);
@@ -98,20 +116,35 @@ const SignUpScreen = ({ navigation }: any) => {
     setLoading(true);
     
     // Test backend connectivity first
-    console.log('Testing backend connectivity...');
-    console.log('API URL:', API_ENDPOINTS.SEND_OTP);
+    if (__DEV__) {
+      console.log('Testing backend connectivity...');
+      console.log('API URL:', API_ENDPOINTS.SEND_OTP);
+    }
     
     try {
+      // First check if user already exists
+      const checkResult = await authAPI.checkUserExists(`+91${mobile}`);
+      
+      if (checkResult.exists) {
+        setWarning('An account with this phone number already exists. Please log in instead.');
+        setLoading(false);
+        return;
+      }
+      
+      // User doesn't exist, proceed with OTP
       const result = await authAPI.sendOTP(`+91${mobile}`);
       setLoading(false);
       navigation.navigate('OtpVerification', { 
         phone: `+91${mobile}`,
-        fullName: fullName.trim()
+        fullName: fullName.trim(),
+        userType: userType
       });
     } catch (err) {
       console.error('Network error details:', err);
       if (err.message?.includes('429')) {
         setWarning('Please wait 1 minute before requesting another code.');
+      } else if (err.message?.includes('409')) {
+        setWarning('An account with this phone number already exists. Please log in instead.');
       } else {
         setWarning('Network error. Please check your connection and try again.');
       }

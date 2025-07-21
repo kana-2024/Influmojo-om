@@ -3,8 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Platform, Image, D
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
-import CustomDropdownDefault from '../components/CustomDropdown';
-import { profileAPI } from '../services/apiService';
+import CustomDropdownDefault from '../../components/CustomDropdown';
+import { profileAPI } from '../../services/apiService';
 
 interface CreatePortfolioScreenProps {
   onClose: () => void;

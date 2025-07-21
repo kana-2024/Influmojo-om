@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { profileAPI } from '../services/apiService';
+import { profileAPI } from '../../services/apiService';
 
 const CATEGORIES = [
   'Gaming', 'Travel', 'Food', 'Education', 'Pet', 'Beauty',
@@ -21,9 +21,10 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [about, setAbout] = useState('');
-  const [selectedLanguages, setSelectedLanguages] = useState(LANGUAGES);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
 
   // Category selection logic
   const toggleCategory = (cat: string) => {
@@ -33,6 +34,21 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
       setSelectedCategories([...selectedCategories, cat]);
     }
   };
+
+  // Language selection logic
+  const toggleLanguage = (lang: string) => {
+    if (selectedLanguages.includes(lang)) {
+      setSelectedLanguages(selectedLanguages.filter(l => l !== lang));
+    } else {
+      setSelectedLanguages([...selectedLanguages, lang]);
+    }
+  };
+
+  const removeLanguage = (lang: string) => {
+    setSelectedLanguages(selectedLanguages.filter(l => l !== lang));
+  };
+
+
 
   // Save preferences to database
   const handleSavePreferences = async () => {
@@ -46,6 +62,11 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
       return;
     }
 
+    if (selectedLanguages.length === 0) {
+      Alert.alert('Error', 'Please select at least one language');
+      return;
+    }
+
     setLoading(true);
     try {
       await profileAPI.updatePreferences({
@@ -54,11 +75,13 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
         languages: selectedLanguages
       });
 
+      console.log('✅ Preferences saved successfully!');
       Alert.alert('Success', 'Preferences saved successfully!', [
-        { text: 'OK', onPress: () => navigation.navigate('ProfileSetup') }
+        { text: 'OK', onPress: () => navigation.navigate('ProfileComplete') }
       ]);
     } catch (error) {
-      console.error('Save preferences error:', error);
+      console.error('❌ Save preferences error:', error);
+      console.error('❌ Error message:', error.message);
       Alert.alert('Error', 'Failed to save preferences. Please try again.');
     } finally {
       setLoading(false);
@@ -101,7 +124,7 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
           <View style={styles.progressBarBg} />
           <View style={styles.progressBarFill} />
         </View>
-        <Text style={styles.progressPercent}>50%</Text>
+        <Text style={styles.progressPercent}>90%</Text>
 
         {/* Pick Categories */}
         <Text style={styles.sectionTitle}>Pick categories</Text>
@@ -146,22 +169,63 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
           multiline
         />
 
+
+
         {/* Languages */}
         <Text style={styles.sectionTitle}>Languages</Text>
-        <View style={styles.languageRow}>
+        <Text style={styles.sectionSubtitle}>
+          Select the languages you can create content in.
+        </Text>
+        <View style={styles.languageBox}>
           <View style={styles.languageChips}>
             {selectedLanguages.map(lang => (
-              <View key={lang} style={styles.languageChip}>
+              <TouchableOpacity
+                key={lang}
+                style={styles.languageChip}
+                onPress={() => removeLanguage(lang)}
+                activeOpacity={0.7}
+              >
                 <Text style={styles.languageText}>{lang}</Text>
-                <Ionicons name="close" size={14} color="#6B7280" style={{ marginLeft: 2 }} />
-              </View>
+                <Ionicons name="close" size={14} color="#6B7280" style={{ marginLeft: 4 }} />
+              </TouchableOpacity>
             ))}
           </View>
-          {/* Placeholder for dropdown */}
-          <TouchableOpacity style={styles.languageDropdown}>
-            <Ionicons name="chevron-down" size={20} color="#6B7280" />
+          <TouchableOpacity 
+            style={[styles.languageDropdown, LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 && { opacity: 0.5 }]}
+            onPress={() => setShowLanguageDropdown(!showLanguageDropdown)}
+            activeOpacity={0.7}
+            disabled={LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0}
+          >
+            <Text style={styles.dropdownText}>
+              {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 ? 'All Selected' : 'Add Language'}
+            </Text>
+            <Ionicons name={showLanguageDropdown ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
           </TouchableOpacity>
         </View>
+        
+        {/* Language Dropdown Options */}
+        {showLanguageDropdown && (
+          <View style={styles.languageOptionsBox}>
+            {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).map(lang => (
+              <TouchableOpacity
+                key={lang}
+                style={styles.languageOption}
+                onPress={() => {
+                  toggleLanguage(lang);
+                  setShowLanguageDropdown(false);
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.languageOptionText}>{lang}</Text>
+              </TouchableOpacity>
+            ))}
+            {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 && (
+              <View style={styles.languageOption}>
+                <Text style={[styles.languageOptionText, { color: '#6B7280' }]}>All languages selected</Text>
+              </View>
+            )}
+          </View>
+        )}
 
         {/* Next Button */}
         <TouchableOpacity
@@ -175,6 +239,8 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
           {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
       </ScrollView>
+
+
     </SafeAreaView>
   );
 }
@@ -194,7 +260,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5E7EB', borderRadius: 4,
   },
   progressBarFill: {
-    position: 'absolute', left: 0, top: 0, height: 8, width: '50%',
+    position: 'absolute', left: 0, top: 0, height: 8, width: '90%',
     backgroundColor: '#FF6B2C', borderRadius: 4, zIndex: 1,
   },
   progressPercent: { alignSelf: 'flex-end', color: '#6B7280', fontSize: 13, marginBottom: 12 },
@@ -224,7 +290,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
     paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, marginBottom: 8, marginTop: 12, minHeight: 48,
   },
-  languageRow: { backgroundColor: '#FFFFFF', flexDirection: 'row', alignItems: 'center', marginBottom: 24, marginTop: 12, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB' },
+  languageBox: { 
+    backgroundColor: '#FFFFFF', 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 12, 
+    marginTop: 12, 
+    paddingHorizontal: 12, 
+    paddingVertical: 8, 
+    borderRadius: 8, 
+    borderWidth: 1, 
+    borderColor: '#E5E7EB' 
+  },
   languageChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, flex: 1 },
   languageChip: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: '#F3F4F6',
@@ -232,9 +309,32 @@ const styles = StyleSheet.create({
   },
   languageText: { color: '#1A1D1F', fontSize: 14, marginRight: 2 },
   languageDropdown: {
-    backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
-    padding: 4, marginLeft: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff', 
+    borderRadius: 8, 
+    borderWidth: 1, 
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 12, 
+    paddingVertical: 8, 
+    marginLeft: 8,
   },
+  dropdownText: { color: '#6B7280', fontSize: 14, marginRight: 8 },
+  languageOptionsBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    marginBottom: 12,
+    paddingVertical: 4,
+  },
+  languageOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  languageOptionText: { color: '#1A1D1F', fontSize: 14 },
   nextButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#FF6B2C', borderRadius: 8, paddingVertical: 14, marginBottom: 8,

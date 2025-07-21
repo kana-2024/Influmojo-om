@@ -13,16 +13,21 @@
     "build:ios": "eas build --platform ios --profile development",
     "build:dev": "eas build --profile development",
     "setup:env": "cp .env.example .env || echo 'Please create .env file manually'",
-    "check:env": "node -e \"console.log('Environment check:'); console.log('API_URL:', process.env.EXPO_PUBLIC_API_URL); console.log('GOOGLE_CLIENT_ID:', process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ? 'Set' : 'Not set');\""
+    "check:env": "node -e \"console.log('Environment check:'); console.log('API_URL:', process.env.EXPO_PUBLIC_API_URL); console.log('GOOGLE_CLIENT_ID:', process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ? 'Set' : 'Not set');\"",
+    "optimize:check": "node scripts/optimize-build.js",
+    "build:clean": "expo build:clean && npm run optimize:check",
+    "troubleshoot": "node scripts/build-troubleshoot.js",
+    "build:android": "node scripts/build-android.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
-    "@react-native-async-storage/async-storage": "^1.23.1",
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-community/datetimepicker": "8.4.1",
     "@react-native-google-signin/google-signin": "^11.0.0",
     "@react-navigation/native": "^7.1.6",
     "@react-navigation/native-stack": "^7.1.6",
     "@reduxjs/toolkit": "^2.5.0",
-    "expo": "~53.0.17",
+    "expo": "53.0.20",
     "expo-constants": "~17.1.7",
     "expo-dev-client": "~5.2.4",
     "expo-document-picker": "~13.1.6",
@@ -40,7 +45,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "^19.0.0",
+    "@expo/config-plugins": "^8.0.0",
+    "@types/react": "~19.0.10",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "typescript": "~5.8.3"

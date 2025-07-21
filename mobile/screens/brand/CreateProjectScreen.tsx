@@ -3,21 +3,21 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Scro
 import { Ionicons } from '@expo/vector-icons';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import CustomDropdownDefault from '../components/CustomDropdown';
-import { profileAPI } from '../services/apiService';
+import CustomDropdownDefault from '../../components/CustomDropdown';
+import { profileAPI } from '../../services/apiService';
 
 const platforms = ['Instagram', 'Facebook', 'Youtube', 'Snapchat'];
 const contentTypes = ['Reel', 'Story', 'Feed post', 'Carousel Post'];
 const durations1 = ['1 Minute', '2 Minutes', '3 Minutes'];
 const durations2 = ['30 Seconds', '45 Seconds', '1 Minute'];
 
-interface CreatePackageScreenProps {
+interface CreateProjectScreenProps {
   navigation?: any;
   onClose?: () => void;
   CustomDropdown?: FC<any>;
 }
 
-const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, onClose = () => navigation?.goBack?.(), CustomDropdown }) => {
+const CreateProjectScreen: React.FC<CreateProjectScreenProps> = ({ navigation, onClose = () => navigation?.goBack?.(), CustomDropdown }) => {
   const insets = useSafeAreaInsets();
   useEffect(() => {
   }, []);
@@ -35,8 +35,8 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
 
   const Dropdown = CustomDropdown || CustomDropdownDefault;
 
-  // Save package to database
-  const handleCreatePackage = async () => {
+  // Save project to database
+  const handleCreateProject = async () => {
     if (!platform.trim()) {
       Alert.alert('Error', 'Please select a platform');
       return;
@@ -59,18 +59,16 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
 
     setLoading(true);
     try {
-      await profileAPI.createPackage({
-        platform: platform.trim(),
-        contentType: contentType.trim(),
-        quantity: quantity.trim(),
-        revisions: revisions.trim() || '0',
-        duration1: duration1.trim(),
-        duration2: duration2.trim(),
-        price: price.trim(),
-        description: desc.trim()
+      await profileAPI.createProject({
+        title: 'Project Title', // This should come from form fields
+        description: desc.trim(),
+        budget: price.trim(),
+        timeline: `${duration1.trim()} ${duration2.trim()}`,
+        requirements: 'Requirements', // This should come from form fields
+        deliverables: 'Deliverables' // This should come from form fields
       });
 
-      Alert.alert('Success', 'Package created successfully!', [
+      Alert.alert('Success', 'Project created successfully!', [
         { text: 'OK', onPress: () => onClose() }
       ]);
     } catch (error) {
@@ -89,7 +87,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
           {/* Header */}
           <View style={styles.headerRow}>
             <View style={{ flex: 1 }} />
-            <Text style={styles.header}>Create Package</Text>
+            <Text style={styles.header}>Create Project</Text>
             <TouchableOpacity style={[styles.closeBtn, { flex: 1, alignItems: 'flex-end' }]} onPress={onClose}>
               <Ionicons name="close" size={24} color="#6B7280" />
             </TouchableOpacity>
@@ -133,7 +131,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
             <Text style={styles.label}>Brief Description</Text>
             <TextInput
               style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
-              placeholder="Brief description of your package has to be add here."
+              placeholder="Brief description of your project has to be add here."
               value={desc}
               onChangeText={setDesc}
               multiline
@@ -145,7 +143,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
               </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.submitBtn, loading && { opacity: 0.7 }]}
-                onPress={handleCreatePackage}
+                onPress={handleCreateProject}
                 disabled={loading}
               >
                 <Text style={styles.submitBtnText}>
@@ -322,4 +320,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreatePackageScreen; 
+export default CreateProjectScreen; 

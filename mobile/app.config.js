@@ -16,7 +16,8 @@ export default {
     ],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.influmojo.mobile"
+      bundleIdentifier: "com.influmojo.mobile",
+      buildNumber: "1"
     },
     android: {
       adaptiveIcon: {
@@ -24,6 +25,7 @@ export default {
         backgroundColor: "#FC5213"
       },
       package: "com.influmojo.mobile",
+      versionCode: 1,
       permissions: [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
@@ -33,6 +35,9 @@ export default {
       favicon: "./assets/Asset37.png"
     },
     scheme: "influ-mojo",
+    plugins: [
+      "./plugins/withGoogleSignIn.js"
+    ],
     extra: {
       eas: {
         projectId: "18ad0b63-061b-4159-ac61-9eedeada6db4"

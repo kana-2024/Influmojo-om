@@ -5386,12 +5386,14 @@ export namespace Prisma {
     user_id: bigint | null
     company_name: string | null
     industry: string | null
+    role_in_organization: string | null
     website_url: string | null
     description: string | null
     logo_url: string | null
     company_size: $Enums.CompanySize | null
     location_country: string | null
     location_city: string | null
+    date_of_birth: Date | null
     verified: boolean | null
     created_at: Date | null
     updated_at: Date | null
@@ -5402,12 +5404,14 @@ export namespace Prisma {
     user_id: bigint | null
     company_name: string | null
     industry: string | null
+    role_in_organization: string | null
     website_url: string | null
     description: string | null
     logo_url: string | null
     company_size: $Enums.CompanySize | null
     location_country: string | null
     location_city: string | null
+    date_of_birth: Date | null
     verified: boolean | null
     created_at: Date | null
     updated_at: Date | null
@@ -5418,12 +5422,16 @@ export namespace Prisma {
     user_id: number
     company_name: number
     industry: number
+    industries: number
+    role_in_organization: number
     website_url: number
     description: number
     logo_url: number
     company_size: number
     location_country: number
     location_city: number
+    languages: number
+    date_of_birth: number
     verified: number
     created_at: number
     updated_at: number
@@ -5446,12 +5454,14 @@ export namespace Prisma {
     user_id?: true
     company_name?: true
     industry?: true
+    role_in_organization?: true
     website_url?: true
     description?: true
     logo_url?: true
     company_size?: true
     location_country?: true
     location_city?: true
+    date_of_birth?: true
     verified?: true
     created_at?: true
     updated_at?: true
@@ -5462,12 +5472,14 @@ export namespace Prisma {
     user_id?: true
     company_name?: true
     industry?: true
+    role_in_organization?: true
     website_url?: true
     description?: true
     logo_url?: true
     company_size?: true
     location_country?: true
     location_city?: true
+    date_of_birth?: true
     verified?: true
     created_at?: true
     updated_at?: true
@@ -5478,12 +5490,16 @@ export namespace Prisma {
     user_id?: true
     company_name?: true
     industry?: true
+    industries?: true
+    role_in_organization?: true
     website_url?: true
     description?: true
     logo_url?: true
     company_size?: true
     location_country?: true
     location_city?: true
+    languages?: true
+    date_of_birth?: true
     verified?: true
     created_at?: true
     updated_at?: true
@@ -5581,12 +5597,16 @@ export namespace Prisma {
     user_id: bigint
     company_name: string
     industry: string | null
+    industries: JsonValue | null
+    role_in_organization: string | null
     website_url: string | null
     description: string | null
     logo_url: string | null
     company_size: $Enums.CompanySize | null
     location_country: string | null
     location_city: string | null
+    languages: JsonValue | null
+    date_of_birth: Date | null
     verified: boolean
     created_at: Date
     updated_at: Date
@@ -5616,12 +5636,16 @@ export namespace Prisma {
     user_id?: boolean
     company_name?: boolean
     industry?: boolean
+    industries?: boolean
+    role_in_organization?: boolean
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
     company_size?: boolean
     location_country?: boolean
     location_city?: boolean
+    languages?: boolean
+    date_of_birth?: boolean
     verified?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -5637,12 +5661,16 @@ export namespace Prisma {
     user_id?: boolean
     company_name?: boolean
     industry?: boolean
+    industries?: boolean
+    role_in_organization?: boolean
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
     company_size?: boolean
     location_country?: boolean
     location_city?: boolean
+    languages?: boolean
+    date_of_birth?: boolean
     verified?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -5654,12 +5682,16 @@ export namespace Prisma {
     user_id?: boolean
     company_name?: boolean
     industry?: boolean
+    industries?: boolean
+    role_in_organization?: boolean
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
     company_size?: boolean
     location_country?: boolean
     location_city?: boolean
+    languages?: boolean
+    date_of_birth?: boolean
     verified?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -5671,18 +5703,22 @@ export namespace Prisma {
     user_id?: boolean
     company_name?: boolean
     industry?: boolean
+    industries?: boolean
+    role_in_organization?: boolean
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
     company_size?: boolean
     location_country?: boolean
     location_city?: boolean
+    languages?: boolean
+    date_of_birth?: boolean
     verified?: boolean
     created_at?: boolean
     updated_at?: boolean
   }
 
-  export type BrandProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "company_name" | "industry" | "website_url" | "description" | "logo_url" | "company_size" | "location_country" | "location_city" | "verified" | "created_at" | "updated_at", ExtArgs["result"]["brandProfile"]>
+  export type BrandProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "company_name" | "industry" | "industries" | "role_in_organization" | "website_url" | "description" | "logo_url" | "company_size" | "location_country" | "location_city" | "languages" | "date_of_birth" | "verified" | "created_at" | "updated_at", ExtArgs["result"]["brandProfile"]>
   export type BrandProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     campaigns?: boolean | BrandProfile$campaignsArgs<ExtArgs>
@@ -5710,12 +5746,16 @@ export namespace Prisma {
       user_id: bigint
       company_name: string
       industry: string | null
+      industries: Prisma.JsonValue | null
+      role_in_organization: string | null
       website_url: string | null
       description: string | null
       logo_url: string | null
       company_size: $Enums.CompanySize | null
       location_country: string | null
       location_city: string | null
+      languages: Prisma.JsonValue | null
+      date_of_birth: Date | null
       verified: boolean
       created_at: Date
       updated_at: Date
@@ -6150,12 +6190,16 @@ export namespace Prisma {
     readonly user_id: FieldRef<"BrandProfile", 'BigInt'>
     readonly company_name: FieldRef<"BrandProfile", 'String'>
     readonly industry: FieldRef<"BrandProfile", 'String'>
+    readonly industries: FieldRef<"BrandProfile", 'Json'>
+    readonly role_in_organization: FieldRef<"BrandProfile", 'String'>
     readonly website_url: FieldRef<"BrandProfile", 'String'>
     readonly description: FieldRef<"BrandProfile", 'String'>
     readonly logo_url: FieldRef<"BrandProfile", 'String'>
     readonly company_size: FieldRef<"BrandProfile", 'CompanySize'>
     readonly location_country: FieldRef<"BrandProfile", 'String'>
     readonly location_city: FieldRef<"BrandProfile", 'String'>
+    readonly languages: FieldRef<"BrandProfile", 'Json'>
+    readonly date_of_birth: FieldRef<"BrandProfile", 'DateTime'>
     readonly verified: FieldRef<"BrandProfile", 'Boolean'>
     readonly created_at: FieldRef<"BrandProfile", 'DateTime'>
     readonly updated_at: FieldRef<"BrandProfile", 'DateTime'>
@@ -32242,12 +32286,16 @@ export namespace Prisma {
     user_id: 'user_id',
     company_name: 'company_name',
     industry: 'industry',
+    industries: 'industries',
+    role_in_organization: 'role_in_organization',
     website_url: 'website_url',
     description: 'description',
     logo_url: 'logo_url',
     company_size: 'company_size',
     location_country: 'location_country',
     location_city: 'location_city',
+    languages: 'languages',
+    date_of_birth: 'date_of_birth',
     verified: 'verified',
     created_at: 'created_at',
     updated_at: 'updated_at'
@@ -32757,20 +32805,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'CompanySize'
-   */
-  export type EnumCompanySizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanySize'>
-    
-
-
-  /**
-   * Reference to a field of type 'CompanySize[]'
-   */
-  export type ListEnumCompanySizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanySize[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -32781,6 +32815,20 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'CompanySize'
+   */
+  export type EnumCompanySizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanySize'>
+    
+
+
+  /**
+   * Reference to a field of type 'CompanySize[]'
+   */
+  export type ListEnumCompanySizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanySize[]'>
     
 
 
@@ -33254,12 +33302,16 @@ export namespace Prisma {
     user_id?: BigIntFilter<"BrandProfile"> | bigint | number
     company_name?: StringFilter<"BrandProfile"> | string
     industry?: StringNullableFilter<"BrandProfile"> | string | null
+    industries?: JsonNullableFilter<"BrandProfile">
+    role_in_organization?: StringNullableFilter<"BrandProfile"> | string | null
     website_url?: StringNullableFilter<"BrandProfile"> | string | null
     description?: StringNullableFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
     company_size?: EnumCompanySizeNullableFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableFilter<"BrandProfile"> | string | null
     location_city?: StringNullableFilter<"BrandProfile"> | string | null
+    languages?: JsonNullableFilter<"BrandProfile">
+    date_of_birth?: DateTimeNullableFilter<"BrandProfile"> | Date | string | null
     verified?: BoolFilter<"BrandProfile"> | boolean
     created_at?: DateTimeFilter<"BrandProfile"> | Date | string
     updated_at?: DateTimeFilter<"BrandProfile"> | Date | string
@@ -33274,12 +33326,16 @@ export namespace Prisma {
     user_id?: SortOrder
     company_name?: SortOrder
     industry?: SortOrderInput | SortOrder
+    industries?: SortOrderInput | SortOrder
+    role_in_organization?: SortOrderInput | SortOrder
     website_url?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     logo_url?: SortOrderInput | SortOrder
     company_size?: SortOrderInput | SortOrder
     location_country?: SortOrderInput | SortOrder
     location_city?: SortOrderInput | SortOrder
+    languages?: SortOrderInput | SortOrder
+    date_of_birth?: SortOrderInput | SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -33297,12 +33353,16 @@ export namespace Prisma {
     user_id?: BigIntFilter<"BrandProfile"> | bigint | number
     company_name?: StringFilter<"BrandProfile"> | string
     industry?: StringNullableFilter<"BrandProfile"> | string | null
+    industries?: JsonNullableFilter<"BrandProfile">
+    role_in_organization?: StringNullableFilter<"BrandProfile"> | string | null
     website_url?: StringNullableFilter<"BrandProfile"> | string | null
     description?: StringNullableFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
     company_size?: EnumCompanySizeNullableFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableFilter<"BrandProfile"> | string | null
     location_city?: StringNullableFilter<"BrandProfile"> | string | null
+    languages?: JsonNullableFilter<"BrandProfile">
+    date_of_birth?: DateTimeNullableFilter<"BrandProfile"> | Date | string | null
     verified?: BoolFilter<"BrandProfile"> | boolean
     created_at?: DateTimeFilter<"BrandProfile"> | Date | string
     updated_at?: DateTimeFilter<"BrandProfile"> | Date | string
@@ -33317,12 +33377,16 @@ export namespace Prisma {
     user_id?: SortOrder
     company_name?: SortOrder
     industry?: SortOrderInput | SortOrder
+    industries?: SortOrderInput | SortOrder
+    role_in_organization?: SortOrderInput | SortOrder
     website_url?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     logo_url?: SortOrderInput | SortOrder
     company_size?: SortOrderInput | SortOrder
     location_country?: SortOrderInput | SortOrder
     location_city?: SortOrderInput | SortOrder
+    languages?: SortOrderInput | SortOrder
+    date_of_birth?: SortOrderInput | SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -33341,12 +33405,16 @@ export namespace Prisma {
     user_id?: BigIntWithAggregatesFilter<"BrandProfile"> | bigint | number
     company_name?: StringWithAggregatesFilter<"BrandProfile"> | string
     industry?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
+    industries?: JsonNullableWithAggregatesFilter<"BrandProfile">
+    role_in_organization?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     website_url?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     description?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     company_size?: EnumCompanySizeNullableWithAggregatesFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     location_city?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
+    languages?: JsonNullableWithAggregatesFilter<"BrandProfile">
+    date_of_birth?: DateTimeNullableWithAggregatesFilter<"BrandProfile"> | Date | string | null
     verified?: BoolWithAggregatesFilter<"BrandProfile"> | boolean
     created_at?: DateTimeWithAggregatesFilter<"BrandProfile"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"BrandProfile"> | Date | string
@@ -35553,12 +35621,16 @@ export namespace Prisma {
     id?: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -35573,12 +35645,16 @@ export namespace Prisma {
     user_id: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -35591,12 +35667,16 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35611,12 +35691,16 @@ export namespace Prisma {
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35630,12 +35714,16 @@ export namespace Prisma {
     user_id: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -35645,12 +35733,16 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35661,12 +35753,16 @@ export namespace Prisma {
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38229,6 +38325,29 @@ export namespace Prisma {
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type EnumCompanySizeNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.CompanySize | EnumCompanySizeFieldRefInput<$PrismaModel> | null
@@ -38277,12 +38396,16 @@ export namespace Prisma {
     user_id?: SortOrder
     company_name?: SortOrder
     industry?: SortOrder
+    industries?: SortOrder
+    role_in_organization?: SortOrder
     website_url?: SortOrder
     description?: SortOrder
     logo_url?: SortOrder
     company_size?: SortOrder
     location_country?: SortOrder
     location_city?: SortOrder
+    languages?: SortOrder
+    date_of_birth?: SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -38298,12 +38421,14 @@ export namespace Prisma {
     user_id?: SortOrder
     company_name?: SortOrder
     industry?: SortOrder
+    role_in_organization?: SortOrder
     website_url?: SortOrder
     description?: SortOrder
     logo_url?: SortOrder
     company_size?: SortOrder
     location_country?: SortOrder
     location_city?: SortOrder
+    date_of_birth?: SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -38314,12 +38439,14 @@ export namespace Prisma {
     user_id?: SortOrder
     company_name?: SortOrder
     industry?: SortOrder
+    role_in_organization?: SortOrder
     website_url?: SortOrder
     description?: SortOrder
     logo_url?: SortOrder
     company_size?: SortOrder
     location_country?: SortOrder
     location_city?: SortOrder
+    date_of_birth?: SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -38329,24 +38456,14 @@ export namespace Prisma {
     id?: SortOrder
     user_id?: SortOrder
   }
-
-  export type EnumCompanySizeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.CompanySize | EnumCompanySizeFieldRefInput<$PrismaModel> | null
-    in?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumCompanySizeNullableWithAggregatesFilter<$PrismaModel> | $Enums.CompanySize | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedEnumCompanySizeNullableFilter<$PrismaModel>
-    _max?: NestedEnumCompanySizeNullableFilter<$PrismaModel>
-  }
-  export type JsonNullableFilter<$PrismaModel = never> =
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
       >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
     equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
     path?: string[]
     mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
@@ -38361,6 +38478,19 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumCompanySizeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CompanySize | EnumCompanySizeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumCompanySizeNullableWithAggregatesFilter<$PrismaModel> | $Enums.CompanySize | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumCompanySizeNullableFilter<$PrismaModel>
+    _max?: NestedEnumCompanySizeNullableFilter<$PrismaModel>
   }
 
   export type DecimalNullableFilter<$PrismaModel = never> = {
@@ -38538,32 +38668,6 @@ export namespace Prisma {
     rating?: SortOrder
     total_collaborations?: SortOrder
     follower_count?: SortOrder
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -42639,6 +42743,29 @@ export namespace Prisma {
     notIn?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
     not?: NestedEnumCompanySizeNullableFilter<$PrismaModel> | $Enums.CompanySize | null
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedEnumCompanySizeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.CompanySize | EnumCompanySizeFieldRefInput<$PrismaModel> | null
@@ -42677,29 +42804,6 @@ export namespace Prisma {
     gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
-  }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -43097,12 +43201,16 @@ export namespace Prisma {
     id?: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -43115,12 +43223,16 @@ export namespace Prisma {
     id?: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -43704,12 +43816,16 @@ export namespace Prisma {
     user_id?: BigIntFilter<"BrandProfile"> | bigint | number
     company_name?: StringFilter<"BrandProfile"> | string
     industry?: StringNullableFilter<"BrandProfile"> | string | null
+    industries?: JsonNullableFilter<"BrandProfile">
+    role_in_organization?: StringNullableFilter<"BrandProfile"> | string | null
     website_url?: StringNullableFilter<"BrandProfile"> | string | null
     description?: StringNullableFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
     company_size?: EnumCompanySizeNullableFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableFilter<"BrandProfile"> | string | null
     location_city?: StringNullableFilter<"BrandProfile"> | string | null
+    languages?: JsonNullableFilter<"BrandProfile">
+    date_of_birth?: DateTimeNullableFilter<"BrandProfile"> | Date | string | null
     verified?: BoolFilter<"BrandProfile"> | boolean
     created_at?: DateTimeFilter<"BrandProfile"> | Date | string
     updated_at?: DateTimeFilter<"BrandProfile"> | Date | string
@@ -45350,12 +45466,16 @@ export namespace Prisma {
     id?: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -45369,12 +45489,16 @@ export namespace Prisma {
     user_id: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -45516,12 +45640,16 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45535,12 +45663,16 @@ export namespace Prisma {
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46021,12 +46153,16 @@ export namespace Prisma {
     id?: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -46040,12 +46176,16 @@ export namespace Prisma {
     user_id: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -46461,12 +46601,16 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46480,12 +46624,16 @@ export namespace Prisma {
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -47980,12 +48128,16 @@ export namespace Prisma {
     id?: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -47999,12 +48151,16 @@ export namespace Prisma {
     user_id: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -48152,12 +48308,16 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48171,12 +48331,16 @@ export namespace Prisma {
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -50691,12 +50855,16 @@ export namespace Prisma {
     id?: bigint | number
     company_name: string
     industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_city?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -50871,12 +51039,16 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -50889,12 +51061,16 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -50907,12 +51083,16 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
     industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string

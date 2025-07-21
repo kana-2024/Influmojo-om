@@ -8,14 +8,16 @@ import { authAPI } from '../services/apiService';
 
 const OTP_LENGTH = 6;
 const RESEND_TIME = 30;
-console.log("🚀 Hitting OTP API:", API_ENDPOINTS.SEND_OTP);
+if (__DEV__) {
+  console.log("🚀 Hitting OTP API:", API_ENDPOINTS.SEND_OTP);
+}
 const OtpVerificationScreen = ({ navigation, route }: any) => {
   useEffect(() => {
     // NavigationBar.setBackgroundColorAsync('#F8F9FB'); // Removed as per edit hint
     // NavigationBar.setButtonStyleAsync('dark'); // Removed as per edit hint
   }, []);
 
-  const { phone, fullName } = route.params;
+  const { phone, fullName, userType } = route.params;
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(''));
   const [timer, setTimer] = useState(RESEND_TIME);
   const [loading, setLoading] = useState(false);
@@ -51,7 +53,7 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
     }
     setLoading(true);
     try {
-      const result = await authAPI.verifyOTP(phone, otp.join(''), fullName);
+      const result = await authAPI.verifyOTP(phone, otp.join(''), fullName, userType);
       setLoading(false);
       navigation.navigate('MobileVerification');
     } catch (err) {
@@ -65,7 +67,9 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
     setTimer(RESEND_TIME);
     try {
       await authAPI.sendOTP(phone);
-      console.log('OTP resent successfully');
+      if (__DEV__) {
+        console.log('OTP resent successfully');
+      }
     } catch (err) {
       if (err.message?.includes('429')) {
         setError('Please wait 1 minute before requesting another code.');

@@ -46,10 +46,10 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
 // Auth API calls
 export const authAPI = {
   // Google OAuth
-  googleAuth: async (idToken: string) => {
+  googleAuth: async (idToken: string, isSignup: boolean = false, userType: string = 'creator') => {
     const response = await apiRequest(API_ENDPOINTS.GOOGLE_AUTH, {
       method: 'POST',
-      body: JSON.stringify({ idToken }),
+      body: JSON.stringify({ idToken, isSignup, userType }),
     });
     
     if (response.token) {
@@ -68,10 +68,10 @@ export const authAPI = {
   },
 
   // Verify OTP
-  verifyOTP: async (phone: string, code: string, fullName?: string) => {
+  verifyOTP: async (phone: string, code: string, fullName?: string, userType: string = 'creator') => {
     const response = await apiRequest(API_ENDPOINTS.VERIFY_OTP, {
       method: 'POST',
-      body: JSON.stringify({ phone, code, fullName }),
+      body: JSON.stringify({ phone, code, fullName, userType }),
     });
     
     if (response.token) {
@@ -95,6 +95,14 @@ export const authAPI = {
       method: 'GET',
     });
   },
+
+  // Check if user exists
+  checkUserExists: async (phone: string) => {
+    return await apiRequest(API_ENDPOINTS.CHECK_USER_EXISTS, {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
+    });
+  },
 };
 
 // Profile API calls
@@ -102,7 +110,8 @@ export const profileAPI = {
   // Update basic info
   updateBasicInfo: async (data: {
     gender: string;
-    email: string;
+    email?: string;
+    phone?: string;
     dob: string;
     state: string;
     city: string;
@@ -119,6 +128,8 @@ export const profileAPI = {
     categories: string[];
     about: string;
     languages: string[];
+    role?: string;
+    dateOfBirth?: Date;
   }) => {
     return await apiRequest(API_ENDPOINTS.UPDATE_PREFERENCES, {
       method: 'POST',
@@ -157,6 +168,36 @@ export const profileAPI = {
     });
   },
 
+  // Create campaign
+  createCampaign: async (data: {
+    title: string;
+    description: string;
+    budget: string;
+    duration: string;
+    requirements: string;
+    targetAudience: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.CREATE_CAMPAIGN, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Create project
+  createProject: async (data: {
+    title: string;
+    description: string;
+    budget: string;
+    timeline: string;
+    requirements: string;
+    deliverables: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.CREATE_PROJECT, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   // Submit KYC
   submitKYC: async (data: {
     documentType: string;
@@ -172,6 +213,20 @@ export const profileAPI = {
   // Get full profile
   getProfile: async () => {
     return await apiRequest(API_ENDPOINTS.GET_PROFILE, {
+      method: 'GET',
+    });
+  },
+
+  // Get creator profile
+  getCreatorProfile: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_CREATOR_PROFILE, {
+      method: 'GET',
+    });
+  },
+
+  // Get brand profile
+  getBrandProfile: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_BRAND_PROFILE, {
       method: 'GET',
     });
   },

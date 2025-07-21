@@ -2,34 +2,52 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Platform } from 'react-native';
 import { ENV } from '../config/env';
 
-// Add debug logging at module level
-console.log('=== Google Auth Service Module Loading ===');
-console.log('Google Auth service file is being loaded');
-console.log('Platform:', Platform.OS);
-console.log('Is development:', __DEV__);
+// Add debug logging at module level (only in development)
+if (__DEV__) {
+  console.log('=== Google Auth Service Module Loading ===');
+  console.log('Google Auth service file is being loaded');
+  console.log('Platform:', Platform.OS);
+  console.log('Is development:', __DEV__);
+}
 
-// Google OAuth configuration
-const GOOGLE_CLIENT_ID = ENV.GOOGLE_CLIENT_ID;
+// Platform-specific Google OAuth configuration
+let GOOGLE_CLIENT_ID = '';
 
-console.log('=== Google Auth Service Initialization ===');
-console.log('ENV.GOOGLE_CLIENT_ID exists:', !!ENV.GOOGLE_CLIENT_ID);
-console.log('GOOGLE_CLIENT_ID length:', GOOGLE_CLIENT_ID?.length || 0);
+if (Platform.OS === 'android') {
+  // Android OAuth client ID (you need to create this in Google Cloud Console)
+  GOOGLE_CLIENT_ID = ENV.GOOGLE_CLIENT_ID_ANDROID || ENV.GOOGLE_CLIENT_ID;
+} else if (Platform.OS === 'ios') {
+  // iOS OAuth client ID (you need to create this in Google Cloud Console)
+  GOOGLE_CLIENT_ID = ENV.GOOGLE_CLIENT_ID_IOS || ENV.GOOGLE_CLIENT_ID;
+} else {
+  // Web fallback
+  GOOGLE_CLIENT_ID = ENV.GOOGLE_CLIENT_ID;
+}
+
+if (__DEV__) {
+  console.log('=== Google Auth Service Initialization ===');
+  console.log('Platform:', Platform.OS);
+  console.log('GOOGLE_CLIENT_ID exists:', !!GOOGLE_CLIENT_ID);
+  console.log('GOOGLE_CLIENT_ID length:', GOOGLE_CLIENT_ID?.length || 0);
+}
 
 // Validate that credentials are configured
 if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === '') {
-  console.error('GOOGLE_CLIENT_ID is not configured!');
+  console.error('GOOGLE_CLIENT_ID is not configured for platform:', Platform.OS);
   console.error('Current value:', GOOGLE_CLIENT_ID);
-  throw new Error('GOOGLE_CLIENT_ID is not configured. Please add EXPO_PUBLIC_GOOGLE_CLIENT_ID to your .env file.');
+  throw new Error(`GOOGLE_CLIENT_ID is not configured for ${Platform.OS}. Please add EXPO_PUBLIC_GOOGLE_CLIENT_ID_${Platform.OS.toUpperCase()} to your .env file.`);
 }
 
-console.log('Google Client ID validation passed');
+if (__DEV__) {
+  console.log('Google Client ID validation passed for platform:', Platform.OS);
+}
 
 // Configure Google Sign-In
 GoogleSignin.configure({
-  webClientId: GOOGLE_CLIENT_ID, // Use your existing web client ID
+  webClientId: ENV.GOOGLE_CLIENT_ID, // Keep web client ID for server auth
+  iosClientId: ENV.GOOGLE_CLIENT_ID_IOS, // iOS-specific client ID
   offlineAccess: true,
   forceCodeForRefreshToken: true,
-  // Note: For React Native, we use webClientId, not androidClientId
 });
 
 export interface GoogleUser {
@@ -46,6 +64,7 @@ export interface AuthResult {
   user?: GoogleUser;
   error?: string;
   accessToken?: string;
+  idToken?: string;
   refreshToken?: string;
 }
 
@@ -63,29 +82,43 @@ class GoogleAuthService {
 
   async signIn(): Promise<AuthResult> {
     try {
-      console.log('=== APK Google Sign-In Debug ===');
-      console.log('Starting Google Sign-In...');
-      console.log('Google Client ID configured:', !!GOOGLE_CLIENT_ID);
-      console.log('Platform:', Platform.OS);
-      console.log('Is APK build:', __DEV__ ? 'Development' : 'Production');
+      if (__DEV__) {
+        console.log('=== APK Google Sign-In Debug ===');
+        console.log('Starting Google Sign-In...');
+        console.log('Google Client ID configured:', !!GOOGLE_CLIENT_ID);
+        console.log('Platform:', Platform.OS);
+        console.log('Is APK build:', __DEV__ ? 'Development' : 'Production');
+      }
 
       // Check if user is already signed in
       const isSignedIn = await GoogleSignin.isSignedIn();
-      console.log('User already signed in:', isSignedIn);
+      if (__DEV__) {
+        console.log('User already signed in:', isSignedIn);
+      }
       if (isSignedIn) {
-        console.log('Signing out existing user...');
+        if (__DEV__) {
+          console.log('Signing out existing user...');
+        }
         await GoogleSignin.signOut();
       }
 
       // Sign in
-      console.log('Calling GoogleSignin.signIn()...');
+      if (__DEV__) {
+        console.log('Calling GoogleSignin.signIn()...');
+      }
       const userInfo = await GoogleSignin.signIn();
-      console.log('Google sign-in successful, user info received');
+      if (__DEV__) {
+        console.log('Google sign-in successful, user info received');
+      }
       
       // Get tokens
-      console.log('Getting tokens...');
+      if (__DEV__) {
+        console.log('Getting tokens...');
+      }
       const tokens = await GoogleSignin.getTokens();
-      console.log('Tokens received');
+      if (__DEV__) {
+        console.log('Tokens received');
+      }
 
       this.accessToken = tokens.accessToken;
       // Note: refreshToken might not be available in all cases
@@ -101,16 +134,16 @@ class GoogleAuthService {
         family_name: userInfo.user.familyName,
       };
 
-      console.log('Google Sign-In successful:', user.email);
-
-      // Store the access token for API calls
-      // In a real app, you'd use AsyncStorage or secure storage
-      console.log('Google access token stored:', tokens.accessToken);
+      if (__DEV__) {
+        console.log('Google Sign-In successful:', user.email);
+        console.log('Google access token stored:', tokens.accessToken);
+      }
 
       return {
         success: true,
         user,
         accessToken: tokens.accessToken,
+        idToken: tokens.idToken,
         refreshToken: null, // refreshToken not available in this implementation
       };
     } catch (error: any) {
@@ -146,7 +179,9 @@ class GoogleAuthService {
       await GoogleSignin.signOut();
       this.accessToken = null;
       this.refreshToken = null;
-      console.log('Google Sign-Out successful');
+      if (__DEV__) {
+        console.log('Google Sign-Out successful');
+      }
     } catch (error) {
       console.error('Google Sign-Out error:', error);
     }

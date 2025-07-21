@@ -52,8 +52,11 @@ const UserRoleScreen = ({ navigation, route }: UserRoleScreenProps) => {
             style={[styles.continueButton, !selected && { opacity: 0.5 }]}
             disabled={!selected}
             onPress={() => {
-              if (selected === 'creator') navigation.navigate('SignUp');
-              // else if (selected === 'brand') navigation.navigate('BrandOnboarding'); // To be implemented later
+              if (selected === 'creator') {
+                navigation.navigate('SignUp', { userType: 'creator' });
+              } else if (selected === 'brand') {
+                navigation.navigate('SignUp', { userType: 'brand' });
+              }
             }}
           >
             <Text style={styles.continueText}>Continue</Text>

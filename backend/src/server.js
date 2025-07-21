@@ -20,6 +20,34 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
 
+// Global BigInt serializer for JSON responses
+const originalJson = express.response.json;
+express.response.json = function(data) {
+  const serializeBigInt = (obj) => {
+    if (obj === null || obj === undefined) {
+      return obj;
+    }
+    if (typeof obj === 'bigint') {
+      return obj.toString();
+    }
+    if (Array.isArray(obj)) {
+      return obj.map(serializeBigInt);
+    }
+    if (typeof obj === 'object') {
+      const result = {};
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          result[key] = serializeBigInt(obj[key]);
+        }
+      }
+      return result;
+    }
+    return obj;
+  };
+  
+  return originalJson.call(this, serializeBigInt(data));
+};
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -35,20 +63,29 @@ app.use(helmet());
 app.use(cors({
   origin: [
     'http://localhost:3000', 
+    'http://127.0.0.1:3000',
     'http://192.168.31.75:3000', 
     'http://192.168.31.57:3000',
     'http://192.168.31.57:3002',
     'exp://192.168.31.75:8081',
     'exp://192.168.31.57:8081',
     'http://localhost:8081',
-    'exp://localhost:8081'
+    'exp://localhost:8081',
+    'https://fair-legal-gar.ngrok-free.app',
+    'exp://fair-legal-gar.ngrok-free.app',
+    'file://'  // Allow file:// protocol for local HTML files
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
 }));
 app.use(morgan('combined'));
 app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

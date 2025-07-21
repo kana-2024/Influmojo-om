@@ -51,13 +51,17 @@ model BrandProfile {
   id               BigInt          @id @default(autoincrement())
   user_id          BigInt
   company_name     String
-  industry         String?
+  industry         String?         // Single primary industry
+  industries       Json?           // Array of selected industries
+  role_in_organization String?
   website_url      String?
   description      String?
   logo_url         String?
   company_size     CompanySize?
   location_country String?
   location_city    String?
+  languages        Json?           // Array of selected languages
+  date_of_birth    DateTime?       // Date of birth for brand
   verified         Boolean         @default(false)
   created_at       DateTime        @default(now())
   updated_at       DateTime        @updatedAt

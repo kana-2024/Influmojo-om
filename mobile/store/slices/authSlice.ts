@@ -10,6 +10,8 @@ interface User {
   lastName?: string;
   profileImage?: string;
   isVerified?: boolean;
+  user_type?: string;
+  auth_provider?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -74,6 +76,12 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.signupForm = initialState.signupForm;
     },
+    loginSuccess: (state, action: PayloadAction<User>) => {
+      state.isLoading = false;
+      state.error = null;
+      state.isAuthenticated = true;
+      state.user = action.payload;
+    },
     signupFailure: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
       state.error = action.payload;
@@ -93,6 +101,7 @@ export const {
   setLoading,
   setError,
   signupSuccess,
+  loginSuccess,
   signupFailure,
   logout,
 } = authSlice.actions;

@@ -1,27 +1,50 @@
 {
   "cli": {
-    "version": ">= 16.16.0"
+    "version": ">= 16.16.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
-      "env": {
-       "EXPO_PUBLIC_API_URL": "https://7d582f61cbae.ngrok-free.app",
-        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com"
-      },
+      "developmentClient": true,
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://fair-legal-gar.ngrok-free.app",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID": "401925027822-8vnuv8dfjbjnc265fkihkk61qsoofnot.apps.googleusercontent.com"
+      },
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "buildConfiguration": "Debug"
       }
     },
     "preview": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://fair-legal-gar.ngrok-free.app",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID": "401925027822-8vnuv8dfjbjnc265fkihkk61qsoofnot.apps.googleusercontent.com"
+      },
       "android": {
         "buildType": "apk"
+      },
+      "ios": {
+        "buildConfiguration": "Release"
       }
     },
     "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://fair-legal-gar.ngrok-free.app",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID": "401925027822-8vnuv8dfjbjnc265fkihkk61qsoofnot.apps.googleusercontent.com"
+      },
       "android": {
         "buildType": "app-bundle"
+      },
+      "ios": {
+        "buildConfiguration": "Release"
       }
     }
   },
