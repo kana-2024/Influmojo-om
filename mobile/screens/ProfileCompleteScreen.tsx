@@ -151,13 +151,42 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
     loadUserProfile();
   }, []);
 
+  // Automatically navigate to the correct profile screen when user is loaded
+  useEffect(() => {
+    if (!loading && user) {
+      // Support both camelCase and snake_case
+      const userType = user.userType || user.user_type || 'creator';
+      if (userType === 'brand') {
+        console.log('🔍 ProfileCompleteScreen: Auto-navigating to BrandProfile');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'BrandProfile' }],
+        });
+      } else if (userType === 'creator') {
+        console.log('🔍 ProfileCompleteScreen: Auto-navigating to CreatorProfile');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'CreatorProfile' }],
+        });
+      }
+    }
+  }, [loading, user]);
+
+
   const loadUserProfile = async () => {
     try {
+      console.log('🔍 ProfileCompleteScreen: Loading user profile...');
       const response = await authAPI.getUserProfile();
+      console.log('🔍 ProfileCompleteScreen: User profile response:', response);
       setUser(response.user);
     } catch (error) {
-      console.error('Failed to load user profile:', error);
+      console.error('❌ ProfileCompleteScreen: Failed to load user profile:', error);
+      console.error('❌ ProfileCompleteScreen: Error details:', {
+        message: error.message,
+        stack: error.stack
+      });
       // Default to creator if profile loading fails
+      console.log('🔍 ProfileCompleteScreen: Defaulting to creator due to error');
       setUser({ user_type: 'creator' });
     } finally {
       setLoading(false);
@@ -167,9 +196,15 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
   const handleViewProfile = () => {
     // Navigate to appropriate profile based on user type
     const userType = user?.user_type || 'creator';
+    console.log('🔍 ProfileCompleteScreen: handleViewProfile called');
+    console.log('🔍 ProfileCompleteScreen: Current user:', user);
+    console.log('🔍 ProfileCompleteScreen: User type:', userType);
+    
     if (userType === 'brand') {
+      console.log('🔍 ProfileCompleteScreen: Navigating to BrandProfile');
       navigation.navigate('BrandProfile');
     } else {
+      console.log('🔍 ProfileCompleteScreen: Navigating to CreatorProfile');
       navigation.navigate('CreatorProfile');
     }
   };

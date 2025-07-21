@@ -190,6 +190,15 @@ router.post('/update-preferences', [
     const { categories, about, languages, role, dateOfBirth } = req.body;
     const userId = BigInt(req.userId);
 
+    console.log('Update preferences request:', {
+      userId: userId.toString(),
+      categories,
+      about,
+      languages,
+      role,
+      dateOfBirth
+    });
+
     // Get user to check user type
     const user = await prisma.user.findUnique({
       where: { id: userId }
@@ -197,6 +206,18 @@ router.post('/update-preferences', [
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log('User type:', user.user_type);
+
+    // Additional validation for brand users
+    if (user.user_type === 'brand') {
+      if (!categories || categories.length === 0) {
+        return res.status(400).json({ error: 'At least one industry/category is required for brands' });
+      }
+      if (!about || about.trim() === '') {
+        return res.status(400).json({ error: 'Company description is required for brands' });
+      }
     }
 
     if (user.user_type === 'creator') {
@@ -238,28 +259,54 @@ router.post('/update-preferences', [
       });
 
     } else if (user.user_type === 'brand') {
-      // Create or update brand profile
-      const brandProfile = await prisma.brandProfile.upsert({
-        where: { user_id: userId },
-        update: {
-          industries: categories, // Store selected industries as JSON array
-          industry: categories[0], // Store first industry as primary
-          description: about,
-          languages: languages,
-          role_in_organization: role,
-          date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
-        },
-        create: {
-          user_id: userId,
-          company_name: user.name, // Use user name as default company name
-          industries: categories, // Store selected industries as JSON array
-          industry: categories[0], // Store first industry as primary
-          description: about,
-          languages: languages,
-          role_in_organization: role,
-          date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
-        }
+      console.log('Processing brand preferences...');
+      
+      // Check if brand profile exists
+      const existingBrandProfile = await prisma.brandProfile.findFirst({
+        where: { user_id: userId }
       });
+
+      console.log('Existing brand profile:', existingBrandProfile ? 'Found' : 'Not found');
+
+      let brandProfile;
+      
+      try {
+        if (existingBrandProfile) {
+          console.log('Updating existing brand profile...');
+          // Update existing brand profile
+          brandProfile = await prisma.brandProfile.update({
+            where: { id: existingBrandProfile.id },
+            data: {
+              industries: categories, // Store selected industries as JSON array
+              industry: categories[0], // Store first industry as primary
+              description: about,
+              languages: languages,
+              role_in_organization: role,
+              date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
+            }
+          });
+        } else {
+          console.log('Creating new brand profile...');
+          // Create new brand profile
+          brandProfile = await prisma.brandProfile.create({
+            data: {
+              user_id: userId,
+              company_name: user.name, // Use user name as default company name
+              industries: categories, // Store selected industries as JSON array
+              industry: categories[0], // Store first industry as primary
+              description: about,
+              languages: languages,
+              role_in_organization: role,
+              date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
+            }
+          });
+        }
+        
+        console.log('Brand profile saved successfully:', brandProfile.id.toString());
+      } catch (brandError) {
+        console.error('Brand profile save error:', brandError);
+        throw brandError;
+      }
 
       // Update user onboarding step
       await prisma.user.update({
@@ -369,7 +416,7 @@ router.post('/create-package', [
 // Create portfolio item (from CreatePortfolioScreen)
 router.post('/create-portfolio', [
   body('mediaUrl').notEmpty().withMessage('Media URL is required'),
-  body('mediaType').isIn(['image', 'video', 'archive', 'document']).withMessage('Valid media type required'),
+  body('mediaType').isIn(['image', 'video', 'text']).withMessage('Valid media type required'),
   body('fileName').notEmpty().withMessage('File name is required'),
   body('fileSize').isInt({ min: 1 }).withMessage('Valid file size required'),
   body('mimeType').optional()
@@ -387,17 +434,30 @@ router.post('/create-portfolio', [
       return res.status(400).json({ error: 'Creator profile not found' });
     }
 
+    // Map media type to enum value (always lowercase)
+    let portfolioMediaType;
+    if (mediaType && typeof mediaType === 'string') {
+      if (mediaType.toLowerCase() === 'image') {
+        portfolioMediaType = 'image';
+      } else if (mediaType.toLowerCase() === 'video') {
+        portfolioMediaType = 'video';
+      } else {
+        portfolioMediaType = 'text'; // Default for documents/archives
+      }
+    } else {
+      portfolioMediaType = 'text';
+    }
+
     // Create portfolio item
     const portfolioItem = await prisma.portfolioItem.create({
       data: {
         creator_id: creatorProfile.id,
-        media_type: mediaType.toUpperCase(),
-        media_url: mediaUrl,
         title: fileName,
         description: `Uploaded file: ${fileName}`,
-        file_size: BigInt(fileSize),
-        mime_type: mimeType || '',
-        status: 'active'
+        media_url: mediaUrl,
+        media_type: portfolioMediaType,
+        file_size: fileSize ? BigInt(fileSize) : null,
+        mime_type: mimeType || null
       }
     });
 
@@ -405,8 +465,7 @@ router.post('/create-portfolio', [
     const serializedPortfolioItem = {
       ...portfolioItem,
       id: portfolioItem.id.toString(),
-      creator_id: portfolioItem.creator_id.toString(),
-      file_size: portfolioItem.file_size.toString()
+      creator_id: portfolioItem.creator_id.toString()
     };
 
     res.json({
@@ -625,6 +684,7 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
 // Get brand profile with all related data
 router.get('/brand-profile', authenticateToken, async (req, res) => {
   try {
+    console.log('🔍 Brand profile request received for user ID:', req.userId);
     const userId = BigInt(req.userId);
 
     const user = await prisma.user.findUnique({
@@ -639,20 +699,34 @@ router.get('/brand-profile', authenticateToken, async (req, res) => {
       }
     });
 
+    console.log('🔍 User found:', !!user);
+    console.log('🔍 User type:', user?.user_type);
+
     if (!user) {
+      console.log('❌ User not found');
       return res.status(404).json({ error: 'User not found' });
     }
 
     if (user.user_type !== 'brand') {
+      console.log('❌ User is not a brand, user type:', user.user_type);
       return res.status(403).json({ error: 'User is not a brand' });
     }
 
     // Get the first brand profile (assuming one brand profile per user)
     const brandProfile = user.brand_profiles[0];
+    console.log('🔍 Brand profile found:', !!brandProfile);
 
     if (!brandProfile) {
+      console.log('❌ Brand profile not found');
       return res.status(404).json({ error: 'Brand profile not found' });
     }
+
+    console.log('🔍 Brand profile data:', {
+      id: brandProfile.id.toString(),
+      user_id: brandProfile.user_id.toString(),
+      campaigns_count: brandProfile.campaigns?.length || 0,
+      collaborations_count: brandProfile.collaborations?.length || 0
+    });
 
     // Convert BigInt values to strings for JSON serialization
     const serializedProfile = {
@@ -665,7 +739,7 @@ router.get('/brand-profile', authenticateToken, async (req, res) => {
         brand_id: campaign.brand_id.toString(),
         budget_min: campaign.budget_min?.toString(),
         budget_max: campaign.budget_max?.toString(),
-        required_follower_count_min: campaign.required_follower_count_min.toString(),
+        required_follower_count_min: campaign.required_follower_count_min?.toString(),
         required_follower_count_max: campaign.required_follower_count_max?.toString()
       })) || [],
       collaborations: brandProfile.collaborations?.map(collaboration => ({
@@ -683,13 +757,15 @@ router.get('/brand-profile', authenticateToken, async (req, res) => {
       }
     };
 
+    console.log('✅ Sending brand profile response');
     res.json({
       success: true,
       data: serializedProfile
     });
 
   } catch (error) {
-    console.error('Get brand profile error:', error);
+    console.error('❌ Get brand profile error:', error);
+    console.error('❌ Error stack:', error.stack);
     res.status(500).json({ 
       error: 'Failed to get brand profile',
       message: error.message 

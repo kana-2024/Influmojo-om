@@ -65,7 +65,7 @@ model BrandProfile {
   verified             Boolean         @default(false)
   created_at           DateTime        @default(now())
   updated_at           DateTime        @updatedAt
-  user                 User            @relation(fields: [user_id], references: [id])
+  user                 User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
   campaigns            Campaign[]
   collaborations       Collaboration[]
   invoices             Invoice[]
@@ -101,7 +101,7 @@ model CreatorProfile {
   interests             Json? // Store as JSON array (languages, etc.)
   campaign_applications CampaignApplication[]
   collaborations        Collaboration[]
-  user                  User                  @relation(fields: [user_id], references: [id])
+  user                  User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   invoices              Invoice[]
   social_media_accounts SocialMediaAccount[]
   kyc                   KYC?
@@ -120,7 +120,7 @@ model SocialMediaAccount {
   verified        Boolean        @default(false)
   last_updated    DateTime       @default(now())
   created_at      DateTime       @default(now())
-  creator         CreatorProfile @relation(fields: [creator_id], references: [id])
+  creator         CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
 
   @@unique([creator_id, platform])
 }
@@ -148,7 +148,7 @@ model Campaign {
   max_collaborators           Int                   @default(1)
   created_at                  DateTime              @default(now())
   updated_at                  DateTime              @updatedAt
-  brand                       BrandProfile          @relation(fields: [brand_id], references: [id])
+  brand                       BrandProfile          @relation(fields: [brand_id], references: [id], onDelete: Cascade)
   campaign_analytics          CampaignAnalytics[]
   campaign_applications       CampaignApplication[]
   collaborations              Collaboration[]
@@ -167,7 +167,7 @@ model CampaignApplication {
   applied_at              DateTime          @default(now())
   responded_at            DateTime?
   campaign                Campaign          @relation(fields: [campaign_id], references: [id])
-  creator                 CreatorProfile    @relation(fields: [creator_id], references: [id])
+  creator                 CreatorProfile    @relation(fields: [creator_id], references: [id], onDelete: Cascade)
   collaboration           Collaboration?
 
   @@unique([campaign_id, creator_id])
@@ -187,9 +187,9 @@ model Collaboration {
   started_at          DateTime              @default(now())
   completed_at        DateTime?
   application         CampaignApplication   @relation(fields: [application_id], references: [id])
-  brand               BrandProfile          @relation(fields: [brand_id], references: [id])
+  brand               BrandProfile          @relation(fields: [brand_id], references: [id], onDelete: Cascade)
   campaign            Campaign              @relation(fields: [campaign_id], references: [id])
-  creator             CreatorProfile        @relation(fields: [creator_id], references: [id])
+  creator             CreatorProfile        @relation(fields: [creator_id], references: [id], onDelete: Cascade)
   channels            CollaborationChannel?
   content_submissions ContentSubmission[]
   invoices            Invoice[]
@@ -247,10 +247,10 @@ model Payment {
   initiated_at     DateTime      @default(now())
   completed_at     DateTime?
   failure_reason   String?
-  admin            User          @relation("AdminPayments", fields: [admin_id], references: [id])
+  admin            User          @relation("AdminPayments", fields: [admin_id], references: [id], onDelete: Cascade)
   collaboration    Collaboration @relation(fields: [collaboration_id], references: [id])
-  payee            User          @relation("PaymentPayee", fields: [payee_id], references: [id])
-  payer            User          @relation("PaymentPayer", fields: [payer_id], references: [id])
+  payee            User          @relation("PaymentPayee", fields: [payee_id], references: [id], onDelete: Cascade)
+  payer            User          @relation("PaymentPayer", fields: [payer_id], references: [id], onDelete: Cascade)
 }
 
 model Invoice {
@@ -267,9 +267,9 @@ model Invoice {
   status           InvoiceStatus  @default(draft)
   issued_at        DateTime       @default(now())
   paid_at          DateTime?
-  brand            BrandProfile   @relation(fields: [brand_id], references: [id])
+  brand            BrandProfile   @relation(fields: [brand_id], references: [id], onDelete: Cascade)
   collaboration    Collaboration  @relation(fields: [collaboration_id], references: [id])
-  creator          CreatorProfile @relation(fields: [creator_id], references: [id])
+  creator          CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
 }
 
 model Message {
@@ -283,7 +283,7 @@ model Message {
   read_at      DateTime?
   created_at   DateTime             @default(now())
   channel      CollaborationChannel @relation(fields: [channel_id], references: [id])
-  sender       User                 @relation("MessageSender", fields: [sender_id], references: [id])
+  sender       User                 @relation("MessageSender", fields: [sender_id], references: [id], onDelete: Cascade)
 }
 
 model Review {
@@ -297,8 +297,8 @@ model Review {
   is_public        Boolean         @default(true)
   created_at       DateTime        @default(now())
   collaboration    Collaboration   @relation(fields: [collaboration_id], references: [id])
-  reviewed         User            @relation("ReviewReviewed", fields: [reviewed_id], references: [id])
-  reviewer         User            @relation("ReviewReviewer", fields: [reviewer_id], references: [id])
+  reviewed         User            @relation("ReviewReviewed", fields: [reviewed_id], references: [id], onDelete: Cascade)
+  reviewer         User            @relation("ReviewReviewer", fields: [reviewer_id], references: [id], onDelete: Cascade)
 
   @@unique([collaboration_id, reviewer_id])
 }
@@ -351,7 +351,7 @@ model Notification {
   data       Json?
   read_at    DateTime?
   created_at DateTime  @default(now())
-  user       User      @relation(fields: [user_id], references: [id])
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model PlatformSetting {
@@ -368,7 +368,7 @@ model CollaborationChannel {
   collaboration_id BigInt        @unique
   admin_id         BigInt
   created_at       DateTime      @default(now())
-  admin            User          @relation("AdminChannels", fields: [admin_id], references: [id])
+  admin            User          @relation("AdminChannels", fields: [admin_id], references: [id], onDelete: Cascade)
   collaboration    Collaboration @relation(fields: [collaboration_id], references: [id])
   messages         Message[]
 }
@@ -383,7 +383,7 @@ model Package {
   price            Decimal
   deliverables     Json?
   created_at       DateTime      @default(now())
-  admin            User          @relation("AdminPackages", fields: [admin_id], references: [id])
+  admin            User          @relation("AdminPackages", fields: [admin_id], references: [id], onDelete: Cascade)
   collaboration    Collaboration @relation(fields: [collaboration_id], references: [id])
 }
 
@@ -396,7 +396,7 @@ model PhoneVerification {
   expires_at  DateTime
   verified_at DateTime?
   created_at  DateTime  @default(now())
-  user        User?     @relation(fields: [user_id], references: [id])
+  user        User?     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([phone, code])
   @@index([token])
@@ -420,8 +420,8 @@ model KYC {
   rejected_at         DateTime?
   rejection_reason    String?
   verified_by         BigInt?
-  creator             CreatorProfile @relation(fields: [creator_id], references: [id])
-  verifier            User?          @relation("KYCVerifier", fields: [verified_by], references: [id])
+  creator             CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  verifier            User?          @relation("KYCVerifier", fields: [verified_by], references: [id], onDelete: Cascade)
 
   @@index([status])
 }
@@ -433,12 +433,14 @@ model PortfolioItem {
   description String?
   media_url   String
   media_type  PortfolioMediaType
+  file_size   BigInt?
+  mime_type   String?
   platform    SocialPlatform?
   tags        Json? // Store as JSON array
   is_featured Boolean            @default(false)
   created_at  DateTime           @default(now())
   updated_at  DateTime           @updatedAt
-  creator     CreatorProfile     @relation(fields: [creator_id], references: [id])
+  creator     CreatorProfile     @relation(fields: [creator_id], references: [id], onDelete: Cascade)
 
   @@index([creator_id])
   @@index([media_type])

@@ -31085,11 +31085,13 @@ export namespace Prisma {
   export type PortfolioItemAvgAggregateOutputType = {
     id: number | null
     creator_id: number | null
+    file_size: number | null
   }
 
   export type PortfolioItemSumAggregateOutputType = {
     id: bigint | null
     creator_id: bigint | null
+    file_size: bigint | null
   }
 
   export type PortfolioItemMinAggregateOutputType = {
@@ -31099,6 +31101,8 @@ export namespace Prisma {
     description: string | null
     media_url: string | null
     media_type: $Enums.PortfolioMediaType | null
+    file_size: bigint | null
+    mime_type: string | null
     platform: $Enums.SocialPlatform | null
     is_featured: boolean | null
     created_at: Date | null
@@ -31112,6 +31116,8 @@ export namespace Prisma {
     description: string | null
     media_url: string | null
     media_type: $Enums.PortfolioMediaType | null
+    file_size: bigint | null
+    mime_type: string | null
     platform: $Enums.SocialPlatform | null
     is_featured: boolean | null
     created_at: Date | null
@@ -31125,6 +31131,8 @@ export namespace Prisma {
     description: number
     media_url: number
     media_type: number
+    file_size: number
+    mime_type: number
     platform: number
     tags: number
     is_featured: number
@@ -31137,11 +31145,13 @@ export namespace Prisma {
   export type PortfolioItemAvgAggregateInputType = {
     id?: true
     creator_id?: true
+    file_size?: true
   }
 
   export type PortfolioItemSumAggregateInputType = {
     id?: true
     creator_id?: true
+    file_size?: true
   }
 
   export type PortfolioItemMinAggregateInputType = {
@@ -31151,6 +31161,8 @@ export namespace Prisma {
     description?: true
     media_url?: true
     media_type?: true
+    file_size?: true
+    mime_type?: true
     platform?: true
     is_featured?: true
     created_at?: true
@@ -31164,6 +31176,8 @@ export namespace Prisma {
     description?: true
     media_url?: true
     media_type?: true
+    file_size?: true
+    mime_type?: true
     platform?: true
     is_featured?: true
     created_at?: true
@@ -31177,6 +31191,8 @@ export namespace Prisma {
     description?: true
     media_url?: true
     media_type?: true
+    file_size?: true
+    mime_type?: true
     platform?: true
     tags?: true
     is_featured?: true
@@ -31278,6 +31294,8 @@ export namespace Prisma {
     description: string | null
     media_url: string
     media_type: $Enums.PortfolioMediaType
+    file_size: bigint | null
+    mime_type: string | null
     platform: $Enums.SocialPlatform | null
     tags: JsonValue | null
     is_featured: boolean
@@ -31311,6 +31329,8 @@ export namespace Prisma {
     description?: boolean
     media_url?: boolean
     media_type?: boolean
+    file_size?: boolean
+    mime_type?: boolean
     platform?: boolean
     tags?: boolean
     is_featured?: boolean
@@ -31326,6 +31346,8 @@ export namespace Prisma {
     description?: boolean
     media_url?: boolean
     media_type?: boolean
+    file_size?: boolean
+    mime_type?: boolean
     platform?: boolean
     tags?: boolean
     is_featured?: boolean
@@ -31341,6 +31363,8 @@ export namespace Prisma {
     description?: boolean
     media_url?: boolean
     media_type?: boolean
+    file_size?: boolean
+    mime_type?: boolean
     platform?: boolean
     tags?: boolean
     is_featured?: boolean
@@ -31356,6 +31380,8 @@ export namespace Prisma {
     description?: boolean
     media_url?: boolean
     media_type?: boolean
+    file_size?: boolean
+    mime_type?: boolean
     platform?: boolean
     tags?: boolean
     is_featured?: boolean
@@ -31363,7 +31389,7 @@ export namespace Prisma {
     updated_at?: boolean
   }
 
-  export type PortfolioItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "creator_id" | "title" | "description" | "media_url" | "media_type" | "platform" | "tags" | "is_featured" | "created_at" | "updated_at", ExtArgs["result"]["portfolioItem"]>
+  export type PortfolioItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "creator_id" | "title" | "description" | "media_url" | "media_type" | "file_size" | "mime_type" | "platform" | "tags" | "is_featured" | "created_at" | "updated_at", ExtArgs["result"]["portfolioItem"]>
   export type PortfolioItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }
@@ -31386,6 +31412,8 @@ export namespace Prisma {
       description: string | null
       media_url: string
       media_type: $Enums.PortfolioMediaType
+      file_size: bigint | null
+      mime_type: string | null
       platform: $Enums.SocialPlatform | null
       tags: Prisma.JsonValue | null
       is_featured: boolean
@@ -31821,6 +31849,8 @@ export namespace Prisma {
     readonly description: FieldRef<"PortfolioItem", 'String'>
     readonly media_url: FieldRef<"PortfolioItem", 'String'>
     readonly media_type: FieldRef<"PortfolioItem", 'PortfolioMediaType'>
+    readonly file_size: FieldRef<"PortfolioItem", 'BigInt'>
+    readonly mime_type: FieldRef<"PortfolioItem", 'String'>
     readonly platform: FieldRef<"PortfolioItem", 'SocialPlatform'>
     readonly tags: FieldRef<"PortfolioItem", 'Json'>
     readonly is_featured: FieldRef<"PortfolioItem", 'Boolean'>
@@ -32657,6 +32687,8 @@ export namespace Prisma {
     description: 'description',
     media_url: 'media_url',
     media_type: 'media_type',
+    file_size: 'file_size',
+    mime_type: 'mime_type',
     platform: 'platform',
     tags: 'tags',
     is_featured: 'is_featured',
@@ -35312,6 +35344,8 @@ export namespace Prisma {
     description?: StringNullableFilter<"PortfolioItem"> | string | null
     media_url?: StringFilter<"PortfolioItem"> | string
     media_type?: EnumPortfolioMediaTypeFilter<"PortfolioItem"> | $Enums.PortfolioMediaType
+    file_size?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
+    mime_type?: StringNullableFilter<"PortfolioItem"> | string | null
     platform?: EnumSocialPlatformNullableFilter<"PortfolioItem"> | $Enums.SocialPlatform | null
     tags?: JsonNullableFilter<"PortfolioItem">
     is_featured?: BoolFilter<"PortfolioItem"> | boolean
@@ -35327,6 +35361,8 @@ export namespace Prisma {
     description?: SortOrderInput | SortOrder
     media_url?: SortOrder
     media_type?: SortOrder
+    file_size?: SortOrderInput | SortOrder
+    mime_type?: SortOrderInput | SortOrder
     platform?: SortOrderInput | SortOrder
     tags?: SortOrderInput | SortOrder
     is_featured?: SortOrder
@@ -35345,6 +35381,8 @@ export namespace Prisma {
     description?: StringNullableFilter<"PortfolioItem"> | string | null
     media_url?: StringFilter<"PortfolioItem"> | string
     media_type?: EnumPortfolioMediaTypeFilter<"PortfolioItem"> | $Enums.PortfolioMediaType
+    file_size?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
+    mime_type?: StringNullableFilter<"PortfolioItem"> | string | null
     platform?: EnumSocialPlatformNullableFilter<"PortfolioItem"> | $Enums.SocialPlatform | null
     tags?: JsonNullableFilter<"PortfolioItem">
     is_featured?: BoolFilter<"PortfolioItem"> | boolean
@@ -35360,6 +35398,8 @@ export namespace Prisma {
     description?: SortOrderInput | SortOrder
     media_url?: SortOrder
     media_type?: SortOrder
+    file_size?: SortOrderInput | SortOrder
+    mime_type?: SortOrderInput | SortOrder
     platform?: SortOrderInput | SortOrder
     tags?: SortOrderInput | SortOrder
     is_featured?: SortOrder
@@ -35382,6 +35422,8 @@ export namespace Prisma {
     description?: StringNullableWithAggregatesFilter<"PortfolioItem"> | string | null
     media_url?: StringWithAggregatesFilter<"PortfolioItem"> | string
     media_type?: EnumPortfolioMediaTypeWithAggregatesFilter<"PortfolioItem"> | $Enums.PortfolioMediaType
+    file_size?: BigIntNullableWithAggregatesFilter<"PortfolioItem"> | bigint | number | null
+    mime_type?: StringNullableWithAggregatesFilter<"PortfolioItem"> | string | null
     platform?: EnumSocialPlatformNullableWithAggregatesFilter<"PortfolioItem"> | $Enums.SocialPlatform | null
     tags?: JsonNullableWithAggregatesFilter<"PortfolioItem">
     is_featured?: BoolWithAggregatesFilter<"PortfolioItem"> | boolean
@@ -37814,6 +37856,8 @@ export namespace Prisma {
     description?: string | null
     media_url: string
     media_type: $Enums.PortfolioMediaType
+    file_size?: bigint | number | null
+    mime_type?: string | null
     platform?: $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: boolean
@@ -37829,6 +37873,8 @@ export namespace Prisma {
     description?: string | null
     media_url: string
     media_type: $Enums.PortfolioMediaType
+    file_size?: bigint | number | null
+    mime_type?: string | null
     platform?: $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: boolean
@@ -37842,6 +37888,8 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
     media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
     platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -37857,6 +37905,8 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
     media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
     platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -37871,6 +37921,8 @@ export namespace Prisma {
     description?: string | null
     media_url: string
     media_type: $Enums.PortfolioMediaType
+    file_size?: bigint | number | null
+    mime_type?: string | null
     platform?: $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: boolean
@@ -37884,6 +37936,8 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
     media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
     platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -37898,6 +37952,8 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
     media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
     platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -40178,6 +40234,8 @@ export namespace Prisma {
     description?: SortOrder
     media_url?: SortOrder
     media_type?: SortOrder
+    file_size?: SortOrder
+    mime_type?: SortOrder
     platform?: SortOrder
     tags?: SortOrder
     is_featured?: SortOrder
@@ -40188,6 +40246,7 @@ export namespace Prisma {
   export type PortfolioItemAvgOrderByAggregateInput = {
     id?: SortOrder
     creator_id?: SortOrder
+    file_size?: SortOrder
   }
 
   export type PortfolioItemMaxOrderByAggregateInput = {
@@ -40197,6 +40256,8 @@ export namespace Prisma {
     description?: SortOrder
     media_url?: SortOrder
     media_type?: SortOrder
+    file_size?: SortOrder
+    mime_type?: SortOrder
     platform?: SortOrder
     is_featured?: SortOrder
     created_at?: SortOrder
@@ -40210,6 +40271,8 @@ export namespace Prisma {
     description?: SortOrder
     media_url?: SortOrder
     media_type?: SortOrder
+    file_size?: SortOrder
+    mime_type?: SortOrder
     platform?: SortOrder
     is_featured?: SortOrder
     created_at?: SortOrder
@@ -40219,6 +40282,7 @@ export namespace Prisma {
   export type PortfolioItemSumOrderByAggregateInput = {
     id?: SortOrder
     creator_id?: SortOrder
+    file_size?: SortOrder
   }
 
   export type EnumPortfolioMediaTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -45009,6 +45073,8 @@ export namespace Prisma {
     description?: string | null
     media_url: string
     media_type: $Enums.PortfolioMediaType
+    file_size?: bigint | number | null
+    mime_type?: string | null
     platform?: $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: boolean
@@ -45022,6 +45088,8 @@ export namespace Prisma {
     description?: string | null
     media_url: string
     media_type: $Enums.PortfolioMediaType
+    file_size?: bigint | number | null
+    mime_type?: string | null
     platform?: $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: boolean
@@ -45299,6 +45367,8 @@ export namespace Prisma {
     description?: StringNullableFilter<"PortfolioItem"> | string | null
     media_url?: StringFilter<"PortfolioItem"> | string
     media_type?: EnumPortfolioMediaTypeFilter<"PortfolioItem"> | $Enums.PortfolioMediaType
+    file_size?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
+    mime_type?: StringNullableFilter<"PortfolioItem"> | string | null
     platform?: EnumSocialPlatformNullableFilter<"PortfolioItem"> | $Enums.SocialPlatform | null
     tags?: JsonNullableFilter<"PortfolioItem">
     is_featured?: BoolFilter<"PortfolioItem"> | boolean
@@ -51890,6 +51960,8 @@ export namespace Prisma {
     description?: string | null
     media_url: string
     media_type: $Enums.PortfolioMediaType
+    file_size?: bigint | number | null
+    mime_type?: string | null
     platform?: $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: boolean
@@ -52082,6 +52154,8 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
     media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
     platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -52095,6 +52169,8 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
     media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
     platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -52108,6 +52184,8 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
     media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
     platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
     tags?: NullableJsonNullValueInput | InputJsonValue
     is_featured?: BoolFieldUpdateOperationsInput | boolean

@@ -5,19 +5,22 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import CustomDropdownDefault from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
+import { cloudinaryService, CloudinaryUploadResponse } from '../../services/cloudinaryService';
 
 interface CreatePortfolioScreenProps {
   onClose: () => void;
   onBack: () => void;
   CustomDropdown?: React.FC<any>;
+  onPortfolioCreated?: () => void; // Callback to refresh portfolio
 }
 
-const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, onBack }) => {
+const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, onBack, onPortfolioCreated }) => {
   const insets = useSafeAreaInsets();
   const [file, setFile] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<CloudinaryUploadResponse | null>(null);
 
   const pickFile = async () => {
     const result = await DocumentPicker.getDocumentAsync({
@@ -29,7 +32,28 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
       setFile(result.assets[0]);
       setProgress(0);
       setUploading(true);
-      simulateUpload();
+      setUploadedFile(null);
+      
+      // Upload to Cloudinary
+      try {
+        const cloudinaryResponse = await cloudinaryService.uploadFile(
+          result.assets[0],
+          (progress) => {
+            setProgress(progress.percentage / 100);
+          }
+        );
+        
+        setUploadedFile(cloudinaryResponse);
+        setProgress(1);
+        setUploading(false);
+        
+        Alert.alert('Success', 'File uploaded successfully!');
+      } catch (error) {
+        console.error('Upload error:', error);
+        Alert.alert('Upload Failed', error.message || 'Failed to upload file. Please try again.');
+        setUploading(false);
+        setProgress(0);
+      }
     }
   };
 
@@ -37,13 +61,13 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
     setFile(null);
     setProgress(0);
     setUploading(false);
+    setUploadedFile(null);
   };
 
   const getFileType = (mimeType: string) => {
     if (mimeType.startsWith('image/')) return 'image';
     if (mimeType.startsWith('video/')) return 'video';
-    if (mimeType.includes('zip')) return 'archive';
-    return 'document';
+    return 'text'; // Default for documents, archives, etc.
   };
 
   const formatFileSize = (bytes: number) => {
@@ -54,42 +78,38 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // Simulate upload progress
-  const simulateUpload = () => {
-    let prog = 0;
-    const interval = setInterval(() => {
-      prog += 0.1;
-      setProgress(Math.min(prog, 1));
-      if (prog >= 1) {
-        clearInterval(interval);
-        setUploading(false);
-      }
-    }, 400);
-  };
-
   // Save portfolio item to database
   const handleSubmitPortfolio = async () => {
-    if (!file) {
-      Alert.alert('Error', 'Please select a file first');
+    if (!file || !uploadedFile) {
+      Alert.alert('Error', 'Please select and upload a file first');
       return;
     }
 
     setSaving(true);
     try {
-      // In a real app, you would upload the file to a cloud storage service first
-      // For now, we'll simulate the upload URL
-      const mediaUrl = `https://example.com/uploads/${file.name}`;
-      
-      await profileAPI.createPortfolio({
-        mediaUrl,
+      console.log('Creating portfolio item with data:', {
+        mediaUrl: uploadedFile.secure_url,
         mediaType: getFileType(file.mimeType || ''),
         fileName: file.name,
-        fileSize: file.size || 0,
+        fileSize: file.size || uploadedFile.bytes,
+        mimeType: file.mimeType
+      });
+      
+      await profileAPI.createPortfolio({
+        mediaUrl: uploadedFile.secure_url,
+        mediaType: getFileType(file.mimeType || ''),
+        fileName: file.name,
+        fileSize: file.size || uploadedFile.bytes,
         mimeType: file.mimeType
       });
 
+      console.log('Portfolio item created successfully');
+      
       Alert.alert('Success', 'Portfolio item created successfully!', [
-        { text: 'OK', onPress: () => onClose() }
+        { text: 'OK', onPress: () => {
+          onClose();
+          onPortfolioCreated?.(); // Call the callback to refresh portfolio
+        }}
       ]);
     } catch (error) {
       console.error('Create portfolio error:', error);
@@ -140,18 +160,33 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
               </View>
               
               <View style={styles.filePreviewContent}>
-                {/* File Type Icon */}
-                <View style={styles.fileTypeIcon}>
-                  {getFileType(file.mimeType || '') === 'image' ? (
-                    <Ionicons name="image" size={24} color="#2D5BFF" />
-                  ) : getFileType(file.mimeType || '') === 'video' ? (
-                    <Ionicons name="videocam" size={24} color="#2D5BFF" />
-                  ) : getFileType(file.mimeType || '') === 'archive' ? (
-                    <Ionicons name="archive" size={24} color="#2D5BFF" />
-                  ) : (
-                    <Ionicons name="document" size={24} color="#2D5BFF" />
-                  )}
-                </View>
+                {/* File Type Icon or Preview */}
+                {uploadedFile && uploadedFile.resource_type === 'image' ? (
+                  <Image 
+                    source={{ uri: uploadedFile.secure_url }} 
+                    style={styles.filePreviewImage}
+                    resizeMode="cover"
+                  />
+                ) : uploadedFile && uploadedFile.resource_type === 'video' ? (
+                  <View style={styles.filePreviewImage}>
+                    <Ionicons name="play-circle" size={32} color="#fff" style={styles.videoPlayIcon} />
+                    <Image 
+                      source={{ uri: uploadedFile.secure_url.replace('/upload/', '/upload/w_100,h_100,c_fill/') }} 
+                      style={styles.filePreviewImage}
+                      resizeMode="cover"
+                    />
+                  </View>
+                ) : (
+                  <View style={styles.fileTypeIcon}>
+                    {getFileType(file.mimeType || '') === 'image' ? (
+                      <Ionicons name="image" size={24} color="#2D5BFF" />
+                    ) : getFileType(file.mimeType || '') === 'video' ? (
+                      <Ionicons name="videocam" size={24} color="#2D5BFF" />
+                    ) : (
+                      <Ionicons name="document" size={24} color="#2D5BFF" />
+                    )}
+                  </View>
+                )}
                 
                 {/* File Details */}
                 <View style={styles.fileDetails}>
@@ -159,10 +194,10 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
                     {file.name}
                   </Text>
                   <Text style={styles.fileMeta}>
-                    {formatFileSize(file.size || 0)} • {getFileType(file.mimeType || '').toUpperCase()}
+                    {formatFileSize(uploadedFile?.bytes || file.size || 0)} • {getFileType(file.mimeType || '').toUpperCase()}
                   </Text>
-                  {file.mimeType && (
-                    <Text style={styles.fileMimeType}>{file.mimeType}</Text>
+                  {uploadedFile && (
+                    <Text style={styles.uploadStatus}>✓ Uploaded to Cloudinary</Text>
                   )}
                 </View>
               </View>
@@ -201,12 +236,12 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              style={[styles.submitBtn, (!file || uploading || saving) && { opacity: 0.7 }]}
+              style={[styles.submitBtn, (!file || !uploadedFile || uploading || saving) && { opacity: 0.7 }]}
               onPress={handleSubmitPortfolio}
-              disabled={!file || uploading || saving}
+              disabled={!file || !uploadedFile || uploading || saving}
             >
               <Text style={styles.submitBtnText}>
-                {saving ? 'Saving...' : 'Submit'}
+                {saving ? 'Saving...' : uploading ? 'Uploading...' : 'Submit'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -329,6 +364,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 12,
   },
+  filePreviewImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  videoPlayIcon: {
+    position: 'absolute',
+    zIndex: 1,
+  },
   fileDetails: {
     flex: 1,
   },
@@ -387,6 +435,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
     marginBottom: 4,
+  },
+  uploadStatus: {
+    fontSize: 12,
+    color: '#2DD36F',
+    marginTop: 4,
   },
   progressBarBg: {
     height: 5,

@@ -457,6 +457,8 @@ exports.Prisma.PortfolioItemScalarFieldEnum = {
   description: 'description',
   media_url: 'media_url',
   media_type: 'media_type',
+  file_size: 'file_size',
+  mime_type: 'mime_type',
   platform: 'platform',
   tags: 'tags',
   is_featured: 'is_featured',
