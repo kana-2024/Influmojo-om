@@ -30,6 +30,7 @@ export const API_ENDPOINTS = {
   // Profile endpoints
   UPDATE_BASIC_INFO: `${ENV.API_BASE_URL}/api/profile/update-basic-info`,
   UPDATE_PREFERENCES: `${ENV.API_BASE_URL}/api/profile/update-preferences`,
+  GET_INDUSTRIES: `${ENV.API_BASE_URL}/api/profile/industries`,
   CREATE_PACKAGE: `${ENV.API_BASE_URL}/api/profile/create-package`,
   CREATE_PORTFOLIO: `${ENV.API_BASE_URL}/api/profile/create-portfolio`,
   CREATE_CAMPAIGN: `${ENV.API_BASE_URL}/api/profile/create-campaign`,

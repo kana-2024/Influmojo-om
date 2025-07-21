@@ -156,9 +156,12 @@ exports.Prisma.BrandProfileScalarFieldEnum = {
   logo_url: 'logo_url',
   company_size: 'company_size',
   location_country: 'location_country',
+  location_state: 'location_state',
   location_city: 'location_city',
+  location_pincode: 'location_pincode',
   languages: 'languages',
   date_of_birth: 'date_of_birth',
+  gender: 'gender',
   verified: 'verified',
   created_at: 'created_at',
   updated_at: 'updated_at'

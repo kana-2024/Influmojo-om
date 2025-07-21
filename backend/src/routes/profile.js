@@ -37,6 +37,37 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
+// Get available industries for selection
+router.get('/industries', async (req, res) => {
+  try {
+    // This could be moved to a database table in the future for better management
+    const industries = [
+      'IT & Technology', 'Entertainment', 'Fashion & Beauty', 'Food & Beverage', 
+      'Healthcare', 'Education', 'Finance & Banking', 'Travel & Tourism',
+      'Sports & Fitness', 'Automotive', 'Real Estate', 'E-commerce',
+      'Manufacturing', 'Media & Advertising', 'Consulting', 'Non-Profit',
+      'Retail', 'Telecommunications', 'Energy', 'Transportation',
+      'Agriculture', 'Construction', 'Legal Services', 'Insurance'
+    ];
+
+    const highlighted = ['IT & Technology', 'Entertainment', 'Fashion & Beauty', 'E-commerce'];
+
+    res.json({
+      success: true,
+      data: {
+        industries,
+        highlighted
+      }
+    });
+  } catch (error) {
+    console.error('Get industries error:', error);
+    res.status(500).json({ 
+      error: 'Failed to get industries',
+      message: error.message 
+    });
+  }
+});
+
 // Update user basic info (from ProfileSetupScreen)
 router.post('/update-basic-info', [
   body('gender').isIn(['Male', 'Female', 'Other']).withMessage('Valid gender is required'),
@@ -59,11 +90,29 @@ router.post('/update-basic-info', [
   body('dob').notEmpty().withMessage('Date of birth is required'),
   body('state').notEmpty().withMessage('State is required'),
   body('city').notEmpty().withMessage('City is required'),
-  body('pincode').notEmpty().withMessage('Pincode is required')
+  body('pincode').notEmpty().withMessage('Pincode is required'),
+  body('role').optional()
 ], validateRequest, authenticateToken, async (req, res) => {
   try {
-    const { gender, email, phone, dob, state, city, pincode } = req.body;
+    const { gender, email, phone, dob, state, city, pincode, role } = req.body;
     const userId = BigInt(req.userId);
+
+    // Get user to check user type
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Validate role for brands
+    if (user.user_type === 'brand' && (!role || !role.trim())) {
+      return res.status(400).json({ 
+        error: 'Role is required',
+        message: 'Please select your role in the organization' 
+      });
+    }
 
     // Parse date of birth
     let dateOfBirth;
@@ -136,38 +185,94 @@ router.post('/update-basic-info', [
       data: updateData
     });
 
-    // Create or update creator profile
-    const creatorProfile = await prisma.creatorProfile.upsert({
-      where: { user_id: userId },
-      update: {
-        gender,
-        date_of_birth: dateOfBirth,
-        location_state: state,
-        location_city: city,
-        location_pincode: pincode
-      },
-      create: {
-        user_id: userId,
-        gender,
-        date_of_birth: dateOfBirth,
-        location_state: state,
-        location_city: city,
-        location_pincode: pincode
+    // Create or update profile based on user type
+    if (user.user_type === 'creator') {
+      // Create or update creator profile
+      const creatorProfile = await prisma.creatorProfile.upsert({
+        where: { user_id: userId },
+        update: {
+          gender,
+          date_of_birth: dateOfBirth,
+          location_state: state,
+          location_city: city,
+          location_pincode: pincode
+        },
+        create: {
+          user_id: userId,
+          gender,
+          date_of_birth: dateOfBirth,
+          location_state: state,
+          location_city: city,
+          location_pincode: pincode
+        }
+      });
+
+      // Convert BigInt to string for JSON serialization
+      const serializedProfile = {
+        ...creatorProfile,
+        id: creatorProfile.id.toString(),
+        user_id: creatorProfile.user_id.toString()
+      };
+
+      res.json({
+        success: true,
+        message: 'Basic info updated successfully',
+        profile: serializedProfile
+      });
+    } else if (user.user_type === 'brand') {
+      // For brand profiles, we'll use a different approach
+      // First try to find existing profile
+      const existingProfile = await prisma.brandProfile.findMany({
+        where: { user_id: userId },
+        take: 1
+      });
+
+      let brandProfile;
+      
+      if (existingProfile.length > 0) {
+        // Update existing brand profile
+        brandProfile = await prisma.brandProfile.update({
+          where: { id: existingProfile[0].id },
+          data: {
+            gender,
+            date_of_birth: dateOfBirth,
+            location_state: state,
+            location_city: city,
+            location_pincode: pincode,
+            role_in_organization: role || null
+          }
+        });
+      } else {
+        // Create new brand profile
+        brandProfile = await prisma.brandProfile.create({
+          data: {
+            user_id: userId,
+            company_name: user.name, // Use user name as default company name
+            gender,
+            date_of_birth: dateOfBirth,
+            location_state: state,
+            location_city: city,
+            location_pincode: pincode,
+            role_in_organization: role || null
+          }
+        });
       }
-    });
 
-    // Convert BigInt to string for JSON serialization
-    const serializedProfile = {
-      ...creatorProfile,
-      id: creatorProfile.id.toString(),
-      user_id: creatorProfile.user_id.toString()
-    };
+      // Convert BigInt to string for JSON serialization
+      const serializedProfile = {
+        ...brandProfile,
+        id: brandProfile.id.toString(),
+        user_id: brandProfile.user_id.toString()
+      };
 
-    res.json({
-      success: true,
-      message: 'Basic info updated successfully',
-      profile: serializedProfile
-    });
+      res.json({
+        success: true,
+        message: 'Basic info updated successfully',
+        profile: serializedProfile
+      });
+    } else {
+      return res.status(400).json({ error: 'Invalid user type' });
+    }
 
   } catch (error) {
     console.error('Update basic info error:', error);

@@ -38,7 +38,7 @@ const AnimatedModalOverlay: React.FC<AnimatedModalOverlayProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType={Platform.OS === 'ios' ? 'slide' : 'fade'}
+      animationType="slide"
       onRequestClose={onRequestClose}
     >
       <View style={StyleSheet.absoluteFill} pointerEvents={visible ? 'auto' : 'none'}>

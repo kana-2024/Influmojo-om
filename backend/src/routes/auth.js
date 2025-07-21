@@ -12,6 +12,9 @@ const prisma = new PrismaClient();
 // Google OAuth client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Request deduplication cache (in-memory)
+const pendingRequests = new Map();
+
 // Validation middleware
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
@@ -32,6 +35,29 @@ const generateToken = (userId) => {
     { expiresIn: '7d' }
   );
 };
+
+// Clean up old OTP records periodically (every 5 minutes)
+let cleanupInterval;
+if (process.env.NODE_ENV !== 'production') {
+  cleanupInterval = setInterval(async () => {
+    try {
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+      const deletedRecords = await prisma.phoneVerification.deleteMany({
+        where: {
+          created_at: {
+            lt: tenMinutesAgo
+          }
+        }
+      });
+      
+      if (deletedRecords.count > 0) {
+        console.log(`🧹 Auto-cleanup: Deleted ${deletedRecords.count} old OTP records`);
+      }
+    } catch (error) {
+      console.error('Auto-cleanup error:', error);
+    }
+  }, 5 * 60 * 1000); // Run every 5 minutes
+}
 
 // Google OAuth for mobile
 router.post('/google-mobile', [
@@ -176,6 +202,59 @@ router.post('/google-mobile', [
   }
 }));
 
+// Development endpoint to disable rate limiting (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  router.post('/disable-rate-limit', async (req, res) => {
+    try {
+      const { phone } = req.body;
+      
+      if (!phone) {
+        return res.status(400).json({ error: 'Phone number is required' });
+      }
+      
+      // Delete all OTP records for this phone
+      const deletedRecords = await prisma.phoneVerification.deleteMany({
+        where: { phone }
+      });
+      
+      console.log(`🧹 Development: Disabled rate limit for ${phone} by deleting ${deletedRecords.count} records`);
+      
+      res.json({
+        success: true,
+        message: `Rate limit disabled for ${phone}`,
+        deletedCount: deletedRecords.count
+      });
+    } catch (error) {
+      console.error('Error disabling rate limit:', error);
+      res.status(500).json({ error: 'Failed to disable rate limit' });
+    }
+  });
+}
+
+// Development endpoint to clear OTP records (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  router.delete('/clear-otp/:phone', async (req, res) => {
+    try {
+      const { phone } = req.params;
+      
+      const deletedRecords = await prisma.phoneVerification.deleteMany({
+        where: { phone }
+      });
+      
+      console.log(`🧹 Development: Cleared ${deletedRecords.count} OTP records for ${phone}`);
+      
+      res.json({
+        success: true,
+        message: `Cleared ${deletedRecords.count} OTP records for ${phone}`,
+        deletedCount: deletedRecords.count
+      });
+    } catch (error) {
+      console.error('Error clearing OTP records:', error);
+      res.status(500).json({ error: 'Failed to clear OTP records' });
+    }
+  });
+}
+
 // Send phone verification code
 router.post('/send-phone-verification-code', [
   body('phone').isMobilePhone().withMessage('Valid phone number is required')
@@ -183,78 +262,172 @@ router.post('/send-phone-verification-code', [
   try {
     const { phone } = req.body;
     
-    // Check for recent OTP requests to prevent spam
-    const recentVerification = await prisma.phoneVerification.findFirst({
-      where: {
-        phone,
-        created_at: { gt: new Date(Date.now() - 60 * 1000) } // Last 1 minute
-      }
-    });
+    console.log(`🔍 OTP request for ${phone} at ${new Date().toISOString()}`);
     
-    if (recentVerification) {
-      return res.status(429).json({
-        error: 'Please wait 1 minute before requesting another code'
-      });
+    // Check for duplicate requests
+    if (pendingRequests.has(phone)) {
+      console.log(`🔄 Duplicate request detected for ${phone}, returning existing promise`);
+      const existingPromise = pendingRequests.get(phone);
+      const result = await existingPromise;
+      return res.json(result);
     }
-
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Generate unique token
-    const token = require('crypto').randomBytes(32).toString('hex');
-    
-    // Store OTP in database
-    await prisma.phoneVerification.create({
-      data: {
-        phone,
-        code: otp,
-        token,
-        expires_at: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
-      }
-    });
-
-    // Send SMS using Twilio Verify (if configured)
-    let smsSent = false;
-    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_VERIFY_SERVICE_SID) {
-      const twilio = require('twilio')(
-        process.env.TWILIO_ACCOUNT_SID,
-        process.env.TWILIO_AUTH_TOKEN
-      );
-
+    // Create a promise for this request
+    const requestPromise = (async () => {
       try {
-        await twilio.verify.v2.services(process.env.TWILIO_VERIFY_SERVICE_SID)
-          .verifications.create({
-            to: phone,
-            channel: 'sms'
-          });
-        console.log(`Verification SMS sent to ${phone}`);
-        smsSent = true;
-      } catch (smsError) {
-        console.error('SMS sending failed:', smsError);
+        // Check for recent OTP requests to prevent spam
+        const rateLimitWindow = process.env.NODE_ENV === 'production' ? 60 * 1000 : 10 * 1000; // 10 seconds in dev, 60 in prod
         
-        // Handle rate limiting specifically
-        if (smsError.status === 429) {
-          console.log(`Rate limit hit for ${phone}. OTP: ${otp} (check console for development)`);
-          console.log(`Please wait before requesting another code or upgrade your Twilio plan`);
+        // Temporarily disable rate limiting in development
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`🔧 Development: Rate limiting disabled for ${phone}`);
         } else {
-          console.log(`OTP for ${phone}: ${otp} (SMS failed, using console log)`);
+          const recentVerification = await prisma.phoneVerification.findFirst({
+            where: {
+              phone,
+              created_at: { gt: new Date(Date.now() - rateLimitWindow) }
+            },
+            orderBy: {
+              created_at: 'desc'
+            }
+          });
+          
+          console.log(`🔍 Rate limit check for ${phone}:`, {
+            hasRecentVerification: !!recentVerification,
+            currentTime: new Date().toISOString(),
+            checkTime: new Date(Date.now() - rateLimitWindow).toISOString(),
+            recentVerificationTime: recentVerification?.created_at?.toISOString(),
+            timeDifference: recentVerification ? Date.now() - recentVerification.created_at.getTime() : 'N/A',
+            rateLimitWindow: `${rateLimitWindow / 1000}s`,
+            phoneNumber: phone
+          });
+          
+          if (recentVerification) {
+            const timeElapsed = Date.now() - recentVerification.created_at.getTime();
+            const timeRemaining = Math.ceil((rateLimitWindow - timeElapsed) / 1000); // seconds remaining
+            
+            console.log(`⏰ Rate limit hit for ${phone}. Last OTP sent: ${recentVerification.created_at.toISOString()}, Time remaining: ${timeRemaining}s`);
+            
+            // In development, allow bypassing rate limit with a special flag
+            if (process.env.NODE_ENV !== 'production' && req.headers['x-bypass-rate-limit'] === 'true') {
+              console.log(`🔧 Development: Bypassing rate limit for ${phone}`);
+            } else if (process.env.NODE_ENV !== 'production' && process.env.DISABLE_RATE_LIMIT === 'true') {
+              console.log(`🔧 Development: Rate limiting disabled globally for ${phone}`);
+            } else if (process.env.NODE_ENV !== 'production' && process.env.DEV_MODE === 'true') {
+              console.log(`🔧 Development: DEV_MODE enabled, bypassing rate limit for ${phone}`);
+            } else {
+              return {
+                status: 429,
+                data: {
+                  error: 'Rate limit exceeded',
+                  message: `Please wait ${timeRemaining} seconds before requesting another code`,
+                  timeRemaining,
+                  retryAfter: timeRemaining
+                }
+              };
+            }
+          }
         }
-      }
-    } else {
-      // Development mode - just log the OTP
-      console.log(`OTP for ${phone}: ${otp} (Twilio not configured)`);
-    }
 
-    res.json({
-      success: true,
-      message: 'Verification code sent successfully',
-      phone,
-      // Include OTP in development mode for testing
-      ...(process.env.NODE_ENV !== 'production' && { otp })
-    });
+        console.log(`✅ No rate limit for ${phone}, proceeding with OTP generation`);
+
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Generate unique token
+        const token = require('crypto').randomBytes(32).toString('hex');
+        
+        // Store OTP in database
+        const verificationRecord = await prisma.phoneVerification.create({
+          data: {
+            phone,
+            code: otp,
+            token,
+            expires_at: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+          }
+        });
+
+        console.log(`💾 OTP stored in database for ${phone} at ${verificationRecord.created_at.toISOString()}`);
+
+        // Send SMS using Twilio Verify (if configured)
+        let smsSent = false;
+        if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_VERIFY_SERVICE_SID) {
+          const twilio = require('twilio')(
+            process.env.TWILIO_ACCOUNT_SID,
+            process.env.TWILIO_AUTH_TOKEN
+          );
+
+          try {
+            await twilio.verify.v2.services(process.env.TWILIO_VERIFY_SERVICE_SID)
+              .verifications.create({
+                to: phone,
+                channel: 'sms'
+              });
+            console.log(`📱 Verification SMS sent to ${phone}`);
+            smsSent = true;
+          } catch (smsError) {
+            console.error('SMS sending failed:', smsError);
+            
+            // Handle rate limiting specifically
+            if (smsError.status === 429) {
+              console.log(`📱 Twilio rate limit hit for ${phone}. OTP: ${otp} (check console for development)`);
+              console.log(`Please wait before requesting another code or upgrade your Twilio plan`);
+            } else {
+              console.log(`📱 OTP for ${phone}: ${otp} (SMS failed, using console log)`);
+            }
+          }
+        } else {
+          // Development mode - just log the OTP
+          console.log(`🔧 Development OTP for ${phone}: ${otp} (Twilio not configured)`);
+        }
+
+        console.log(`✅ OTP request completed successfully for ${phone}`);
+
+        return {
+          status: 200,
+          data: {
+            success: true,
+            message: 'Verification code sent successfully',
+            phone,
+            // Include OTP in development mode for testing
+            ...(process.env.NODE_ENV !== 'production' && { otp })
+          }
+        };
+
+      } catch (error) {
+        console.error('❌ Send OTP error:', error);
+        return {
+          status: 500,
+          data: { 
+            error: 'Failed to send verification code',
+            message: error.message 
+          }
+        };
+      }
+    })();
+
+    // Store the promise in the cache
+    pendingRequests.set(phone, requestPromise);
+    
+    // Wait for the result
+    const result = await requestPromise;
+    
+    // Remove from cache after a delay to prevent immediate duplicates
+    setTimeout(() => {
+      pendingRequests.delete(phone);
+    }, 5000); // 5 second delay
+    
+    // Return the appropriate response
+    if (result.status === 429) {
+      return res.status(429).json(result.data);
+    } else if (result.status === 500) {
+      return res.status(500).json(result.data);
+    } else {
+      return res.json(result.data);
+    }
 
   } catch (error) {
-    console.error('Send OTP error:', error);
+    console.error('❌ Outer OTP error:', error);
     res.status(500).json({ 
       error: 'Failed to send verification code',
       message: error.message 
@@ -307,25 +480,34 @@ router.post('/verify-phone-code', [
 
         if (verificationCheck.status === 'approved') {
           twilioVerification = true;
+          console.log('✅ Twilio verification successful for:', phone);
         } else {
+          console.log('❌ Twilio verification failed - status:', verificationCheck.status);
           return res.status(400).json({ 
             error: 'Invalid verification code' 
           });
         }
       } catch (verifyError) {
-        console.error('Twilio verification failed:', verifyError);
+        console.error('❌ Twilio verification failed:', verifyError.message);
+        console.error('❌ Twilio error code:', verifyError.code);
+        console.error('❌ Twilio error status:', verifyError.status);
         
-        // If Twilio fails (rate limit, etc.), fall back to database verification
+        // If Twilio fails (rate limit, auth error, etc.), fall back to database verification
         if (verifyError.status === 429) {
-          console.log('Twilio rate limit hit, falling back to database verification');
+          console.log('⚠️ Twilio rate limit hit, falling back to database verification');
+        } else if (verifyError.status === 401) {
+          console.log('⚠️ Twilio authentication error, falling back to database verification');
         } else {
-          console.log('Twilio verification error, falling back to database verification');
+          console.log('⚠️ Twilio verification error, falling back to database verification');
         }
       }
+    } else {
+      console.log('ℹ️ Twilio not configured, using database verification');
     }
     
     // If Twilio verification failed or not configured, use database verification
     if (!twilioVerification) {
+      console.log('🔍 Using database verification for:', phone);
       // Fallback to database verification for development
       const verification = await prisma.phoneVerification.findFirst({
         where: {
@@ -338,11 +520,13 @@ router.post('/verify-phone-code', [
       });
 
       if (!verification) {
+        console.log('❌ No valid verification found for:', phone, 'code:', code);
         return res.status(400).json({ 
           error: 'Invalid or expired verification code' 
         });
       }
 
+      console.log('✅ Database verification successful for:', phone);
       // Mark as verified
       await prisma.phoneVerification.update({
         where: { id: verification.id },
@@ -354,22 +538,48 @@ router.post('/verify-phone-code', [
     let userWithPhone = await prisma.user.findUnique({ where: { phone } });
 
     if (authUserId) {
-      // If authenticated, update the current user with the phone number
-      // If another user already has this phone, handle the conflict
-      if (userWithPhone && userWithPhone.id !== BigInt(authUserId)) {
-        console.log('[verify-phone-code] Phone number already in use by another account.');
-        return res.status(409).json({ error: 'Phone number already in use by another account.' });
-      }
-      user = await prisma.user.update({
-        where: { id: BigInt(authUserId) },
-        data: {
-          phone,
-          phone_verified: true,
-          last_login_at: new Date(),
-          ...(fullName && { name: fullName }),
-        }
+      // First check if the user with authUserId actually exists
+      const existingUser = await prisma.user.findUnique({
+        where: { id: BigInt(authUserId) }
       });
-      console.log('[verify-phone-code] Updated user ID:', user.id, 'User data:', { id: user.id.toString(), phone: user.phone, name: user.name, email: user.email });
+
+      if (!existingUser) {
+        console.log('[verify-phone-code] User with authUserId not found:', authUserId);
+        // If the authenticated user doesn't exist, treat this as a new user creation
+        if (userWithPhone) {
+          console.log('[verify-phone-code] Phone number already in use by another account.');
+          return res.status(409).json({ error: 'Phone number already in use by another account.' });
+        }
+        
+        console.log('[verify-phone-code] Creating new user with phone:', phone);
+        user = await prisma.user.create({
+          data: {
+            phone,
+            phone_verified: true,
+            user_type: userType,
+            status: 'active',
+            name: fullName || 'User'
+          }
+        });
+        console.log('[verify-phone-code] Created new user ID:', user.id);
+      } else {
+        // If authenticated, update the current user with the phone number
+        // If another user already has this phone, handle the conflict
+        if (userWithPhone && userWithPhone.id !== BigInt(authUserId)) {
+          console.log('[verify-phone-code] Phone number already in use by another account.');
+          return res.status(409).json({ error: 'Phone number already in use by another account.' });
+        }
+        user = await prisma.user.update({
+          where: { id: BigInt(authUserId) },
+          data: {
+            phone,
+            phone_verified: true,
+            last_login_at: new Date(),
+            ...(fullName && { name: fullName }),
+          }
+        });
+        console.log('[verify-phone-code] Updated user ID:', user.id, 'User data:', { id: user.id.toString(), phone: user.phone, name: user.name, email: user.email });
+      }
     } else if (!userWithPhone) {
       console.log('[verify-phone-code] Creating new user with phone:', phone);
       // Create new user with full name

@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  Alert,
-  ActivityIndicator
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { authAPI } from '../../services/apiService';
+import * as apiService from '../../services/apiService';
 
 interface OtpModalProps {
   visible: boolean;
@@ -42,7 +33,7 @@ const OtpModal: React.FC<OtpModalProps> = ({ visible, onClose, onSuccess, phone 
   const sendOtp = async () => {
     setSendingOtp(true);
     try {
-      const result = await authAPI.sendOTP(phone);
+      const result = await apiService.authAPI.sendOTP(phone);
       setTimeLeft(60); // 60 seconds cooldown
       
       // Show OTP in development mode
@@ -67,7 +58,7 @@ const OtpModal: React.FC<OtpModalProps> = ({ visible, onClose, onSuccess, phone 
 
     setLoading(true);
     try {
-      const result = await authAPI.verifyOTP(phone, otp);
+      const result = await apiService.authAPI.verifyOTP(phone, otp);
       Alert.alert('Success', 'Phone number verified successfully!');
       // Call onSuccess with the full result object (contains user data)
       onSuccess(result);

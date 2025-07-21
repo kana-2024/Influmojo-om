@@ -2,9 +2,39 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as NavigationBar from 'expo-navigation-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import * as apiService from '../services/apiService';
 
 const MobileVerifiedScreen = ({ navigation }: any) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleNext = async () => {
+    setLoading(true);
+    try {
+      // Get user profile to determine user type
+      const profile = await apiService.authAPI.getUserProfile();
+      const userType = profile.user?.userType || profile.user?.user_type || 'creator';
+      
+      console.log('🔍 MobileVerifiedScreen: User profile loaded:', {
+        userType: userType,
+        user: profile.user
+      });
+      
+      // Navigate to appropriate profile setup screen
+      if (userType === 'brand') {
+        navigation.navigate('BrandProfileSetup');
+      } else {
+        navigation.navigate('ProfileSetup');
+      }
+    } catch (error) {
+      console.error('Error getting user profile:', error);
+      // Default to creator profile setup
+      navigation.navigate('ProfileSetup');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
   }, []);
   return (
@@ -32,9 +62,13 @@ const MobileVerifiedScreen = ({ navigation }: any) => {
         We have successfully verified your mobile number you can now give few personal details to access your dashboard.
       </Text>
       {/* Next Button */}
-              <TouchableOpacity style={styles.nextButton} onPress={() => {navigation.navigate('ProfileSetup');}}>
-        <Text style={styles.nextText}>Next</Text>
-        <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
+      <TouchableOpacity 
+        style={[styles.nextButton, loading && { opacity: 0.7 }]} 
+        onPress={handleNext}
+        disabled={loading}
+      >
+        <Text style={styles.nextText}>{loading ? 'Loading...' : 'Next'}</Text>
+        {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
       </TouchableOpacity>
     </View>
   );

@@ -1,6 +1,31 @@
 import { API_ENDPOINTS } from '../config/env';
 import { getToken as getStoredToken, setToken as setStoredToken, clearToken as clearStoredToken } from './storage';
 
+// JSON validation helper
+const isJson = (str: any): boolean => {
+  if (typeof str !== 'string') return false;
+  try {
+    const result = JSON.parse(str);
+    return typeof result === 'object' || Array.isArray(result);
+  } catch (e) {
+    return false;
+  }
+};
+
+// Safe JSON parse helper
+const safeJsonParse = (str: any, fallback: any = null) => {
+  if (!str) return fallback;
+  if (typeof str === 'object') return str;
+  if (!isJson(str)) return fallback;
+  
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    console.warn('Failed to parse JSON:', str);
+    return fallback;
+  }
+};
+
 // Get stored token
 const getToken = async (): Promise<string | null> => {
   return await getStoredToken();
@@ -40,34 +65,56 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     const response = await fetch(endpoint, config);
     let data;
     const contentType = response.headers.get('content-type');
+    
+    // First, try to get the response as text
+    const responseText = await response.text();
+    
+    // Check if it's valid JSON
     if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
-    } else {
-      // Try to get text for debugging
-      const text = await response.text();
-      data = { error: text };
-      if (!response.ok || !contentType || !contentType.includes('application/json')) {
-        console.error('[apiService] Non-JSON or error response:', {
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('[apiService] JSON parse error for JSON content-type:', {
           url: endpoint,
           status: response.status,
-          headers: Object.fromEntries(response.headers.entries()),
-          body: text,
+          responseText: responseText.substring(0, 200), // Log first 200 chars
+          parseError
         });
+        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
+      }
+    } else {
+      // Non-JSON response
+      console.error('[apiService] Non-JSON response:', {
+        url: endpoint,
+        status: response.status,
+        contentType,
+        responseText: responseText.substring(0, 200), // Log first 200 chars
+      });
+      
+      // If it's an error response, create a proper error object
+      if (!response.ok) {
+        throw new Error(`Server error (${response.status}): ${responseText.substring(0, 100)}`);
+      }
+      
+      // If it's not an error but not JSON, try to parse it anyway
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error(`Unexpected response format: ${responseText.substring(0, 100)}`);
       }
     }
 
     if (!response.ok) {
-      throw new Error(data.error || 'API request failed');
+      throw new Error(data.error || data.message || `HTTP ${response.status}: ${responseText.substring(0, 100)}`);
     }
 
     return data;
   } catch (error) {
-    // If error is a SyntaxError (JSON parse), wrap it
-    if (error instanceof SyntaxError) {
-      console.error('[apiService] JSON parse error:', error, { url: endpoint, config });
-      throw new Error('Invalid server response. Please try again later.');
-    }
-    console.error('API request error:', error, { url: endpoint, config });
+    console.error('[apiService] Request failed:', {
+      url: endpoint,
+      error: error.message,
+      config: { method: config.method, hasAuth: !!token }
+    });
     throw error;
   }
 };
@@ -90,8 +137,15 @@ export const authAPI = {
 
   // Send OTP
   sendOTP: async (phone: string) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      // Add bypass header in development
+      ...(process.env.NODE_ENV !== 'production' && { 'x-bypass-rate-limit': 'true' })
+    };
+    
     return await apiRequest(API_ENDPOINTS.SEND_OTP, {
       method: 'POST',
+      headers,
       body: JSON.stringify({ phone }),
     });
   },
@@ -144,6 +198,13 @@ export const authAPI = {
 
 // Profile API calls
 export const profileAPI = {
+  // Get available industries
+  getIndustries: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_INDUSTRIES, {
+      method: 'GET',
+    });
+  },
+
   // Update basic info
   updateBasicInfo: async (data: {
     gender: string;
@@ -256,16 +317,36 @@ export const profileAPI = {
 
   // Get creator profile
   getCreatorProfile: async () => {
-    return await apiRequest(API_ENDPOINTS.GET_CREATOR_PROFILE, {
+    const response = await apiRequest(API_ENDPOINTS.GET_CREATOR_PROFILE, {
       method: 'GET',
     });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      response.data.interests = safeJsonParse(response.data.interests, []);
+      response.data.content_categories = safeJsonParse(response.data.content_categories, []);
+      response.data.social_media_accounts = safeJsonParse(response.data.social_media_accounts, []);
+      response.data.portfolio_items = safeJsonParse(response.data.portfolio_items, []);
+    }
+    
+    return response;
   },
 
   // Get brand profile
   getBrandProfile: async () => {
-    return await apiRequest(API_ENDPOINTS.GET_BRAND_PROFILE, {
+    const response = await apiRequest(API_ENDPOINTS.GET_BRAND_PROFILE, {
       method: 'GET',
     });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      response.data.industries = safeJsonParse(response.data.industries, []);
+      response.data.languages = safeJsonParse(response.data.languages, []);
+      response.data.campaigns = safeJsonParse(response.data.campaigns, []);
+      response.data.collaborations = safeJsonParse(response.data.collaborations, []);
+    }
+    
+    return response;
   },
 };
 

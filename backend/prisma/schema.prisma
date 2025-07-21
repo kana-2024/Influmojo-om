@@ -59,9 +59,12 @@ model BrandProfile {
   logo_url         String?
   company_size     CompanySize?
   location_country String?
+  location_state   String?         // Added for unified profile
   location_city    String?
+  location_pincode String?         // Added for unified profile
   languages        Json?           // Array of selected languages
   date_of_birth    DateTime?       // Date of birth for brand
+  gender           String?         // Added for unified profile
   verified         Boolean         @default(false)
   created_at       DateTime        @default(now())
   updated_at       DateTime        @updatedAt

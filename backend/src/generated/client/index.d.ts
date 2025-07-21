@@ -5392,8 +5392,11 @@ export namespace Prisma {
     logo_url: string | null
     company_size: $Enums.CompanySize | null
     location_country: string | null
+    location_state: string | null
     location_city: string | null
+    location_pincode: string | null
     date_of_birth: Date | null
+    gender: string | null
     verified: boolean | null
     created_at: Date | null
     updated_at: Date | null
@@ -5410,8 +5413,11 @@ export namespace Prisma {
     logo_url: string | null
     company_size: $Enums.CompanySize | null
     location_country: string | null
+    location_state: string | null
     location_city: string | null
+    location_pincode: string | null
     date_of_birth: Date | null
+    gender: string | null
     verified: boolean | null
     created_at: Date | null
     updated_at: Date | null
@@ -5429,9 +5435,12 @@ export namespace Prisma {
     logo_url: number
     company_size: number
     location_country: number
+    location_state: number
     location_city: number
+    location_pincode: number
     languages: number
     date_of_birth: number
+    gender: number
     verified: number
     created_at: number
     updated_at: number
@@ -5460,8 +5469,11 @@ export namespace Prisma {
     logo_url?: true
     company_size?: true
     location_country?: true
+    location_state?: true
     location_city?: true
+    location_pincode?: true
     date_of_birth?: true
+    gender?: true
     verified?: true
     created_at?: true
     updated_at?: true
@@ -5478,8 +5490,11 @@ export namespace Prisma {
     logo_url?: true
     company_size?: true
     location_country?: true
+    location_state?: true
     location_city?: true
+    location_pincode?: true
     date_of_birth?: true
+    gender?: true
     verified?: true
     created_at?: true
     updated_at?: true
@@ -5497,9 +5512,12 @@ export namespace Prisma {
     logo_url?: true
     company_size?: true
     location_country?: true
+    location_state?: true
     location_city?: true
+    location_pincode?: true
     languages?: true
     date_of_birth?: true
+    gender?: true
     verified?: true
     created_at?: true
     updated_at?: true
@@ -5604,9 +5622,12 @@ export namespace Prisma {
     logo_url: string | null
     company_size: $Enums.CompanySize | null
     location_country: string | null
+    location_state: string | null
     location_city: string | null
+    location_pincode: string | null
     languages: JsonValue | null
     date_of_birth: Date | null
+    gender: string | null
     verified: boolean
     created_at: Date
     updated_at: Date
@@ -5643,9 +5664,12 @@ export namespace Prisma {
     logo_url?: boolean
     company_size?: boolean
     location_country?: boolean
+    location_state?: boolean
     location_city?: boolean
+    location_pincode?: boolean
     languages?: boolean
     date_of_birth?: boolean
+    gender?: boolean
     verified?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -5668,9 +5692,12 @@ export namespace Prisma {
     logo_url?: boolean
     company_size?: boolean
     location_country?: boolean
+    location_state?: boolean
     location_city?: boolean
+    location_pincode?: boolean
     languages?: boolean
     date_of_birth?: boolean
+    gender?: boolean
     verified?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -5689,9 +5716,12 @@ export namespace Prisma {
     logo_url?: boolean
     company_size?: boolean
     location_country?: boolean
+    location_state?: boolean
     location_city?: boolean
+    location_pincode?: boolean
     languages?: boolean
     date_of_birth?: boolean
+    gender?: boolean
     verified?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -5710,15 +5740,18 @@ export namespace Prisma {
     logo_url?: boolean
     company_size?: boolean
     location_country?: boolean
+    location_state?: boolean
     location_city?: boolean
+    location_pincode?: boolean
     languages?: boolean
     date_of_birth?: boolean
+    gender?: boolean
     verified?: boolean
     created_at?: boolean
     updated_at?: boolean
   }
 
-  export type BrandProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "company_name" | "industry" | "industries" | "role_in_organization" | "website_url" | "description" | "logo_url" | "company_size" | "location_country" | "location_city" | "languages" | "date_of_birth" | "verified" | "created_at" | "updated_at", ExtArgs["result"]["brandProfile"]>
+  export type BrandProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "company_name" | "industry" | "industries" | "role_in_organization" | "website_url" | "description" | "logo_url" | "company_size" | "location_country" | "location_state" | "location_city" | "location_pincode" | "languages" | "date_of_birth" | "gender" | "verified" | "created_at" | "updated_at", ExtArgs["result"]["brandProfile"]>
   export type BrandProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     campaigns?: boolean | BrandProfile$campaignsArgs<ExtArgs>
@@ -5753,9 +5786,12 @@ export namespace Prisma {
       logo_url: string | null
       company_size: $Enums.CompanySize | null
       location_country: string | null
+      location_state: string | null
       location_city: string | null
+      location_pincode: string | null
       languages: Prisma.JsonValue | null
       date_of_birth: Date | null
+      gender: string | null
       verified: boolean
       created_at: Date
       updated_at: Date
@@ -6197,9 +6233,12 @@ export namespace Prisma {
     readonly logo_url: FieldRef<"BrandProfile", 'String'>
     readonly company_size: FieldRef<"BrandProfile", 'CompanySize'>
     readonly location_country: FieldRef<"BrandProfile", 'String'>
+    readonly location_state: FieldRef<"BrandProfile", 'String'>
     readonly location_city: FieldRef<"BrandProfile", 'String'>
+    readonly location_pincode: FieldRef<"BrandProfile", 'String'>
     readonly languages: FieldRef<"BrandProfile", 'Json'>
     readonly date_of_birth: FieldRef<"BrandProfile", 'DateTime'>
+    readonly gender: FieldRef<"BrandProfile", 'String'>
     readonly verified: FieldRef<"BrandProfile", 'Boolean'>
     readonly created_at: FieldRef<"BrandProfile", 'DateTime'>
     readonly updated_at: FieldRef<"BrandProfile", 'DateTime'>
@@ -32323,9 +32362,12 @@ export namespace Prisma {
     logo_url: 'logo_url',
     company_size: 'company_size',
     location_country: 'location_country',
+    location_state: 'location_state',
     location_city: 'location_city',
+    location_pincode: 'location_pincode',
     languages: 'languages',
     date_of_birth: 'date_of_birth',
+    gender: 'gender',
     verified: 'verified',
     created_at: 'created_at',
     updated_at: 'updated_at'
@@ -33341,9 +33383,12 @@ export namespace Prisma {
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
     company_size?: EnumCompanySizeNullableFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableFilter<"BrandProfile"> | string | null
+    location_state?: StringNullableFilter<"BrandProfile"> | string | null
     location_city?: StringNullableFilter<"BrandProfile"> | string | null
+    location_pincode?: StringNullableFilter<"BrandProfile"> | string | null
     languages?: JsonNullableFilter<"BrandProfile">
     date_of_birth?: DateTimeNullableFilter<"BrandProfile"> | Date | string | null
+    gender?: StringNullableFilter<"BrandProfile"> | string | null
     verified?: BoolFilter<"BrandProfile"> | boolean
     created_at?: DateTimeFilter<"BrandProfile"> | Date | string
     updated_at?: DateTimeFilter<"BrandProfile"> | Date | string
@@ -33365,9 +33410,12 @@ export namespace Prisma {
     logo_url?: SortOrderInput | SortOrder
     company_size?: SortOrderInput | SortOrder
     location_country?: SortOrderInput | SortOrder
+    location_state?: SortOrderInput | SortOrder
     location_city?: SortOrderInput | SortOrder
+    location_pincode?: SortOrderInput | SortOrder
     languages?: SortOrderInput | SortOrder
     date_of_birth?: SortOrderInput | SortOrder
+    gender?: SortOrderInput | SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -33392,9 +33440,12 @@ export namespace Prisma {
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
     company_size?: EnumCompanySizeNullableFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableFilter<"BrandProfile"> | string | null
+    location_state?: StringNullableFilter<"BrandProfile"> | string | null
     location_city?: StringNullableFilter<"BrandProfile"> | string | null
+    location_pincode?: StringNullableFilter<"BrandProfile"> | string | null
     languages?: JsonNullableFilter<"BrandProfile">
     date_of_birth?: DateTimeNullableFilter<"BrandProfile"> | Date | string | null
+    gender?: StringNullableFilter<"BrandProfile"> | string | null
     verified?: BoolFilter<"BrandProfile"> | boolean
     created_at?: DateTimeFilter<"BrandProfile"> | Date | string
     updated_at?: DateTimeFilter<"BrandProfile"> | Date | string
@@ -33416,9 +33467,12 @@ export namespace Prisma {
     logo_url?: SortOrderInput | SortOrder
     company_size?: SortOrderInput | SortOrder
     location_country?: SortOrderInput | SortOrder
+    location_state?: SortOrderInput | SortOrder
     location_city?: SortOrderInput | SortOrder
+    location_pincode?: SortOrderInput | SortOrder
     languages?: SortOrderInput | SortOrder
     date_of_birth?: SortOrderInput | SortOrder
+    gender?: SortOrderInput | SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -33444,9 +33498,12 @@ export namespace Prisma {
     logo_url?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     company_size?: EnumCompanySizeNullableWithAggregatesFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
+    location_state?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     location_city?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
+    location_pincode?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     languages?: JsonNullableWithAggregatesFilter<"BrandProfile">
     date_of_birth?: DateTimeNullableWithAggregatesFilter<"BrandProfile"> | Date | string | null
+    gender?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     verified?: BoolWithAggregatesFilter<"BrandProfile"> | boolean
     created_at?: DateTimeWithAggregatesFilter<"BrandProfile"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"BrandProfile"> | Date | string
@@ -35670,9 +35727,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -35694,9 +35754,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -35716,9 +35779,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35740,9 +35806,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35763,9 +35832,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -35782,9 +35854,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35802,9 +35877,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38459,9 +38537,12 @@ export namespace Prisma {
     logo_url?: SortOrder
     company_size?: SortOrder
     location_country?: SortOrder
+    location_state?: SortOrder
     location_city?: SortOrder
+    location_pincode?: SortOrder
     languages?: SortOrder
     date_of_birth?: SortOrder
+    gender?: SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -38483,8 +38564,11 @@ export namespace Prisma {
     logo_url?: SortOrder
     company_size?: SortOrder
     location_country?: SortOrder
+    location_state?: SortOrder
     location_city?: SortOrder
+    location_pincode?: SortOrder
     date_of_birth?: SortOrder
+    gender?: SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -38501,8 +38585,11 @@ export namespace Prisma {
     logo_url?: SortOrder
     company_size?: SortOrder
     location_country?: SortOrder
+    location_state?: SortOrder
     location_city?: SortOrder
+    location_pincode?: SortOrder
     date_of_birth?: SortOrder
+    gender?: SortOrder
     verified?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -43272,9 +43359,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -43294,9 +43384,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -43887,9 +43980,12 @@ export namespace Prisma {
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
     company_size?: EnumCompanySizeNullableFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableFilter<"BrandProfile"> | string | null
+    location_state?: StringNullableFilter<"BrandProfile"> | string | null
     location_city?: StringNullableFilter<"BrandProfile"> | string | null
+    location_pincode?: StringNullableFilter<"BrandProfile"> | string | null
     languages?: JsonNullableFilter<"BrandProfile">
     date_of_birth?: DateTimeNullableFilter<"BrandProfile"> | Date | string | null
+    gender?: StringNullableFilter<"BrandProfile"> | string | null
     verified?: BoolFilter<"BrandProfile"> | boolean
     created_at?: DateTimeFilter<"BrandProfile"> | Date | string
     updated_at?: DateTimeFilter<"BrandProfile"> | Date | string
@@ -45543,9 +45639,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -45566,9 +45665,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -45717,9 +45819,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45740,9 +45845,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46230,9 +46338,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -46253,9 +46364,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -46678,9 +46792,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46701,9 +46818,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48205,9 +48325,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -48228,9 +48351,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -48385,9 +48511,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48408,9 +48537,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -50932,9 +51064,12 @@ export namespace Prisma {
     logo_url?: string | null
     company_size?: $Enums.CompanySize | null
     location_country?: string | null
+    location_state?: string | null
     location_city?: string | null
+    location_pincode?: string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: Date | string | null
+    gender?: string | null
     verified?: boolean
     created_at?: Date | string
     updated_at?: Date | string
@@ -51116,9 +51251,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -51138,9 +51276,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -51160,9 +51301,12 @@ export namespace Prisma {
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
     languages?: NullableJsonNullValueInput | InputJsonValue
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
     verified?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string

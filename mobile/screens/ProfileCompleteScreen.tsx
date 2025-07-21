@@ -151,28 +151,6 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
     loadUserProfile();
   }, []);
 
-  // Automatically navigate to the correct profile screen when user is loaded
-  useEffect(() => {
-    if (!loading && user) {
-      // Support both camelCase and snake_case
-      const userType = user.userType || user.user_type || 'creator';
-      if (userType === 'brand') {
-        console.log('🔍 ProfileCompleteScreen: Auto-navigating to BrandProfile');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'BrandProfile' }],
-        });
-      } else if (userType === 'creator') {
-        console.log('🔍 ProfileCompleteScreen: Auto-navigating to CreatorProfile');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'CreatorProfile' }],
-        });
-      }
-    }
-  }, [loading, user]);
-
-
   const loadUserProfile = async () => {
     try {
       console.log('🔍 ProfileCompleteScreen: Loading user profile...');

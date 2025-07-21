@@ -17,6 +17,7 @@ import GoogleVerifiedScreen from './screens/GoogleVerifiedScreen';
 import CreatorPreferencesScreen from './screens/creator/CreatorPreferencesScreen';
 import BrandPreferencesScreen from './screens/brand/BrandPreferencesScreen';
 import ProfileSetupScreen from './screens/ProfileSetupScreen';
+import BrandProfileSetupScreen from './screens/brand/BrandProfileSetupScreen';
 
 import CreatorProfile from './screens/creator/CreatorProfile';
 import BrandProfile from './screens/brand/BrandProfile';
@@ -126,6 +127,7 @@ export default function App() {
             <Stack.Screen name="CreatorPreferences" component={CreatorPreferencesScreen} />
             <Stack.Screen name="BrandPreferences" component={BrandPreferencesScreen} />
             <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+            <Stack.Screen name="BrandProfileSetup" component={BrandProfileSetupScreen} />
 
             <Stack.Screen name="CreatorProfile" component={CreatorProfile} />
             <Stack.Screen name="BrandProfile" component={BrandProfile} />

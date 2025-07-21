@@ -104,7 +104,8 @@ export default function LoginScreen({ navigation }: any) {
   const handleOtpSuccess = (user: any) => {
     setShowOtpModal(false);
     // Navigate to appropriate profile after successful OTP verification
-    if (user && user.user_type === 'brand') {
+    const userType = user?.userType || user?.user_type;
+    if (userType === 'brand') {
       navigation.navigate('BrandProfile');
     } else {
       navigation.navigate('CreatorProfile');

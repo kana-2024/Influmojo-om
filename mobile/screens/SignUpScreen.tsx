@@ -18,11 +18,15 @@ const testBackendConnection = async () => {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StatusBar } from 'react-native';
 import googleAuthService from '../services/googleAuth';
-import { authAPI } from '../services/apiService';
+import * as apiService from '../services/apiService';
 
 // Debug import (only in development)
 if (__DEV__) {
   console.log('SignUpScreen: googleAuthService imported:', !!googleAuthService);
+  console.log('SignUpScreen: apiService imported:', !!apiService);
+  console.log('SignUpScreen: apiService.authAPI exists:', !!apiService?.authAPI);
+  console.log('SignUpScreen: apiService.authAPI.sendOTP exists:', !!apiService?.authAPI?.sendOTP);
+  console.log('SignUpScreen: apiService.authAPI methods:', Object.keys(apiService?.authAPI || {}));
 }
 
 const SignUpScreen = ({ navigation, route }: any) => {
@@ -37,8 +41,10 @@ const SignUpScreen = ({ navigation, route }: any) => {
   const [error, setError] = useState('');
   const [warning, setWarning] = useState('');
   const [loading, setLoading] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [lastRequestTime, setLastRequestTime] = useState(0);
   const userType = route.params?.userType || 'creator'; // Get user type from navigation params
 
   const handleGoogleAuth = async () => {
@@ -73,7 +79,7 @@ const SignUpScreen = ({ navigation, route }: any) => {
           
           try {
             // Call backend API with Google ID token for signup
-            const apiResult = await authAPI.googleAuth(result.idToken, true, userType); // isSignup = true, userType
+            const apiResult = await apiService.authAPI.googleAuth(result.idToken, true, userType); // isSignup = true, userType
             if (__DEV__) {
               console.log('Backend API response:', apiResult);
               console.log('[SignUpScreen] Google auth successful, token saved:', !!apiResult.token);
@@ -105,52 +111,82 @@ const SignUpScreen = ({ navigation, route }: any) => {
   };
 
   const handleCreateAccount = async () => {
-    setWarning('');
-    if (!fullName) {
-      setError('Field is required');
+    // Prevent multiple rapid clicks
+    if (buttonDisabled || loading) {
       return;
     }
-    setError('');
-    if (!/^\d{10}$/.test(mobile)) {
-      setWarning('Please enter a valid 10-digit phone number.');
+
+    // Prevent requests within 2 seconds of each other
+    const now = Date.now();
+    if (now - lastRequestTime < 2000) {
+      console.log('🔄 Request blocked: Too soon after last request');
       return;
     }
+
+    setLastRequestTime(now);
+    setButtonDisabled(true);
     setLoading(true);
-    
-    // Test backend connectivity first
-    if (__DEV__) {
-      console.log('Testing backend connectivity...');
-      console.log('API URL:', API_ENDPOINTS.SEND_OTP);
+    setWarning('');
+    setError('');
+
+    // Validate inputs
+    if (!fullName.trim()) {
+      setError('Please enter your full name');
+      setLoading(false);
+      setButtonDisabled(false);
+      return;
     }
-    
+
+    if (!mobile.trim()) {
+      setError('Please enter your mobile number');
+      setLoading(false);
+      setButtonDisabled(false);
+      return;
+    }
+
+    if (mobile.length !== 10) {
+      setError('Please enter a valid 10-digit mobile number');
+      setLoading(false);
+      setButtonDisabled(false);
+      return;
+    }
+
     try {
-      // First check if user already exists
-      const checkResult = await authAPI.checkUserExists(`+91${mobile}`);
+      console.log('🔄 Sending OTP request for:', `+91${mobile}`);
+      
+      // Check if user already exists
+      const checkResult = await apiService.authAPI.checkUserExists(`+91${mobile}`);
       
       if (checkResult.exists) {
         setWarning('An account with this phone number already exists. Please log in instead.');
         setLoading(false);
+        setButtonDisabled(false);
         return;
       }
       
       // User doesn't exist, proceed with OTP
-      const result = await authAPI.sendOTP(`+91${mobile}`);
+      const result = await apiService.authAPI.sendOTP(`+91${mobile}`);
+      console.log('✅ OTP sent successfully');
+      
       setLoading(false);
+      setButtonDisabled(false);
       navigation.navigate('OtpVerification', { 
         phone: `+91${mobile}`,
         fullName: fullName.trim(),
         userType: userType
       });
     } catch (err) {
-      console.error('Network error details:', err);
-      if (err.message?.includes('429')) {
-        setWarning('Please wait 1 minute before requesting another code.');
+      console.error('❌ OTP request failed:', err);
+      if (err.message?.includes('429') || err.error === 'Rate limit exceeded') {
+        const timeRemaining = err.timeRemaining || err.retryAfter || 60;
+        setWarning(`Please wait ${timeRemaining} seconds before requesting another code.`);
       } else if (err.message?.includes('409')) {
         setWarning('An account with this phone number already exists. Please log in instead.');
       } else {
         setWarning('Network error. Please check your connection and try again.');
       }
       setLoading(false);
+      setButtonDisabled(false);
     }
   };
 

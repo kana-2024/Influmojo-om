@@ -5,13 +5,13 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
-import CustomDropdown from '../components/CustomDropdown';
-import * as apiService from '../services/apiService';
-import OtpModal from '../components/modals/OtpModal';
-import DatePickerModal from '../components/modals/DatePickerModal';
-import googleAuthService from '../services/googleAuth';
+import CustomDropdown from '../../components/CustomDropdown';
+import * as apiService from '../../services/apiService';
+import OtpModal from '../../components/modals/OtpModal';
+import DatePickerModal from '../../components/modals/DatePickerModal';
+import googleAuthService from '../../services/googleAuth';
 
-export default function ProfileSetupScreen({ navigation }: any) {
+export default function BrandProfileSetupScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const [scrolled, setScrolled] = useState(false);
   const [gender, setGender] = useState('Male');
@@ -29,7 +29,16 @@ export default function ProfileSetupScreen({ navigation }: any) {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const [role, setRole] = useState('');
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
+
+  // Role options for brands
+  const ROLES = [
+    'Founder/CEO', 'Marketing Manager', 'Brand Manager', 'Digital Marketing Specialist',
+    'Product Manager', 'Business Development', 'Sales Manager', 'Creative Director',
+    'Social Media Manager', 'PR Manager', 'Operations Manager', 'Other'
+  ];
 
   useEffect(() => {
     loadUserProfile();
@@ -42,7 +51,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
       const profile = await apiService.authAPI.getUserProfile();
       setUserProfile(profile.user);
       
-      console.log('🔍 ProfileSetupScreen: User profile loaded:', {
+      console.log('🔍 BrandProfileSetupScreen: User profile loaded:', {
         user_type: profile.user?.user_type,
         auth_provider: profile.user?.auth_provider
       });
@@ -61,9 +70,9 @@ export default function ProfileSetupScreen({ navigation }: any) {
       }
       
       // Debug: Check if JWT token is present
-      const { getToken } = await import('../services/storage');
+      const { getToken } = await import('../../services/storage');
       const token = await getToken();
-      console.log('[ProfileSetupScreen] loadUserProfile - JWT token present:', !!token, 'length:', token?.length || 0);
+      console.log('[BrandProfileSetupScreen] loadUserProfile - JWT token present:', !!token, 'length:', token?.length || 0);
     } catch (error) {
       console.error('Failed to load user profile:', error);
       // Default to showing email field if profile loading fails
@@ -163,6 +172,11 @@ export default function ProfileSetupScreen({ navigation }: any) {
       Alert.alert('Error', 'Please enter your pincode');
       return;
     }
+    
+    if (!role.trim()) {
+      Alert.alert('Error', 'Please select your role in the organization');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -171,7 +185,8 @@ export default function ProfileSetupScreen({ navigation }: any) {
         dob: selectedDate ? selectedDate.toISOString().split('T')[0] : dob.trim(),
         state: state.trim(),
         city: city.trim(),
-        pincode: pincode.trim()
+        pincode: pincode.trim(),
+        role: role.trim()
       };
 
       // Only add email/phone if they have values and are different from existing
@@ -194,8 +209,8 @@ export default function ProfileSetupScreen({ navigation }: any) {
 
       Alert.alert('Success', 'Basic info saved successfully!', [
         { text: 'OK', onPress: () => {
-          // Navigate to creator preferences
-          navigation.navigate('CreatorPreferences');
+          // Navigate to brand preferences
+          navigation.navigate('BrandPreferences');
         }}
       ]);
     } catch (error) {
@@ -282,7 +297,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
         {/* Heading and Explanation */}
         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', marginTop: 8, marginBottom: 4, textAlign: 'left' }}>You're almost there!</Text>
         <Text style={{ fontSize: 15, color: '#6B7280', marginBottom: 12, textAlign: 'left' }}>
-          Just a few more details to complete your creator profile. This helps us personalize your experience and keep your account secure.
+          Just a few more details to complete your brand profile. This helps us personalize your experience and keep your account secure.
         </Text>
         {/* Progress Bar */}
         <View style={styles.progressBarContainer}>
@@ -419,6 +434,38 @@ export default function ProfileSetupScreen({ navigation }: any) {
           onChangeText={setPincode}
         />
 
+        {/* Role Selection for Brands */}
+        <Text style={styles.sectionTitle}>Select your role in organization</Text>
+        <TouchableOpacity 
+          style={styles.roleDropdown}
+          onPress={() => setShowRoleDropdown(!showRoleDropdown)}
+          activeOpacity={0.7}
+        >
+          <Text style={role ? styles.roleDropdownText : styles.roleDropdownPlaceholder}>
+            {role || 'Select your role'}
+          </Text>
+          <Ionicons name={showRoleDropdown ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
+        </TouchableOpacity>
+        
+        {/* Role Dropdown Options */}
+        {showRoleDropdown && (
+          <View style={styles.roleOptionsBox}>
+            {ROLES.map(roleOption => (
+              <TouchableOpacity
+                key={roleOption}
+                style={styles.roleOption}
+                onPress={() => {
+                  setRole(roleOption);
+                  setShowRoleDropdown(false);
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.roleOptionText}>{roleOption}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {/* Next Button */}
         <TouchableOpacity
           style={[styles.nextButton, (loading || profileLoading) && { opacity: 0.7 }]}
@@ -525,5 +572,50 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     fontSize: 15,
     color: '#1A1D1F',
+  },
+  roleDropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginTop: 8,
+    marginBottom: 8,
+    minHeight: 48,
+  },
+  roleDropdownText: {
+    fontSize: 15,
+    color: '#1A1D1F',
+    fontWeight: '400',
+  },
+  roleDropdownPlaceholder: {
+    fontSize: 15,
+    color: '#B0B0B0',
+    fontWeight: '400',
+  },
+  roleOptionsBox: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    marginTop: -8,
+    marginBottom: 8,
+    maxHeight: 150,
+    zIndex: 1000,
+  },
+  roleOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  roleOptionText: {
+    fontSize: 15,
+    color: '#1A1D1F',
+    fontWeight: '400',
   },
 }); 

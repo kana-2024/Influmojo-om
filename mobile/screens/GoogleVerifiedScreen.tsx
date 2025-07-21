@@ -2,12 +2,41 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as NavigationBar from 'expo-navigation-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import * as apiService from '../services/apiService';
 
 const GoogleVerifiedScreen = ({ navigation }: any) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleNext = async () => {
+    setLoading(true);
+    try {
+      // Get user profile to determine user type
+      const profile = await apiService.authAPI.getUserProfile();
+      const userType = profile.user?.userType || profile.user?.user_type || 'creator';
+      
+      console.log('🔍 GoogleVerifiedScreen: User profile loaded:', {
+        userType: userType,
+        user: profile.user
+      });
+      
+      // Navigate to appropriate profile setup screen
+      if (userType === 'brand') {
+        navigation.navigate('BrandProfileSetup');
+      } else {
+        navigation.navigate('ProfileSetup');
+      }
+    } catch (error) {
+      console.error('Error getting user profile:', error);
+      // Default to creator profile setup
+      navigation.navigate('ProfileSetup');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
   }, []);
-
   return (
     <View style={styles.container}>
       {/* Top Bar */}
@@ -18,9 +47,11 @@ const GoogleVerifiedScreen = ({ navigation }: any) => {
         <View style={{ flex: 1 }} />
       </View>
       {/* Illustration */}
-      <View style={[styles.illustration, { backgroundColor: '#E5E7EB', justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ color: '#6B7280', fontSize: 16 }}>Verified Illustration</Text>
-      </View>
+      <Image
+        source={require('../assets/06.jpg')}
+        style={styles.illustration}
+        resizeMode="cover"
+      />
       {/* Checkmark */}
       <View style={styles.checkCircle}>
         <Ionicons name="checkmark" size={40} color="#22C55E" />
@@ -28,12 +59,16 @@ const GoogleVerifiedScreen = ({ navigation }: any) => {
       {/* Success Message */}
       <Text style={styles.title}>Your Google account has been verified.</Text>
       <Text style={styles.description}>
-        You can now provide a few personal details to access your dashboard.
+        We have successfully verified your Google account you can now give few personal details to access your dashboard.
       </Text>
       {/* Next Button */}
-      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('ProfileSetup')}>
-        <Text style={styles.nextText}>Continue Setup</Text>
-        <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
+      <TouchableOpacity 
+        style={[styles.nextButton, loading && { opacity: 0.7 }]} 
+        onPress={handleNext}
+        disabled={loading}
+      >
+        <Text style={styles.nextText}>{loading ? 'Loading...' : 'Next'}</Text>
+        {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
       </TouchableOpacity>
       {/* Login Link */}
       <TouchableOpacity style={styles.loginRow} onPress={() => navigation.navigate('Login')}>

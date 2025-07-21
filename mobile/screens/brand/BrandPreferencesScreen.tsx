@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput, SafeAreaView, ScrollView, StatusBar, Alert
 } from 'react-native';
@@ -6,34 +6,58 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { profileAPI } from '../../services/apiService';
 
-
-const INDUSTRIES = [
-  'IT & Technology', 'Entertainment', 'Fashion & Beauty', 'Food & Beverage', 
-  'Healthcare', 'Education', 'Finance & Banking', 'Travel & Tourism',
-  'Sports & Fitness', 'Automotive', 'Real Estate', 'E-commerce',
-  'Manufacturing', 'Media & Advertising', 'Consulting', 'Non-Profit'
-];
-
-const HIGHLIGHTED = ['IT & Technology', 'Entertainment', 'Fashion & Beauty', 'E-commerce'];
-
-const ROLES = [
-  'Founder/CEO', 'Marketing Manager', 'Brand Manager', 'Digital Marketing Specialist',
-  'Product Manager', 'Business Development', 'Sales Manager', 'Creative Director',
-  'Social Media Manager', 'PR Manager', 'Operations Manager', 'Other'
-];
-
-const LANGUAGES = ['Hindi', 'English', 'Telugu'];
-
 export default function BrandPreferencesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
-  const [selectedRole, setSelectedRole] = useState('');
   const [about, setAbout] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const [industries, setIndustries] = useState<string[]>([]);
+  const [highlightedIndustries, setHighlightedIndustries] = useState<string[]>([]);
+  const [industriesLoading, setIndustriesLoading] = useState(true);
+
+  const LANGUAGES = ['Hindi', 'English', 'Telugu'];
+
+  useEffect(() => {
+    loadIndustries();
+  }, []);
+
+  // Load industries from API
+  const loadIndustries = async () => {
+    try {
+      setIndustriesLoading(true);
+      const response = await profileAPI.getIndustries();
+      
+      if (response.success && response.data) {
+        setIndustries(response.data.industries || []);
+        setHighlightedIndustries(response.data.highlighted || []);
+      } else {
+        console.warn('Failed to load industries, using fallback');
+        // Fallback to default industries if API fails
+        setIndustries([
+          'IT & Technology', 'Entertainment', 'Fashion & Beauty', 'Food & Beverage', 
+          'Healthcare', 'Education', 'Finance & Banking', 'Travel & Tourism',
+          'Sports & Fitness', 'Automotive', 'Real Estate', 'E-commerce',
+          'Manufacturing', 'Media & Advertising', 'Consulting', 'Non-Profit'
+        ]);
+        setHighlightedIndustries(['IT & Technology', 'Entertainment', 'Fashion & Beauty', 'E-commerce']);
+      }
+    } catch (error) {
+      console.error('Error loading industries:', error);
+      // Fallback to default industries if API fails
+      setIndustries([
+        'IT & Technology', 'Entertainment', 'Fashion & Beauty', 'Food & Beverage', 
+        'Healthcare', 'Education', 'Finance & Banking', 'Travel & Tourism',
+        'Sports & Fitness', 'Automotive', 'Real Estate', 'E-commerce',
+        'Manufacturing', 'Media & Advertising', 'Consulting', 'Non-Profit'
+      ]);
+      setHighlightedIndustries(['IT & Technology', 'Entertainment', 'Fashion & Beauty', 'E-commerce']);
+    } finally {
+      setIndustriesLoading(false);
+    }
+  };
 
   // Industry selection logic
   const toggleIndustry = (industry: string) => {
@@ -63,11 +87,6 @@ export default function BrandPreferencesScreen({ navigation }: any) {
   const handleSavePreferences = async () => {
     if (selectedIndustries.length === 0) {
       Alert.alert('Error', 'Please select at least one industry');
-      return;
-    }
-
-    if (!selectedRole.trim()) {
-      Alert.alert('Error', 'Please select your role in the organization');
       return;
     }
 
@@ -101,10 +120,9 @@ export default function BrandPreferencesScreen({ navigation }: any) {
         categories: selectedIndustries,
         about: about.trim(),
         languages: selectedLanguages,
-        role: selectedRole
       });
       
-      console.log('🔍 Debug: Selected role:', selectedRole);
+      console.log('🔍 Debug: Selected role:', 'N/A'); // Removed role from debug log
 
       console.log('✅ Preferences saved successfully!');
       Alert.alert('Success', 'Preferences saved successfully!', [
@@ -162,64 +180,38 @@ export default function BrandPreferencesScreen({ navigation }: any) {
         <Text style={styles.sectionSubtitle}>
           Minimum one industry and maximum five you can select.
         </Text>
-        <View style={styles.categoriesBox}>
-          <View style={styles.categoriesRow}>
-            {INDUSTRIES.map((industry) => (
-              <TouchableOpacity
-                key={industry}
-                style={[
-                  styles.categoryChip,
-                  selectedIndustries.includes(industry) && styles.categoryChipSelected,
-                  HIGHLIGHTED.includes(industry) && styles.categoryChipHighlighted
-                ]}
-                onPress={() => toggleIndustry(industry)}
-                activeOpacity={0.7}
-              >
-                <Text
+        <View style={styles.industriesBox}>
+          {industriesLoading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Loading industries...</Text>
+            </View>
+          ) : (
+            <View style={styles.industriesRow}>
+              {industries.map((industry) => (
+                <TouchableOpacity
+                  key={industry}
                   style={[
-                    styles.categoryText,
-                    selectedIndustries.includes(industry) && styles.categoryTextSelected,
-                    HIGHLIGHTED.includes(industry) && styles.categoryTextHighlighted
+                    styles.categoryChip,
+                    selectedIndustries.includes(industry) && styles.categoryChipSelected,
+                    highlightedIndustries.includes(industry) && styles.categoryChipHighlighted
                   ]}
+                  onPress={() => toggleIndustry(industry)}
+                  activeOpacity={0.7}
                 >
-                  {industry}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                  <Text
+                    style={[
+                      styles.categoryText,
+                      selectedIndustries.includes(industry) && styles.categoryTextSelected,
+                      highlightedIndustries.includes(industry) && styles.categoryTextHighlighted
+                    ]}
+                  >
+                    {industry}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
-
-        {/* Role Selection */}
-        <Text style={styles.sectionTitle}>Select your role in organization</Text>
-        <TouchableOpacity 
-          style={styles.roleDropdown}
-          onPress={() => setShowRoleDropdown(!showRoleDropdown)}
-          activeOpacity={0.7}
-        >
-          <Text style={selectedRole ? styles.roleDropdownText : styles.roleDropdownPlaceholder}>
-            {selectedRole || 'Select your role'}
-          </Text>
-          <Ionicons name={showRoleDropdown ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
-        </TouchableOpacity>
-        
-        {/* Role Dropdown Options */}
-        {showRoleDropdown && (
-          <View style={styles.roleOptionsBox}>
-            {ROLES.map(role => (
-              <TouchableOpacity
-                key={role}
-                style={styles.roleOption}
-                onPress={() => {
-                  setSelectedRole(role);
-                  setShowRoleDropdown(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.roleOptionText}>{role}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
 
         {/* About */}
         <Text style={styles.sectionTitle}>About</Text>
@@ -329,11 +321,11 @@ const styles = StyleSheet.create({
   progressPercent: { alignSelf: 'flex-end', color: '#6B7280', fontSize: 13, marginBottom: 12 },
   sectionTitle: { fontSize: 15, fontWeight: '600', color: '#1A1D1F', marginTop: 12, marginBottom: 2 },
   sectionSubtitle: { fontSize: 13, color: '#6B7280', marginBottom: 8 },
-  categoriesBox: {
+  industriesBox: {
     backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12,
     borderWidth: 1, borderColor: '#E5E7EB',
   },
-  categoriesRow: {
+  industriesRow: {
     flexDirection: 'row', flexWrap: 'wrap', gap: 8,
   },
   categoryChip: {
@@ -425,35 +417,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F3F4F6',
   },
   languageOptionText: { color: '#1A1D1F', fontSize: 14 },
-  roleDropdown: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginBottom: 12,
-  },
-  roleDropdownText: { color: '#1A1D1F', fontSize: 15 },
-  roleDropdownPlaceholder: { color: '#B0B0B0', fontSize: 15 },
-  roleOptionsBox: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    marginBottom: 12,
-    paddingVertical: 4,
-  },
-  roleOption: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  roleOptionText: { color: '#1A1D1F', fontSize: 14 },
   nextButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#FF6B2C', borderRadius: 8, paddingVertical: 14, marginBottom: 8,
@@ -462,4 +425,14 @@ const styles = StyleSheet.create({
   bottomRow: { alignItems: 'center', marginTop: 8 },
   bottomText: { color: '#6B7280', fontSize: 14, textAlign: 'center' },
   loginLink: { color: '#2563EB', fontWeight: '500' },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  loadingText: {
+    color: '#6B7280',
+    fontSize: 16,
+  },
 }); 

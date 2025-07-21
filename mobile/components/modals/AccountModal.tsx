@@ -1,6 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Modal, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Modal, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { useAppDispatch } from '../../store/hooks';
+import { logout } from '../../store/slices/authSlice';
+import { clearToken } from '../../services/storage';
 
 interface AccountModalProps {
   visible: boolean;
@@ -9,15 +13,58 @@ interface AccountModalProps {
     name?: string;
     email?: string;
     profile_image_url?: string;
+    user_type?: string;
+    role_in_organization?: string;
   };
 }
 
 const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) => {
+  const navigation = useNavigation();
+  const dispatch = useAppDispatch();
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Clear stored token
+              await clearToken();
+              
+              // Dispatch logout action
+              dispatch(logout());
+              
+              // Navigate to login screen
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' as never }],
+              });
+              
+              // Close the modal
+              onClose();
+            } catch (error) {
+              console.error('Logout error:', error);
+              Alert.alert('Error', 'Failed to logout. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <Modal
       visible={visible}
       transparent
-      animationType={Platform.OS === 'ios' ? 'slide' : 'fade'}
+      animationType="slide"
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
@@ -27,9 +74,10 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
             <TouchableOpacity onPress={onClose} style={styles.headerBtn}>
               <Ionicons name="arrow-back" size={24} color="#1A1D1F" />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Account</Text>
+            <Text style={styles.headerTitle}>{user.name || 'Account'}</Text>
             <View style={{ width: 32 }} />
           </View>
+          
           {/* Profile Info */}
           <View style={styles.profileRow}>
             <View style={styles.avatarWrapper}>
@@ -43,11 +91,12 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
               </TouchableOpacity>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.profileName}>{user.name || 'Mohammed Azhar'}</Text>
-              <Text style={styles.profileEmail}>{user.email || 'azharweb90@gmail.com'}</Text>
+              <Text style={styles.profileName}>{user.name || 'User'}</Text>
+              <Text style={styles.profileEmail}>{user.role_in_organization || 'no role'}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
           </View>
+          
           {/* Account Section */}
           <Text style={styles.sectionLabel}>Account</Text>
           <TouchableOpacity style={styles.row}>
@@ -60,6 +109,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
             </View>
             <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
           </TouchableOpacity>
+          
           <TouchableOpacity style={styles.row}>
             <View style={styles.rowLeft}>
               <Ionicons name="settings-outline" size={22} color="#1A1D1F" style={styles.rowIcon} />
@@ -70,6 +120,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
             </View>
             <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
           </TouchableOpacity>
+          
           {/* Help & Support Section */}
           <Text style={styles.sectionLabel}>Help & Support</Text>
           <TouchableOpacity style={styles.row}>
@@ -82,6 +133,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
             </View>
             <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
           </TouchableOpacity>
+          
           <TouchableOpacity style={styles.row}>
             <View style={styles.rowLeft}>
               <Ionicons name="lock-closed-outline" size={22} color="#1A1D1F" style={styles.rowIcon} />
@@ -92,6 +144,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
             </View>
             <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
           </TouchableOpacity>
+          
           <TouchableOpacity style={styles.row}>
             <View style={styles.rowLeft}>
               <Ionicons name="document-text-outline" size={22} color="#1A1D1F" style={styles.rowIcon} />
@@ -102,6 +155,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
             </View>
             <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
           </TouchableOpacity>
+          
           <TouchableOpacity style={styles.row}>
             <View style={styles.rowLeft}>
               <Ionicons name="help-circle-outline" size={22} color="#1A1D1F" style={styles.rowIcon} />
@@ -112,8 +166,9 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
             </View>
             <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
           </TouchableOpacity>
+          
           {/* Logout */}
-          <TouchableOpacity style={[styles.row, { marginTop: 8 }] }>
+          <TouchableOpacity style={[styles.row, { marginTop: 8 }]} onPress={handleLogout}>
             <View style={styles.rowLeft}>
               <Ionicons name="power-outline" size={22} color="#1A1D1F" style={styles.rowIcon} />
               <View>
@@ -132,7 +187,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   sheet: {

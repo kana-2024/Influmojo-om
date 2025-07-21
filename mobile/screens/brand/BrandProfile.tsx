@@ -4,16 +4,25 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAppSelector } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
-import { BottomNavBar, KycModal } from '../../components';
+import { BottomNavBar, KycModal, AccountModal } from '../../components';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import CreateCampaignScreen from './CreateCampaignScreen';
+import CreateCampaignModal from './CreateCampaignModal';
 import CreateProjectScreen from './CreateProjectScreen';
 import AnimatedModalOverlay from '../../components/AnimatedModalOverlay';
 import CustomDropdown from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
 
-const industries = ['IT & Technology', 'Entertainment', 'Fashion & Beauty'];
-const languages = ['English', 'Hindi', 'Telugu', 'Marathi'];
+// Safe parsing helper
+const safeParse = (value: any): string[] => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    console.warn('Invalid JSON:', value);
+    return [];
+  }
+};
 
 const SCROLL_THRESHOLD = 40;
 
@@ -37,6 +46,7 @@ const BrandProfile = () => {
   const scrollViewRef = useRef(null);
   const [brandProfile, setBrandProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showAccountModal, setShowAccountModal] = useState(false);
 
   useEffect(() => {
     setShowKycModal(false);
@@ -57,12 +67,37 @@ const BrandProfile = () => {
   const loadBrandProfile = async () => {
     try {
       setLoading(true);
+      console.log('🔍 Loading brand profile...');
       const response = await profileAPI.getBrandProfile();
-      if (response.success) {
-        setBrandProfile(response.data);
+      
+      if (response.success && response.data) {
+        const profile = response.data;
+        
+        // Safely parse JSON fields
+        const parsedIndustries = safeParse(profile.industries);
+        const parsedLanguages = safeParse(profile.languages);
+        const parsedCampaigns = Array.isArray(profile.campaigns) ? profile.campaigns : [];
+        const parsedCollaborations = Array.isArray(profile.collaborations) ? profile.collaborations : [];
+        
+        console.log('🔍 Brand profile loaded successfully:', {
+          industries: parsedIndustries,
+          languages: parsedLanguages,
+          campaigns_count: parsedCampaigns.length,
+          collaborations_count: parsedCollaborations.length
+        });
+        
+        setBrandProfile({
+          ...profile,
+          industries: parsedIndustries,
+          languages: parsedLanguages,
+          campaigns: parsedCampaigns,
+          collaborations: parsedCollaborations
+        });
+      } else {
+        console.warn('❌ Brand profile API failed:', response);
       }
-    } catch (error) {
-      console.error('Error loading brand profile:', error);
+    } catch (error: any) {
+      console.error('❌ Error in loadBrandProfile:', error?.message || error);
     } finally {
       setLoading(false);
     }
@@ -96,7 +131,7 @@ const BrandProfile = () => {
             <Ionicons name="arrow-back" size={22} color="#1A1D1F" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Brand Profile</Text>
-          <TouchableOpacity style={styles.headerIconBtn}>
+          <TouchableOpacity style={styles.headerIconBtn} onPress={() => setShowAccountModal(true)}>
             <Ionicons name="ellipsis-vertical" size={22} color="#1A1D1F" />
           </TouchableOpacity>
         </View>
@@ -136,6 +171,14 @@ const BrandProfile = () => {
           <View style={styles.infoRowIcon}>
             <Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
             <Text style={styles.infoGray}>
+              {brandProfile?.languages && brandProfile.languages.length > 0 
+                ? brandProfile.languages.join(', ') 
+                : 'Languages not specified'}
+            </Text>
+          </View>
+          <View style={styles.infoRowIcon}>
+            <Ionicons name="person-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
+            <Text style={styles.infoGray}>
               {brandProfile?.role_in_organization || 'Role not specified'}
             </Text>
           </View>
@@ -159,12 +202,21 @@ const BrandProfile = () => {
             <Text style={[styles.infoGray, { alignSelf: 'center' }]}> • {brandProfile?.company_size || 'Company size not specified'}</Text>
           </View>
           <View style={styles.ratingRow}>
-            <Text style={styles.ratingValue}>4.8</Text>
-            <Ionicons name="star" size={16} color="#FFD600" />
-            <Ionicons name="star" size={16} color="#FFD600" />
-            <Ionicons name="star" size={16} color="#FFD600" />
-            <Ionicons name="star" size={16} color="#FFD600" />
-            <Ionicons name="star" size={16} color="#FFD600" />
+            {brandProfile?.rating && Number(brandProfile.rating) > 0 ? (
+              <>
+                <Text style={styles.ratingValue}>{Number(brandProfile.rating).toFixed(1)}</Text>
+                <Ionicons name="star" size={16} color="#FFD600" />
+                <Ionicons name="star" size={16} color="#FFD600" />
+                <Ionicons name="star" size={16} color="#FFD600" />
+                <Ionicons name="star" size={16} color="#FFD600" />
+                <Ionicons name="star" size={16} color="#FFD600" />
+              </>
+            ) : (
+              <>
+                <Text style={styles.ratingValue}>No ratings yet</Text>
+                <Ionicons name="star" size={16} color="#B0B0B0" />
+              </>
+            )}
           </View>
         </View>
         <View style={styles.divider} />
@@ -174,7 +226,7 @@ const BrandProfile = () => {
           <Ionicons name="chevron-forward" size={18} color="#6B7280" style={{ marginBottom: 6 }} />
         </TouchableOpacity>
         <View style={styles.categoryRow}>
-          {brandProfile?.industries ? JSON.parse(brandProfile.industries).map((industry: string, index: number) => (
+          {brandProfile?.industries && brandProfile.industries.length > 0 ? brandProfile.industries.map((industry: string, index: number) => (
             <View 
               key={industry} 
               style={[
@@ -184,17 +236,11 @@ const BrandProfile = () => {
             >
               <Text style={[styles.categoryText, { color: '#000' }]}>{industry}</Text>
             </View>
-          )) : industries.map((industry, index) => (
-            <View 
-              key={industry} 
-              style={[
-                styles.categoryChip,
-                { backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D' }
-              ]}
-            >
-              <Text style={[styles.categoryText, { color: '#000' }]}>{industry}</Text>
+          )) : (
+            <View style={styles.categoryChip}>
+              <Text style={[styles.categoryText, { color: '#6B7280' }]}>No industries specified</Text>
             </View>
-          ))}
+          )}
         </View>
         {/* About */}
         <TouchableOpacity style={styles.sectionRow}>
@@ -222,7 +268,7 @@ const BrandProfile = () => {
             <View style={styles.emptyState}>
               <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
               <Text style={styles.emptyTitle}>There are no Campaigns created yet!</Text>
-              <Text style={styles.emptyDesc}>To collaborate with creators, you need to create campaigns for your brand promotion and marketing initiatives.</Text>
+              <Text style={styles.emptyDesc}>To connect with creators and promote your brand, you need to create campaigns for your marketing needs.</Text>
               <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowCreateCampaign(true)}>
                 <Text style={styles.createPackageBtnText}>Create Campaign</Text>
               </TouchableOpacity>
@@ -261,11 +307,11 @@ const BrandProfile = () => {
         </View>
       </ScrollView>
 
-      {/* Modals */}
-      <AnimatedModalOverlay
-        visible={showCreateCampaign}
-      >
-        <CreateCampaignScreen onClose={() => setShowCreateCampaign(false)} onBack={() => setShowCreateCampaign(false)} />
+      {/* Modals and BottomNavBar */}
+      <AnimatedModalOverlay visible={showCreateCampaign}>
+        <CreateCampaignModal 
+          onClose={() => setShowCreateCampaign(false)} 
+        />
       </AnimatedModalOverlay>
 
       <AnimatedModalOverlay
@@ -274,11 +320,25 @@ const BrandProfile = () => {
         <CreateProjectScreen onClose={() => setShowCreateProject(false)} />
       </AnimatedModalOverlay>
 
-      <KycModal
-        onClose={() => setShowKycModal(false)}
-        onBack={() => setShowKycModal(false)}
+      {showKycModal && (
+        <Modal visible={showKycModal} transparent animationType="slide" onRequestClose={() => setShowKycModal(false)}>
+          <KycModal
+            onClose={() => setShowKycModal(false)}
+            onBack={() => setShowKycModal(false)}
+          />
+        </Modal>
+      )}
+      <AccountModal 
+        visible={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
+        user={{
+          name: user?.name,
+          email: user?.email,
+          profile_image_url: user?.profileImage,
+          user_type: user?.user_type,
+          role_in_organization: brandProfile?.role_in_organization
+        }}
       />
-
       <BottomNavBar navigation={navigation} />
     </SafeAreaView>
   );
