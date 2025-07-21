@@ -12,6 +12,7 @@ import AnimatedModalOverlay from '../../components/AnimatedModalOverlay';
 import CustomDropdown from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
 import { setShowCreatePortfolio, setShowKycModal, resetModals } from '../../store/slices/modalSlice';
+import AccountModal from '../../components/modals/AccountModal';
 
 const categories = ['Technology', 'Science', 'Training'];
 const languages = ['English', 'Hindi', 'Telugu', 'Marathi'];
@@ -50,6 +51,7 @@ const CreatorProfile = () => {
   const scrollViewRef = useRef(null);
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showAccountModal, setShowAccountModal] = useState(false);
 
   console.log('🔍 CreatorProfile component loaded');
   console.log('🔍 Current user:', user);
@@ -158,6 +160,7 @@ const CreatorProfile = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <StatusBar barStyle='dark-content' backgroundColor='#fff' />
+<<<<<<< HEAD
       
       {/* Show error message for brand users */}
       {user && user.user_type === 'brand' && (
@@ -181,6 +184,26 @@ const CreatorProfile = () => {
           {/* Header */}
           <View style={{ alignItems: 'center', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12 }}>
             <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' }}>My Profile</Text>
+=======
+      {/* Header */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12, paddingHorizontal: 16 }}>
+        <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row' }}>
+          {/* Optionally add a back button here if needed */}
+        </View>
+        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center', flex: 2 }}>My Profile</Text>
+        <TouchableOpacity style={{ flex: 1, alignItems: 'flex-end' }} onPress={() => setShowAccountModal(true)}>
+          <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
+        </TouchableOpacity>
+      </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        {/* Profile Card */}
+        <View style={{ marginHorizontal: 16, marginTop: 8, backgroundColor: '#fff', borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }}>
+          {/* Cover block */}
+          <View style={{ height: 90, backgroundColor: '#FF6B2C', borderTopLeftRadius: 16, borderTopRightRadius: 16, justifyContent: 'flex-end', alignItems: 'flex-end', padding: 8 }}>
+            <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 16, padding: 4 }}>
+              <Ionicons name="camera" size={18} color="#FF6B2C" />
+            </TouchableOpacity>
+>>>>>>> 1f291ff78b1f4fcd0a6be29cdb6e941c64c46090
           </View>
           <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
             {/* Profile Card */}
@@ -375,6 +398,7 @@ const CreatorProfile = () => {
                 </View>
               )}
             </View>
+<<<<<<< HEAD
           </ScrollView>
           {/* Modals and BottomNavBar remain unchanged */}
           <AnimatedModalOverlay visible={showCreatePortfolio}>
@@ -390,6 +414,59 @@ const CreatorProfile = () => {
           <BottomNavBar navigation={navigation} />
         </>
       )}
+=======
+          )}
+          {activeTab === 'Portfolio' && (
+            <View style={styles.emptyState}>
+              <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
+              <Text style={styles.emptyTitle}>There are no Portfolio files added yet!</Text>
+              <Text style={styles.emptyDesc}>To showcase your work, you need to add your portfolio files for all your social platforms.</Text>
+              <TouchableOpacity style={styles.createPackageBtn} onPress={openCreatePortfolio}>
+                <Text style={styles.createPackageBtnText}>Add Files</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {activeTab === 'Kyc' && (
+            <View style={styles.emptyState}>
+              <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
+              <Text style={styles.emptyTitle}>Your KYC is not verified yet!</Text>
+              <Text style={styles.emptyDesc}>To unlock all features and receive payments, please verify your identity by uploading your ID proof.</Text>
+              <TouchableOpacity style={styles.createPackageBtn} onPress={openKycModal}>
+                <Text style={styles.createPackageBtnText}>Verify ID</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {activeTab === 'Payments' && (
+            <View style={styles.emptyState}>
+              <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
+              <Text style={styles.emptyTitle}>No payment information available yet!</Text>
+              <Text style={styles.emptyDesc}>Once you start collaborating and earning, your payment details will appear here.</Text>
+              <TouchableOpacity style={styles.createPackageBtn} onPress={() => alert('Add Bank Account')}>
+                <Text style={styles.createPackageBtnText}>Add Bank Account</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+      {/* Account Modal Overlay (use new component) */}
+      <AccountModal
+        visible={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
+        user={{
+          name: creatorProfile?.user?.name,
+          email: creatorProfile?.user?.email,
+          profile_image_url: creatorProfile?.user?.profile_image_url,
+        }}
+      />
+      {/* Modals and BottomNavBar remain unchanged */}
+      <AnimatedModalOverlay visible={showCreatePortfolio}>
+        <CreatePortfolioScreen onClose={closeCreatePortfolio} onBack={closeCreatePortfolio} />
+      </AnimatedModalOverlay>
+      <Modal visible={showKycModal} transparent animationType={Platform.OS === 'ios' ? 'slide' : 'fade'} onRequestClose={closeKycModal}>
+        <KycModal onClose={closeKycModal} onBack={closeKycModal} />
+      </Modal>
+      <BottomNavBar navigation={navigation} />
+>>>>>>> 1f291ff78b1f4fcd0a6be29cdb6e941c64c46090
     </SafeAreaView>
   );
 };
