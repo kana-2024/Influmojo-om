@@ -25,6 +25,18 @@ const tabList = [
   { key: 'Payments', label: 'Payments' },
 ];
 
+// Utility to safely parse array from string or return array as-is
+const safeParseArray = (value: any): any[] => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  try {
+    return JSON.parse(value);
+  } catch (err) {
+    console.warn('❗Invalid JSON in creator profile:', value);
+    return [];
+  }
+};
+
 const CreatorProfile = () => {
   const user = useAppSelector(state => state.auth.user);
   const insets = useSafeAreaInsets();
@@ -65,7 +77,12 @@ const CreatorProfile = () => {
       const response = await profileAPI.getCreatorProfile();
       console.log('✅ Creator profile response:', response);
       if (response.success) {
-        setCreatorProfile(response.data);
+        const profile = response.data;
+        setCreatorProfile({
+          ...profile,
+          interests: safeParseArray(profile.interests),
+          content_categories: safeParseArray(profile.content_categories),
+        });
       } else {
         console.error('❌ Creator profile failed:', response.error);
       }
@@ -113,154 +130,106 @@ const CreatorProfile = () => {
   const closeKycModal = () => dispatch(setShowKycModal(false));
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle='light-content' backgroundColor='#000' />
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}
-        onScroll={event => {
-          const y = event.nativeEvent.contentOffset.y;
-          setScrolled(y > 10);
-        }}
-        scrollEventThrottle={16}
-      >
-        {/* Header with back and menu */}
-        <View style={[styles.headerRow, { paddingTop: insets.top }]}>
-          <TouchableOpacity style={styles.headerIconBtn}>
-            <Ionicons name="arrow-back" size={22} color="#1A1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Creator Profile</Text>
-          <TouchableOpacity style={styles.headerIconBtn}>
-            <Ionicons name="ellipsis-vertical" size={22} color="#1A1D1F" />
-          </TouchableOpacity>
-        </View>
-        {/* Cover Image and Avatar */}
-        <View style={styles.coverContainer}>
-          <Image source={{ uri: (user && (user as any).coverUrl) ? (user as any).coverUrl : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80' }} style={styles.coverImage} />
-          {/* Avatar and Info Row */}
-          <View style={styles.avatarInfoRow}>
-            <View style={styles.avatarWrapper}>
-              <Image source={{ uri: (user && (user as any).avatarUrl) ? (user as any).avatarUrl : 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
-              <TouchableOpacity style={styles.avatarEditBtn}>
-                <Ionicons name="pencil" size={12} color="#fff" />
-              </TouchableOpacity>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <StatusBar barStyle='dark-content' backgroundColor='#fff' />
+      {/* Header */}
+      <View style={{ alignItems: 'center', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12 }}>
+        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' }}>My Profile</Text>
+      </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        {/* Profile Card */}
+        <View style={{ marginHorizontal: 16, marginTop: 8, backgroundColor: '#fff', borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }}>
+          {/* Cover block */}
+          <View style={{ height: 90, backgroundColor: '#FF6B2C', borderTopLeftRadius: 16, borderTopRightRadius: 16, justifyContent: 'flex-end', alignItems: 'flex-end', padding: 8 }}>
+            <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 16, padding: 4 }}>
+              <Ionicons name="camera" size={18} color="#FF6B2C" />
+            </TouchableOpacity>
+          </View>
+          {/* Avatar and Info */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: -32, paddingHorizontal: 16 }}>
+            <View style={{ borderWidth: 3, borderColor: '#fff', borderRadius: 48, overflow: 'hidden', width: 64, height: 64, backgroundColor: '#eee' }}>
+              <Image source={{ uri: creatorProfile?.user?.profile_image_url || 'https://randomuser.me/api/portraits/men/1.jpg' }} style={{ width: 64, height: 64 }} />
             </View>
-            
-          </View>
-          {/* Cover camera */}
-          <TouchableOpacity style={styles.coverEditBtn}>
-            <Ionicons name="camera" size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
-        <View style={{ height: 48 }} />
-        {/* User Info */}
-        <View style={styles.infoSection}>
-          <Text style={styles.name}>{creatorProfile?.user?.name || user?.name || 'Creator Name'}</Text>
-          <View style={styles.infoRowIcon}>
-            <MaterialIcons name="female" size={15} color="#B0B0B0" style={styles.infoIcon} />
-            <Text style={styles.infoGray}>
-              {creatorProfile?.gender || 'Not specified'} {creatorProfile?.date_of_birth ? new Date().getFullYear() - new Date(creatorProfile.date_of_birth).getFullYear() : ''}
-            </Text>
-          </View>
-          {creatorProfile?.date_of_birth && (
-            <View style={styles.infoRowIcon}>
-              <Ionicons name="calendar-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-              <Text style={styles.infoGray}>
-                {new Date(creatorProfile.date_of_birth).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </Text>
+            <View style={{ marginLeft: 12, flex: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ fontSize: 17, fontWeight: '700', color: '#1A1D1F' }}>{creatorProfile?.user?.name || 'Creator Name'}</Text>
+                <Ionicons name="chevron-forward" size={18} color="#1A1D1F" style={{ marginLeft: 4 }} />
+              </View>
+              <Text style={{ color: '#6B7280', fontSize: 14, marginTop: 2 }}>{creatorProfile?.user?.email || ''}</Text>
+              <Text style={{ color: '#6B7280', fontSize: 14 }}>{creatorProfile?.user?.phone || ''}</Text>
             </View>
-          )}
-          <View style={styles.infoRowIcon}>
-            <Ionicons name="location-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-            <Text style={styles.infoGray}>
-              {creatorProfile?.location_state ? `${creatorProfile.location_state}, ` : ''}
-              {creatorProfile?.location_city || 'City'}{creatorProfile?.location_pincode ? ` ${creatorProfile.location_pincode}` : ''}
-            </Text>
           </View>
-          <View style={styles.infoRowIcon}>
-            <Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-            <Text style={styles.infoGray}>
-              {creatorProfile?.interests ? JSON.parse(creatorProfile.interests).join(', ') : 'Languages not specified'}
-            </Text>
-          </View>
-          <View style={styles.infoRowIcon}>
-            <Ionicons name="time-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-            <View style={styles.quickResponderTag}>
-              <Text style={styles.quickResponderText}>Quick Responder</Text>
+          {/* Info Rows */}
+          <View style={{ marginTop: 12, paddingHorizontal: 16, marginBottom: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+              <Ionicons name="male" size={15} color="#B0B0B0" style={{ marginRight: 6 }} />
+              <Text style={{ color: '#6B7280', fontSize: 14 }}>{creatorProfile?.gender || 'Not specified'}{creatorProfile?.date_of_birth ? ' ' + (new Date().getFullYear() - new Date(creatorProfile.date_of_birth).getFullYear()) : ''}</Text>
             </View>
-            <Text style={[styles.infoGray, { alignSelf: 'center' }]}> • {creatorProfile?.average_response_time || '2-4 hours'}</Text>
-          </View>
-          <View style={styles.ratingRow}>
-            <Text style={styles.ratingValue}>{creatorProfile?.rating || '0.0'}</Text>
-            <Ionicons name="star" size={16} color="#FFD600" />
-            <Ionicons name="star" size={16} color="#FFD600" />
-            <Ionicons name="star" size={16} color="#FFD600" />
-            <Ionicons name="star" size={16} color="#FFD600" />
-            <Ionicons name="star-half" size={16} color="#FFD600" />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+              <Ionicons name="location-outline" size={15} color="#B0B0B0" style={{ marginRight: 6 }} />
+              <Text style={{ color: '#6B7280', fontSize: 14 }}>{creatorProfile?.location_state ? `${creatorProfile.location_state}, ` : ''}{creatorProfile?.location_city || 'City'}{creatorProfile?.location_pincode ? ` ${creatorProfile.location_pincode}` : ''}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+              <Ionicons name="language-outline" size={15} color="#B0B0B0" style={{ marginRight: 6 }} />
+              <Text style={{ color: '#6B7280', fontSize: 14 }}>{creatorProfile?.interests?.length ? creatorProfile.interests.join(', ') : 'Languages not specified'}</Text>
+            </View>
           </View>
         </View>
-        <View style={styles.divider} />
+        {/* Divider */}
+        <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
         {/* Categories */}
-        <TouchableOpacity style={styles.sectionRow}>
-          <Text style={styles.sectionTitle}>CATEGORIES</Text>
-          <Ionicons name="chevron-forward" size={18} color="#6B7280" style={{ marginBottom: 6 }} />
-        </TouchableOpacity>
-        <View style={styles.categoryRow}>
-          {creatorProfile?.content_categories ? JSON.parse(creatorProfile.content_categories).map((cat: string, index: number) => (
-            <View 
-              key={cat} 
-              style={[
-                styles.categoryChip,
-                { backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D' }
-              ]}
-            >
-              <Text style={[styles.categoryText, { color: '#000' }]}>{cat}</Text>
-            </View>
-          )) : categories.map((cat, index) => (
-            <View 
-              key={cat} 
-              style={[
-                styles.categoryChip,
-                { backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D' }
-              ]}
-            >
-              <Text style={[styles.categoryText, { color: '#000' }]}>{cat}</Text>
-            </View>
-          ))}
+        <View style={{ marginHorizontal: 16 }}>
+          <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>Categories</Text>
+            <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 }}>
+            {creatorProfile?.content_categories?.length
+              ? creatorProfile.content_categories.map((cat: string, index: number) => (
+                  <View key={cat} style={{ backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, marginRight: 8, marginBottom: 8 }}>
+                    <Text style={{ color: '#000', fontSize: 14, fontWeight: '500' }}>{cat}</Text>
+                  </View>
+                ))
+              : categories.map((cat, index) => (
+                  <View key={cat} style={{ backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, marginRight: 8, marginBottom: 8 }}>
+                    <Text style={{ color: '#000', fontSize: 14, fontWeight: '500' }}>{cat}</Text>
+                  </View>
+                ))}
+          </View>
         </View>
+        {/* Divider */}
+        <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
         {/* About */}
-        <TouchableOpacity style={styles.sectionRow}>
-          <Text style={styles.sectionTitle}>ABOUT</Text>
-          <Ionicons name="chevron-forward" size={18} color="#6B7280" style={{ marginBottom: 6 }} />
-        </TouchableOpacity>
-        <Text style={styles.aboutText}>
-          {creatorProfile?.bio || 'No bio available yet.'}
-        </Text>
+        <View style={{ marginHorizontal: 16 }}>
+          <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>About</Text>
+            <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+          </TouchableOpacity>
+          <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 22 }}>{creatorProfile?.bio || 'No bio available yet.'}</Text>
+        </View>
+        {/* Divider */}
+        <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
         {/* Tabs */}
-        <View style={styles.tabRow}>
+        <View style={{ flexDirection: 'row', backgroundColor: '#F3F4F6', borderRadius: 12, padding: 4, marginHorizontal: 16, marginTop: 8, marginBottom: 16 }}>
           {tabList.map(tab => (
             <TouchableOpacity
               key={tab.key}
-              style={activeTab === tab.key ? styles.tabBtnActive : styles.tabBtn}
+              style={{ flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 8, backgroundColor: activeTab === tab.key ? '#fff' : 'transparent', borderWidth: activeTab === tab.key ? 0 : 1, borderColor: activeTab === tab.key ? 'transparent' : '#E5E7EB' }}
               onPress={() => handleTabPress(tab.key)}
             >
-              <Text style={activeTab === tab.key ? styles.tabBtnTextActive : styles.tabBtnText}>{tab.label}</Text>
+              <Text style={{ fontSize: 15, fontWeight: activeTab === tab.key ? '700' : '500', color: activeTab === tab.key ? '#1A1D1F' : '#6B7280' }}>{tab.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
-        {/* Tab Content Area - fixed height for smooth switching */}
-        <View style={{ flex: 1, width: '100%', marginBottom: 32 }}>
+        {/* Tab Content Area */}
+        <View style={{ flex: 1, width: '100%', marginBottom: 32, alignItems: 'center', justifyContent: 'center' }}>
           {activeTab === 'Packages' && (
-            <View style={styles.emptyState}>
+            <View style={{ alignItems: 'center', paddingVertical: 40 }}>
               <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
-              <Text style={styles.emptyTitle}>There are no Packages has been created yet!</Text>
-              <Text style={styles.emptyDesc}>To enjoy the benefits and business you need to add your packages for all your social platforms.</Text>
-              <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePortfolio(true))}>
-                <Text style={styles.createPackageBtnText}>Create Package</Text>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#2563EB', textAlign: 'center', marginBottom: 8 }}>There are no Packages has been created yet!</Text>
+              <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 24, paddingHorizontal: 20 }}>To enjoy the benefits and brands wants to give business you need to add your packages for all your social platforms.</Text>
+              <TouchableOpacity style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: '#FF6B2C', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 }} onPress={() => dispatch(setShowCreatePortfolio(true))}>
+                <Text style={{ color: '#FF6B2C', fontSize: 16, fontWeight: '700' }}>Create Package</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -296,27 +265,13 @@ const CreatorProfile = () => {
           )}
         </View>
       </ScrollView>
-
-      {/* Modals */}
-      <AnimatedModalOverlay
-        visible={showCreatePortfolio}
-      >
+      {/* Modals and BottomNavBar remain unchanged */}
+      <AnimatedModalOverlay visible={showCreatePortfolio}>
         <CreatePortfolioScreen onClose={closeCreatePortfolio} onBack={closeCreatePortfolio} />
       </AnimatedModalOverlay>
-
-      {/* KYC Modal - wrap in native Modal */}
-      <Modal
-        visible={showKycModal}
-        transparent
-        animationType={Platform.OS === 'ios' ? 'slide' : 'fade'}
-        onRequestClose={closeKycModal}
-      >
-        <KycModal
-          onClose={closeKycModal}
-          onBack={closeKycModal}
-        />
+      <Modal visible={showKycModal} transparent animationType={Platform.OS === 'ios' ? 'slide' : 'fade'} onRequestClose={closeKycModal}>
+        <KycModal onClose={closeKycModal} onBack={closeKycModal} />
       </Modal>
-
       <BottomNavBar navigation={navigation} />
     </SafeAreaView>
   );

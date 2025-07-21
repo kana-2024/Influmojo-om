@@ -108,12 +108,15 @@ app.use((req, res, next) => {
   });
 });
 
-// Error handling middleware
+// Global error handler (ensure all errors are JSON)
 app.use((err, req, res, next) => {
   console.error('Error:', err);
-  res.status(500).json({
-    error: 'Internal server error',
-    message: err.message || 'An unexpected error occurred.'
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal server error',
+    details: err.stack || undefined
   });
 });
 
