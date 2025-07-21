@@ -76,10 +76,12 @@ const SignUpScreen = ({ navigation, route }: any) => {
             const apiResult = await authAPI.googleAuth(result.idToken, true, userType); // isSignup = true, userType
             if (__DEV__) {
               console.log('Backend API response:', apiResult);
+              console.log('[SignUpScreen] Google auth successful, token saved:', !!apiResult.token);
             }
           
           if (apiResult.success) {
             // New user created successfully, proceed to verification
+            console.log('[SignUpScreen] Navigating to GoogleVerification');
             navigation.navigate('GoogleVerification');
           } else {
             setWarning(apiResult.error || 'Backend authentication failed. Please try again.');

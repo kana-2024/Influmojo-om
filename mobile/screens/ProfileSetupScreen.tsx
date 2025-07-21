@@ -52,6 +52,11 @@ export default function ProfileSetupScreen({ navigation }: any) {
         // Phone user - show email field, pre-fill phone if available
         setPhone(profile.user?.phone || '');
       }
+      
+      // Debug: Check if JWT token is present
+      const { getToken } = await import('../services/storage');
+      const token = await getToken();
+      console.log('[ProfileSetupScreen] loadUserProfile - JWT token present:', !!token, 'length:', token?.length || 0);
     } catch (error) {
       console.error('Failed to load user profile:', error);
       // Default to showing email field if profile loading fails
@@ -197,17 +202,36 @@ export default function ProfileSetupScreen({ navigation }: any) {
   };
 
   // Handle phone verification success
-  const handlePhoneVerified = (verifiedPhone: string) => {
-    setPhone(verifiedPhone);
+  const handlePhoneVerified = (result: any) => {
+    console.log('[ProfileSetupScreen] handlePhoneVerified received:', result);
+    
+    // Extract phone from the result object
+    const verifiedPhone = result.user?.phone || result.phone || '';
+    
+    let formattedPhone = verifiedPhone.trim();
+    if (!formattedPhone.startsWith('+91')) {
+      if (formattedPhone.startsWith('91') && formattedPhone.length === 12) {
+        formattedPhone = '+' + formattedPhone;
+      } else if (formattedPhone.length === 10) {
+        formattedPhone = '+91' + formattedPhone;
+      }
+    }
+    console.log('Verified phone set in state:', formattedPhone);
+    setPhone(formattedPhone);
     setShowOtpModal(false);
   };
 
   // Handle send OTP button press
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
     if (!phone.trim()) {
       Alert.alert('Error', 'Please enter your phone number first');
       return;
     }
+    
+    // Debug: Check if JWT token is present before sending OTP
+    const { getToken } = await import('../services/storage');
+    const token = await getToken();
+    console.log('[ProfileSetupScreen] handleSendOtp - JWT token present:', !!token, 'length:', token?.length || 0);
     
     // Format phone number to ensure it has +91 prefix
     let formattedPhone = phone.trim();

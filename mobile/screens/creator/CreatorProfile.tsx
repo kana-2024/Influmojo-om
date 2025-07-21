@@ -1,16 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, StatusBar, Platform, Dimensions, Modal } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useAppSelector } from '../../store/hooks';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { BottomNavBar, KycModal } from '../../components';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import CreatePackageScreen from './CreatePackageScreen';
 import CreatePortfolioScreen from './CreatePortfolioScreen';
 import AnimatedModalOverlay from '../../components/AnimatedModalOverlay';
 import CustomDropdown from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
+import { setShowCreatePortfolio, setShowKycModal, resetModals } from '../../store/slices/modalSlice';
 
 const categories = ['Technology', 'Science', 'Training'];
 const languages = ['English', 'Hindi', 'Telugu', 'Marathi'];
@@ -30,14 +31,30 @@ const CreatorProfile = () => {
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState('Packages');
   const navigation = useNavigation();
-  const [showCreatePackage, setShowCreatePackage] = useState(false);
-  const [showCreatePortfolio, setShowCreatePortfolio] = useState(false);
-  const [showKycModal, setShowKycModal] = useState(false);
+  const route = useRoute();
+  const dispatch = useAppDispatch();
+  const showCreatePortfolio = useAppSelector(state => state.modal.showCreatePortfolio);
+  const showKycModal = useAppSelector(state => state.modal.showKycModal);
   const scrollViewRef = useRef(null);
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Open modals only if navigation param is set
   useEffect(() => {
+    if (route.params && (route.params as any).openModal) {
+      if ((route.params as any).openModal === 'portfolio') {
+        dispatch(setShowCreatePortfolio(true));
+      } else if ((route.params as any).openModal === 'kyc') {
+        dispatch(setShowKycModal(true));
+      }
+      // Optionally, reset the param so it doesn't trigger again
+      (route.params as any).openModal = undefined;
+    }
+  }, [route.params]);
+
+  // Defensive reset on mount
+  useEffect(() => {
+    dispatch(resetModals());
     loadCreatorProfile();
   }, []);
 
@@ -83,6 +100,17 @@ const CreatorProfile = () => {
       (scrollViewRef.current as any).scrollToEnd({ animated: true });
     }
   };
+
+  // Modal open handlers: only one modal can be open at a time
+  const openCreatePortfolio = () => {
+    dispatch(setShowCreatePortfolio(true));
+  };
+  const openKycModal = () => {
+    dispatch(setShowKycModal(true));
+  };
+  // Modal close handlers
+  const closeCreatePortfolio = () => dispatch(setShowCreatePortfolio(false));
+  const closeKycModal = () => dispatch(setShowKycModal(false));
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -231,7 +259,7 @@ const CreatorProfile = () => {
               <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
               <Text style={styles.emptyTitle}>There are no Packages has been created yet!</Text>
               <Text style={styles.emptyDesc}>To enjoy the benefits and business you need to add your packages for all your social platforms.</Text>
-              <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowCreatePackage(true)}>
+              <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePortfolio(true))}>
                 <Text style={styles.createPackageBtnText}>Create Package</Text>
               </TouchableOpacity>
             </View>
@@ -241,7 +269,7 @@ const CreatorProfile = () => {
               <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
               <Text style={styles.emptyTitle}>There are no Portfolio files added yet!</Text>
               <Text style={styles.emptyDesc}>To showcase your work, you need to add your portfolio files for all your social platforms.</Text>
-              <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowCreatePortfolio(true)}>
+              <TouchableOpacity style={styles.createPackageBtn} onPress={openCreatePortfolio}>
                 <Text style={styles.createPackageBtnText}>Add Files</Text>
               </TouchableOpacity>
             </View>
@@ -251,7 +279,7 @@ const CreatorProfile = () => {
               <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
               <Text style={styles.emptyTitle}>Your KYC is not verified yet!</Text>
               <Text style={styles.emptyDesc}>To unlock all features and receive payments, please verify your identity by uploading your ID proof.</Text>
-              <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowKycModal(true)}>
+              <TouchableOpacity style={styles.createPackageBtn} onPress={openKycModal}>
                 <Text style={styles.createPackageBtnText}>Verify ID</Text>
               </TouchableOpacity>
             </View>
@@ -271,21 +299,23 @@ const CreatorProfile = () => {
 
       {/* Modals */}
       <AnimatedModalOverlay
-        visible={showCreatePackage}
-      >
-        <CreatePackageScreen onClose={() => setShowCreatePackage(false)} />
-      </AnimatedModalOverlay>
-
-      <AnimatedModalOverlay
         visible={showCreatePortfolio}
       >
-        <CreatePortfolioScreen onClose={() => setShowCreatePortfolio(false)} onBack={() => setShowCreatePortfolio(false)} />
+        <CreatePortfolioScreen onClose={closeCreatePortfolio} onBack={closeCreatePortfolio} />
       </AnimatedModalOverlay>
 
-      <KycModal
-        onClose={() => setShowKycModal(false)}
-        onBack={() => setShowKycModal(false)}
-      />
+      {/* KYC Modal - wrap in native Modal */}
+      <Modal
+        visible={showKycModal}
+        transparent
+        animationType={Platform.OS === 'ios' ? 'slide' : 'fade'}
+        onRequestClose={closeKycModal}
+      >
+        <KycModal
+          onClose={closeKycModal}
+          onBack={closeKycModal}
+        />
+      </Modal>
 
       <BottomNavBar navigation={navigation} />
     </SafeAreaView>

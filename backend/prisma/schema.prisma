@@ -65,7 +65,7 @@ model BrandProfile {
   verified         Boolean         @default(false)
   created_at       DateTime        @default(now())
   updated_at       DateTime        @updatedAt
-  user             User            @relation(fields: [user_id], references: [id])
+  user             User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
   campaigns        Campaign[]
   collaborations   Collaboration[]
   invoices         Invoice[]
@@ -101,7 +101,7 @@ model CreatorProfile {
   interests             Json? // Store as JSON array (languages, etc.)
   campaign_applications CampaignApplication[]
   collaborations        Collaboration[]
-  user                  User                  @relation(fields: [user_id], references: [id])
+  user                  User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   invoices              Invoice[]
   social_media_accounts SocialMediaAccount[]
   kyc                   KYC?

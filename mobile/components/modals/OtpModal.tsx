@@ -15,7 +15,7 @@ import { authAPI } from '../../services/apiService';
 interface OtpModalProps {
   visible: boolean;
   onClose: () => void;
-  onSuccess: (phone: string) => void;
+  onSuccess: (user: any) => void;
   phone: string;
 }
 
@@ -68,9 +68,9 @@ const OtpModal: React.FC<OtpModalProps> = ({ visible, onClose, onSuccess, phone 
     setLoading(true);
     try {
       const result = await authAPI.verifyOTP(phone, otp);
-      // The API returns the result directly, not wrapped in a success property
       Alert.alert('Success', 'Phone number verified successfully!');
-      onSuccess(phone);
+      // Call onSuccess with the full result object (contains user data)
+      onSuccess(result);
       onClose();
     } catch (error) {
       console.error('Verify OTP error:', error);

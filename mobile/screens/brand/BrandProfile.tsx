@@ -5,7 +5,7 @@ import { useAppSelector } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { BottomNavBar, KycModal } from '../../components';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import CreateCampaignScreen from './CreateCampaignScreen';
 import CreateProjectScreen from './CreateProjectScreen';
 import AnimatedModalOverlay from '../../components/AnimatedModalOverlay';
@@ -30,6 +30,7 @@ const BrandProfile = () => {
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState('Campaigns');
   const navigation = useNavigation();
+  const route = useRoute();
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [showKycModal, setShowKycModal] = useState(false);
@@ -38,8 +39,20 @@ const BrandProfile = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setShowKycModal(false);
     loadBrandProfile();
   }, []);
+
+  // Open KYC modal only if navigation param is set
+  useEffect(() => {
+    if (route.params && (route.params as any).openModal) {
+      if ((route.params as any).openModal === 'kyc') {
+        setShowKycModal(true);
+      }
+      // Optionally, reset the param so it doesn't trigger again
+      (route.params as any).openModal = undefined;
+    }
+  }, [route.params]);
 
   const loadBrandProfile = async () => {
     try {

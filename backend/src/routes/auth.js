@@ -4,6 +4,7 @@ const { OAuth2Client } = require('google-auth-library');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('../generated/client');
+const asyncHandler = require('../utils/asyncHandler');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -37,7 +38,7 @@ router.post('/google-mobile', [
   body('idToken').notEmpty().withMessage('ID token is required'),
   body('isSignup').optional().isBoolean().withMessage('isSignup must be a boolean'),
   body('userType').optional().isIn(['creator', 'brand']).withMessage('userType must be creator or brand')
-], validateRequest, async (req, res) => {
+], validateRequest, asyncHandler(async (req, res) => {
   try {
     const { idToken, isSignup = false, userType = 'creator' } = req.body;
 
@@ -173,12 +174,12 @@ router.post('/google-mobile', [
       message: error.message 
     });
   }
-});
+}));
 
 // Send phone verification code
 router.post('/send-phone-verification-code', [
   body('phone').isMobilePhone().withMessage('Valid phone number is required')
-], validateRequest, async (req, res) => {
+], validateRequest, asyncHandler(async (req, res) => {
   try {
     const { phone } = req.body;
     
@@ -259,7 +260,7 @@ router.post('/send-phone-verification-code', [
       message: error.message 
     });
   }
-});
+}));
 
 // Verify phone code
 router.post('/verify-phone-code', [
@@ -267,9 +268,27 @@ router.post('/verify-phone-code', [
   body('code').isLength({ min: 6, max: 6 }).withMessage('6-digit code is required'),
   body('fullName').optional().isString().withMessage('Full name must be a string'),
   body('userType').optional().isIn(['creator', 'brand']).withMessage('userType must be creator or brand')
-], validateRequest, async (req, res) => {
+], validateRequest, asyncHandler(async (req, res) => {
   try {
     const { phone, code, fullName, userType = 'creator' } = req.body;
+
+    // Check for authenticated user (JWT in Authorization header)
+    let authUserId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        console.log('[verify-phone-code] Received JWT token length:', token.length);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        authUserId = decoded.userId;
+        console.log('[verify-phone-code] JWT token decoded successfully, authUserId:', authUserId, 'Full decoded:', decoded);
+      } catch (err) {
+        console.log('[verify-phone-code] JWT token verification failed:', err.message);
+        // Invalid token, ignore
+      }
+    } else {
+      console.log('[verify-phone-code] No Authorization header found');
+    }
 
     // Verify with Twilio Verify (if configured)
     let twilioVerification = false;
@@ -332,11 +351,27 @@ router.post('/verify-phone-code', [
     }
 
     // Check if user exists with this phone
-    let user = await prisma.user.findUnique({
-      where: { phone }
-    });
+    let userWithPhone = await prisma.user.findUnique({ where: { phone } });
 
-    if (!user) {
+    if (authUserId) {
+      // If authenticated, update the current user with the phone number
+      // If another user already has this phone, handle the conflict
+      if (userWithPhone && userWithPhone.id !== BigInt(authUserId)) {
+        console.log('[verify-phone-code] Phone number already in use by another account.');
+        return res.status(409).json({ error: 'Phone number already in use by another account.' });
+      }
+      user = await prisma.user.update({
+        where: { id: BigInt(authUserId) },
+        data: {
+          phone,
+          phone_verified: true,
+          last_login_at: new Date(),
+          ...(fullName && { name: fullName }),
+        }
+      });
+      console.log('[verify-phone-code] Updated user ID:', user.id, 'User data:', { id: user.id.toString(), phone: user.phone, name: user.name, email: user.email });
+    } else if (!userWithPhone) {
+      console.log('[verify-phone-code] Creating new user with phone:', phone);
       // Create new user with full name
       user = await prisma.user.create({
         data: {
@@ -347,16 +382,19 @@ router.post('/verify-phone-code', [
           name: fullName || 'User' // Use provided full name or default
         }
       });
+      console.log('[verify-phone-code] Created new user ID:', user.id);
     } else {
-      // Update existing user
+      console.log('[verify-phone-code] Updating existing phone user ID:', userWithPhone.id);
+      // Update existing user (phone login)
       user = await prisma.user.update({
-        where: { id: user.id },
-        data: { 
+        where: { id: userWithPhone.id },
+        data: {
           phone_verified: true,
           last_login_at: new Date(),
           ...(fullName && { name: fullName }) // Update name if provided
         }
       });
+      console.log('[verify-phone-code] Updated existing user ID:', user.id);
     }
 
     // Generate JWT token
@@ -369,7 +407,8 @@ router.post('/verify-phone-code', [
         id: user.id.toString(),
         phone: user.phone,
         name: user.name,
-        isVerified: user.phone_verified
+        isVerified: user.phone_verified,
+        user_type: user.user_type // Add user_type to response
       },
       token
     });
@@ -381,12 +420,12 @@ router.post('/verify-phone-code', [
       message: error.message 
     });
   }
-});
+}));
 
 // Update user name (for phone signup flow)
 router.post('/update-name', [
   body('name').notEmpty().withMessage('Name is required')
-], validateRequest, async (req, res) => {
+], validateRequest, asyncHandler(async (req, res) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
     
@@ -420,10 +459,10 @@ router.post('/update-name', [
       message: error.message 
     });
   }
-});
+}));
 
 // Get user profile
-router.get('/profile', async (req, res) => {
+router.get('/profile', asyncHandler(async (req, res) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
     
@@ -459,10 +498,10 @@ router.get('/profile', async (req, res) => {
     console.error('Get profile error:', error);
     res.status(401).json({ error: 'Invalid token' });
   }
-});
+}));
 
 // Get all users (admin/developer endpoint)
-router.get('/users', async (req, res) => {
+router.get('/users', asyncHandler(async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -500,12 +539,12 @@ router.get('/users', async (req, res) => {
       message: error.message 
     });
   }
-});
+}));
 
 // Delete user (admin/developer endpoint)
 router.delete('/delete-user', [
   body('userId').notEmpty().withMessage('User ID is required')
-], validateRequest, async (req, res) => {
+], validateRequest, asyncHandler(async (req, res) => {
   try {
     const { userId } = req.body;
     const userIdBigInt = BigInt(userId);
@@ -592,7 +631,7 @@ router.delete('/delete-user', [
 
       // Delete KYC verifications where user is verifier
       await tx.kYC.deleteMany({
-        where: { verifier_id: userIdBigInt }
+        where: { verified_by: userIdBigInt }
       });
 
       // Delete creator profile and related data
@@ -697,12 +736,12 @@ router.delete('/delete-user', [
       message: error.message 
     });
   }
-});
+}));
 
 // Delete user by phone number (admin/developer endpoint)
 router.delete('/delete-user-by-phone', [
   body('phone').notEmpty().withMessage('Phone number is required')
-], validateRequest, async (req, res) => {
+], validateRequest, asyncHandler(async (req, res) => {
   try {
     const { phone } = req.body;
     // Find user by phone
@@ -728,7 +767,7 @@ router.delete('/delete-user-by-phone', [
       await tx.contentReview.deleteMany({ where: { reviewer_id: userIdBigInt } });
       await tx.contentSubmission.deleteMany({ where: { admin_id: userIdBigInt } });
       await tx.collaborationChannel.deleteMany({ where: { admin_id: userIdBigInt } });
-      await tx.kYC.deleteMany({ where: { verifier_id: userIdBigInt } });
+      await tx.kYC.deleteMany({ where: { verified_by: userIdBigInt } });
       if (user.user_type === 'creator') {
         const creatorProfile = await tx.creatorProfile.findUnique({ where: { user_id: userIdBigInt } });
         if (creatorProfile) {
@@ -758,12 +797,12 @@ router.delete('/delete-user-by-phone', [
     console.error('❌ Delete user by phone error:', error);
     res.status(500).json({ error: 'Failed to delete user by phone', message: error.message });
   }
-});
+}));
 
 // Check if user exists
 router.post('/check-user-exists', [
   body('phone').notEmpty().withMessage('Phone number is required')
-], validateRequest, async (req, res) => {
+], validateRequest, asyncHandler(async (req, res) => {
   try {
     const { phone } = req.body;
 
@@ -785,6 +824,6 @@ router.post('/check-user-exists', [
       message: error.message 
     });
   }
-});
+}));
 
 module.exports = router; 

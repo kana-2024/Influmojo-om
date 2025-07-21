@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 // Simple in-memory storage for development
 // In a real app, you'd use AsyncStorage or secure storage
 
@@ -14,28 +16,49 @@ const STORAGE_KEYS = {
 // Get stored token
 export const getToken = async (): Promise<string | null> => {
   try {
-    return memoryStorage[STORAGE_KEYS.AUTH_TOKEN] || null;
+    // Try AsyncStorage first, then fallback to memory storage
+    let token = await AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    if (!token) {
+      token = memoryStorage[STORAGE_KEYS.AUTH_TOKEN] || null;
+    }
+    console.log('[storage] getToken called, token present:', !!token, 'length:', token?.length || 0);
+    return token;
   } catch (error) {
     console.error('Error getting token:', error);
-    return null;
+    // Fallback to memory storage
+    const token = memoryStorage[STORAGE_KEYS.AUTH_TOKEN] || null;
+    console.log('[storage] getToken fallback, token present:', !!token, 'length:', token?.length || 0);
+    return token;
   }
 };
 
 // Set stored token
 export const setToken = async (token: string): Promise<void> => {
   try {
+    console.log('[storage] setToken called with token length:', token?.length || 0);
+    // Save to both AsyncStorage and memory storage
+    await AsyncStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
     memoryStorage[STORAGE_KEYS.AUTH_TOKEN] = token;
+    console.log('[storage] Token saved successfully to both AsyncStorage and memory');
   } catch (error) {
     console.error('Error setting token:', error);
+    // Fallback to memory storage only
+    memoryStorage[STORAGE_KEYS.AUTH_TOKEN] = token;
+    console.log('[storage] Token saved to memory storage only');
   }
 };
 
 // Clear stored token
 export const clearToken = async (): Promise<void> => {
   try {
+    await AsyncStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     delete memoryStorage[STORAGE_KEYS.AUTH_TOKEN];
+    console.log('[storage] Token cleared from both AsyncStorage and memory');
   } catch (error) {
     console.error('Error clearing token:', error);
+    // Fallback to memory storage only
+    delete memoryStorage[STORAGE_KEYS.AUTH_TOKEN];
+    console.log('[storage] Token cleared from memory storage only');
   }
 };
 

@@ -101,11 +101,14 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   // Handle OTP verification success
-  const handleOtpSuccess = (verifiedPhone: string) => {
+  const handleOtpSuccess = (user: any) => {
     setShowOtpModal(false);
     // Navigate to appropriate profile after successful OTP verification
-    // For now, default to CreatorProfile - this should be updated based on user type from backend
-    navigation.navigate('CreatorProfile');
+    if (user && user.user_type === 'brand') {
+      navigation.navigate('BrandProfile');
+    } else {
+      navigation.navigate('CreatorProfile');
+    }
   };
 
   return (

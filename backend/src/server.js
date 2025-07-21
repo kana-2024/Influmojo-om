@@ -52,7 +52,7 @@ express.response.json = function(data) {
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  message: { error: 'Too many requests', message: 'Too many requests from this IP, please try again later.' }
 });
 
 // Trust proxy for ngrok
@@ -100,18 +100,21 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ 
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+// Catch-all 404 handler for unknown routes
+app.use((req, res, next) => {
+  res.status(404).json({
+    error: 'Not found',
+    message: 'The requested resource was not found.'
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: err.message || 'An unexpected error occurred.'
+  });
 });
 
 // Database connection and server start

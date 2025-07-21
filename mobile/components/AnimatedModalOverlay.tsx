@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View, Pressable } from 'react-native';
+import { Animated, StyleSheet, View, Pressable, Modal, Platform } from 'react-native';
 
 interface AnimatedModalOverlayProps {
   visible: boolean;
@@ -32,13 +32,22 @@ const AnimatedModalOverlay: React.FC<AnimatedModalOverlayProps> = ({
     }
   }, [visible, overlayOpacity, opacity]);
 
+  if (!visible) return null;
+
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents={visible ? 'auto' : 'none'}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={onRequestClose}>
-        <Animated.View style={[styles.overlay, { opacity }]} />
-      </Pressable>
-      {children}
-    </View>
+    <Modal
+      visible={visible}
+      transparent
+      animationType={Platform.OS === 'ios' ? 'slide' : 'fade'}
+      onRequestClose={onRequestClose}
+    >
+      <View style={StyleSheet.absoluteFill} pointerEvents={visible ? 'auto' : 'none'}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onRequestClose}>
+          <Animated.View style={[styles.overlay, { opacity }]} />
+        </Pressable>
+        {children}
+      </View>
+    </Modal>
   );
 };
 

@@ -28,9 +28,33 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     },
   };
 
+  // Debug: Log the request details
+  console.log('[apiService] Making request:', {
+    url: endpoint,
+    method: config.method || 'GET',
+    hasAuthHeader: !!token,
+    authHeaderLength: token?.length || 0
+  });
+
   try {
     const response = await fetch(endpoint, config);
-    const data = await response.json();
+    let data;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      // Try to get text for debugging
+      const text = await response.text();
+      data = { error: text };
+      if (!response.ok || !contentType || !contentType.includes('application/json')) {
+        console.error('[apiService] Non-JSON or error response:', {
+          url: endpoint,
+          status: response.status,
+          headers: Object.fromEntries(response.headers.entries()),
+          body: text,
+        });
+      }
+    }
 
     if (!response.ok) {
       throw new Error(data.error || 'API request failed');
@@ -38,7 +62,12 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
 
     return data;
   } catch (error) {
-    console.error('API request error:', error);
+    // If error is a SyntaxError (JSON parse), wrap it
+    if (error instanceof SyntaxError) {
+      console.error('[apiService] JSON parse error:', error, { url: endpoint, config });
+      throw new Error('Invalid server response. Please try again later.');
+    }
+    console.error('API request error:', error, { url: endpoint, config });
     throw error;
   }
 };
@@ -69,6 +98,14 @@ export const authAPI = {
 
   // Verify OTP
   verifyOTP: async (phone: string, code: string, fullName?: string, userType: string = 'creator') => {
+    // Debug: Check if token is present
+    const token = await getToken();
+    console.log('[apiService] verifyOTP - Token present:', !!token, 'Phone:', phone, 'UserType:', userType);
+    
+    if (!token) {
+      console.warn('[apiService] verifyOTP - No JWT token found! This may cause duplicate user creation.');
+    }
+    
     const response = await apiRequest(API_ENDPOINTS.VERIFY_OTP, {
       method: 'POST',
       body: JSON.stringify({ phone, code, fullName, userType }),
