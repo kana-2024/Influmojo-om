@@ -5,9 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 interface BottomNavBarProps {
   navigation: any;
   currentRoute?: string;
+  userType?: 'creator' | 'brand';
 }
 
-const BottomNavBar = ({ navigation, currentRoute = 'home' }: BottomNavBarProps) => {
+const BottomNavBar = ({ navigation, currentRoute = 'home', userType = 'creator' }: BottomNavBarProps) => {
   const navItems = [
     { name: 'home', icon: 'home-outline', label: 'Home' },
     { name: 'insights', icon: 'analytics-outline', label: 'Insights' },
@@ -15,13 +16,26 @@ const BottomNavBar = ({ navigation, currentRoute = 'home' }: BottomNavBarProps) 
     { name: 'profile', icon: 'person-outline', label: 'Profile' },
   ];
 
+  const handleNavigation = (routeName: string) => {
+    if (routeName === 'profile') {
+      // Navigate to the appropriate profile based on user type
+      if (userType === 'brand') {
+        navigation.navigate('BrandProfile');
+      } else {
+        navigation.navigate('CreatorProfile');
+      }
+    } else {
+      navigation.navigate(routeName);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {navItems.map((item) => (
         <TouchableOpacity
           key={item.name}
           style={styles.navItem}
-          onPress={() => navigation.navigate(item.name)}
+          onPress={() => handleNavigation(item.name)}
         >
           <Ionicons
             name={item.icon as any}

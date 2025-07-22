@@ -9,6 +9,7 @@ import CustomDropdown from '../../components/CustomDropdown';
 import * as apiService from '../../services/apiService';
 import OtpModal from '../../components/modals/OtpModal';
 import DatePickerModal from '../../components/modals/DatePickerModal';
+import GoogleVerificationModal from '../../components/modals/GoogleVerificationModal';
 import googleAuthService from '../../services/googleAuth';
 
 export default function BrandProfileSetupScreen({ navigation }: any) {
@@ -32,6 +33,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
   const [role, setRole] = useState('');
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [googleVerifying, setGoogleVerifying] = useState(false);
 
   // Role options for brands
   const ROLES = [
@@ -113,14 +115,20 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
 
   // Save basic info to database
   const handleSaveBasicInfo = async () => {
+    console.log('🔍 handleSaveBasicInfo called');
+    console.log('🔍 Current state:', { isGoogleUser, phone, email, gender, state, city, pincode, role });
+    
     // Validate based on signup method
     if (isGoogleUser) {
+      console.log('🔍 Validating Google user phone number');
       // Google user - validate phone
       if (!phone.trim()) {
+        console.log('❌ Phone number is empty');
         Alert.alert('Error', 'Please enter your phone number');
         return;
       }
       
+      console.log('🔍 Phone number before formatting:', phone);
       // Format phone number to ensure it has +91 prefix
       let formattedPhone = phone.trim();
       if (!formattedPhone.startsWith('+91')) {
@@ -128,13 +136,19 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
           formattedPhone = '+' + formattedPhone;
         } else if (formattedPhone.length === 10) {
           formattedPhone = '+91' + formattedPhone;
+        } else if (formattedPhone.length === 12 && formattedPhone.startsWith('91')) {
+          formattedPhone = '+' + formattedPhone;
         } else {
+          console.log('❌ Invalid phone number format:', formattedPhone);
           Alert.alert('Error', 'Please enter a valid 10-digit phone number');
           return;
         }
       }
       
+      console.log('🔍 Phone number after formatting:', formattedPhone);
+      // More flexible validation - allow both +91XXXXXXXXXX and +91XXXXXXXXXX formats
       if (!/^\+91\d{10}$/.test(formattedPhone)) {
+        console.log('❌ Phone number validation failed:', formattedPhone);
         Alert.alert('Error', 'Please enter a valid 10-digit phone number');
         return;
       }
@@ -202,19 +216,19 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
         // Don't send phone for phone users as it's already set during signup
       }
 
-      if (__DEV__) {
-        console.log('Sending basic info data:', requestData);
-      }
-      await apiService.profileAPI.updateBasicInfo(requestData);
+      console.log('🔍 Sending request data:', requestData);
+      const response = await apiService.profileAPI.updateBasicInfo(requestData);
+      console.log('✅ API response:', response);
 
       Alert.alert('Success', 'Basic info saved successfully!', [
         { text: 'OK', onPress: () => {
+          console.log('🔍 Navigating to BrandPreferences');
           // Navigate to brand preferences
           navigation.navigate('BrandPreferences');
         }}
       ]);
     } catch (error) {
-      console.error('Save basic info error:', error);
+      console.error('❌ Save basic info error:', error);
       Alert.alert('Error', 'Failed to save basic info. Please try again.');
     } finally {
       setLoading(false);
@@ -222,12 +236,33 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
   };
 
   const handlePhoneVerified = (result: any) => {
-    console.log('Verified phone set in state:', result.phone);
-    setPhone(result.phone);
+    console.log('Verified phone result:', result);
+    
+    // Extract phone number from the result
+    let verifiedPhone = '';
+    if (result && result.user && result.user.phone) {
+      verifiedPhone = result.user.phone;
+    } else if (result && result.phone) {
+      verifiedPhone = result.phone;
+    } else {
+      // If no phone in result, use the phone that was passed to OTP modal
+      verifiedPhone = phone;
+    }
+    
+    // Ensure phone number has +91 prefix
+    if (verifiedPhone && !verifiedPhone.startsWith('+91')) {
+      if (verifiedPhone.startsWith('91') && verifiedPhone.length === 12) {
+        verifiedPhone = '+' + verifiedPhone;
+      } else if (verifiedPhone.length === 10) {
+        verifiedPhone = '+91' + verifiedPhone;
+      }
+    }
+    
+    console.log('Setting verified phone in state:', verifiedPhone);
+    setPhone(verifiedPhone);
     setShowOtpModal(false);
     
-    // Auto-save after phone verification
-    handleSaveBasicInfo();
+    // Don't auto-save - let user fill all fields and click Next manually
   };
 
   const handleSendOtp = async () => {
@@ -264,6 +299,11 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
 
   const handleGoogleEmailVerification = async () => {
     try {
+      setGoogleVerifying(true);
+      
+      // Add a small delay to show the verification modal
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const result = await googleAuthService.signIn();
       if (result.success && result.user && result.user.email) {
         setEmail(result.user.email);
@@ -276,6 +316,8 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
     } catch (error) {
       console.error('Google email verification error:', error);
       Alert.alert('Error', 'Failed to verify email with Google. Please try again.');
+    } finally {
+      setGoogleVerifying(false);
     }
   };
 
@@ -383,10 +425,11 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
                 keyboardType="email-address"
               />
               <TouchableOpacity 
-                style={styles.verifyButton}
+                style={[styles.verifyButton, googleVerifying && styles.verifyButtonDisabled]}
                 onPress={handleGoogleEmailVerification}
+                disabled={googleVerifying}
               >
-                <Text style={styles.verifyButtonText}>Verify Email</Text>
+                <Text style={styles.verifyButtonText}>{googleVerifying ? 'Verifying...' : 'Verify Email'}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.emailWarningBox}>
@@ -495,6 +538,12 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
         currentDate={selectedDate || new Date()}
         title="Select Date of Birth"
       />
+
+      {/* Google Verification Modal */}
+      <GoogleVerificationModal
+        visible={googleVerifying}
+        onClose={() => setGoogleVerifying(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -541,6 +590,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  verifyButtonDisabled: {
+    backgroundColor: '#E0E0E0',
+    opacity: 0.7,
   },
   emailWarningBox: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF4ED',

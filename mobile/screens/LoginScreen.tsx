@@ -80,7 +80,7 @@ export default function LoginScreen({ navigation }: any) {
         
         if (apiResult.success) {
           // User exists and login successful, navigate to appropriate profile based on user type
-          const userType = apiResult.user?.user_type || 'creator';
+          const userType = apiResult.user?.userType || apiResult.user?.user_type || 'creator';
           if (userType === 'brand') {
             navigation.navigate('BrandProfile');
           } else {

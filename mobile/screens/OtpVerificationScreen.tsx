@@ -63,7 +63,7 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
       const result = await apiService.authAPI.verifyOTP(phone, otpString, fullName, userType);
       
       if (result.success) {
-        if (result.user?.user_type === 'brand') {
+        if (result.user?.userType === 'brand' || result.user?.user_type === 'brand') {
           navigation.reset({
             index: 0,
             routes: [{ name: 'BrandProfileSetup' }],

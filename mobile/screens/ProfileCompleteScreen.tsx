@@ -173,7 +173,7 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
 
   const handleViewProfile = () => {
     // Navigate to appropriate profile based on user type
-    const userType = user?.user_type || 'creator';
+    const userType = user?.user_type || user?.userType || 'creator';
     console.log('🔍 ProfileCompleteScreen: handleViewProfile called');
     console.log('🔍 ProfileCompleteScreen: Current user:', user);
     console.log('🔍 ProfileCompleteScreen: User type:', userType);
@@ -200,7 +200,7 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
         <ConfettiCheckmark />
         <Text style={styles.title}>Your basic profile has been completed!</Text>
         <Text style={styles.subtitle}>
-          {(user?.user_type === 'brand') 
+          {((user?.user_type === 'brand') || (user?.userType === 'brand'))
             ? "You're now ready to explore your brand space. Start connecting with creators and grow your brand presence."
             : "You're now ready to explore your creator space. Start growing your presence and get discovered by the right brands."
           }

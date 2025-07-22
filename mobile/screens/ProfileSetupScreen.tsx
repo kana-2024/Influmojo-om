@@ -9,6 +9,7 @@ import CustomDropdown from '../components/CustomDropdown';
 import * as apiService from '../services/apiService';
 import OtpModal from '../components/modals/OtpModal';
 import DatePickerModal from '../components/modals/DatePickerModal';
+import GoogleVerificationModal from '../components/modals/GoogleVerificationModal';
 import googleAuthService from '../services/googleAuth';
 
 export default function ProfileSetupScreen({ navigation }: any) {
@@ -30,6 +31,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [googleVerifying, setGoogleVerifying] = useState(false);
 
   useEffect(() => {
     loadUserProfile();
@@ -207,12 +209,33 @@ export default function ProfileSetupScreen({ navigation }: any) {
   };
 
   const handlePhoneVerified = (result: any) => {
-    console.log('Verified phone set in state:', result.phone);
-    setPhone(result.phone);
+    console.log('Verified phone result:', result);
+    
+    // Extract phone number from the result
+    let verifiedPhone = '';
+    if (result && result.user && result.user.phone) {
+      verifiedPhone = result.user.phone;
+    } else if (result && result.phone) {
+      verifiedPhone = result.phone;
+    } else {
+      // If no phone in result, use the phone that was passed to OTP modal
+      verifiedPhone = phone;
+    }
+    
+    // Ensure phone number has +91 prefix
+    if (verifiedPhone && !verifiedPhone.startsWith('+91')) {
+      if (verifiedPhone.startsWith('91') && verifiedPhone.length === 12) {
+        verifiedPhone = '+' + verifiedPhone;
+      } else if (verifiedPhone.length === 10) {
+        verifiedPhone = '+91' + verifiedPhone;
+      }
+    }
+    
+    console.log('Setting verified phone in state:', verifiedPhone);
+    setPhone(verifiedPhone);
     setShowOtpModal(false);
     
-    // Auto-save after phone verification
-    handleSaveBasicInfo();
+    // Don't auto-save - let user fill all fields and click Next manually
   };
 
   const handleSendOtp = async () => {
@@ -249,6 +272,11 @@ export default function ProfileSetupScreen({ navigation }: any) {
 
   const handleGoogleEmailVerification = async () => {
     try {
+      setGoogleVerifying(true);
+      
+      // Add a small delay to show the verification modal
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const result = await googleAuthService.signIn();
       if (result.success && result.user && result.user.email) {
         setEmail(result.user.email);
@@ -261,6 +289,8 @@ export default function ProfileSetupScreen({ navigation }: any) {
     } catch (error) {
       console.error('Google email verification error:', error);
       Alert.alert('Error', 'Failed to verify email with Google. Please try again.');
+    } finally {
+      setGoogleVerifying(false);
     }
   };
 
@@ -361,17 +391,18 @@ export default function ProfileSetupScreen({ navigation }: any) {
             <View style={styles.inputRow}>
               <TextInput
                 style={[styles.input, { flex: 1 }]}
-                placeholder="e.g. azharweb90@gmail.com"
+                placeholder="e.g. xxxxxstill sayin@gmail.com"
                 placeholderTextColor="#B0B0B0"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
               />
               <TouchableOpacity 
-                style={styles.verifyButton}
+                style={[styles.verifyButton, googleVerifying && styles.verifyButtonDisabled]}
                 onPress={handleGoogleEmailVerification}
+                disabled={googleVerifying}
               >
-                <Text style={styles.verifyButtonText}>Verify Email</Text>
+                <Text style={styles.verifyButtonText}>{googleVerifying ? 'Verifying...' : 'Verify Email'}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.emailWarningBox}>
@@ -426,7 +457,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
           disabled={loading || profileLoading}
         >
           <Text style={styles.nextButtonText}>
-            {loading ? 'Saving...' : profileLoading ? 'Loading...' : 'Next 2 / 2'}
+            {loading ? 'Saving...' : profileLoading ? 'Loading...' : 'Next 1 / 2'}
           </Text>
           {!loading && !profileLoading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
@@ -447,6 +478,12 @@ export default function ProfileSetupScreen({ navigation }: any) {
         onDateSelected={handleDateSelected}
         currentDate={selectedDate || new Date()}
         title="Select Date of Birth"
+      />
+
+      {/* Google Verification Modal */}
+      <GoogleVerificationModal
+        visible={googleVerifying}
+        onClose={() => setGoogleVerifying(false)}
       />
     </SafeAreaView>
   );
@@ -494,6 +531,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  verifyButtonDisabled: {
+    backgroundColor: '#D1D5DB',
+    opacity: 0.7,
   },
   emailWarningBox: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF4ED',

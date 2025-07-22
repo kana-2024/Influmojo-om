@@ -68,6 +68,14 @@ const BrandProfile = () => {
     try {
       setLoading(true);
       console.log('🔍 Loading brand profile...');
+      
+      // Check if user is a creator user and prevent API call
+      if (user && user.user_type === 'creator') {
+        console.log('🔍 User is a creator, preventing brand profile API call');
+        setLoading(false);
+        return;
+      }
+      
       const response = await profileAPI.getBrandProfile();
       
       if (response.success && response.data) {
@@ -98,6 +106,13 @@ const BrandProfile = () => {
       }
     } catch (error: any) {
       console.error('❌ Error in loadBrandProfile:', error?.message || error);
+      
+      // Check if error is due to user type mismatch
+      if (error.message && error.message.includes('User is not a brand')) {
+        console.log('🔍 User type mismatch detected, user should be on CreatorProfile');
+        setLoading(false);
+        return;
+      }
     } finally {
       setLoading(false);
     }
@@ -116,15 +131,35 @@ const BrandProfile = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle='light-content' backgroundColor='#000' />
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}
-        onScroll={event => {
-          const y = event.nativeEvent.contentOffset.y;
-          setScrolled(y > 10);
-        }}
-        scrollEventThrottle={16}
-      >
+      
+      {/* Show error message for creator users */}
+      {user && user.user_type === 'creator' && (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+          <Ionicons name="alert-circle" size={64} color="#FF6B2C" />
+          <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
+            Wrong Profile Type
+          </Text>
+          <Text style={{ fontSize: 14, color: '#6B7280', marginTop: 8, textAlign: 'center', lineHeight: 20 }}>
+            You are registered as a creator. Please use the creator profile instead.
+          </Text>
+          <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 16, textAlign: 'center' }}>
+            Please go back and select the creator profile.
+          </Text>
+        </View>
+      )}
+      
+      {/* Regular brand profile content */}
+      {(!user || user.user_type !== 'creator') && (
+        <>
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}
+            onScroll={event => {
+              const y = event.nativeEvent.contentOffset.y;
+              setScrolled(y > 10);
+            }}
+            scrollEventThrottle={16}
+          >
         {/* Header with back and menu */}
         <View style={[styles.headerRow, { paddingTop: insets.top }]}>
           <TouchableOpacity style={styles.headerIconBtn}>
@@ -339,7 +374,9 @@ const BrandProfile = () => {
           role_in_organization: brandProfile?.role_in_organization
         }}
       />
-      <BottomNavBar navigation={navigation} />
+      <BottomNavBar navigation={navigation} userType="brand" />
+        </>
+      )}
     </SafeAreaView>
   );
 };

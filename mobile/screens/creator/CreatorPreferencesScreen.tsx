@@ -234,7 +234,7 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
           disabled={loading}
         >
           <Text style={styles.nextButtonText}>
-            {loading ? 'Saving...' : 'Next 1 / 1'}
+            {loading ? 'Saving...' : 'Next 2 / 2'}
           </Text>
           {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>

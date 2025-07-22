@@ -101,6 +101,14 @@ const CreatorProfile = () => {
     try {
       setLoading(true);
       console.log('🔍 Loading creator profile...');
+      
+      // Check if user is a brand user and prevent API call
+      if (user && (user.user_type === 'brand' || (user as any).userType === 'brand')) {
+        console.log('🔍 User is a brand, preventing creator profile API call');
+        setLoading(false);
+        return;
+      }
+      
       const response = await profileAPI.getCreatorProfile();
       console.log('✅ Creator profile response:', response);
       if (response.success) {
@@ -119,6 +127,14 @@ const CreatorProfile = () => {
         message: error.message,
         stack: error.stack
       });
+      
+      // Check if error is due to user type mismatch
+      if (error.message && error.message.includes('User is not a creator')) {
+        console.log('🔍 User type mismatch detected, user should be on BrandProfile');
+        setLoading(false);
+        return;
+      }
+      
       // Set a default profile to prevent crashes
       setCreatorProfile({
         user: { name: 'User', email: '', phone: '' },
@@ -161,7 +177,7 @@ const CreatorProfile = () => {
       <StatusBar barStyle='dark-content' backgroundColor='#fff' />
       
       {/* Show error message for brand users */}
-      {user && user.user_type === 'brand' && (
+      {user && (user.user_type === 'brand' || (user as any).userType === 'brand') && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
           <Ionicons name="alert-circle" size={64} color="#FF6B2C" />
           <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
@@ -177,7 +193,7 @@ const CreatorProfile = () => {
       )}
       
       {/* Regular creator profile content */}
-      {(!user || user.user_type !== 'brand') && (
+      {(!user || (user.user_type !== 'brand' && (user as any).userType !== 'brand')) && (
         <>
           {/* Header */}
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12, paddingHorizontal: 16 }}>
@@ -403,7 +419,7 @@ const CreatorProfile = () => {
               role_in_organization: creatorProfile?.role_in_organization
             }}
           />
-          <BottomNavBar navigation={navigation} />
+          <BottomNavBar navigation={navigation} userType="creator" />
         </>
       )}
     </SafeAreaView>
