@@ -651,7 +651,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\kanas\\Influmojo-mono-18-07-25\\backend\\src\\generated\\client",
+      "value": "H:\\Dev\\Influmojo-om\\backend\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -665,7 +665,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\kanas\\Influmojo-mono-18-07-25\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "H:\\Dev\\Influmojo-om\\backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

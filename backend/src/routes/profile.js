@@ -478,30 +478,41 @@ router.post('/create-package', [
       return res.status(400).json({ error: 'Creator profile not found' });
     }
 
-    // Create package
-    const package = await prisma.package.create({
+    // Store package data in the creator profile's interests field as JSON
+    const existingPackages = creatorProfile.interests?.packages || [];
+    const newPackage = {
+      id: Date.now().toString(), // Temporary ID
+      platform: platform.toUpperCase(),
+      content_type: contentType,
+      quantity: parseInt(quantity),
+      revisions: parseInt(revisions),
+      duration1: duration1,
+      duration2: duration2,
+      price: parseFloat(price),
+      currency: 'INR',
+      title: `${platform} ${contentType}`,
+      description: description || '',
+      created_at: new Date().toISOString()
+    };
+    
+    const updatedPackages = [...existingPackages, newPackage];
+    
+    // Update creator profile with new package in interests field
+    await prisma.creatorProfile.update({
+      where: { id: creatorProfile.id },
       data: {
-        creator_id: creatorProfile.id,
-        package_type: 'content',
-        title: `${platform} ${contentType}`,
-        description: description || '',
-        platform: platform.toUpperCase(),
-        content_type: contentType,
-        quantity: parseInt(quantity),
-        revisions: parseInt(revisions),
-        duration: `${duration1} ${duration2}`,
-        price: parseFloat(price),
-        currency: 'INR',
-        status: 'active'
+        interests: {
+          ...creatorProfile.interests,
+          packages: updatedPackages
+        }
       }
     });
+    
+    // Return the new package
+    const package = newPackage;
 
-    // Convert BigInt to string for JSON serialization
-    const serializedPackage = {
-      ...package,
-      id: package.id.toString(),
-      creator_id: package.creator_id.toString()
-    };
+    // Package is already in the correct format
+    const serializedPackage = package;
 
     res.json({
       success: true,
@@ -513,6 +524,93 @@ router.post('/create-package', [
     console.error('Create package error:', error);
     res.status(500).json({ 
       error: 'Failed to create package',
+      message: error.message 
+    });
+  }
+});
+
+// Update package
+router.put('/update-package', [
+  body('id').notEmpty().withMessage('Package ID is required'),
+  body('platform').notEmpty().withMessage('Platform is required'),
+  body('content_type').notEmpty().withMessage('Content type is required'),
+  body('quantity').isInt({ min: 1 }).withMessage('Valid quantity required'),
+  body('revisions').isInt({ min: 0 }).withMessage('Valid revisions required'),
+  body('duration1').notEmpty().withMessage('Duration 1 is required'),
+  body('duration2').notEmpty().withMessage('Duration 2 is required'),
+  body('price').isFloat({ min: 0 }).withMessage('Valid price required'),
+  body('description').optional()
+], validateRequest, authenticateToken, async (req, res) => {
+  try {
+    const { 
+      id,
+      platform, 
+      content_type, 
+      quantity, 
+      revisions, 
+      duration1, 
+      duration2, 
+      price, 
+      description 
+    } = req.body;
+    const userId = BigInt(req.userId);
+
+    // Get creator profile
+    const creatorProfile = await prisma.creatorProfile.findUnique({
+      where: { user_id: userId }
+    });
+
+    if (!creatorProfile) {
+      return res.status(400).json({ error: 'Creator profile not found' });
+    }
+
+    // Get existing packages
+    const existingPackages = creatorProfile.interests?.packages || [];
+    
+    // Find and update the specific package
+    const packageIndex = existingPackages.findIndex(pkg => pkg.id === id);
+    
+    if (packageIndex === -1) {
+      return res.status(404).json({ error: 'Package not found' });
+    }
+
+    // Update the package
+    const updatedPackage = {
+      ...existingPackages[packageIndex],
+      platform: platform.toUpperCase(),
+      content_type: content_type,
+      quantity: parseInt(quantity),
+      revisions: parseInt(revisions),
+      duration1: duration1,
+      duration2: duration2,
+      price: parseFloat(price),
+      description: description || '',
+      updated_at: new Date().toISOString()
+    };
+    
+    existingPackages[packageIndex] = updatedPackage;
+    
+    // Update creator profile with updated packages
+    await prisma.creatorProfile.update({
+      where: { id: creatorProfile.id },
+      data: {
+        interests: {
+          ...creatorProfile.interests,
+          packages: existingPackages
+        }
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Package updated successfully',
+      package: updatedPackage
+    });
+
+  } catch (error) {
+    console.error('Update package error:', error);
+    res.status(500).json({ 
+      error: 'Failed to update package',
       message: error.message 
     });
   }
@@ -763,6 +861,7 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
         follower_count: account.follower_count.toString(),
         avg_views: account.avg_views.toString()
       })) || [],
+      packages: user.creator_profiles?.interests?.packages || [],
       user: {
         id: user.id.toString(),
         name: user.name,
