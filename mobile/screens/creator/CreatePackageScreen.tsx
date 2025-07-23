@@ -15,9 +15,10 @@ interface CreatePackageScreenProps {
   navigation?: any;
   onClose?: () => void;
   CustomDropdown?: FC<any>;
+  onPackageCreated?: () => void;
 }
 
-const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, onClose = () => navigation?.goBack?.(), CustomDropdown }) => {
+const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, onClose = () => navigation?.goBack?.(), CustomDropdown, onPackageCreated }) => {
   const insets = useSafeAreaInsets();
   useEffect(() => {
   }, []);
@@ -71,7 +72,12 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
       });
 
       Alert.alert('Success', 'Package created successfully!', [
-        { text: 'OK', onPress: () => onClose() }
+        { text: 'OK', onPress: () => {
+          onClose();
+          if (onPackageCreated) {
+            onPackageCreated();
+          }
+        }}
       ]);
     } catch (error) {
       console.error('Create package error:', error);
@@ -82,243 +88,249 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle='light-content' backgroundColor='#000' />
-      <View style={[styles.safeArea, { paddingTop: insets.top + 8 }]}>
-        <View style={styles.card}>
-          {/* Header */}
-          <View style={styles.headerRow}>
-            <View style={{ flex: 1 }} />
-            <Text style={styles.header}>Create Package</Text>
-            <TouchableOpacity style={[styles.closeBtn, { flex: 1, alignItems: 'flex-end' }]} onPress={onClose}>
-              <Ionicons name="close" size={24} color="#6B7280" />
+      
+      {/* Header */}
+      <View style={styles.headerRow}>
+        <View style={{ flex: 1 }} />
+        <Text style={styles.header}>Create Package</Text>
+        <TouchableOpacity style={[styles.closeBtn, { flex: 1, alignItems: 'flex-end' }]} onPress={onClose}>
+          <Ionicons name="close" size={24} color="#6B7280" />
+        </TouchableOpacity>
+      </View>
+      
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.form}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Choose platform */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Choose platform<Text style={styles.required}>*</Text></Text>
+          <Dropdown
+            value={platform}
+            setValue={setPlatform}
+            options={platforms}
+          />
+        </View>
+
+        {/* Select Content type */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Select Content type<Text style={styles.required}>*</Text></Text>
+          <Dropdown
+            value={contentType}
+            setValue={setContentType}
+            options={contentTypes}
+          />
+        </View>
+
+        {/* Quantity */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Quantity<Text style={styles.required}>*</Text></Text>
+          <Dropdown
+            value={quantity}
+            setValue={setQuantity}
+            options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']}
+          />
+        </View>
+
+        {/* Revisions */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Revisions</Text>
+          <Dropdown
+            value={revisions}
+            setValue={setRevisions}
+            options={['0', '1', '2', '3', '4', '5']}
+          />
+        </View>
+
+        {/* Duration */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Duration<Text style={styles.required}>*</Text></Text>
+          <View style={styles.durationRow}>
+            <View style={styles.durationDropdown}>
+              <Dropdown
+                value={duration1}
+                setValue={setDuration1}
+                options={durations1}
+              />
+            </View>
+            <View style={styles.durationDropdown}>
+              <Dropdown
+                value={duration2}
+                setValue={setDuration2}
+                options={durations2}
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* Price */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Price (INR)<Text style={styles.required}>*</Text></Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={price}
+              onChangeText={setPrice}
+              keyboardType="numeric"
+              placeholder="50000"
+            />
+            <TouchableOpacity style={styles.arrowBtn}>
+              <Ionicons name="chevron-down" size={20} color="#6B7280" />
             </TouchableOpacity>
           </View>
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.form}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-            onScroll={event => {
-              const y = event.nativeEvent.contentOffset.y;
-              setScrolled(y > 10);
-            }}
-            scrollEventThrottle={16}
-          >
-            <Text style={styles.label}>Choose platform*</Text>
-            <Dropdown value={platform} setValue={setPlatform} options={platforms} />
-
-            <Text style={styles.label}>Select Content type*</Text>
-            <Dropdown value={contentType} setValue={setContentType} options={contentTypes} />
-
-            <Text style={styles.label}>Quantity*</Text>
-            <Dropdown value={quantity} setValue={setQuantity} options={['1', '2', '3', '4', '5']} />
-
-            <Text style={styles.label}>Revisions</Text>
-            <TextInput style={styles.input} value={revisions} onChangeText={setRevisions} keyboardType="numeric" />
-
-            <Text style={styles.label}>Duration*</Text>
-            <View style={{ flexDirection: 'row', gap: 10, marginBottom: 18 }}>
-              <View style={{ flex: 1 }}>
-                <Dropdown value={duration1} setValue={setDuration1} options={durations1} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Dropdown value={duration2} setValue={setDuration2} options={durations2} />
-              </View>
-            </View>
-
-            <Text style={styles.label}>Price (INR)*</Text>
-            <Dropdown value={price} setValue={setPrice} options={['50000', '100000', '200000']} />
-
-            <Text style={styles.label}>Brief Description</Text>
-            <TextInput
-              style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
-              placeholder="Brief description of your package has to be add here."
-              value={desc}
-              onChangeText={setDesc}
-              multiline
-            />
-
-            <View style={styles.btnRow}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.submitBtn, loading && { opacity: 0.7 }]}
-                onPress={handleCreatePackage}
-                disabled={loading}
-              >
-                <Text style={styles.submitBtnText}>
-                  {loading ? 'Creating...' : 'Submit'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
         </View>
+
+        {/* Brief Description */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Brief Description</Text>
+          <TextInput
+            style={styles.textArea}
+            value={desc}
+            onChangeText={setDesc}
+            placeholder="Brief description of your package has to be add here."
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+        </View>
+      </ScrollView>
+
+      {/* Action Buttons */}
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+          <Text style={styles.cancelButtonText}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.submitButton, loading && styles.submitButtonDisabled]} 
+          onPress={handleCreatePackage}
+          disabled={loading}
+        >
+          <Text style={styles.submitButtonText}>
+            {loading ? 'Creating...' : 'Submit'}
+          </Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
-  },
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'transparent', // Changed from '#EFF3F5' to transparent
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0,
-  },
-  card: {
-    flex: 1.2, // Make the card a bit taller (was 1)
     backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    marginTop: 0,
-    marginHorizontal: 0,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: -2 },
-    elevation: 8,
-    overflow: 'hidden',
-  },
-  scrollView: {
-    flex: 1,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingTop: 18,
-    paddingBottom: 12,
-    marginBottom: 8,
-    position: 'relative',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
   header: {
-    flex: 2,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    textAlign: 'center',
     color: '#1A1D1F',
+    textAlign: 'center',
   },
   closeBtn: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 2
+    padding: 4,
+  },
+  scrollView: {
+    flex: 1,
   },
   form: {
     padding: 24,
-    paddingBottom: 40,
-    flexGrow: 1,
-    overflow: 'visible', // Allow dropdowns to overflow
+    paddingBottom: 100,
+  },
+  formGroup: {
+    marginBottom: 24,
   },
   label: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
+    color: '#1A1D1F',
     marginBottom: 8,
-    color: '#1A1D1F'
+  },
+  required: {
+    color: '#EF4444',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
+    backgroundColor: '#fff',
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
-    padding: 16,
-    fontSize: 15,
-    marginBottom: 24,
-    backgroundColor: '#F8F9FB',
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
     color: '#1A1D1F',
   },
-  dropdown: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
-    padding: 16,
-    backgroundColor: '#fff',
-    marginBottom: 0,
-    position: 'relative',
-    zIndex: 10, // Ensure dropdown container is above others
+  arrowBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  dropdownList: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
-    marginTop: 2,
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
-    zIndex: 100,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-    overflow: 'hidden',
-  },
-  dropdownItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  btnRow: {
+  durationRow: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 12,
-    marginBottom: 12,
   },
-  cancelBtn: {
+  durationDropdown: {
     flex: 1,
-    borderWidth: 1.5,
-    borderColor: '#ffcba9',
-    borderRadius: 8,
+  },
+  textArea: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
+    paddingHorizontal: 16,
     paddingVertical: 12,
-    alignItems: 'center',
-    backgroundColor: '#FFF4F0',
-  },
-  cancelBtnText: {
-    color: '#FF6B2C',
-    fontWeight: '700',
     fontSize: 16,
+    color: '#1A1D1F',
+    minHeight: 100,
+    backgroundColor: '#fff',
   },
-  submitBtn: {
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+    padding: 24,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#FEF3C7',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#92400E',
+  },
+  submitButton: {
     flex: 1,
     backgroundColor: '#FF6B2C',
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: 'center',
   },
-  submitBtnText: {
-    color: '#fff',
-    fontWeight: '700',
+  submitButtonDisabled: {
+    backgroundColor: '#FBBF24',
+  },
+  submitButtonText: {
     fontSize: 16,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.08)',
-  },
-  dropdownListModal: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-    overflow: 'hidden',
-    zIndex: 10000,
+    fontWeight: '600',
+    color: '#fff',
   },
 });
 
