@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal, Pressable, Platform, StatusBar, Dimensions, LayoutRectangle, findNodeHandle, UIManager, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Pressable, Platform, StatusBar, Dimensions, LayoutRectangle, findNodeHandle, UIManager, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface CustomDropdownProps {
@@ -57,15 +57,21 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, setValue, option
                     (Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0),
                   left: dropdownLayout.x,
                   width: dropdownLayout.width,
-                  maxHeight: Dimensions.get('window').height - (dropdownLayout.y + dropdownLayout.height) - 24,
+                  maxHeight: 200, // Fixed height for scrolling
                 },
               ]}
             >
-              {options.map((opt: string) => (
-                <TouchableOpacity key={opt} style={styles.dropdownItem} onPress={() => { setValue(opt); closeDropdown(); }}>
-                  <Text style={{ color: '#1A1D1F', fontSize: 15 }}>{opt}</Text>
-                </TouchableOpacity>
-              ))}
+              <ScrollView 
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
+                style={styles.scrollView}
+              >
+                {options.map((opt: string) => (
+                  <TouchableOpacity key={opt} style={styles.dropdownItem} onPress={() => { setValue(opt); closeDropdown(); }}>
+                    <Text style={{ color: '#1A1D1F', fontSize: 15 }}>{opt}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
           </Pressable>
         </Modal>
@@ -104,6 +110,9 @@ const styles = StyleSheet.create({
     elevation: 8,
     overflow: 'hidden',
     zIndex: 10000,
+  },
+  scrollView: {
+    maxHeight: 200,
   },
   dropdownItem: {
     padding: 12,

@@ -11,4 +11,5 @@ export { default as DatePickerModal } from './modals/DatePickerModal';
 export { default as AnimatedModalOverlay } from './AnimatedModalOverlay';
 export { default as CustomDropdown } from './CustomDropdown';
 export { default as OtpCountdownTimer } from './OtpCountdownTimer';
-export { default as AccountModal } from './modals/AccountModal'; 
+export { default as AccountModal } from './modals/AccountModal';
+export { default as PackageCard } from './PackageCard'; 

@@ -4,14 +4,15 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
-import { BottomNavBar, KycModal, AccountModal } from '../../components';
+import { BottomNavBar, KycModal, AccountModal, PackageCard } from '../../components';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CreatePackageScreen from './CreatePackageScreen';
+import EditPackageScreen from './EditPackageScreen';
 import CreatePortfolioScreen from './CreatePortfolioScreen';
 import AnimatedModalOverlay from '../../components/AnimatedModalOverlay';
 import CustomDropdown from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
-import { setShowCreatePortfolio, setShowKycModal, resetModals } from '../../store/slices/modalSlice';
+import { setShowCreatePortfolio, setShowKycModal, setShowCreatePackage, setShowEditPackage, resetModals } from '../../store/slices/modalSlice';
 
 const categories = ['Technology', 'Science', 'Training'];
 const languages = ['English', 'Hindi', 'Telugu', 'Marathi'];
@@ -47,10 +48,13 @@ const CreatorProfile = () => {
   const dispatch = useAppDispatch();
   const showCreatePortfolio = useAppSelector(state => state.modal.showCreatePortfolio);
   const showKycModal = useAppSelector(state => state.modal.showKycModal);
+  const showCreatePackage = useAppSelector(state => state.modal.showCreatePackage);
+  const showEditPackage = useAppSelector(state => state.modal.showEditPackage);
   const scrollViewRef = useRef(null);
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [editingPackage, setEditingPackage] = useState<any>(null);
 
   console.log('🔍 CreatorProfile component loaded');
   console.log('🔍 Current user:', user);
@@ -171,6 +175,33 @@ const CreatorProfile = () => {
   // Modal close handlers
   const closeCreatePortfolio = () => dispatch(setShowCreatePortfolio(false));
   const closeKycModal = () => dispatch(setShowKycModal(false));
+  const closeCreatePackage = () => dispatch(setShowCreatePackage(false));
+  const closeEditPackage = () => {
+    dispatch(setShowEditPackage(false));
+    setEditingPackage(null);
+  };
+
+  const handleEditPackage = (pkg: any) => {
+    setEditingPackage(pkg);
+    dispatch(setShowEditPackage(true));
+  };
+
+  const handleSaveEditedPackage = async (updatedPackage: any) => {
+    try {
+      // Update the package in the backend
+      const response = await profileAPI.updatePackage(updatedPackage);
+      
+      if (response.success) {
+        // Refresh the profile to get updated data
+        await loadCreatorProfile();
+        closeEditPackage();
+      } else {
+        console.error('Failed to update package:', response.message);
+      }
+    } catch (error) {
+      console.error('Error updating package:', error);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -292,14 +323,32 @@ const CreatorProfile = () => {
             {/* Tab Content Area */}
             <View style={{ flex: 1, width: '100%', marginBottom: 32, alignItems: 'center', justifyContent: 'center' }}>
               {activeTab === 'Packages' && (
-                <View style={styles.emptyState}>
-                  <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
-                  <Text style={styles.emptyTitle}>There are no Packages has been created yet!</Text>
-                  <Text style={styles.emptyDesc}>To enjoy the benefits and brands wants to give business you need to add your packages for all your social platforms.</Text>
-                  <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePortfolio(true))}>
-                    <Text style={styles.createPackageBtnText}>Create Package</Text>
-                  </TouchableOpacity>
-                </View>
+                creatorProfile?.packages?.length > 0 ? (
+                  <View style={{ paddingHorizontal: 16, paddingTop: 16, flex: 1 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                      <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F' }}>My Packages</Text>
+                      <TouchableOpacity style={styles.addPortfolioBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
+                        <Ionicons name="add" size={20} color="#FF6B2C" />
+                        <Text style={styles.addPortfolioBtnText}>Create Package</Text>
+                      </TouchableOpacity>
+                    </View>
+                    
+                    <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+                      {creatorProfile.packages.map((pkg: any, index: number) => (
+                        <PackageCard key={pkg.id || index} item={pkg} onEdit={handleEditPackage} />
+                      ))}
+                    </ScrollView>
+                  </View>
+                ) : (
+                  <View style={styles.emptyState}>
+                    <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
+                    <Text style={styles.emptyTitle}>There are no Packages has been created yet!</Text>
+                    <Text style={styles.emptyDesc}>To enjoy the benefits and brands wants to give business you need to add your packages for all your social platforms.</Text>
+                    <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
+                      <Text style={styles.createPackageBtnText}>Create Package</Text>
+                    </TouchableOpacity>
+                  </View>
+                )
               )}
               {activeTab === 'Portfolio' && (
                 creatorProfile?.portfolio_items?.length > 0 ? (
@@ -405,6 +454,30 @@ const CreatorProfile = () => {
               onPortfolioCreated={loadCreatorProfile}
             />
           </AnimatedModalOverlay>
+          <Modal 
+            visible={showCreatePackage} 
+            animationType="slide" 
+            presentationStyle="fullScreen"
+            onRequestClose={closeCreatePackage}
+          >
+            <CreatePackageScreen 
+              onClose={closeCreatePackage} 
+              CustomDropdown={CustomDropdown}
+              onPackageCreated={loadCreatorProfile}
+            />
+          </Modal>
+          <Modal 
+            visible={showEditPackage} 
+            animationType="slide" 
+            presentationStyle="fullScreen"
+            onRequestClose={closeEditPackage}
+          >
+            <EditPackageScreen 
+              package={editingPackage}
+              onClose={closeEditPackage}
+              onSave={handleSaveEditedPackage}
+            />
+          </Modal>
           <Modal visible={showKycModal} transparent animationType="slide" onRequestClose={closeKycModal}>
             <KycModal onClose={closeKycModal} onBack={closeKycModal} />
           </Modal>
@@ -675,6 +748,7 @@ const styles = StyleSheet.create({
     color: '#B0B0B0',
     marginTop: 8,
   },
+
 });
 
 export default CreatorProfile; 

@@ -252,6 +252,14 @@ export const profileAPI = {
     });
   },
 
+  // Update package
+  updatePackage: async (data: any) => {
+    return await apiRequest(API_ENDPOINTS.UPDATE_PACKAGE, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
   // Create portfolio item
   createPortfolio: async (data: {
     mediaUrl: string;
