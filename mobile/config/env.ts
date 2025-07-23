@@ -40,6 +40,8 @@ export const API_ENDPOINTS = {
   GET_PROFILE: `${ENV.API_BASE_URL}/api/profile/profile`,
   GET_CREATOR_PROFILE: `${ENV.API_BASE_URL}/api/profile/creator-profile`,
   GET_BRAND_PROFILE: `${ENV.API_BASE_URL}/api/profile/brand-profile`,
+  GET_INFLUENCERS: `${ENV.API_BASE_URL}/api/profile/influencers`,
+  GET_INFLUENCER_PROFILE: `${ENV.API_BASE_URL}/api/profile/influencer`,
   
   // Health check
   HEALTH: `${ENV.API_BASE_URL}/api/health`,

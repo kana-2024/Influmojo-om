@@ -23,6 +23,7 @@ import CreatorProfile from './screens/creator/CreatorProfile';
 import BrandProfile from './screens/brand/BrandProfile';
 import ProfileCompleteScreen from './screens/ProfileCompleteScreen';
 import CreatePackageScreen from './screens/creator/CreatePackageScreen';
+import HomeScreen from './screens/HomeScreen';
 import * as NavigationBar from 'expo-navigation-bar';
 import SplashScreen from './screens/SplashScreen';
 import { ENV } from './config/env';
@@ -129,6 +130,7 @@ export default function App() {
             <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
             <Stack.Screen name="BrandProfileSetup" component={BrandProfileSetupScreen} />
 
+            <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="CreatorProfile" component={CreatorProfile} />
             <Stack.Screen name="BrandProfile" component={BrandProfile} />
             <Stack.Screen name="ProfileComplete" component={ProfileCompleteScreen} />

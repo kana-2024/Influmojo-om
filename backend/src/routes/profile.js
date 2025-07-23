@@ -288,11 +288,12 @@ router.post('/update-preferences', [
   body('categories').isArray({ min: 1, max: 5 }).withMessage('1-5 categories required'),
   body('about').notEmpty().withMessage('About is required'),
   body('languages').isArray({ min: 1 }).withMessage('At least one language required'),
+  body('platform').optional().isIn(['YouTube', 'Instagram']).withMessage('Valid platform required'),
   body('role').optional(),
   body('dateOfBirth').optional().isISO8601().withMessage('Valid date required')
 ], validateRequest, authenticateToken, async (req, res) => {
   try {
-    const { categories, about, languages, role, dateOfBirth } = req.body;
+    const { categories, about, languages, platform, role, dateOfBirth } = req.body;
     const userId = BigInt(req.userId);
 
     console.log('Update preferences request:', {
@@ -333,6 +334,7 @@ router.post('/update-preferences', [
           content_categories: categories,
           bio: about,
           interests: languages,
+          social_platforms: platform ? [platform.toLowerCase()] : null,
           date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
         },
         create: {
@@ -340,6 +342,7 @@ router.post('/update-preferences', [
           content_categories: categories,
           bio: about,
           interests: languages,
+          social_platforms: platform ? [platform.toLowerCase()] : null,
           date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
         }
       });
@@ -972,6 +975,442 @@ router.get('/brand-profile', authenticateToken, async (req, res) => {
     console.error('❌ Error stack:', error.stack);
     res.status(500).json({ 
       error: 'Failed to get brand profile',
+      message: error.message 
+    });
+  }
+});
+
+// Get all influencers for brand home screen
+router.get('/influencers', authenticateToken, async (req, res) => {
+  try {
+    console.log('🔍 Fetching influencers for brand home screen');
+    
+        // Get all creator profiles with their social media accounts
+    const creators = await prisma.creatorProfile.findMany({
+      where: {
+        // For now, show all creators regardless of verification status
+        // verified: true, // Only show verified creators
+        user: {
+          status: 'active' // Only active users
+        }
+      },
+      select: {
+        id: true,
+        user_id: true,
+        bio: true,
+        rating: true,
+        total_collaborations: true,
+        average_response_time: true,
+        verified: true,
+        featured: true,
+        interests: true,
+        social_platforms: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            first_name: true,
+            last_name: true,
+            profile_image_url: true,
+            email: true
+          }
+        },
+        social_media_accounts: {
+          select: {
+            platform: true,
+            username: true,
+            follower_count: true,
+            engagement_rate: true,
+            avg_views: true,
+            verified: true
+          }
+        }
+      },
+      orderBy: {
+        rating: 'desc' // Sort by rating
+      }
+    });
+
+    console.log(`🔍 Found ${creators.length} creators`);
+    
+    // Debug: Log each creator's data
+    creators.forEach((creator, index) => {
+      console.log(`🔍 Creator ${index + 1}:`, {
+        id: creator.id.toString(),
+        name: creator.user.name,
+        social_platforms: creator.social_platforms,
+        social_accounts_count: creator.social_media_accounts.length,
+        verified: creator.verified
+      });
+    });
+
+    // Process and organize creators by platform
+    const influencersByPlatform = {
+      youtube: [],
+      instagram: [],
+      tiktok: [],
+      twitter: [],
+      facebook: []
+    };
+
+    creators.forEach(creator => {
+      const creatorData = {
+        id: creator.id.toString(),
+        user_id: creator.user_id.toString(),
+        name: creator.user.name,
+        first_name: creator.user.first_name,
+        last_name: creator.user.last_name,
+        profile_image_url: creator.user.profile_image_url,
+        email: creator.user.email,
+        bio: creator.bio,
+        rating: creator.rating?.toString() || '0',
+        total_collaborations: creator.total_collaborations,
+        average_response_time: creator.average_response_time || '2Hr',
+        verified: creator.verified,
+        featured: creator.featured,
+        packages: creator.interests?.packages || [],
+        social_accounts: creator.social_media_accounts.map(account => ({
+          platform: account.platform,
+          username: account.username,
+          follower_count: account.follower_count.toString(),
+          engagement_rate: account.engagement_rate.toString(),
+          avg_views: account.avg_views.toString(),
+          verified: account.verified
+        }))
+      };
+
+      // Add creator to platforms based on their social_platforms selection
+      if (creator.social_platforms && Array.isArray(creator.social_platforms)) {
+        console.log(`🔍 Adding creator ${creator.user.name} to platforms:`, creator.social_platforms);
+        creator.social_platforms.forEach(platform => {
+          // Handle both "YouTube" and "youtube" formats
+          let platformKey = platform.toLowerCase();
+          if (platformKey === 'youtube') {
+            platformKey = 'youtube';
+          } else if (platformKey === 'instagram') {
+            platformKey = 'instagram';
+          }
+          
+          if (influencersByPlatform[platformKey]) {
+            influencersByPlatform[platformKey].push(creatorData);
+            console.log(`✅ Added to ${platformKey} platform`);
+          } else {
+            console.log(`❌ Platform ${platformKey} not found in influencersByPlatform. Available:`, Object.keys(influencersByPlatform));
+          }
+        });
+      } else {
+        console.log(`🔍 Creator ${creator.user.name} has no social_platforms or it's not an array:`, creator.social_platforms);
+      }
+
+      // Also add to platforms based on social media accounts (for backward compatibility)
+      creator.social_media_accounts.forEach(account => {
+        const platform = account.platform;
+        if (influencersByPlatform[platform]) {
+          // Check if creator is not already added to this platform
+          const alreadyAdded = influencersByPlatform[platform].some(
+            influencer => influencer.id === creatorData.id
+          );
+          if (!alreadyAdded) {
+            influencersByPlatform[platform].push(creatorData);
+          }
+        }
+      });
+    });
+
+    // Sort each platform by follower count
+    Object.keys(influencersByPlatform).forEach(platform => {
+      influencersByPlatform[platform].sort((a, b) => {
+        const aFollowers = Math.max(...a.social_accounts
+          .filter(acc => acc.platform === platform)
+          .map(acc => parseInt(acc.follower_count) || 0));
+        const bFollowers = Math.max(...b.social_accounts
+          .filter(acc => acc.platform === platform)
+          .map(acc => parseInt(acc.follower_count) || 0));
+        return bFollowers - aFollowers;
+      });
+    });
+
+    console.log('✅ Final influencers by platform:', {
+      youtube: influencersByPlatform.youtube.length,
+      instagram: influencersByPlatform.instagram.length,
+      tiktok: influencersByPlatform.tiktok.length,
+      twitter: influencersByPlatform.twitter.length,
+      facebook: influencersByPlatform.facebook.length
+    });
+
+    console.log('✅ Sending influencers response');
+    res.json({
+      success: true,
+      data: influencersByPlatform
+    });
+
+  } catch (error) {
+    console.error('❌ Get influencers error:', error);
+    res.status(500).json({ 
+      error: 'Failed to get influencers',
+      message: error.message 
+    });
+  }
+});
+
+// Get influencers by specific platform
+router.get('/influencers/:platform', authenticateToken, async (req, res) => {
+  try {
+    const { platform } = req.params;
+    console.log(`🔍 Fetching ${platform} influencers`);
+
+    // Validate platform
+    const validPlatforms = ['youtube', 'instagram', 'tiktok', 'twitter', 'facebook'];
+    if (!validPlatforms.includes(platform)) {
+      return res.status(400).json({ error: 'Invalid platform' });
+    }
+
+    // Get creators with the specific platform
+    const creators = await prisma.creatorProfile.findMany({
+      where: {
+        verified: true,
+        user: {
+          status: 'active'
+        },
+        social_media_accounts: {
+          some: {
+            platform: platform
+          }
+        }
+      },
+              include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              first_name: true,
+              last_name: true,
+              profile_image_url: true,
+              email: true
+            }
+          },
+          social_media_accounts: {
+            where: {
+              platform: platform
+            },
+            select: {
+              platform: true,
+              username: true,
+              follower_count: true,
+              engagement_rate: true,
+              avg_views: true,
+              verified: true
+            }
+          }
+        },
+      orderBy: {
+        rating: 'desc'
+      }
+    });
+
+    console.log(`🔍 Found ${creators.length} ${platform} creators`);
+
+    const influencers = creators.map(creator => ({
+      id: creator.id.toString(),
+      user_id: creator.user_id.toString(),
+      name: creator.user.name,
+      first_name: creator.user.first_name,
+      last_name: creator.user.last_name,
+      profile_image_url: creator.user.profile_image_url,
+      email: creator.user.email,
+      bio: creator.bio,
+      rating: creator.rating?.toString() || '0',
+      total_collaborations: creator.total_collaborations,
+      average_response_time: creator.average_response_time || '2Hr',
+      verified: creator.verified,
+      featured: creator.featured,
+      packages: creator.interests?.packages || [],
+      social_account: creator.social_media_accounts[0] ? {
+        platform: creator.social_media_accounts[0].platform,
+        username: creator.social_media_accounts[0].username,
+        follower_count: creator.social_media_accounts[0].follower_count.toString(),
+        engagement_rate: creator.social_media_accounts[0].engagement_rate.toString(),
+        avg_views: creator.social_media_accounts[0].avg_views.toString(),
+        verified: creator.social_media_accounts[0].verified
+      } : null
+    }));
+
+    // Sort by follower count
+    influencers.sort((a, b) => {
+      const aFollowers = parseInt(a.social_account?.follower_count || '0');
+      const bFollowers = parseInt(b.social_account?.follower_count || '0');
+      return bFollowers - aFollowers;
+    });
+
+    console.log('✅ Sending platform influencers response');
+    res.json({
+      success: true,
+      data: influencers
+    });
+
+  } catch (error) {
+    console.error('❌ Get platform influencers error:', error);
+    res.status(500).json({ 
+      error: 'Failed to get platform influencers',
+      message: error.message 
+    });
+  }
+});
+
+// Get individual influencer profile for brand view
+router.get('/influencer/:influencerId', authenticateToken, async (req, res) => {
+  try {
+    const { influencerId } = req.params;
+    console.log('🔍 Fetching individual influencer profile for ID:', influencerId);
+
+    const creator = await prisma.creatorProfile.findUnique({
+      where: {
+        id: BigInt(influencerId)
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            first_name: true,
+            last_name: true,
+            profile_image_url: true,
+            email: true
+          }
+        },
+        social_media_accounts: {
+          select: {
+            platform: true,
+            username: true,
+            follower_count: true,
+            engagement_rate: true,
+            avg_views: true,
+            verified: true
+          }
+        },
+        portfolio_items: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            media_url: true,
+            media_type: true
+          }
+        }
+      }
+    });
+
+    if (!creator) {
+      return res.status(404).json({ error: 'Influencer not found' });
+    }
+
+    // Convert BigInt values to strings
+    const serializedCreator = {
+      id: creator.id.toString(),
+      user_id: creator.user_id.toString(),
+      user: {
+        id: creator.user.id.toString(),
+        name: creator.user.name,
+        first_name: creator.user.first_name,
+        last_name: creator.user.last_name,
+        profile_image_url: creator.user.profile_image_url,
+        email: creator.user.email
+      },
+      bio: creator.bio,
+      gender: creator.gender,
+      date_of_birth: creator.date_of_birth,
+      location_city: creator.location_city,
+      location_state: creator.location_state,
+      location_pincode: creator.location_pincode,
+      interests: creator.interests,
+      content_categories: creator.content_categories,
+      rating: creator.rating?.toString() || '0',
+      total_collaborations: creator.total_collaborations,
+      average_response_time: creator.average_response_time || '2Hr',
+      verified: creator.verified,
+      featured: creator.featured,
+      packages: creator.interests?.packages || [],
+      social_media_accounts: creator.social_media_accounts.map(account => ({
+        platform: account.platform,
+        username: account.username,
+        follower_count: account.follower_count.toString(),
+        engagement_rate: account.engagement_rate.toString(),
+        avg_views: account.avg_views.toString(),
+        verified: account.verified
+      })),
+      portfolio_items: creator.portfolio_items.map(item => ({
+        id: item.id.toString(),
+        title: item.title,
+        description: item.description,
+        media_url: item.media_url,
+        media_type: item.media_type
+      })),
+      reviews: [] // TODO: Add reviews when review system is implemented
+    };
+
+    console.log('✅ Sending influencer profile response');
+    res.json({
+      success: true,
+      data: serializedCreator
+    });
+
+  } catch (error) {
+    console.error('❌ Get influencer profile error:', error);
+    res.status(500).json({ 
+      error: 'Failed to get influencer profile',
+      message: error.message 
+    });
+  }
+});
+
+// Test endpoint to check creator data
+router.get('/test-creator/:userId', authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log('🔍 Testing creator data for user ID:', userId);
+
+    const creator = await prisma.creatorProfile.findFirst({
+      where: {
+        user_id: BigInt(userId)
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    if (!creator) {
+      return res.status(404).json({ error: 'Creator not found' });
+    }
+
+    console.log('🔍 Creator data:', {
+      id: creator.id.toString(),
+      name: creator.user.name,
+      social_platforms: creator.social_platforms,
+      verified: creator.verified,
+      bio: creator.bio
+    });
+
+    res.json({
+      success: true,
+      data: {
+        id: creator.id.toString(),
+        name: creator.user.name,
+        social_platforms: creator.social_platforms,
+        verified: creator.verified,
+        bio: creator.bio
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Test creator error:', error);
+    res.status(500).json({ 
+      error: 'Failed to test creator data',
       message: error.message 
     });
   }

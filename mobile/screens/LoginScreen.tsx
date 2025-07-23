@@ -79,10 +79,10 @@ export default function LoginScreen({ navigation }: any) {
         const apiResult = await authAPI.googleAuth(result.idToken, false, 'creator'); // isSignup = false, userType (not used for login)
         
         if (apiResult.success) {
-          // User exists and login successful, navigate to appropriate profile based on user type
+          // User exists and login successful, navigate to Home screen
           const userType = apiResult.user?.userType || apiResult.user?.user_type || 'creator';
           if (userType === 'brand') {
-            navigation.navigate('BrandProfile');
+            navigation.navigate('Home', { activeTab: 'home' });
           } else {
             navigation.navigate('CreatorProfile');
           }
@@ -103,10 +103,10 @@ export default function LoginScreen({ navigation }: any) {
   // Handle OTP verification success
   const handleOtpSuccess = (user: any) => {
     setShowOtpModal(false);
-    // Navigate to appropriate profile after successful OTP verification
+    // Navigate to Home screen after successful OTP verification
     const userType = user?.userType || user?.user_type;
     if (userType === 'brand') {
-      navigation.navigate('BrandProfile');
+      navigation.navigate('Home', { activeTab: 'home' });
     } else {
       navigation.navigate('CreatorProfile');
     }

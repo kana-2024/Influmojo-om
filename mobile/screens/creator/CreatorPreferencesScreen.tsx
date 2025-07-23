@@ -5,6 +5,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { profileAPI } from '../../services/apiService';
+import CustomDropdown from '../../components/CustomDropdown';
 
 const CATEGORIES = [
   'Gaming', 'Travel', 'Food', 'Education', 'Pet', 'Beauty',
@@ -16,12 +17,14 @@ const CATEGORIES = [
 const HIGHLIGHTED = ['Beauty', 'Lifestyle', 'Entertainment', 'virtual'];
 
 const LANGUAGES = ['Hindi', 'English', 'Telugu'];
+const PLATFORMS = ['YouTube', 'Instagram'];
 
 export default function CreatorPreferencesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [about, setAbout] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedPlatform, setSelectedPlatform] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
@@ -67,12 +70,18 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
       return;
     }
 
+    if (!selectedPlatform) {
+      Alert.alert('Error', 'Please select your primary platform');
+      return;
+    }
+
     setLoading(true);
     try {
       await profileAPI.updatePreferences({
         categories: selectedCategories,
         about: about.trim(),
-        languages: selectedLanguages
+        languages: selectedLanguages,
+        platform: selectedPlatform
       });
 
       console.log('✅ Preferences saved successfully!');
@@ -226,6 +235,17 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
             )}
           </View>
         )}
+
+        {/* Platform Selection */}
+        <Text style={styles.sectionTitle}>Choose your platform</Text>
+        <Text style={styles.sectionSubtitle}>
+          Select your primary content creation platform.
+        </Text>
+        <CustomDropdown
+          value={selectedPlatform}
+          setValue={setSelectedPlatform}
+          options={PLATFORMS}
+        />
 
         {/* Next Button */}
         <TouchableOpacity

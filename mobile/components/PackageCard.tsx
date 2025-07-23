@@ -15,9 +15,10 @@ interface PackageCardProps {
     price?: number;
   };
   onEdit?: (item: any) => void;
+  readonly?: boolean;
 }
 
-const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit }) => {
+const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, readonly = false }) => {
   const title = item.title || `${item.platform?.toUpperCase()} ${item.content_type?.toUpperCase()}`;
   
   return (
@@ -32,9 +33,11 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit }) => {
             <Text style={styles.title}>
               {title}
             </Text>
-            <TouchableOpacity style={styles.editButton} onPress={() => onEdit?.(item)}>
-              <Ionicons name="pencil" size={14} color="#B0B0B0" />
-            </TouchableOpacity>
+            {!readonly && (
+              <TouchableOpacity style={styles.editButton} onPress={() => onEdit?.(item)}>
+                <Ionicons name="pencil" size={14} color="#B0B0B0" />
+              </TouchableOpacity>
+            )}
           </View>
           <Text style={styles.description}>
             {item.description || `I craft eye-catching, scroll-stopping ${item.platform} ${item.content_type} designed to grab attention instantly, boost engagement, and turn viewers into loyal followers and customers.`}
@@ -58,11 +61,13 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit }) => {
       {/* Price and Button */}
       <View style={styles.footerRow}>
         <Text style={styles.price}>
-          ₹{parseInt(item.price?.toString() || '0').toLocaleString()}/-
+          ₹{parseInt(item.price?.toString() || '0').toLocaleString()}/
         </Text>
-        <TouchableOpacity style={styles.addToCartButton}>
-          <Text style={styles.addToCartText}>Add to cart</Text>
-        </TouchableOpacity>
+        {readonly && (
+          <TouchableOpacity style={styles.addToCartButton}>
+            <Text style={styles.addToCartText}>Add to cart</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

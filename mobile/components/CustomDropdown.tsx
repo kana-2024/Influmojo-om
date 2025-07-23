@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, Modal, Pressable, Platform, StatusBar, Dimensions, LayoutRectangle, findNodeHandle, UIManager, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface CustomDropdownProps {
   value: string;
@@ -12,6 +13,8 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, setValue, option
   const [open, setOpen] = useState(false);
   const [dropdownLayout, setDropdownLayout] = useState<LayoutRectangle | null>(null);
   const buttonRef = useRef<View>(null);
+  const insets = useSafeAreaInsets();
+  const screenHeight = Dimensions.get('window').height;
 
   const openDropdown = () => {
     if (buttonRef.current) {
@@ -30,6 +33,47 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, setValue, option
   };
 
   const closeDropdown = () => setOpen(false);
+
+  const calculateDropdownPosition = () => {
+    if (!dropdownLayout) return 0;
+    
+    const dropdownHeight = Math.min(200, options.length * 44); // 44px per item
+    const spaceBelow = screenHeight - (dropdownLayout.y + dropdownLayout.height) - insets.bottom - 20; // 20px buffer
+    const spaceAbove = dropdownLayout.y - insets.top - 20; // 20px buffer
+    
+    // If there's enough space below, show dropdown below
+    if (spaceBelow >= dropdownHeight) {
+      return dropdownLayout.y + dropdownLayout.height;
+    }
+    // If there's more space above, show dropdown above
+    else if (spaceAbove > spaceBelow) {
+      return dropdownLayout.y - dropdownHeight;
+    }
+    // Otherwise, show below but with reduced height
+    else {
+      return dropdownLayout.y + dropdownLayout.height;
+    }
+  };
+
+  const calculateMaxHeight = () => {
+    if (!dropdownLayout) return 200;
+    
+    const spaceBelow = screenHeight - (dropdownLayout.y + dropdownLayout.height) - insets.bottom;
+    const spaceAbove = dropdownLayout.y - insets.top;
+    
+    // If there's enough space below, use full height
+    if (spaceBelow >= 200) {
+      return 200;
+    }
+    // If there's more space above, show above with full height
+    else if (spaceAbove > spaceBelow) {
+      return Math.min(200, spaceAbove - 20); // 20px buffer
+    }
+    // Otherwise, use available space below
+    else {
+      return Math.max(100, spaceBelow - 20); // Minimum 100px, 20px buffer
+    }
+  };
 
   return (
     <>
@@ -52,19 +96,17 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, setValue, option
                 styles.dropdownListModal,
                 {
                   position: 'absolute',
-                  top:
-                    (dropdownLayout.y + dropdownLayout.height) -
-                    (Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0),
+                  top: calculateDropdownPosition(),
                   left: dropdownLayout.x,
                   width: dropdownLayout.width,
-                  maxHeight: 200, // Fixed height for scrolling
+                  maxHeight: calculateMaxHeight(),
                 },
               ]}
             >
               <ScrollView 
                 showsVerticalScrollIndicator={true}
                 nestedScrollEnabled={true}
-                style={styles.scrollView}
+                style={[styles.scrollView, { maxHeight: calculateMaxHeight() }]}
               >
                 {options.map((opt: string) => (
                   <TouchableOpacity key={opt} style={styles.dropdownItem} onPress={() => { setValue(opt); closeDropdown(); }}>
@@ -112,7 +154,7 @@ const styles = StyleSheet.create({
     zIndex: 10000,
   },
   scrollView: {
-    maxHeight: 200,
+    // maxHeight will be calculated dynamically
   },
   dropdownItem: {
     padding: 12,

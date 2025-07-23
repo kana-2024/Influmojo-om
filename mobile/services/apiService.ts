@@ -226,6 +226,7 @@ export const profileAPI = {
     categories: string[];
     about: string;
     languages: string[];
+    platform?: string;
     role?: string;
     dateOfBirth?: Date;
   }) => {
@@ -352,6 +353,66 @@ export const profileAPI = {
       response.data.languages = safeJsonParse(response.data.languages, []);
       response.data.campaigns = safeJsonParse(response.data.campaigns, []);
       response.data.collaborations = safeJsonParse(response.data.collaborations, []);
+    }
+    
+    return response;
+  },
+
+  // Get all influencers for brand home screen
+  getInfluencers: async () => {
+    const response = await apiRequest(API_ENDPOINTS.GET_INFLUENCERS, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      Object.keys(response.data).forEach(platform => {
+        response.data[platform] = response.data[platform].map((influencer: any) => ({
+          ...influencer,
+          packages: safeJsonParse(influencer.packages, []),
+          social_accounts: safeJsonParse(influencer.social_accounts, [])
+        }));
+      });
+    }
+    
+    return response;
+  },
+
+  // Get influencers by platform
+  getInfluencersByPlatform: async (platform: string) => {
+    const response = await apiRequest(`${API_ENDPOINTS.GET_INFLUENCERS}/${platform}`, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      response.data = response.data.map((influencer: any) => ({
+        ...influencer,
+        packages: safeJsonParse(influencer.packages, []),
+        social_account: influencer.social_account ? {
+          ...influencer.social_account,
+          follower_count: influencer.social_account.follower_count || '0',
+          engagement_rate: influencer.social_account.engagement_rate || '0',
+          avg_views: influencer.social_account.avg_views || '0'
+        } : null
+      }));
+    }
+    
+    return response;
+  },
+
+  // Get individual influencer profile
+  getInfluencerProfile: async (influencerId: string) => {
+    const response = await apiRequest(`${API_ENDPOINTS.GET_INFLUENCER_PROFILE}/${influencerId}`, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      response.data.packages = safeJsonParse(response.data.packages, []);
+      response.data.social_media_accounts = safeJsonParse(response.data.social_media_accounts, []);
+      response.data.portfolio_items = safeJsonParse(response.data.portfolio_items, []);
+      response.data.reviews = safeJsonParse(response.data.reviews, []);
     }
     
     return response;

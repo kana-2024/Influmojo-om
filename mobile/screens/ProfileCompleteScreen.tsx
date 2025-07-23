@@ -179,8 +179,8 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
     console.log('🔍 ProfileCompleteScreen: User type:', userType);
     
     if (userType === 'brand') {
-      console.log('🔍 ProfileCompleteScreen: Navigating to BrandProfile');
-      navigation.navigate('BrandProfile');
+      console.log('🔍 ProfileCompleteScreen: Navigating to Home with profile tab');
+      navigation.navigate('Home', { activeTab: 'profile' });
     } else {
       console.log('🔍 ProfileCompleteScreen: Navigating to CreatorProfile');
       navigation.navigate('CreatorProfile');

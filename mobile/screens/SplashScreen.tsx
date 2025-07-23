@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Image, Animated, Easing, ActivityIndicator } from 'react-native';
+import { getToken } from '../services/storage';
+import { authAPI } from '../services/apiService';
 
 // debug logging
 console.log('=== SplashScreen Loading ===');
@@ -11,6 +13,33 @@ const SplashScreen = ({ navigation }: any) => {
   const spinnerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    const checkAuthAndNavigate = async () => {
+      try {
+        // Check if user has a valid token
+        const token = await getToken();
+        
+        if (token) {
+          // User is logged in, check their profile
+          const profile = await authAPI.getUserProfile();
+          const userType = profile.user?.user_type || 'creator';
+          
+          // Navigate to appropriate screen based on user type
+          if (userType === 'brand') {
+            navigation.replace('Home', { activeTab: 'home' });
+          } else {
+            navigation.replace('CreatorProfile');
+          }
+        } else {
+          // No token, show welcome screen
+          navigation.replace('Welcome');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        // On error, show welcome screen
+        navigation.replace('Welcome');
+      }
+    };
+
     // Animate logo and text in
     Animated.sequence([
       Animated.timing(logoAnim, {
@@ -32,7 +61,7 @@ const SplashScreen = ({ navigation }: any) => {
       })
     ]).start(() => {
       setTimeout(() => {
-        navigation.replace('Welcome');
+        checkAuthAndNavigate();
       }, 1500);
     });
   }, []);

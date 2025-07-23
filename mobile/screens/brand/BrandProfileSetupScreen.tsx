@@ -31,7 +31,6 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [role, setRole] = useState('');
-  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [googleVerifying, setGoogleVerifying] = useState(false);
 
@@ -479,35 +478,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
 
         {/* Role Selection for Brands */}
         <Text style={styles.sectionTitle}>Select your role in organization</Text>
-        <TouchableOpacity 
-          style={styles.roleDropdown}
-          onPress={() => setShowRoleDropdown(!showRoleDropdown)}
-          activeOpacity={0.7}
-        >
-          <Text style={role ? styles.roleDropdownText : styles.roleDropdownPlaceholder}>
-            {role || 'Select your role'}
-          </Text>
-          <Ionicons name={showRoleDropdown ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
-        </TouchableOpacity>
-        
-        {/* Role Dropdown Options */}
-        {showRoleDropdown && (
-          <View style={styles.roleOptionsBox}>
-            {ROLES.map(roleOption => (
-              <TouchableOpacity
-                key={roleOption}
-                style={styles.roleOption}
-                onPress={() => {
-                  setRole(roleOption);
-                  setShowRoleDropdown(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.roleOptionText}>{roleOption}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+        <CustomDropdown value={role} setValue={setRole} options={ROLES} />
 
         {/* Next Button */}
         <TouchableOpacity
