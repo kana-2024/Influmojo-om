@@ -15,7 +15,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
   const [loading, setLoading] = useState(false);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [industries, setIndustries] = useState<string[]>([]);
-  const [highlightedIndustries, setHighlightedIndustries] = useState<string[]>([]);
+
   const [industriesLoading, setIndustriesLoading] = useState(true);
 
   const LANGUAGES = ['Hindi', 'English', 'Telugu'];
@@ -32,7 +32,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
       
       if (response.success && response.data) {
         setIndustries(response.data.industries || []);
-        setHighlightedIndustries(response.data.highlighted || []);
+
       } else {
         console.warn('Failed to load industries, using fallback');
         // Fallback to default industries if API fails
@@ -42,7 +42,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
           'Sports & Fitness', 'Automotive', 'Real Estate', 'E-commerce',
           'Manufacturing', 'Media & Advertising', 'Consulting', 'Non-Profit'
         ]);
-        setHighlightedIndustries(['IT & Technology', 'Entertainment', 'Fashion & Beauty', 'E-commerce']);
+
       }
     } catch (error) {
       console.error('Error loading industries:', error);
@@ -53,7 +53,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
         'Sports & Fitness', 'Automotive', 'Real Estate', 'E-commerce',
         'Manufacturing', 'Media & Advertising', 'Consulting', 'Non-Profit'
       ]);
-      setHighlightedIndustries(['IT & Technology', 'Entertainment', 'Fashion & Beauty', 'E-commerce']);
+      
     } finally {
       setIndustriesLoading(false);
     }
@@ -192,8 +192,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
                   key={industry}
                   style={[
                     styles.categoryChip,
-                    selectedIndustries.includes(industry) && styles.categoryChipSelected,
-                    highlightedIndustries.includes(industry) && styles.categoryChipHighlighted
+                    selectedIndustries.includes(industry) && styles.categoryChipSelected
                   ]}
                   onPress={() => toggleIndustry(industry)}
                   activeOpacity={0.7}
@@ -201,8 +200,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
                   <Text
                     style={[
                       styles.categoryText,
-                      selectedIndustries.includes(industry) && styles.categoryTextSelected,
-                      highlightedIndustries.includes(industry) && styles.categoryTextHighlighted
+                      selectedIndustries.includes(industry) && styles.categoryTextSelected
                     ]}
                   >
                     {industry}
@@ -289,7 +287,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
           disabled={loading}
         >
           <Text style={styles.nextButtonText}>
-            {loading ? 'Saving...' : 'Next 1 / 1'}
+            {loading ? 'Saving...' : 'Next 2 / 2'}
           </Text>
           {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
@@ -335,12 +333,10 @@ const styles = StyleSheet.create({
   categoryChipSelected: {
     backgroundColor: '#FF6B2C22', borderColor: '#FF6B2C', borderWidth: 1,
   },
-  categoryChipHighlighted: {
-    backgroundColor: '#FF6B2C11',
-  },
+
   categoryText: { color: '#1A1D1F', fontSize: 14 },
   categoryTextSelected: { color: '#FF6B2C', fontWeight: '600' },
-  categoryTextHighlighted: { color: '#FF6B2C', fontWeight: '500' },
+
   aboutInput: {
     backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
     paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, marginBottom: 8, marginTop: 12, minHeight: 48,

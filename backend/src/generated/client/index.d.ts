@@ -3322,12 +3322,14 @@ export namespace Prisma {
     campaigns: number
     collaborations: number
     invoices: number
+    portfolio_items: number
   }
 
   export type BrandProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     campaigns?: boolean | BrandProfileCountOutputTypeCountCampaignsArgs
     collaborations?: boolean | BrandProfileCountOutputTypeCountCollaborationsArgs
     invoices?: boolean | BrandProfileCountOutputTypeCountInvoicesArgs
+    portfolio_items?: boolean | BrandProfileCountOutputTypeCountPortfolio_itemsArgs
   }
 
   // Custom InputTypes
@@ -3360,6 +3362,13 @@ export namespace Prisma {
    */
   export type BrandProfileCountOutputTypeCountInvoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InvoiceWhereInput
+  }
+
+  /**
+   * BrandProfileCountOutputType without action
+   */
+  export type BrandProfileCountOutputTypeCountPortfolio_itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PortfolioItemWhereInput
   }
 
 
@@ -5387,6 +5396,7 @@ export namespace Prisma {
     company_name: string | null
     industry: string | null
     role_in_organization: string | null
+    business_type: string | null
     website_url: string | null
     description: string | null
     logo_url: string | null
@@ -5408,6 +5418,7 @@ export namespace Prisma {
     company_name: string | null
     industry: string | null
     role_in_organization: string | null
+    business_type: string | null
     website_url: string | null
     description: string | null
     logo_url: string | null
@@ -5430,6 +5441,7 @@ export namespace Prisma {
     industry: number
     industries: number
     role_in_organization: number
+    business_type: number
     website_url: number
     description: number
     logo_url: number
@@ -5464,6 +5476,7 @@ export namespace Prisma {
     company_name?: true
     industry?: true
     role_in_organization?: true
+    business_type?: true
     website_url?: true
     description?: true
     logo_url?: true
@@ -5485,6 +5498,7 @@ export namespace Prisma {
     company_name?: true
     industry?: true
     role_in_organization?: true
+    business_type?: true
     website_url?: true
     description?: true
     logo_url?: true
@@ -5507,6 +5521,7 @@ export namespace Prisma {
     industry?: true
     industries?: true
     role_in_organization?: true
+    business_type?: true
     website_url?: true
     description?: true
     logo_url?: true
@@ -5617,6 +5632,7 @@ export namespace Prisma {
     industry: string | null
     industries: JsonValue | null
     role_in_organization: string | null
+    business_type: string | null
     website_url: string | null
     description: string | null
     logo_url: string | null
@@ -5659,6 +5675,7 @@ export namespace Prisma {
     industry?: boolean
     industries?: boolean
     role_in_organization?: boolean
+    business_type?: boolean
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
@@ -5677,6 +5694,7 @@ export namespace Prisma {
     campaigns?: boolean | BrandProfile$campaignsArgs<ExtArgs>
     collaborations?: boolean | BrandProfile$collaborationsArgs<ExtArgs>
     invoices?: boolean | BrandProfile$invoicesArgs<ExtArgs>
+    portfolio_items?: boolean | BrandProfile$portfolio_itemsArgs<ExtArgs>
     _count?: boolean | BrandProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["brandProfile"]>
 
@@ -5687,6 +5705,7 @@ export namespace Prisma {
     industry?: boolean
     industries?: boolean
     role_in_organization?: boolean
+    business_type?: boolean
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
@@ -5711,6 +5730,7 @@ export namespace Prisma {
     industry?: boolean
     industries?: boolean
     role_in_organization?: boolean
+    business_type?: boolean
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
@@ -5735,6 +5755,7 @@ export namespace Prisma {
     industry?: boolean
     industries?: boolean
     role_in_organization?: boolean
+    business_type?: boolean
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
@@ -5751,12 +5772,13 @@ export namespace Prisma {
     updated_at?: boolean
   }
 
-  export type BrandProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "company_name" | "industry" | "industries" | "role_in_organization" | "website_url" | "description" | "logo_url" | "company_size" | "location_country" | "location_state" | "location_city" | "location_pincode" | "languages" | "date_of_birth" | "gender" | "verified" | "created_at" | "updated_at", ExtArgs["result"]["brandProfile"]>
+  export type BrandProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "company_name" | "industry" | "industries" | "role_in_organization" | "business_type" | "website_url" | "description" | "logo_url" | "company_size" | "location_country" | "location_state" | "location_city" | "location_pincode" | "languages" | "date_of_birth" | "gender" | "verified" | "created_at" | "updated_at", ExtArgs["result"]["brandProfile"]>
   export type BrandProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     campaigns?: boolean | BrandProfile$campaignsArgs<ExtArgs>
     collaborations?: boolean | BrandProfile$collaborationsArgs<ExtArgs>
     invoices?: boolean | BrandProfile$invoicesArgs<ExtArgs>
+    portfolio_items?: boolean | BrandProfile$portfolio_itemsArgs<ExtArgs>
     _count?: boolean | BrandProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BrandProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5773,6 +5795,7 @@ export namespace Prisma {
       campaigns: Prisma.$CampaignPayload<ExtArgs>[]
       collaborations: Prisma.$CollaborationPayload<ExtArgs>[]
       invoices: Prisma.$InvoicePayload<ExtArgs>[]
+      portfolio_items: Prisma.$PortfolioItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
@@ -5781,6 +5804,7 @@ export namespace Prisma {
       industry: string | null
       industries: Prisma.JsonValue | null
       role_in_organization: string | null
+      business_type: string | null
       website_url: string | null
       description: string | null
       logo_url: string | null
@@ -6193,6 +6217,7 @@ export namespace Prisma {
     campaigns<T extends BrandProfile$campaignsArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfile$campaignsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     collaborations<T extends BrandProfile$collaborationsArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfile$collaborationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CollaborationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invoices<T extends BrandProfile$invoicesArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfile$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    portfolio_items<T extends BrandProfile$portfolio_itemsArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfile$portfolio_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PortfolioItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6228,6 +6253,7 @@ export namespace Prisma {
     readonly industry: FieldRef<"BrandProfile", 'String'>
     readonly industries: FieldRef<"BrandProfile", 'Json'>
     readonly role_in_organization: FieldRef<"BrandProfile", 'String'>
+    readonly business_type: FieldRef<"BrandProfile", 'String'>
     readonly website_url: FieldRef<"BrandProfile", 'String'>
     readonly description: FieldRef<"BrandProfile", 'String'>
     readonly logo_url: FieldRef<"BrandProfile", 'String'>
@@ -6707,6 +6733,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * BrandProfile.portfolio_items
+   */
+  export type BrandProfile$portfolio_itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PortfolioItem
+     */
+    select?: PortfolioItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PortfolioItem
+     */
+    omit?: PortfolioItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PortfolioItemInclude<ExtArgs> | null
+    where?: PortfolioItemWhereInput
+    orderBy?: PortfolioItemOrderByWithRelationInput | PortfolioItemOrderByWithRelationInput[]
+    cursor?: PortfolioItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PortfolioItemScalarFieldEnum | PortfolioItemScalarFieldEnum[]
   }
 
   /**
@@ -31124,18 +31174,21 @@ export namespace Prisma {
   export type PortfolioItemAvgAggregateOutputType = {
     id: number | null
     creator_id: number | null
+    brand_id: number | null
     file_size: number | null
   }
 
   export type PortfolioItemSumAggregateOutputType = {
     id: bigint | null
     creator_id: bigint | null
+    brand_id: bigint | null
     file_size: bigint | null
   }
 
   export type PortfolioItemMinAggregateOutputType = {
     id: bigint | null
     creator_id: bigint | null
+    brand_id: bigint | null
     title: string | null
     description: string | null
     media_url: string | null
@@ -31151,6 +31204,7 @@ export namespace Prisma {
   export type PortfolioItemMaxAggregateOutputType = {
     id: bigint | null
     creator_id: bigint | null
+    brand_id: bigint | null
     title: string | null
     description: string | null
     media_url: string | null
@@ -31166,6 +31220,7 @@ export namespace Prisma {
   export type PortfolioItemCountAggregateOutputType = {
     id: number
     creator_id: number
+    brand_id: number
     title: number
     description: number
     media_url: number
@@ -31184,18 +31239,21 @@ export namespace Prisma {
   export type PortfolioItemAvgAggregateInputType = {
     id?: true
     creator_id?: true
+    brand_id?: true
     file_size?: true
   }
 
   export type PortfolioItemSumAggregateInputType = {
     id?: true
     creator_id?: true
+    brand_id?: true
     file_size?: true
   }
 
   export type PortfolioItemMinAggregateInputType = {
     id?: true
     creator_id?: true
+    brand_id?: true
     title?: true
     description?: true
     media_url?: true
@@ -31211,6 +31269,7 @@ export namespace Prisma {
   export type PortfolioItemMaxAggregateInputType = {
     id?: true
     creator_id?: true
+    brand_id?: true
     title?: true
     description?: true
     media_url?: true
@@ -31226,6 +31285,7 @@ export namespace Prisma {
   export type PortfolioItemCountAggregateInputType = {
     id?: true
     creator_id?: true
+    brand_id?: true
     title?: true
     description?: true
     media_url?: true
@@ -31328,7 +31388,8 @@ export namespace Prisma {
 
   export type PortfolioItemGroupByOutputType = {
     id: bigint
-    creator_id: bigint
+    creator_id: bigint | null
+    brand_id: bigint | null
     title: string
     description: string | null
     media_url: string
@@ -31364,6 +31425,7 @@ export namespace Prisma {
   export type PortfolioItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     creator_id?: boolean
+    brand_id?: boolean
     title?: boolean
     description?: boolean
     media_url?: boolean
@@ -31375,12 +31437,14 @@ export namespace Prisma {
     is_featured?: boolean
     created_at?: boolean
     updated_at?: boolean
-    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    creator?: boolean | PortfolioItem$creatorArgs<ExtArgs>
+    brand?: boolean | PortfolioItem$brandArgs<ExtArgs>
   }, ExtArgs["result"]["portfolioItem"]>
 
   export type PortfolioItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     creator_id?: boolean
+    brand_id?: boolean
     title?: boolean
     description?: boolean
     media_url?: boolean
@@ -31392,12 +31456,14 @@ export namespace Prisma {
     is_featured?: boolean
     created_at?: boolean
     updated_at?: boolean
-    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    creator?: boolean | PortfolioItem$creatorArgs<ExtArgs>
+    brand?: boolean | PortfolioItem$brandArgs<ExtArgs>
   }, ExtArgs["result"]["portfolioItem"]>
 
   export type PortfolioItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     creator_id?: boolean
+    brand_id?: boolean
     title?: boolean
     description?: boolean
     media_url?: boolean
@@ -31409,12 +31475,14 @@ export namespace Prisma {
     is_featured?: boolean
     created_at?: boolean
     updated_at?: boolean
-    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    creator?: boolean | PortfolioItem$creatorArgs<ExtArgs>
+    brand?: boolean | PortfolioItem$brandArgs<ExtArgs>
   }, ExtArgs["result"]["portfolioItem"]>
 
   export type PortfolioItemSelectScalar = {
     id?: boolean
     creator_id?: boolean
+    brand_id?: boolean
     title?: boolean
     description?: boolean
     media_url?: boolean
@@ -31428,25 +31496,30 @@ export namespace Prisma {
     updated_at?: boolean
   }
 
-  export type PortfolioItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "creator_id" | "title" | "description" | "media_url" | "media_type" | "file_size" | "mime_type" | "platform" | "tags" | "is_featured" | "created_at" | "updated_at", ExtArgs["result"]["portfolioItem"]>
+  export type PortfolioItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "creator_id" | "brand_id" | "title" | "description" | "media_url" | "media_type" | "file_size" | "mime_type" | "platform" | "tags" | "is_featured" | "created_at" | "updated_at", ExtArgs["result"]["portfolioItem"]>
   export type PortfolioItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    creator?: boolean | PortfolioItem$creatorArgs<ExtArgs>
+    brand?: boolean | PortfolioItem$brandArgs<ExtArgs>
   }
   export type PortfolioItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    creator?: boolean | PortfolioItem$creatorArgs<ExtArgs>
+    brand?: boolean | PortfolioItem$brandArgs<ExtArgs>
   }
   export type PortfolioItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    creator?: boolean | PortfolioItem$creatorArgs<ExtArgs>
+    brand?: boolean | PortfolioItem$brandArgs<ExtArgs>
   }
 
   export type $PortfolioItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "PortfolioItem"
     objects: {
-      creator: Prisma.$CreatorProfilePayload<ExtArgs>
+      creator: Prisma.$CreatorProfilePayload<ExtArgs> | null
+      brand: Prisma.$BrandProfilePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
-      creator_id: bigint
+      creator_id: bigint | null
+      brand_id: bigint | null
       title: string
       description: string | null
       media_url: string
@@ -31852,7 +31925,8 @@ export namespace Prisma {
    */
   export interface Prisma__PortfolioItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    creator<T extends CreatorProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfileDefaultArgs<ExtArgs>>): Prisma__CreatorProfileClient<$Result.GetResult<Prisma.$CreatorProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    creator<T extends PortfolioItem$creatorArgs<ExtArgs> = {}>(args?: Subset<T, PortfolioItem$creatorArgs<ExtArgs>>): Prisma__CreatorProfileClient<$Result.GetResult<Prisma.$CreatorProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    brand<T extends PortfolioItem$brandArgs<ExtArgs> = {}>(args?: Subset<T, PortfolioItem$brandArgs<ExtArgs>>): Prisma__BrandProfileClient<$Result.GetResult<Prisma.$BrandProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -31884,6 +31958,7 @@ export namespace Prisma {
   interface PortfolioItemFieldRefs {
     readonly id: FieldRef<"PortfolioItem", 'BigInt'>
     readonly creator_id: FieldRef<"PortfolioItem", 'BigInt'>
+    readonly brand_id: FieldRef<"PortfolioItem", 'BigInt'>
     readonly title: FieldRef<"PortfolioItem", 'String'>
     readonly description: FieldRef<"PortfolioItem", 'String'>
     readonly media_url: FieldRef<"PortfolioItem", 'String'>
@@ -32291,6 +32366,44 @@ export namespace Prisma {
   }
 
   /**
+   * PortfolioItem.creator
+   */
+  export type PortfolioItem$creatorArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreatorProfile
+     */
+    select?: CreatorProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreatorProfile
+     */
+    omit?: CreatorProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CreatorProfileInclude<ExtArgs> | null
+    where?: CreatorProfileWhereInput
+  }
+
+  /**
+   * PortfolioItem.brand
+   */
+  export type PortfolioItem$brandArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandProfile
+     */
+    select?: BrandProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandProfile
+     */
+    omit?: BrandProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandProfileInclude<ExtArgs> | null
+    where?: BrandProfileWhereInput
+  }
+
+  /**
    * PortfolioItem without action
    */
   export type PortfolioItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -32357,6 +32470,7 @@ export namespace Prisma {
     industry: 'industry',
     industries: 'industries',
     role_in_organization: 'role_in_organization',
+    business_type: 'business_type',
     website_url: 'website_url',
     description: 'description',
     logo_url: 'logo_url',
@@ -32725,6 +32839,7 @@ export namespace Prisma {
   export const PortfolioItemScalarFieldEnum: {
     id: 'id',
     creator_id: 'creator_id',
+    brand_id: 'brand_id',
     title: 'title',
     description: 'description',
     media_url: 'media_url',
@@ -33378,6 +33493,7 @@ export namespace Prisma {
     industry?: StringNullableFilter<"BrandProfile"> | string | null
     industries?: JsonNullableFilter<"BrandProfile">
     role_in_organization?: StringNullableFilter<"BrandProfile"> | string | null
+    business_type?: StringNullableFilter<"BrandProfile"> | string | null
     website_url?: StringNullableFilter<"BrandProfile"> | string | null
     description?: StringNullableFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
@@ -33396,6 +33512,7 @@ export namespace Prisma {
     campaigns?: CampaignListRelationFilter
     collaborations?: CollaborationListRelationFilter
     invoices?: InvoiceListRelationFilter
+    portfolio_items?: PortfolioItemListRelationFilter
   }
 
   export type BrandProfileOrderByWithRelationInput = {
@@ -33405,6 +33522,7 @@ export namespace Prisma {
     industry?: SortOrderInput | SortOrder
     industries?: SortOrderInput | SortOrder
     role_in_organization?: SortOrderInput | SortOrder
+    business_type?: SortOrderInput | SortOrder
     website_url?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     logo_url?: SortOrderInput | SortOrder
@@ -33423,6 +33541,7 @@ export namespace Prisma {
     campaigns?: CampaignOrderByRelationAggregateInput
     collaborations?: CollaborationOrderByRelationAggregateInput
     invoices?: InvoiceOrderByRelationAggregateInput
+    portfolio_items?: PortfolioItemOrderByRelationAggregateInput
   }
 
   export type BrandProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -33435,6 +33554,7 @@ export namespace Prisma {
     industry?: StringNullableFilter<"BrandProfile"> | string | null
     industries?: JsonNullableFilter<"BrandProfile">
     role_in_organization?: StringNullableFilter<"BrandProfile"> | string | null
+    business_type?: StringNullableFilter<"BrandProfile"> | string | null
     website_url?: StringNullableFilter<"BrandProfile"> | string | null
     description?: StringNullableFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
@@ -33453,6 +33573,7 @@ export namespace Prisma {
     campaigns?: CampaignListRelationFilter
     collaborations?: CollaborationListRelationFilter
     invoices?: InvoiceListRelationFilter
+    portfolio_items?: PortfolioItemListRelationFilter
   }, "id">
 
   export type BrandProfileOrderByWithAggregationInput = {
@@ -33462,6 +33583,7 @@ export namespace Prisma {
     industry?: SortOrderInput | SortOrder
     industries?: SortOrderInput | SortOrder
     role_in_organization?: SortOrderInput | SortOrder
+    business_type?: SortOrderInput | SortOrder
     website_url?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     logo_url?: SortOrderInput | SortOrder
@@ -33493,6 +33615,7 @@ export namespace Prisma {
     industry?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     industries?: JsonNullableWithAggregatesFilter<"BrandProfile">
     role_in_organization?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
+    business_type?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     website_url?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     description?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
@@ -35396,7 +35519,8 @@ export namespace Prisma {
     OR?: PortfolioItemWhereInput[]
     NOT?: PortfolioItemWhereInput | PortfolioItemWhereInput[]
     id?: BigIntFilter<"PortfolioItem"> | bigint | number
-    creator_id?: BigIntFilter<"PortfolioItem"> | bigint | number
+    creator_id?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
+    brand_id?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
     title?: StringFilter<"PortfolioItem"> | string
     description?: StringNullableFilter<"PortfolioItem"> | string | null
     media_url?: StringFilter<"PortfolioItem"> | string
@@ -35408,12 +35532,14 @@ export namespace Prisma {
     is_featured?: BoolFilter<"PortfolioItem"> | boolean
     created_at?: DateTimeFilter<"PortfolioItem"> | Date | string
     updated_at?: DateTimeFilter<"PortfolioItem"> | Date | string
-    creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
+    creator?: XOR<CreatorProfileNullableScalarRelationFilter, CreatorProfileWhereInput> | null
+    brand?: XOR<BrandProfileNullableScalarRelationFilter, BrandProfileWhereInput> | null
   }
 
   export type PortfolioItemOrderByWithRelationInput = {
     id?: SortOrder
-    creator_id?: SortOrder
+    creator_id?: SortOrderInput | SortOrder
+    brand_id?: SortOrderInput | SortOrder
     title?: SortOrder
     description?: SortOrderInput | SortOrder
     media_url?: SortOrder
@@ -35426,6 +35552,7 @@ export namespace Prisma {
     created_at?: SortOrder
     updated_at?: SortOrder
     creator?: CreatorProfileOrderByWithRelationInput
+    brand?: BrandProfileOrderByWithRelationInput
   }
 
   export type PortfolioItemWhereUniqueInput = Prisma.AtLeast<{
@@ -35433,7 +35560,8 @@ export namespace Prisma {
     AND?: PortfolioItemWhereInput | PortfolioItemWhereInput[]
     OR?: PortfolioItemWhereInput[]
     NOT?: PortfolioItemWhereInput | PortfolioItemWhereInput[]
-    creator_id?: BigIntFilter<"PortfolioItem"> | bigint | number
+    creator_id?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
+    brand_id?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
     title?: StringFilter<"PortfolioItem"> | string
     description?: StringNullableFilter<"PortfolioItem"> | string | null
     media_url?: StringFilter<"PortfolioItem"> | string
@@ -35445,12 +35573,14 @@ export namespace Prisma {
     is_featured?: BoolFilter<"PortfolioItem"> | boolean
     created_at?: DateTimeFilter<"PortfolioItem"> | Date | string
     updated_at?: DateTimeFilter<"PortfolioItem"> | Date | string
-    creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
+    creator?: XOR<CreatorProfileNullableScalarRelationFilter, CreatorProfileWhereInput> | null
+    brand?: XOR<BrandProfileNullableScalarRelationFilter, BrandProfileWhereInput> | null
   }, "id">
 
   export type PortfolioItemOrderByWithAggregationInput = {
     id?: SortOrder
-    creator_id?: SortOrder
+    creator_id?: SortOrderInput | SortOrder
+    brand_id?: SortOrderInput | SortOrder
     title?: SortOrder
     description?: SortOrderInput | SortOrder
     media_url?: SortOrder
@@ -35474,7 +35604,8 @@ export namespace Prisma {
     OR?: PortfolioItemScalarWhereWithAggregatesInput[]
     NOT?: PortfolioItemScalarWhereWithAggregatesInput | PortfolioItemScalarWhereWithAggregatesInput[]
     id?: BigIntWithAggregatesFilter<"PortfolioItem"> | bigint | number
-    creator_id?: BigIntWithAggregatesFilter<"PortfolioItem"> | bigint | number
+    creator_id?: BigIntNullableWithAggregatesFilter<"PortfolioItem"> | bigint | number | null
+    brand_id?: BigIntNullableWithAggregatesFilter<"PortfolioItem"> | bigint | number | null
     title?: StringWithAggregatesFilter<"PortfolioItem"> | string
     description?: StringNullableWithAggregatesFilter<"PortfolioItem"> | string | null
     media_url?: StringWithAggregatesFilter<"PortfolioItem"> | string
@@ -35722,6 +35853,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -35740,6 +35872,7 @@ export namespace Prisma {
     campaigns?: CampaignCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationCreateNestedManyWithoutBrandInput
     invoices?: InvoiceCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateInput = {
@@ -35749,6 +35882,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -35766,6 +35900,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUpdateInput = {
@@ -35774,6 +35909,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35792,6 +35928,7 @@ export namespace Prisma {
     campaigns?: CampaignUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateInput = {
@@ -35801,6 +35938,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35818,6 +35956,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileCreateManyInput = {
@@ -35827,6 +35966,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -35849,6 +35989,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35872,6 +36013,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37941,12 +38083,14 @@ export namespace Prisma {
     is_featured?: boolean
     created_at?: Date | string
     updated_at?: Date | string
-    creator: CreatorProfileCreateNestedOneWithoutPortfolio_itemsInput
+    creator?: CreatorProfileCreateNestedOneWithoutPortfolio_itemsInput
+    brand?: BrandProfileCreateNestedOneWithoutPortfolio_itemsInput
   }
 
   export type PortfolioItemUncheckedCreateInput = {
     id?: bigint | number
-    creator_id: bigint | number
+    creator_id?: bigint | number | null
+    brand_id?: bigint | number | null
     title: string
     description?: string | null
     media_url: string
@@ -37973,12 +38117,14 @@ export namespace Prisma {
     is_featured?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    creator?: CreatorProfileUpdateOneRequiredWithoutPortfolio_itemsNestedInput
+    creator?: CreatorProfileUpdateOneWithoutPortfolio_itemsNestedInput
+    brand?: BrandProfileUpdateOneWithoutPortfolio_itemsNestedInput
   }
 
   export type PortfolioItemUncheckedUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    brand_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
@@ -37994,7 +38140,8 @@ export namespace Prisma {
 
   export type PortfolioItemCreateManyInput = {
     id?: bigint | number
-    creator_id: bigint | number
+    creator_id?: bigint | number | null
+    brand_id?: bigint | number | null
     title: string
     description?: string | null
     media_url: string
@@ -38025,7 +38172,8 @@ export namespace Prisma {
 
   export type PortfolioItemUncheckedUpdateManyInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    brand_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
@@ -38513,6 +38661,12 @@ export namespace Prisma {
     none?: InvoiceWhereInput
   }
 
+  export type PortfolioItemListRelationFilter = {
+    every?: PortfolioItemWhereInput
+    some?: PortfolioItemWhereInput
+    none?: PortfolioItemWhereInput
+  }
+
   export type CampaignOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -38525,6 +38679,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type PortfolioItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type BrandProfileCountOrderByAggregateInput = {
     id?: SortOrder
     user_id?: SortOrder
@@ -38532,6 +38690,7 @@ export namespace Prisma {
     industry?: SortOrder
     industries?: SortOrder
     role_in_organization?: SortOrder
+    business_type?: SortOrder
     website_url?: SortOrder
     description?: SortOrder
     logo_url?: SortOrder
@@ -38559,6 +38718,7 @@ export namespace Prisma {
     company_name?: SortOrder
     industry?: SortOrder
     role_in_organization?: SortOrder
+    business_type?: SortOrder
     website_url?: SortOrder
     description?: SortOrder
     logo_url?: SortOrder
@@ -38580,6 +38740,7 @@ export namespace Prisma {
     company_name?: SortOrder
     industry?: SortOrder
     role_in_organization?: SortOrder
+    business_type?: SortOrder
     website_url?: SortOrder
     description?: SortOrder
     logo_url?: SortOrder
@@ -38693,21 +38854,11 @@ export namespace Prisma {
     isNot?: KYCWhereInput | null
   }
 
-  export type PortfolioItemListRelationFilter = {
-    every?: PortfolioItemWhereInput
-    some?: PortfolioItemWhereInput
-    none?: PortfolioItemWhereInput
-  }
-
   export type CampaignApplicationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type SocialMediaAccountOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type PortfolioItemOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -40314,9 +40465,15 @@ export namespace Prisma {
     not?: NestedEnumSocialPlatformNullableFilter<$PrismaModel> | $Enums.SocialPlatform | null
   }
 
+  export type BrandProfileNullableScalarRelationFilter = {
+    is?: BrandProfileWhereInput | null
+    isNot?: BrandProfileWhereInput | null
+  }
+
   export type PortfolioItemCountOrderByAggregateInput = {
     id?: SortOrder
     creator_id?: SortOrder
+    brand_id?: SortOrder
     title?: SortOrder
     description?: SortOrder
     media_url?: SortOrder
@@ -40333,12 +40490,14 @@ export namespace Prisma {
   export type PortfolioItemAvgOrderByAggregateInput = {
     id?: SortOrder
     creator_id?: SortOrder
+    brand_id?: SortOrder
     file_size?: SortOrder
   }
 
   export type PortfolioItemMaxOrderByAggregateInput = {
     id?: SortOrder
     creator_id?: SortOrder
+    brand_id?: SortOrder
     title?: SortOrder
     description?: SortOrder
     media_url?: SortOrder
@@ -40354,6 +40513,7 @@ export namespace Prisma {
   export type PortfolioItemMinOrderByAggregateInput = {
     id?: SortOrder
     creator_id?: SortOrder
+    brand_id?: SortOrder
     title?: SortOrder
     description?: SortOrder
     media_url?: SortOrder
@@ -40369,6 +40529,7 @@ export namespace Prisma {
   export type PortfolioItemSumOrderByAggregateInput = {
     id?: SortOrder
     creator_id?: SortOrder
+    brand_id?: SortOrder
     file_size?: SortOrder
   }
 
@@ -41083,6 +41244,13 @@ export namespace Prisma {
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
   }
 
+  export type PortfolioItemCreateNestedManyWithoutBrandInput = {
+    create?: XOR<PortfolioItemCreateWithoutBrandInput, PortfolioItemUncheckedCreateWithoutBrandInput> | PortfolioItemCreateWithoutBrandInput[] | PortfolioItemUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: PortfolioItemCreateOrConnectWithoutBrandInput | PortfolioItemCreateOrConnectWithoutBrandInput[]
+    createMany?: PortfolioItemCreateManyBrandInputEnvelope
+    connect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+  }
+
   export type CampaignUncheckedCreateNestedManyWithoutBrandInput = {
     create?: XOR<CampaignCreateWithoutBrandInput, CampaignUncheckedCreateWithoutBrandInput> | CampaignCreateWithoutBrandInput[] | CampaignUncheckedCreateWithoutBrandInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutBrandInput | CampaignCreateOrConnectWithoutBrandInput[]
@@ -41102,6 +41270,13 @@ export namespace Prisma {
     connectOrCreate?: InvoiceCreateOrConnectWithoutBrandInput | InvoiceCreateOrConnectWithoutBrandInput[]
     createMany?: InvoiceCreateManyBrandInputEnvelope
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+  }
+
+  export type PortfolioItemUncheckedCreateNestedManyWithoutBrandInput = {
+    create?: XOR<PortfolioItemCreateWithoutBrandInput, PortfolioItemUncheckedCreateWithoutBrandInput> | PortfolioItemCreateWithoutBrandInput[] | PortfolioItemUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: PortfolioItemCreateOrConnectWithoutBrandInput | PortfolioItemCreateOrConnectWithoutBrandInput[]
+    createMany?: PortfolioItemCreateManyBrandInputEnvelope
+    connect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
   }
 
   export type NullableEnumCompanySizeFieldUpdateOperationsInput = {
@@ -41158,6 +41333,20 @@ export namespace Prisma {
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
   }
 
+  export type PortfolioItemUpdateManyWithoutBrandNestedInput = {
+    create?: XOR<PortfolioItemCreateWithoutBrandInput, PortfolioItemUncheckedCreateWithoutBrandInput> | PortfolioItemCreateWithoutBrandInput[] | PortfolioItemUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: PortfolioItemCreateOrConnectWithoutBrandInput | PortfolioItemCreateOrConnectWithoutBrandInput[]
+    upsert?: PortfolioItemUpsertWithWhereUniqueWithoutBrandInput | PortfolioItemUpsertWithWhereUniqueWithoutBrandInput[]
+    createMany?: PortfolioItemCreateManyBrandInputEnvelope
+    set?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+    disconnect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+    delete?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+    connect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+    update?: PortfolioItemUpdateWithWhereUniqueWithoutBrandInput | PortfolioItemUpdateWithWhereUniqueWithoutBrandInput[]
+    updateMany?: PortfolioItemUpdateManyWithWhereWithoutBrandInput | PortfolioItemUpdateManyWithWhereWithoutBrandInput[]
+    deleteMany?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
+  }
+
   export type CampaignUncheckedUpdateManyWithoutBrandNestedInput = {
     create?: XOR<CampaignCreateWithoutBrandInput, CampaignUncheckedCreateWithoutBrandInput> | CampaignCreateWithoutBrandInput[] | CampaignUncheckedCreateWithoutBrandInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutBrandInput | CampaignCreateOrConnectWithoutBrandInput[]
@@ -41198,6 +41387,20 @@ export namespace Prisma {
     update?: InvoiceUpdateWithWhereUniqueWithoutBrandInput | InvoiceUpdateWithWhereUniqueWithoutBrandInput[]
     updateMany?: InvoiceUpdateManyWithWhereWithoutBrandInput | InvoiceUpdateManyWithWhereWithoutBrandInput[]
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+  }
+
+  export type PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput = {
+    create?: XOR<PortfolioItemCreateWithoutBrandInput, PortfolioItemUncheckedCreateWithoutBrandInput> | PortfolioItemCreateWithoutBrandInput[] | PortfolioItemUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: PortfolioItemCreateOrConnectWithoutBrandInput | PortfolioItemCreateOrConnectWithoutBrandInput[]
+    upsert?: PortfolioItemUpsertWithWhereUniqueWithoutBrandInput | PortfolioItemUpsertWithWhereUniqueWithoutBrandInput[]
+    createMany?: PortfolioItemCreateManyBrandInputEnvelope
+    set?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+    disconnect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+    delete?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+    connect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+    update?: PortfolioItemUpdateWithWhereUniqueWithoutBrandInput | PortfolioItemUpdateWithWhereUniqueWithoutBrandInput[]
+    updateMany?: PortfolioItemUpdateManyWithWhereWithoutBrandInput | PortfolioItemUpdateManyWithWhereWithoutBrandInput[]
+    deleteMany?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
   }
 
   export type CampaignApplicationCreateNestedManyWithoutCreatorInput = {
@@ -42626,6 +42829,12 @@ export namespace Prisma {
     connect?: CreatorProfileWhereUniqueInput
   }
 
+  export type BrandProfileCreateNestedOneWithoutPortfolio_itemsInput = {
+    create?: XOR<BrandProfileCreateWithoutPortfolio_itemsInput, BrandProfileUncheckedCreateWithoutPortfolio_itemsInput>
+    connectOrCreate?: BrandProfileCreateOrConnectWithoutPortfolio_itemsInput
+    connect?: BrandProfileWhereUniqueInput
+  }
+
   export type EnumPortfolioMediaTypeFieldUpdateOperationsInput = {
     set?: $Enums.PortfolioMediaType
   }
@@ -42634,12 +42843,24 @@ export namespace Prisma {
     set?: $Enums.SocialPlatform | null
   }
 
-  export type CreatorProfileUpdateOneRequiredWithoutPortfolio_itemsNestedInput = {
+  export type CreatorProfileUpdateOneWithoutPortfolio_itemsNestedInput = {
     create?: XOR<CreatorProfileCreateWithoutPortfolio_itemsInput, CreatorProfileUncheckedCreateWithoutPortfolio_itemsInput>
     connectOrCreate?: CreatorProfileCreateOrConnectWithoutPortfolio_itemsInput
     upsert?: CreatorProfileUpsertWithoutPortfolio_itemsInput
+    disconnect?: CreatorProfileWhereInput | boolean
+    delete?: CreatorProfileWhereInput | boolean
     connect?: CreatorProfileWhereUniqueInput
     update?: XOR<XOR<CreatorProfileUpdateToOneWithWhereWithoutPortfolio_itemsInput, CreatorProfileUpdateWithoutPortfolio_itemsInput>, CreatorProfileUncheckedUpdateWithoutPortfolio_itemsInput>
+  }
+
+  export type BrandProfileUpdateOneWithoutPortfolio_itemsNestedInput = {
+    create?: XOR<BrandProfileCreateWithoutPortfolio_itemsInput, BrandProfileUncheckedCreateWithoutPortfolio_itemsInput>
+    connectOrCreate?: BrandProfileCreateOrConnectWithoutPortfolio_itemsInput
+    upsert?: BrandProfileUpsertWithoutPortfolio_itemsInput
+    disconnect?: BrandProfileWhereInput | boolean
+    delete?: BrandProfileWhereInput | boolean
+    connect?: BrandProfileWhereUniqueInput
+    update?: XOR<XOR<BrandProfileUpdateToOneWithWhereWithoutPortfolio_itemsInput, BrandProfileUpdateWithoutPortfolio_itemsInput>, BrandProfileUncheckedUpdateWithoutPortfolio_itemsInput>
   }
 
   export type NestedBigIntFilter<$PrismaModel = never> = {
@@ -43354,6 +43575,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -43371,6 +43593,7 @@ export namespace Prisma {
     campaigns?: CampaignCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationCreateNestedManyWithoutBrandInput
     invoices?: InvoiceCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateWithoutUserInput = {
@@ -43379,6 +43602,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -43396,6 +43620,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileCreateOrConnectWithoutUserInput = {
@@ -43975,6 +44200,7 @@ export namespace Prisma {
     industry?: StringNullableFilter<"BrandProfile"> | string | null
     industries?: JsonNullableFilter<"BrandProfile">
     role_in_organization?: StringNullableFilter<"BrandProfile"> | string | null
+    business_type?: StringNullableFilter<"BrandProfile"> | string | null
     website_url?: StringNullableFilter<"BrandProfile"> | string | null
     description?: StringNullableFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
@@ -44675,6 +44901,48 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PortfolioItemCreateWithoutBrandInput = {
+    id?: bigint | number
+    title: string
+    description?: string | null
+    media_url: string
+    media_type: $Enums.PortfolioMediaType
+    file_size?: bigint | number | null
+    mime_type?: string | null
+    platform?: $Enums.SocialPlatform | null
+    tags?: NullableJsonNullValueInput | InputJsonValue
+    is_featured?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    creator?: CreatorProfileCreateNestedOneWithoutPortfolio_itemsInput
+  }
+
+  export type PortfolioItemUncheckedCreateWithoutBrandInput = {
+    id?: bigint | number
+    creator_id?: bigint | number | null
+    title: string
+    description?: string | null
+    media_url: string
+    media_type: $Enums.PortfolioMediaType
+    file_size?: bigint | number | null
+    mime_type?: string | null
+    platform?: $Enums.SocialPlatform | null
+    tags?: NullableJsonNullValueInput | InputJsonValue
+    is_featured?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type PortfolioItemCreateOrConnectWithoutBrandInput = {
+    where: PortfolioItemWhereUniqueInput
+    create: XOR<PortfolioItemCreateWithoutBrandInput, PortfolioItemUncheckedCreateWithoutBrandInput>
+  }
+
+  export type PortfolioItemCreateManyBrandInputEnvelope = {
+    data: PortfolioItemCreateManyBrandInput | PortfolioItemCreateManyBrandInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutBrand_profilesInput = {
     update: XOR<UserUpdateWithoutBrand_profilesInput, UserUncheckedUpdateWithoutBrand_profilesInput>
     create: XOR<UserCreateWithoutBrand_profilesInput, UserUncheckedCreateWithoutBrand_profilesInput>
@@ -44873,6 +45141,42 @@ export namespace Prisma {
     status?: EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
     issued_at?: DateTimeFilter<"Invoice"> | Date | string
     paid_at?: DateTimeNullableFilter<"Invoice"> | Date | string | null
+  }
+
+  export type PortfolioItemUpsertWithWhereUniqueWithoutBrandInput = {
+    where: PortfolioItemWhereUniqueInput
+    update: XOR<PortfolioItemUpdateWithoutBrandInput, PortfolioItemUncheckedUpdateWithoutBrandInput>
+    create: XOR<PortfolioItemCreateWithoutBrandInput, PortfolioItemUncheckedCreateWithoutBrandInput>
+  }
+
+  export type PortfolioItemUpdateWithWhereUniqueWithoutBrandInput = {
+    where: PortfolioItemWhereUniqueInput
+    data: XOR<PortfolioItemUpdateWithoutBrandInput, PortfolioItemUncheckedUpdateWithoutBrandInput>
+  }
+
+  export type PortfolioItemUpdateManyWithWhereWithoutBrandInput = {
+    where: PortfolioItemScalarWhereInput
+    data: XOR<PortfolioItemUpdateManyMutationInput, PortfolioItemUncheckedUpdateManyWithoutBrandInput>
+  }
+
+  export type PortfolioItemScalarWhereInput = {
+    AND?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
+    OR?: PortfolioItemScalarWhereInput[]
+    NOT?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
+    id?: BigIntFilter<"PortfolioItem"> | bigint | number
+    creator_id?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
+    brand_id?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
+    title?: StringFilter<"PortfolioItem"> | string
+    description?: StringNullableFilter<"PortfolioItem"> | string | null
+    media_url?: StringFilter<"PortfolioItem"> | string
+    media_type?: EnumPortfolioMediaTypeFilter<"PortfolioItem"> | $Enums.PortfolioMediaType
+    file_size?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
+    mime_type?: StringNullableFilter<"PortfolioItem"> | string | null
+    platform?: EnumSocialPlatformNullableFilter<"PortfolioItem"> | $Enums.SocialPlatform | null
+    tags?: JsonNullableFilter<"PortfolioItem">
+    is_featured?: BoolFilter<"PortfolioItem"> | boolean
+    created_at?: DateTimeFilter<"PortfolioItem"> | Date | string
+    updated_at?: DateTimeFilter<"PortfolioItem"> | Date | string
   }
 
   export type CampaignApplicationCreateWithoutCreatorInput = {
@@ -45176,10 +45480,12 @@ export namespace Prisma {
     is_featured?: boolean
     created_at?: Date | string
     updated_at?: Date | string
+    brand?: BrandProfileCreateNestedOneWithoutPortfolio_itemsInput
   }
 
   export type PortfolioItemUncheckedCreateWithoutCreatorInput = {
     id?: bigint | number
+    brand_id?: bigint | number | null
     title: string
     description?: string | null
     media_url: string
@@ -45453,25 +45759,6 @@ export namespace Prisma {
     data: XOR<PortfolioItemUpdateManyMutationInput, PortfolioItemUncheckedUpdateManyWithoutCreatorInput>
   }
 
-  export type PortfolioItemScalarWhereInput = {
-    AND?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
-    OR?: PortfolioItemScalarWhereInput[]
-    NOT?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
-    id?: BigIntFilter<"PortfolioItem"> | bigint | number
-    creator_id?: BigIntFilter<"PortfolioItem"> | bigint | number
-    title?: StringFilter<"PortfolioItem"> | string
-    description?: StringNullableFilter<"PortfolioItem"> | string | null
-    media_url?: StringFilter<"PortfolioItem"> | string
-    media_type?: EnumPortfolioMediaTypeFilter<"PortfolioItem"> | $Enums.PortfolioMediaType
-    file_size?: BigIntNullableFilter<"PortfolioItem"> | bigint | number | null
-    mime_type?: StringNullableFilter<"PortfolioItem"> | string | null
-    platform?: EnumSocialPlatformNullableFilter<"PortfolioItem"> | $Enums.SocialPlatform | null
-    tags?: JsonNullableFilter<"PortfolioItem">
-    is_featured?: BoolFilter<"PortfolioItem"> | boolean
-    created_at?: DateTimeFilter<"PortfolioItem"> | Date | string
-    updated_at?: DateTimeFilter<"PortfolioItem"> | Date | string
-  }
-
   export type CreatorProfileCreateWithoutSocial_media_accountsInput = {
     id?: bigint | number
     email?: string | null
@@ -45634,6 +45921,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -45651,6 +45939,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutBrand_profilesInput
     collaborations?: CollaborationCreateNestedManyWithoutBrandInput
     invoices?: InvoiceCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateWithoutCampaignsInput = {
@@ -45660,6 +45949,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -45676,6 +45966,7 @@ export namespace Prisma {
     updated_at?: Date | string
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileCreateOrConnectWithoutCampaignsInput = {
@@ -45814,6 +46105,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45831,6 +46123,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutBrand_profilesNestedInput
     collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateWithoutCampaignsInput = {
@@ -45840,6 +46133,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45856,6 +46150,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type CampaignAnalyticsUpsertWithWhereUniqueWithoutCampaignInput = {
@@ -46333,6 +46628,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -46350,6 +46646,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutBrand_profilesInput
     campaigns?: CampaignCreateNestedManyWithoutBrandInput
     invoices?: InvoiceCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateWithoutCollaborationsInput = {
@@ -46359,6 +46656,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -46375,6 +46673,7 @@ export namespace Prisma {
     updated_at?: Date | string
     campaigns?: CampaignUncheckedCreateNestedManyWithoutBrandInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileCreateOrConnectWithoutCollaborationsInput = {
@@ -46787,6 +47086,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46804,6 +47104,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutBrand_profilesNestedInput
     campaigns?: CampaignUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateWithoutCollaborationsInput = {
@@ -46813,6 +47114,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46829,6 +47131,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     campaigns?: CampaignUncheckedUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type CampaignUpsertWithoutCollaborationsInput = {
@@ -48320,6 +48623,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -48337,6 +48641,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutBrand_profilesInput
     campaigns?: CampaignCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateWithoutInvoicesInput = {
@@ -48346,6 +48651,7 @@ export namespace Prisma {
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -48362,6 +48668,7 @@ export namespace Prisma {
     updated_at?: Date | string
     campaigns?: CampaignUncheckedCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileCreateOrConnectWithoutInvoicesInput = {
@@ -48506,6 +48813,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48523,6 +48831,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutBrand_profilesNestedInput
     campaigns?: CampaignUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateWithoutInvoicesInput = {
@@ -48532,6 +48841,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48548,6 +48858,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     campaigns?: CampaignUncheckedUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type CollaborationUpsertWithoutInvoicesInput = {
@@ -50972,6 +51283,65 @@ export namespace Prisma {
     create: XOR<CreatorProfileCreateWithoutPortfolio_itemsInput, CreatorProfileUncheckedCreateWithoutPortfolio_itemsInput>
   }
 
+  export type BrandProfileCreateWithoutPortfolio_itemsInput = {
+    id?: bigint | number
+    company_name: string
+    industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
+    business_type?: string | null
+    website_url?: string | null
+    description?: string | null
+    logo_url?: string | null
+    company_size?: $Enums.CompanySize | null
+    location_country?: string | null
+    location_state?: string | null
+    location_city?: string | null
+    location_pincode?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
+    gender?: string | null
+    verified?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    user: UserCreateNestedOneWithoutBrand_profilesInput
+    campaigns?: CampaignCreateNestedManyWithoutBrandInput
+    collaborations?: CollaborationCreateNestedManyWithoutBrandInput
+    invoices?: InvoiceCreateNestedManyWithoutBrandInput
+  }
+
+  export type BrandProfileUncheckedCreateWithoutPortfolio_itemsInput = {
+    id?: bigint | number
+    user_id: bigint | number
+    company_name: string
+    industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
+    business_type?: string | null
+    website_url?: string | null
+    description?: string | null
+    logo_url?: string | null
+    company_size?: $Enums.CompanySize | null
+    location_country?: string | null
+    location_state?: string | null
+    location_city?: string | null
+    location_pincode?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
+    gender?: string | null
+    verified?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    campaigns?: CampaignUncheckedCreateNestedManyWithoutBrandInput
+    collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
+  }
+
+  export type BrandProfileCreateOrConnectWithoutPortfolio_itemsInput = {
+    where: BrandProfileWhereUniqueInput
+    create: XOR<BrandProfileCreateWithoutPortfolio_itemsInput, BrandProfileUncheckedCreateWithoutPortfolio_itemsInput>
+  }
+
   export type CreatorProfileUpsertWithoutPortfolio_itemsInput = {
     update: XOR<CreatorProfileUpdateWithoutPortfolio_itemsInput, CreatorProfileUncheckedUpdateWithoutPortfolio_itemsInput>
     create: XOR<CreatorProfileCreateWithoutPortfolio_itemsInput, CreatorProfileUncheckedCreateWithoutPortfolio_itemsInput>
@@ -51053,12 +51423,78 @@ export namespace Prisma {
     kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
   }
 
+  export type BrandProfileUpsertWithoutPortfolio_itemsInput = {
+    update: XOR<BrandProfileUpdateWithoutPortfolio_itemsInput, BrandProfileUncheckedUpdateWithoutPortfolio_itemsInput>
+    create: XOR<BrandProfileCreateWithoutPortfolio_itemsInput, BrandProfileUncheckedCreateWithoutPortfolio_itemsInput>
+    where?: BrandProfileWhereInput
+  }
+
+  export type BrandProfileUpdateToOneWithWhereWithoutPortfolio_itemsInput = {
+    where?: BrandProfileWhereInput
+    data: XOR<BrandProfileUpdateWithoutPortfolio_itemsInput, BrandProfileUncheckedUpdateWithoutPortfolio_itemsInput>
+  }
+
+  export type BrandProfileUpdateWithoutPortfolio_itemsInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
+    website_url?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
+    location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
+    location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutBrand_profilesNestedInput
+    campaigns?: CampaignUpdateManyWithoutBrandNestedInput
+    collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
+    invoices?: InvoiceUpdateManyWithoutBrandNestedInput
+  }
+
+  export type BrandProfileUncheckedUpdateWithoutPortfolio_itemsInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    user_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
+    website_url?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
+    location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
+    location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaigns?: CampaignUncheckedUpdateManyWithoutBrandNestedInput
+    collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
+  }
+
   export type BrandProfileCreateManyUserInput = {
     id?: bigint | number
     company_name: string
     industry?: string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: string | null
+    business_type?: string | null
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
@@ -51246,6 +51682,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51263,6 +51700,7 @@ export namespace Prisma {
     campaigns?: CampaignUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateWithoutUserInput = {
@@ -51271,6 +51709,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51288,6 +51727,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateManyWithoutUserInput = {
@@ -51296,6 +51736,7 @@ export namespace Prisma {
     industry?: NullableStringFieldUpdateOperationsInput | string | null
     industries?: NullableJsonNullValueInput | InputJsonValue
     role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51866,6 +52307,22 @@ export namespace Prisma {
     paid_at?: Date | string | null
   }
 
+  export type PortfolioItemCreateManyBrandInput = {
+    id?: bigint | number
+    creator_id?: bigint | number | null
+    title: string
+    description?: string | null
+    media_url: string
+    media_type: $Enums.PortfolioMediaType
+    file_size?: bigint | number | null
+    mime_type?: string | null
+    platform?: $Enums.SocialPlatform | null
+    tags?: NullableJsonNullValueInput | InputJsonValue
+    is_featured?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
   export type CampaignUpdateWithoutBrandInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     title?: StringFieldUpdateOperationsInput | string
@@ -52043,6 +52500,54 @@ export namespace Prisma {
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type PortfolioItemUpdateWithoutBrandInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    media_url?: StringFieldUpdateOperationsInput | string
+    media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
+    tags?: NullableJsonNullValueInput | InputJsonValue
+    is_featured?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: CreatorProfileUpdateOneWithoutPortfolio_itemsNestedInput
+  }
+
+  export type PortfolioItemUncheckedUpdateWithoutBrandInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    media_url?: StringFieldUpdateOperationsInput | string
+    media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
+    tags?: NullableJsonNullValueInput | InputJsonValue
+    is_featured?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PortfolioItemUncheckedUpdateManyWithoutBrandInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    media_url?: StringFieldUpdateOperationsInput | string
+    media_type?: EnumPortfolioMediaTypeFieldUpdateOperationsInput | $Enums.PortfolioMediaType
+    file_size?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mime_type?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableEnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform | null
+    tags?: NullableJsonNullValueInput | InputJsonValue
+    is_featured?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CampaignApplicationCreateManyCreatorInput = {
     id?: bigint | number
     campaign_id: bigint | number
@@ -52100,6 +52605,7 @@ export namespace Prisma {
 
   export type PortfolioItemCreateManyCreatorInput = {
     id?: bigint | number
+    brand_id?: bigint | number | null
     title: string
     description?: string | null
     media_url: string
@@ -52305,10 +52811,12 @@ export namespace Prisma {
     is_featured?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    brand?: BrandProfileUpdateOneWithoutPortfolio_itemsNestedInput
   }
 
   export type PortfolioItemUncheckedUpdateWithoutCreatorInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string
@@ -52324,6 +52832,7 @@ export namespace Prisma {
 
   export type PortfolioItemUncheckedUpdateManyWithoutCreatorInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     media_url?: StringFieldUpdateOperationsInput | string

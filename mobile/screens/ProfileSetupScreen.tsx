@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import CustomDropdown from '../components/CustomDropdown';
+import CityModal from '../components/modals/CityModal';
 import * as apiService from '../services/apiService';
 import OtpModal from '../components/modals/OtpModal';
 import DatePickerModal from '../components/modals/DatePickerModal';
@@ -21,11 +22,12 @@ export default function ProfileSetupScreen({ navigation }: any) {
   const [dob, setDob] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [state, setState] = useState('');
   const [city, setCity] = useState('');
-  const [pincode, setPincode] = useState('500023');
-  const [showStatePicker, setShowStatePicker] = useState(false);
   const [showCityPicker, setShowCityPicker] = useState(false);
+  const [age, setAge] = useState<number | null>(null);
+  const [showCityModal, setShowCityModal] = useState(false);
+
+
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -36,6 +38,8 @@ export default function ProfileSetupScreen({ navigation }: any) {
   useEffect(() => {
     loadUserProfile();
   }, []);
+
+
 
   // Load user profile to determine signup method
   const loadUserProfile = async () => {
@@ -75,6 +79,19 @@ export default function ProfileSetupScreen({ navigation }: any) {
     }
   };
 
+  // Calculate age from date of birth
+  const calculateAge = (birthDate: Date): number => {
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+
   // Date picker functions
   const handleDateSelected = (date: Date) => {
     setSelectedDate(date);
@@ -83,6 +100,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
       month: '2-digit',
       day: '2-digit'
     }));
+    setAge(calculateAge(date));
     setShowDatePicker(false);
   };
 
@@ -94,15 +112,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
     });
   };
 
-  // Sample states and cities
-  const states = ['Andhra Pradesh', 'Telangana', 'Karnataka', 'Tamil Nadu', 'Kerala'];
-  const cities: { [key: string]: string[] } = {
-    'Andhra Pradesh': ['Hyderabad', 'Vijayawada', 'Guntur'],
-    'Telangana': ['Hyderabad', 'Warangal', 'Karimnagar'],
-    'Karnataka': ['Bangalore', 'Mysore', 'Hubli'],
-    'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai'],
-    'Kerala': ['Thiruvananthapuram', 'Kochi', 'Kozhikode']
-  };
+
 
   // Save basic info to database
   const handleSaveBasicInfo = async () => {
@@ -151,18 +161,8 @@ export default function ProfileSetupScreen({ navigation }: any) {
       return;
     }
     
-    if (!state.trim()) {
-      Alert.alert('Error', 'Please enter your state');
-      return;
-    }
-    
     if (!city.trim()) {
       Alert.alert('Error', 'Please enter your city');
-      return;
-    }
-    
-    if (!pincode.trim()) {
-      Alert.alert('Error', 'Please enter your pincode');
       return;
     }
 
@@ -171,9 +171,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
       const requestData: any = {
         gender,
         dob: selectedDate ? selectedDate.toISOString().split('T')[0] : dob.trim(),
-        state: state.trim(),
-        city: city.trim(),
-        pincode: pincode.trim()
+        city: city.trim()
       };
 
       // Only add email/phone if they have values and are different from existing
@@ -431,24 +429,26 @@ export default function ProfileSetupScreen({ navigation }: any) {
             <Ionicons name="calendar-outline" size={22} color="#000" />
           </TouchableOpacity>
         </View>
-
-        {/* State */}
-        <Text style={styles.sectionTitle}>State</Text>
-        <CustomDropdown value={state} setValue={s => { setState(s); setCity(''); }} options={states} />
+        
+        {/* Age Display */}
+        {age !== null && (
+          <View style={styles.ageContainer}>
+            <Text style={styles.ageText}>Age: {age} years</Text>
+          </View>
+        )}
 
         {/* City */}
         <Text style={styles.sectionTitle}>City</Text>
-        <CustomDropdown value={city} setValue={setCity} options={state ? cities[state] || [] : []} />
-
-        {/* Pincode */}
-        <Text style={styles.sectionTitle}>pincode</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="500023"
-          placeholderTextColor="#B0B0B0"
-          value={pincode}
-          onChangeText={setPincode}
-        />
+        <TouchableOpacity 
+          style={styles.cityDropdown}
+          onPress={() => setShowCityModal(true)}
+          activeOpacity={0.7}
+        >
+          <Text style={city ? styles.cityDropdownText : styles.cityDropdownPlaceholder}>
+            {city || 'Select your city'}
+          </Text>
+          <Ionicons name="chevron-down" size={20} color="#6B7280" />
+        </TouchableOpacity>
 
         {/* Next Button */}
         <TouchableOpacity
@@ -462,6 +462,19 @@ export default function ProfileSetupScreen({ navigation }: any) {
           {!loading && !profileLoading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Overlays for modals */}
+      {showOtpModal && (
+        <View style={styles.modalOverlay} />
+      )}
+      {showDatePicker && (
+        <View style={styles.modalOverlay} />
+      )}
+      {googleVerifying && (
+        <View style={styles.modalOverlay} />
+      )}
+      
+
 
       {/* OTP Modal for phone verification */}
       <OtpModal
@@ -484,6 +497,14 @@ export default function ProfileSetupScreen({ navigation }: any) {
       <GoogleVerificationModal
         visible={googleVerifying}
         onClose={() => setGoogleVerifying(false)}
+      />
+
+      {/* City Modal */}
+      <CityModal
+        visible={showCityModal}
+        onClose={() => setShowCityModal(false)}
+        onSelectCity={setCity}
+        selectedCity={city}
       />
     </SafeAreaView>
   );
@@ -567,4 +588,51 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#1A1D1F',
   },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 1,
+  },
+
+  ageContainer: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 8,
+    alignSelf: 'flex-start',
+  },
+  ageText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  cityDropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 8,
+    minHeight: 48,
+  },
+  cityDropdownText: {
+    fontSize: 15,
+    color: '#1A1D1F',
+    fontWeight: '400',
+  },
+  cityDropdownPlaceholder: {
+    fontSize: 15,
+    color: '#B0B0B0',
+    fontWeight: '400',
+  },
+
 }); 

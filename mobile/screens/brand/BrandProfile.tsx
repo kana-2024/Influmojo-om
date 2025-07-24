@@ -4,10 +4,11 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAppSelector } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
-import { BottomNavBar, KycModal, AccountModal } from '../../components';
+import { BottomNavBar, AccountModal } from '../../components';
+import KycModal from '../../components/modals/KycModal';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CreateCampaignModal from './CreateCampaignModal';
-import CreateProjectScreen from './CreateProjectScreen';
+import CreatePortfolioScreen from '../creator/CreatePortfolioScreen';
 import AnimatedModalOverlay from '../../components/AnimatedModalOverlay';
 import CustomDropdown from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
@@ -28,9 +29,7 @@ const SCROLL_THRESHOLD = 40;
 
 const tabList = [
   { key: 'Campaigns', label: 'Campaigns' },
-  { key: 'Projects', label: 'Projects' },
-  { key: 'Kyc', label: 'Kyc' },
-  { key: 'Payments', label: 'Payments' },
+  { key: 'Portfolio', label: 'Portfolio' },
 ];
 
 const BrandProfile = () => {
@@ -41,33 +40,22 @@ const BrandProfile = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
-  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [showCreatePortfolio, setShowCreatePortfolio] = useState(false);
   const [showKycModal, setShowKycModal] = useState(false);
+  const [showPaymentsModal, setShowPaymentsModal] = useState(false);
   const scrollViewRef = useRef(null);
   const [brandProfile, setBrandProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showAccountModal, setShowAccountModal] = useState(false);
 
   useEffect(() => {
-    setShowKycModal(false);
     loadBrandProfile();
   }, []);
 
-  // Open KYC modal only if navigation param is set
-  useEffect(() => {
-    if (route.params && (route.params as any).openModal) {
-      if ((route.params as any).openModal === 'kyc') {
-        setShowKycModal(true);
-      }
-      // Optionally, reset the param so it doesn't trigger again
-      (route.params as any).openModal = undefined;
-    }
-  }, [route.params]);
-
-  const loadBrandProfile = async () => {
+  const loadBrandProfile = async (forceRefresh = false) => {
     try {
       setLoading(true);
-      console.log('🔍 Loading brand profile...');
+      console.log('🔍 Loading brand profile...', forceRefresh ? '(forced refresh)' : '');
       
       // Check if user is a creator user and prevent API call
       if (user && user.user_type === 'creator') {
@@ -91,15 +79,18 @@ const BrandProfile = () => {
           industries: parsedIndustries,
           languages: parsedLanguages,
           campaigns_count: parsedCampaigns.length,
-          collaborations_count: parsedCollaborations.length
+          collaborations_count: parsedCollaborations.length,
+          portfolio_items_count: profile.portfolio_items?.length || 0
         });
+        console.log('🔍 Portfolio items:', profile.portfolio_items);
         
         setBrandProfile({
           ...profile,
           industries: parsedIndustries,
           languages: parsedLanguages,
           campaigns: parsedCampaigns,
-          collaborations: parsedCollaborations
+          collaborations: parsedCollaborations,
+          portfolio_items: profile.portfolio_items || []
         });
       } else {
         console.warn('❌ Brand profile API failed:', response);
@@ -120,12 +111,23 @@ const BrandProfile = () => {
 
   const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-  // Scroll to bottom when switching to Campaigns, Projects, or Kyc tab
+  // Scroll to bottom when switching to Campaigns or Portfolio tab
   const handleTabPress = (tabKey: string) => {
     setActiveTab(tabKey);
-    if ((tabKey === 'Campaigns' || tabKey === 'Projects' || tabKey === 'Kyc') && scrollViewRef.current) {
+    if ((tabKey === 'Campaigns' || tabKey === 'Portfolio') && scrollViewRef.current) {
       (scrollViewRef.current as any).scrollToEnd({ animated: true });
     }
+  };
+
+  // Modal trigger functions
+  const handleKycPress = () => {
+    setShowAccountModal(false);
+    setShowKycModal(true);
+  };
+
+  const handlePaymentsPress = () => {
+    setShowAccountModal(false);
+    setShowPaymentsModal(true);
   };
 
   return (
@@ -149,7 +151,7 @@ const BrandProfile = () => {
       )}
       
       {/* Regular brand profile content */}
-      {(!user || user.user_type !== 'creator') && (
+      {(!user || user.user_type == 'brand') && (
         <>
           <ScrollView
             ref={scrollViewRef}
@@ -160,14 +162,12 @@ const BrandProfile = () => {
             }}
             scrollEventThrottle={16}
           >
-        {/* Header with back and menu */}
-        <View style={[styles.headerRow, { paddingTop: insets.top }]}>
-          <TouchableOpacity style={styles.headerIconBtn}>
-            <Ionicons name="arrow-back" size={22} color="#1A1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Brand Profile</Text>
-          <TouchableOpacity style={styles.headerIconBtn} onPress={() => setShowAccountModal(true)}>
-            <Ionicons name="ellipsis-vertical" size={22} color="#1A1D1F" />
+        {/* Header */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12, paddingHorizontal: 16 }}>
+          <View style={{ width: 32 }} />
+          <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' }}>Brand Profile</Text>
+          <TouchableOpacity onPress={() => setShowAccountModal(true)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
           </TouchableOpacity>
         </View>
         {/* Cover Image and Avatar */}
@@ -188,7 +188,7 @@ const BrandProfile = () => {
             <Ionicons name="camera" size={18} color="#fff" />
           </TouchableOpacity>
         </View>
-        <View style={{ height: 48 }} />
+        <View style={{ height: 24 }} />
         {/* User Info */}
         <View style={styles.infoSection}>
           <Text style={styles.name}>{brandProfile?.company_name || user?.name || 'Brand Name'}</Text>
@@ -217,18 +217,7 @@ const BrandProfile = () => {
               {brandProfile?.role_in_organization || 'Role not specified'}
             </Text>
           </View>
-          {brandProfile?.date_of_birth && (
-            <View style={styles.infoRowIcon}>
-              <Ionicons name="calendar-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-              <Text style={styles.infoGray}>
-                {new Date(brandProfile.date_of_birth).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </Text>
-            </View>
-          )}
+
           <View style={styles.infoRowIcon}>
             <Ionicons name="time-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
             <View style={styles.verifiedTag}>
@@ -298,7 +287,15 @@ const BrandProfile = () => {
           ))}
         </View>
         {/* Tab Content Area - fixed height for smooth switching */}
-        <View style={{ flex: 1, width: '100%', marginBottom: 32 }}>
+        <View style={{ 
+          flex: 1, 
+          width: '100%', 
+          marginBottom: 32,
+          borderWidth: 1,
+          borderColor: 'rgba(255, 107, 44, 0.2)',
+          borderRadius: 12,
+          padding: 16
+        }}>
           {activeTab === 'Campaigns' && (
             <View style={styles.emptyState}>
               <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
@@ -306,38 +303,70 @@ const BrandProfile = () => {
               <Text style={styles.emptyDesc}>To connect with creators and promote your brand, you need to create campaigns for your marketing needs.</Text>
               <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowCreateCampaign(true)}>
                 <Text style={styles.createPackageBtnText}>Create Campaign</Text>
+                <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
               </TouchableOpacity>
             </View>
           )}
-          {activeTab === 'Projects' && (
-            <View style={styles.emptyState}>
-              <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
-              <Text style={styles.emptyTitle}>There are no Projects added yet!</Text>
-              <Text style={styles.emptyDesc}>To showcase your brand work, you need to add your project files and collaborations.</Text>
-              <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowCreateProject(true)}>
-                <Text style={styles.createPackageBtnText}>Add Project</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {activeTab === 'Kyc' && (
-            <View style={styles.emptyState}>
-              <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
-              <Text style={styles.emptyTitle}>Your KYC is not verified yet!</Text>
-              <Text style={styles.emptyDesc}>To unlock all features and make payments, please verify your business identity by uploading your company documents.</Text>
-              <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowKycModal(true)}>
-                <Text style={styles.createPackageBtnText}>Verify Business</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {activeTab === 'Payments' && (
-            <View style={styles.emptyState}>
-              <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
-              <Text style={styles.emptyTitle}>No payment information available yet!</Text>
-              <Text style={styles.emptyDesc}>Once you start collaborating with creators, your payment details and transactions will appear here.</Text>
-              <TouchableOpacity style={styles.createPackageBtn} onPress={() => alert('Add Bank Account')}>
-                <Text style={styles.createPackageBtnText}>Add Bank Account</Text>
-              </TouchableOpacity>
-            </View>
+          {activeTab === 'Portfolio' && (
+            (() => {
+              console.log('🔍 Portfolio tab - brandProfile:', !!brandProfile);
+              console.log('🔍 Portfolio tab - portfolio_items:', brandProfile?.portfolio_items);
+              console.log('🔍 Portfolio tab - length:', brandProfile?.portfolio_items?.length);
+              return brandProfile?.portfolio_items?.length > 0;
+            })() ? (
+              <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F' }}>Portfolio Items</Text>
+                  <TouchableOpacity style={styles.addPortfolioBtn} onPress={() => setShowCreatePortfolio(true)}>
+                    <Ionicons name="add" size={20} color="#FF6B2C" />
+                    <Text style={styles.addPortfolioBtnText}>Add Files</Text>
+                  </TouchableOpacity>
+                </View>
+                
+                <View style={styles.portfolioGrid}>
+                  {/* Display existing portfolio items */}
+                  {brandProfile.portfolio_items.map((item: any, index: number) => (
+                    <View key={item.id || index} style={styles.portfolioItem}>
+                      {item.media_type === 'image' ? (
+                        <Image 
+                          source={{ uri: item.media_url }} 
+                          style={styles.portfolioImage}
+                          resizeMode="cover"
+                        />
+                      ) : item.media_type === 'video' ? (
+                        <View style={styles.portfolioVideoContainer}>
+                          <Image 
+                            source={{ uri: item.media_url.replace('/upload/', '/upload/w_200,h_200,c_fill/') }} 
+                            style={styles.portfolioImage}
+                            resizeMode="cover"
+                          />
+                          <View style={styles.videoOverlay}>
+                            <Ionicons name="play-circle" size={32} color="#fff" />
+                          </View>
+                        </View>
+                      ) : (
+                        <View style={styles.portfolioFileContainer}>
+                          <Ionicons name="document" size={32} color="#2D5BFF" />
+                          <Text style={styles.portfolioFileName} numberOfLines={1}>
+                            {item.title || 'Document'}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ) : (
+              <View style={styles.emptyState}>
+                <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
+                <Text style={styles.emptyTitle}>There are no Portfolio files added yet!</Text>
+                <Text style={styles.emptyDesc}>To showcase your brand work, you need to add your portfolio files and collaborations.</Text>
+                <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowCreatePortfolio(true)}>
+                  <Text style={styles.createPackageBtnText}>Add Files</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
+                </TouchableOpacity>
+              </View>
+            )
           )}
         </View>
       </ScrollView>
@@ -350,26 +379,62 @@ const BrandProfile = () => {
       </AnimatedModalOverlay>
 
       <AnimatedModalOverlay
-        visible={showCreateProject}
+        visible={showCreatePortfolio}
       >
-        <CreateProjectScreen onClose={() => setShowCreateProject(false)} />
+        <CreatePortfolioScreen onClose={() => setShowCreatePortfolio(false)} onBack={() => setShowCreatePortfolio(false)} onPortfolioCreated={() => loadBrandProfile(true)} />
       </AnimatedModalOverlay>
 
-      {showKycModal && (
-        <Modal visible={showKycModal} transparent animationType="slide" onRequestClose={() => setShowKycModal(false)}>
-          <KycModal
-            onClose={() => setShowKycModal(false)}
-            onBack={() => setShowKycModal(false)}
-          />
-        </Modal>
+      <Modal visible={showKycModal} transparent animationType="slide" onRequestClose={() => {
+        setShowKycModal(false);
+        setShowAccountModal(true);
+      }}>
+        <KycModal
+          onClose={() => {
+            setShowKycModal(false);
+            setShowAccountModal(true);
+          }}
+          onBack={() => {
+            setShowKycModal(false);
+            setShowAccountModal(true);
+          }}
+        />
+      </Modal>
+
+      <Modal visible={showPaymentsModal} transparent animationType="slide" onRequestClose={() => setShowPaymentsModal(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginBottom: 16, textAlign: 'center' }}>Payments</Text>
+            <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 24, textAlign: 'center' }}>Payment management features will be available soon.</Text>
+            <TouchableOpacity 
+              style={{ backgroundColor: '#FF6B2C', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
+              onPress={() => setShowPaymentsModal(false)}
+            >
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Overlays for modals */}
+      {showAccountModal && (
+        <View style={styles.modalOverlay} />
       )}
+      {showKycModal && (
+        <View style={styles.modalOverlay} />
+      )}
+      {showPaymentsModal && (
+        <View style={styles.modalOverlay} />
+      )}
+
       <AccountModal 
         visible={showAccountModal}
         onClose={() => setShowAccountModal(false)}
+        onKycPress={handleKycPress}
+        onPaymentsPress={handlePaymentsPress}
         user={{
-          name: user?.name,
+          name: brandProfile?.company_name || brandProfile?.user?.name || user?.name,
           email: user?.email,
-          profile_image_url: user?.profileImage,
+          profile_image_url: brandProfile?.user?.profile_image_url || user?.profileImage,
           user_type: user?.user_type,
           role_in_organization: brandProfile?.role_in_organization
         }}
@@ -540,11 +605,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 4,
     marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#FF6B2C',
   },
   tabBtn: {
     flex: 1,
@@ -588,15 +650,97 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   createPackageBtn: {
-    backgroundColor: '#FF6B2C',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
+    flexDirection: 'row',
+    height: 36,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#FF6B2C',
+    borderRadius: 18,
+    backgroundColor: '#F8F9FB',
   },
   createPackageBtnText: {
-    color: '#fff',
+    color: '#FF6B2C',
     fontSize: 14,
     fontWeight: '600',
+  },
+  addPortfolioBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFE5D9',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  addPortfolioBtnText: {
+    color: '#FF6B2C',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  portfolioGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  portfolioItem: {
+    width: '48%', // Two items per row
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 1,
+    overflow: 'hidden',
+  },
+  portfolioImage: {
+    width: '100%',
+    height: 150,
+  },
+  portfolioVideoContainer: {
+    position: 'relative',
+    width: '100%',
+    height: 150,
+  },
+  videoOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 12,
+  },
+  portfolioFileContainer: {
+    width: '100%',
+    height: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F9EB',
+    borderRadius: 12,
+  },
+  portfolioFileName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2D5BFF',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 1,
   },
 });
 

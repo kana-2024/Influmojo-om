@@ -10,6 +10,8 @@ import * as apiService from '../../services/apiService';
 import OtpModal from '../../components/modals/OtpModal';
 import DatePickerModal from '../../components/modals/DatePickerModal';
 import GoogleVerificationModal from '../../components/modals/GoogleVerificationModal';
+import CityModal from '../../components/modals/CityModal';
+import RoleModal from '../../components/modals/RoleModal';
 import googleAuthService from '../../services/googleAuth';
 
 export default function BrandProfileSetupScreen({ navigation }: any) {
@@ -21,30 +23,33 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
   const [dob, setDob] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [state, setState] = useState('');
   const [city, setCity] = useState('');
-  const [pincode, setPincode] = useState('500023');
-  const [showStatePicker, setShowStatePicker] = useState(false);
   const [showCityPicker, setShowCityPicker] = useState(false);
+  const [showCityModal, setShowCityModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const [loading, setLoading] = useState(false);
+
+
   const [userProfile, setUserProfile] = useState<any>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [role, setRole] = useState('');
-  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+
   const [profileLoading, setProfileLoading] = useState(true);
   const [googleVerifying, setGoogleVerifying] = useState(false);
+  const [businessType, setBusinessType] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
 
-  // Role options for brands
-  const ROLES = [
-    'Founder/CEO', 'Marketing Manager', 'Brand Manager', 'Digital Marketing Specialist',
-    'Product Manager', 'Business Development', 'Sales Manager', 'Creative Director',
-    'Social Media Manager', 'PR Manager', 'Operations Manager', 'Other'
-  ];
+
+
+  // Business type options
+  const BUSINESS_TYPES = ['SME', 'Startup', 'Enterprise'];
 
   useEffect(() => {
     loadUserProfile();
   }, []);
+
+
 
   // Load user profile to determine signup method
   const loadUserProfile = async () => {
@@ -103,20 +108,27 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
     });
   };
 
-  // Sample states and cities
-  const states = ['Andhra Pradesh', 'Telangana', 'Karnataka', 'Tamil Nadu', 'Kerala'];
-  const cities: { [key: string]: string[] } = {
-    'Andhra Pradesh': ['Hyderabad', 'Vijayawada', 'Guntur'],
-    'Telangana': ['Hyderabad', 'Warangal', 'Karimnagar'],
-    'Karnataka': ['Bangalore', 'Mysore', 'Hubli'],
-    'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai'],
-    'Kerala': ['Thiruvananthapuram', 'Kochi', 'Kozhikode']
+
+
+  // URL validation function
+  const isValidUrl = (url: string) => {
+    try {
+      // Add protocol if missing
+      let urlToTest = url;
+      if (!urlToTest.startsWith('http://') && !urlToTest.startsWith('https://')) {
+        urlToTest = 'https://' + urlToTest;
+      }
+      new URL(urlToTest);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   // Save basic info to database
   const handleSaveBasicInfo = async () => {
     console.log('🔍 handleSaveBasicInfo called');
-    console.log('🔍 Current state:', { isGoogleUser, phone, email, gender, state, city, pincode, role });
+    console.log('🔍 Current state:', { isGoogleUser, phone, email, gender, city, businessType, websiteUrl, role });
     
     // Validate based on signup method
     if (isGoogleUser) {
@@ -172,18 +184,13 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
       return;
     }
     
-    if (!state.trim()) {
-      Alert.alert('Error', 'Please enter your state');
-      return;
-    }
-    
     if (!city.trim()) {
       Alert.alert('Error', 'Please enter your city');
       return;
     }
     
-    if (!pincode.trim()) {
-      Alert.alert('Error', 'Please enter your pincode');
+    if (!businessType.trim()) {
+      Alert.alert('Error', 'Please select your business type');
       return;
     }
     
@@ -192,16 +199,31 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
       return;
     }
 
+    // Validate website URL if provided
+    if (websiteUrl.trim() && !isValidUrl(websiteUrl.trim())) {
+      Alert.alert('Error', 'Please enter a valid website URL');
+      return;
+    }
+
     setLoading(true);
     try {
       const requestData: any = {
         gender,
         dob: selectedDate ? selectedDate.toISOString().split('T')[0] : dob.trim(),
-        state: state.trim(),
         city: city.trim(),
-        pincode: pincode.trim(),
+        business_type: businessType.trim(),
         role: role.trim()
       };
+
+      // Add website URL if provided
+      if (websiteUrl.trim()) {
+        // Format URL to include protocol if missing
+        let formattedUrl = websiteUrl.trim();
+        if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+          formattedUrl = 'https://' + formattedUrl;
+        }
+        requestData.website_url = formattedUrl;
+      }
 
       // Only add email/phone if they have values and are different from existing
       if (isGoogleUser) {
@@ -459,55 +481,62 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
 
-        {/* State */}
-        <Text style={styles.sectionTitle}>State</Text>
-        <CustomDropdown value={state} setValue={s => { setState(s); setCity(''); }} options={states} />
-
         {/* City */}
         <Text style={styles.sectionTitle}>City</Text>
-        <CustomDropdown value={city} setValue={setCity} options={state ? cities[state] || [] : []} />
+        <TouchableOpacity 
+          style={styles.cityDropdown}
+          onPress={() => setShowCityModal(true)}
+          activeOpacity={0.7}
+        >
+          <Text style={city ? styles.cityDropdownText : styles.cityDropdownPlaceholder}>
+            {city || 'Select your city'}
+          </Text>
+          <Ionicons name="chevron-down" size={20} color="#6B7280" />
+        </TouchableOpacity>
 
-        {/* Pincode */}
-        <Text style={styles.sectionTitle}>pincode</Text>
+        {/* Business Type */}
+        <Text style={styles.sectionTitle}>Business Type</Text>
+        <View style={styles.businessTypeRow}>
+          {BUSINESS_TYPES.map(opt => (
+            <TouchableOpacity
+              key={opt}
+              style={styles.radioBtn}
+              onPress={() => setBusinessType(opt)}
+            >
+              <View style={[styles.radioOuter, businessType === opt && styles.radioOuterSelected]}>
+                {businessType === opt && <View style={styles.radioInner} />}
+              </View>
+              <Text style={styles.radioLabel}>{opt}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Website URL */}
+        <Text style={styles.sectionTitle}>Website URL (Optional)</Text>
         <TextInput
           style={styles.input}
-          placeholder="500023"
+          placeholder="e.g. www.yourcompany.com"
           placeholderTextColor="#B0B0B0"
-          value={pincode}
-          onChangeText={setPincode}
+          value={websiteUrl}
+          onChangeText={setWebsiteUrl}
+          keyboardType="default"
+          autoCapitalize="none"
+          autoCorrect={false}
+          spellCheck={false}
         />
 
-        {/* Role Selection for Brands */}
+                {/* Role Selection for Brands */}
         <Text style={styles.sectionTitle}>Select your role in organization</Text>
         <TouchableOpacity 
           style={styles.roleDropdown}
-          onPress={() => setShowRoleDropdown(!showRoleDropdown)}
+          onPress={() => setShowRoleModal(true)}
           activeOpacity={0.7}
         >
           <Text style={role ? styles.roleDropdownText : styles.roleDropdownPlaceholder}>
             {role || 'Select your role'}
           </Text>
-          <Ionicons name={showRoleDropdown ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
+          <Ionicons name="chevron-down" size={20} color="#6B7280" />
         </TouchableOpacity>
-        
-        {/* Role Dropdown Options */}
-        {showRoleDropdown && (
-          <View style={styles.roleOptionsBox}>
-            {ROLES.map(roleOption => (
-              <TouchableOpacity
-                key={roleOption}
-                style={styles.roleOption}
-                onPress={() => {
-                  setRole(roleOption);
-                  setShowRoleDropdown(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.roleOptionText}>{roleOption}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
 
         {/* Next Button */}
         <TouchableOpacity
@@ -516,11 +545,24 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
           disabled={loading || profileLoading}
         >
           <Text style={styles.nextButtonText}>
-            {loading ? 'Saving...' : profileLoading ? 'Loading...' : 'Next 2 / 2'}
+            {loading ? 'Saving...' : profileLoading ? 'Loading...' : 'Next 1 / 2'}
           </Text>
           {!loading && !profileLoading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Overlays for modals */}
+      {showOtpModal && (
+        <View style={styles.modalOverlay} />
+      )}
+      {showDatePicker && (
+        <View style={styles.modalOverlay} />
+      )}
+      {googleVerifying && (
+        <View style={styles.modalOverlay} />
+      )}
+      
+
 
       {/* OTP Modal for phone verification */}
       <OtpModal
@@ -544,6 +586,22 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
         visible={googleVerifying}
         onClose={() => setGoogleVerifying(false)}
       />
+
+      {/* City Modal */}
+      <CityModal
+        visible={showCityModal}
+        onClose={() => setShowCityModal(false)}
+        onSelectCity={setCity}
+        selectedCity={city}
+      />
+
+      {/* Role Modal */}
+      <RoleModal
+        visible={showRoleModal}
+        onClose={() => setShowRoleModal(false)}
+        onSelectRole={setRole}
+        selectedRole={role}
+      />
     </SafeAreaView>
   );
 }
@@ -563,6 +621,7 @@ const styles = StyleSheet.create({
   progressPercent: { alignSelf: 'flex-end', color: '#6B7280', fontSize: 13, marginBottom: 12 },
   sectionTitle: { fontSize: 15, fontWeight: '600', color: '#1A1D1F', marginTop: 18, marginBottom: 6 },
   genderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 16 },
+  businessTypeRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 16 },
   radioBtn: { flexDirection: 'row', alignItems: 'center', marginRight: 16 },
   radioOuter: {
     width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#2563EB', alignItems: 'center', justifyContent: 'center', marginRight: 6,
@@ -573,6 +632,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
     paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, marginBottom: 8, minHeight: 48,
+    color: '#1A1D1F',
   },
   inputRow: { flexDirection: 'row', alignItems: 'center', position: 'relative', marginBottom: 8, gap: 8 },
   calendarIcon: { position: 'absolute', right: 12, top: 12 },
@@ -604,6 +664,7 @@ const styles = StyleSheet.create({
   nextButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#FF6B2C', borderRadius: 8, paddingVertical: 14, marginTop: 16, marginBottom: 8,
+    zIndex: 1,
   },
   nextButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
   dropdownList: {
@@ -650,25 +711,43 @@ const styles = StyleSheet.create({
     color: '#B0B0B0',
     fontWeight: '400',
   },
-  roleOptionsBox: {
+
+  roleSection: {
+    position: 'relative',
+    zIndex: 9999,
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 1,
+  },
+
+  cityDropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    marginTop: -8,
-    marginBottom: 8,
-    maxHeight: 150,
-    zIndex: 1000,
-  },
-  roleOption: {
     paddingHorizontal: 12,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    marginBottom: 8,
+    minHeight: 48,
   },
-  roleOptionText: {
+  cityDropdownText: {
     fontSize: 15,
     color: '#1A1D1F',
     fontWeight: '400',
   },
+  cityDropdownPlaceholder: {
+    fontSize: 15,
+    color: '#B0B0B0',
+    fontWeight: '400',
+  },
+
 }); 

@@ -151,6 +151,7 @@ exports.Prisma.BrandProfileScalarFieldEnum = {
   industry: 'industry',
   industries: 'industries',
   role_in_organization: 'role_in_organization',
+  business_type: 'business_type',
   website_url: 'website_url',
   description: 'description',
   logo_url: 'logo_url',
@@ -456,6 +457,7 @@ exports.Prisma.KYCScalarFieldEnum = {
 exports.Prisma.PortfolioItemScalarFieldEnum = {
   id: 'id',
   creator_id: 'creator_id',
+  brand_id: 'brand_id',
   title: 'title',
   description: 'description',
   media_url: 'media_url',

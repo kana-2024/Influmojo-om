@@ -6,6 +6,8 @@ export { default as KycModal } from './modals/KycModal';
 export { default as ModalWrapper } from './modals/ModalWrapper';
 export { default as OtpModal } from './modals/OtpModal';
 export { default as DatePickerModal } from './modals/DatePickerModal';
+export { default as CityModal } from './modals/CityModal';
+export { default as RoleModal } from './modals/RoleModal';
 
 // UI Components
 export { default as AnimatedModalOverlay } from './AnimatedModalOverlay';

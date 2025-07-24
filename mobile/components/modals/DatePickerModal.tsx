@@ -71,8 +71,7 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.modal}>
+      <View style={styles.modal}>
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
@@ -104,21 +103,18 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
             style={Platform.OS === 'ios' ? styles.iosDatePicker : styles.androidDatePicker}
           />
         </View>
-      </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   modal: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? '10%' : 0,
+    left: Platform.OS === 'ios' ? '5%' : 0,
+    right: Platform.OS === 'ios' ? '5%' : 0,
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: Platform.OS === 'ios' ? 16 : 0,
     width: Platform.OS === 'ios' ? '90%' : '100%',
     maxWidth: Platform.OS === 'ios' ? 400 : undefined,
     maxHeight: Platform.OS === 'ios' ? '80%' : undefined,

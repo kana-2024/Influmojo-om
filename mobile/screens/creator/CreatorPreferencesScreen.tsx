@@ -13,7 +13,7 @@ const CATEGORIES = [
   'Healthcare', 'virtual', 'Finance'
 ];
 
-const HIGHLIGHTED = ['Beauty', 'Lifestyle', 'Entertainment', 'virtual'];
+
 
 const LANGUAGES = ['Hindi', 'English', 'Telugu'];
 
@@ -138,8 +138,7 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
                 key={cat}
                 style={[
                   styles.categoryChip,
-                  selectedCategories.includes(cat) && styles.categoryChipSelected,
-                  HIGHLIGHTED.includes(cat) && styles.categoryChipHighlighted
+                  selectedCategories.includes(cat) && styles.categoryChipSelected
                 ]}
                 onPress={() => toggleCategory(cat)}
                 activeOpacity={0.7}
@@ -147,8 +146,7 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
                 <Text
                   style={[
                     styles.categoryText,
-                    selectedCategories.includes(cat) && styles.categoryTextSelected,
-                    HIGHLIGHTED.includes(cat) && styles.categoryTextHighlighted
+                    selectedCategories.includes(cat) && styles.categoryTextSelected
                   ]}
                 >
                   {cat}
@@ -280,12 +278,10 @@ const styles = StyleSheet.create({
   categoryChipSelected: {
     backgroundColor: '#FF6B2C22', borderColor: '#FF6B2C', borderWidth: 1,
   },
-  categoryChipHighlighted: {
-    backgroundColor: '#FF6B2C11',
-  },
+
   categoryText: { color: '#1A1D1F', fontSize: 14 },
   categoryTextSelected: { color: '#FF6B2C', fontWeight: '600' },
-  categoryTextHighlighted: { color: '#FF6B2C', fontWeight: '500' },
+
   aboutInput: {
     backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
     paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, marginBottom: 8, marginTop: 12, minHeight: 48,

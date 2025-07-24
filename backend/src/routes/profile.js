@@ -88,13 +88,26 @@ router.post('/update-basic-info', [
     return true;
   }),
   body('dob').notEmpty().withMessage('Date of birth is required'),
-  body('state').notEmpty().withMessage('State is required'),
   body('city').notEmpty().withMessage('City is required'),
-  body('pincode').notEmpty().withMessage('Pincode is required'),
+  body('business_type').optional().isIn(['SME', 'Startup', 'Enterprise']).withMessage('Valid business type is required'),
+  body('website_url').optional().custom((value) => {
+    if (value && value.trim() !== '') {
+      try {
+        let urlToTest = value.trim();
+        if (!urlToTest.startsWith('http://') && !urlToTest.startsWith('https://')) {
+          urlToTest = 'https://' + urlToTest;
+        }
+        new URL(urlToTest);
+      } catch {
+        throw new Error('Valid website URL is required');
+      }
+    }
+    return true;
+  }),
   body('role').optional()
 ], validateRequest, authenticateToken, async (req, res) => {
   try {
-    const { gender, email, phone, dob, state, city, pincode, role } = req.body;
+    const { gender, email, phone, dob, state, city, business_type, website_url, role } = req.body;
     const userId = BigInt(req.userId);
 
     // Get user to check user type
@@ -106,12 +119,20 @@ router.post('/update-basic-info', [
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Validate role for brands
-    if (user.user_type === 'brand' && (!role || !role.trim())) {
-      return res.status(400).json({ 
-        error: 'Role is required',
-        message: 'Please select your role in the organization' 
-      });
+    // Validate role and business_type for brands
+    if (user.user_type === 'brand') {
+      if (!role || !role.trim()) {
+        return res.status(400).json({ 
+          error: 'Role is required',
+          message: 'Please select your role in the organization' 
+        });
+      }
+      if (!business_type || !business_type.trim()) {
+        return res.status(400).json({ 
+          error: 'Business type is required',
+          message: 'Please select your business type' 
+        });
+      }
     }
 
     // Parse date of birth
@@ -193,17 +214,13 @@ router.post('/update-basic-info', [
         update: {
           gender,
           date_of_birth: dateOfBirth,
-          location_state: state,
-          location_city: city,
-          location_pincode: pincode
+          location_city: city
         },
         create: {
           user_id: userId,
           gender,
           date_of_birth: dateOfBirth,
-          location_state: state,
-          location_city: city,
-          location_pincode: pincode
+          location_city: city
         }
       });
 
@@ -229,6 +246,15 @@ router.post('/update-basic-info', [
 
       let brandProfile;
       
+      // Format website URL if provided
+      let formattedWebsiteUrl = null;
+      if (website_url && website_url.trim()) {
+        formattedWebsiteUrl = website_url.trim();
+        if (!formattedWebsiteUrl.startsWith('http://') && !formattedWebsiteUrl.startsWith('https://')) {
+          formattedWebsiteUrl = 'https://' + formattedWebsiteUrl;
+        }
+      }
+
       if (existingProfile.length > 0) {
         // Update existing brand profile
         brandProfile = await prisma.brandProfile.update({
@@ -236,9 +262,9 @@ router.post('/update-basic-info', [
           data: {
             gender,
             date_of_birth: dateOfBirth,
-            location_state: state,
             location_city: city,
-            location_pincode: pincode,
+            business_type: business_type,
+            website_url: formattedWebsiteUrl,
             role_in_organization: role || null
           }
         });
@@ -250,9 +276,9 @@ router.post('/update-basic-info', [
             company_name: user.name, // Use user name as default company name
             gender,
             date_of_birth: dateOfBirth,
-            location_state: state,
             location_city: city,
-            location_pincode: pincode,
+            business_type: business_type,
+            website_url: formattedWebsiteUrl,
             role_in_organization: role || null
           }
         });
@@ -469,13 +495,33 @@ router.post('/create-package', [
     } = req.body;
     const userId = BigInt(req.userId);
 
+    // Get user to check user type
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if user is a creator
+    if (user.user_type !== 'creator') {
+      return res.status(400).json({ 
+        error: 'Access denied',
+        message: 'Package creation is only available for creators. Brand users cannot create packages.'
+      });
+    }
+
     // Get creator profile
     const creatorProfile = await prisma.creatorProfile.findUnique({
       where: { user_id: userId }
     });
 
     if (!creatorProfile) {
-      return res.status(400).json({ error: 'Creator profile not found' });
+      return res.status(400).json({ 
+        error: 'Creator profile not found',
+        message: 'Please complete your creator profile setup before creating packages.'
+      });
     }
 
     // Store package data in the creator profile's interests field as JSON
@@ -555,13 +601,33 @@ router.put('/update-package', [
     } = req.body;
     const userId = BigInt(req.userId);
 
+    // Get user to check user type
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if user is a creator
+    if (user.user_type !== 'creator') {
+      return res.status(400).json({ 
+        error: 'Access denied',
+        message: 'Package updates are only available for creators. Brand users cannot update packages.'
+      });
+    }
+
     // Get creator profile
     const creatorProfile = await prisma.creatorProfile.findUnique({
       where: { user_id: userId }
     });
 
     if (!creatorProfile) {
-      return res.status(400).json({ error: 'Creator profile not found' });
+      return res.status(400).json({ 
+        error: 'Creator profile not found',
+        message: 'Please complete your creator profile setup before updating packages.'
+      });
     }
 
     // Get existing packages
@@ -616,6 +682,79 @@ router.put('/update-package', [
   }
 });
 
+// Delete package
+router.delete('/delete-package/:packageId', authenticateToken, async (req, res) => {
+  try {
+    const { packageId } = req.params;
+    const userId = BigInt(req.userId);
+
+    // Get user to check user type
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if user is a creator
+    if (user.user_type !== 'creator') {
+      return res.status(400).json({ 
+        error: 'Access denied',
+        message: 'Package deletion is only available for creators. Brand users cannot delete packages.'
+      });
+    }
+
+    // Get creator profile
+    const creatorProfile = await prisma.creatorProfile.findUnique({
+      where: { user_id: userId }
+    });
+
+    if (!creatorProfile) {
+      return res.status(400).json({ 
+        error: 'Creator profile not found',
+        message: 'Please complete your creator profile setup before deleting packages.'
+      });
+    }
+
+    // Get existing packages
+    const existingPackages = creatorProfile.interests?.packages || [];
+
+    // Find the package to delete
+    const packageIndex = existingPackages.findIndex(pkg => pkg.id === packageId);
+
+    if (packageIndex === -1) {
+      return res.status(404).json({ error: 'Package not found' });
+    }
+
+    // Remove the package from the array
+    existingPackages.splice(packageIndex, 1);
+
+    // Update creator profile with updated packages
+    await prisma.creatorProfile.update({
+      where: { user_id: userId },
+      data: {
+        interests: {
+          ...creatorProfile.interests,
+          packages: existingPackages
+        }
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Package deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Delete package error:', error);
+    res.status(500).json({ 
+      error: 'Failed to delete package',
+      message: error.message 
+    });
+  }
+});
+
 // Create portfolio item (from CreatePortfolioScreen)
 router.post('/create-portfolio', [
   body('mediaUrl').notEmpty().withMessage('Media URL is required'),
@@ -628,13 +767,44 @@ router.post('/create-portfolio', [
     const { mediaUrl, mediaType, fileName, fileSize, mimeType } = req.body;
     const userId = BigInt(req.userId);
 
-    // Get creator profile
-    const creatorProfile = await prisma.creatorProfile.findUnique({
-      where: { user_id: userId }
+    // Get user to check user type
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
     });
 
-    if (!creatorProfile) {
-      return res.status(400).json({ error: 'Creator profile not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if user is a creator or brand (both can have portfolios)
+    if (user.user_type !== 'creator' && user.user_type !== 'brand') {
+      return res.status(400).json({ 
+        error: 'Access denied',
+        message: 'Portfolio creation is only available for creators and brands.'
+      });
+    }
+
+    // Get user profile based on user type
+    let userProfile;
+    let profileType;
+    
+    if (user.user_type === 'creator') {
+      userProfile = await prisma.creatorProfile.findUnique({
+        where: { user_id: userId }
+      });
+      profileType = 'creator';
+    } else if (user.user_type === 'brand') {
+      userProfile = await prisma.brandProfile.findFirst({
+        where: { user_id: userId }
+      });
+      profileType = 'brand';
+    }
+
+    if (!userProfile) {
+      return res.status(400).json({ 
+        error: `${profileType} profile not found`,
+        message: `Please complete your ${profileType} profile setup before creating portfolio items.`
+      });
     }
 
     // Map media type to enum value (always lowercase)
@@ -652,23 +822,32 @@ router.post('/create-portfolio', [
     }
 
     // Create portfolio item
+    const portfolioData = {
+      title: fileName,
+      description: `Uploaded file: ${fileName}`,
+      media_url: mediaUrl,
+      media_type: portfolioMediaType,
+      file_size: fileSize ? BigInt(fileSize) : null,
+      mime_type: mimeType || null
+    };
+
+    // Set the appropriate ID based on user type
+    if (user.user_type === 'creator') {
+      portfolioData.creator_id = userProfile.id;
+    } else if (user.user_type === 'brand') {
+      portfolioData.brand_id = userProfile.id;
+    }
+
     const portfolioItem = await prisma.portfolioItem.create({
-      data: {
-        creator_id: creatorProfile.id,
-        title: fileName,
-        description: `Uploaded file: ${fileName}`,
-        media_url: mediaUrl,
-        media_type: portfolioMediaType,
-        file_size: fileSize ? BigInt(fileSize) : null,
-        mime_type: mimeType || null
-      }
+      data: portfolioData
     });
 
     // Convert BigInt to string for JSON serialization
     const serializedPortfolioItem = {
       ...portfolioItem,
       id: portfolioItem.id.toString(),
-      creator_id: portfolioItem.creator_id.toString()
+      creator_id: portfolioItem.creator_id?.toString(),
+      brand_id: portfolioItem.brand_id?.toString()
     };
 
     res.json({
@@ -696,13 +875,33 @@ router.post('/submit-kyc', [
     const { documentType, frontImageUrl, backImageUrl } = req.body;
     const userId = BigInt(req.userId);
 
+    // Get user to check user type
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if user is a creator
+    if (user.user_type !== 'creator') {
+      return res.status(400).json({ 
+        error: 'Access denied',
+        message: 'KYC submission is only available for creators. Brand users cannot submit KYC.'
+      });
+    }
+
     // Get creator profile
     const creatorProfile = await prisma.creatorProfile.findUnique({
       where: { user_id: userId }
     });
 
     if (!creatorProfile) {
-      return res.status(400).json({ error: 'Creator profile not found' });
+      return res.status(400).json({ 
+        error: 'Creator profile not found',
+        message: 'Please complete your creator profile setup before submitting KYC.'
+      });
     }
 
     // Create or update KYC
@@ -851,8 +1050,9 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
       portfolio_items: user.creator_profiles?.portfolio_items?.map(item => ({
         ...item,
         id: item.id.toString(),
-        creator_id: item.creator_id.toString(),
-        file_size: item.file_size.toString()
+        creator_id: item.creator_id?.toString(),
+        brand_id: item.brand_id?.toString(),
+        file_size: item.file_size?.toString()
       })) || [],
       social_media_accounts: user.creator_profiles?.social_media_accounts?.map(account => ({
         ...account,
@@ -897,7 +1097,12 @@ router.get('/brand-profile', authenticateToken, async (req, res) => {
         brand_profiles: {
           include: {
             campaigns: true,
-            collaborations: true
+            collaborations: true,
+            portfolio_items: {
+              orderBy: {
+                created_at: 'desc'
+              }
+            }
           }
         }
       }
@@ -929,8 +1134,15 @@ router.get('/brand-profile', authenticateToken, async (req, res) => {
       id: brandProfile.id.toString(),
       user_id: brandProfile.user_id.toString(),
       campaigns_count: brandProfile.campaigns?.length || 0,
-      collaborations_count: brandProfile.collaborations?.length || 0
+      collaborations_count: brandProfile.collaborations?.length || 0,
+      portfolio_items_count: brandProfile.portfolio_items?.length || 0,
+      portfolio_items: brandProfile.portfolio_items
     });
+    
+    // Debug portfolio items serialization
+    if (brandProfile.portfolio_items && brandProfile.portfolio_items.length > 0) {
+      console.log('🔍 Raw portfolio items (first 2):', brandProfile.portfolio_items.slice(0, 2));
+    }
 
     // Convert BigInt values to strings for JSON serialization
     const serializedProfile = {
@@ -952,6 +1164,21 @@ router.get('/brand-profile', authenticateToken, async (req, res) => {
         brand_id: collaboration.brand_id.toString(),
         creator_id: collaboration.creator_id.toString()
       })) || [],
+      portfolio_items: brandProfile.portfolio_items?.map(item => {
+        const serializedItem = {
+          ...item,
+          id: item.id.toString(),
+          creator_id: item.creator_id?.toString(),
+          brand_id: item.brand_id?.toString(),
+          file_size: item.file_size?.toString()
+        };
+        console.log('🔍 Serialized portfolio item:', {
+          id: serializedItem.id,
+          title: serializedItem.title,
+          brand_id: serializedItem.brand_id
+        });
+        return serializedItem;
+      }) || [],
       user: {
         id: user.id.toString(),
         name: user.name,
@@ -961,7 +1188,10 @@ router.get('/brand-profile', authenticateToken, async (req, res) => {
       }
     };
 
-    console.log('✅ Sending brand profile response');
+    console.log('✅ Sending brand profile response with portfolio items:', {
+      portfolio_items_count: serializedProfile.portfolio_items?.length || 0,
+      portfolio_items: serializedProfile.portfolio_items
+    });
     res.json({
       success: true,
       data: serializedProfile
@@ -976,5 +1206,88 @@ router.get('/brand-profile', authenticateToken, async (req, res) => {
     });
   }
 });
+
+// Create campaign (from CreateCampaignScreen)
+router.post('/create-campaign', [
+  body('title').notEmpty().withMessage('Campaign title is required'),
+  body('description').notEmpty().withMessage('Campaign description is required'),
+  body('budget').notEmpty().withMessage('Budget is required'),
+  body('duration').notEmpty().withMessage('Duration is required'),
+  body('requirements').notEmpty().withMessage('Requirements are required'),
+  body('targetAudience').notEmpty().withMessage('Target audience is required')
+], validateRequest, authenticateToken, async (req, res) => {
+  try {
+    const { title, description, budget, duration, requirements, targetAudience } = req.body;
+    const userId = BigInt(req.userId);
+
+    // Get user to check user type
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if user is a brand
+    if (user.user_type !== 'brand') {
+      return res.status(400).json({ 
+        error: 'Access denied',
+        message: 'Campaign creation is only available for brands. Creators cannot create campaigns.'
+      });
+    }
+
+    // Get brand profile
+    const brandProfile = await prisma.brandProfile.findFirst({
+      where: { user_id: userId }
+    });
+
+    if (!brandProfile) {
+      return res.status(400).json({ 
+        error: 'Brand profile not found',
+        message: 'Please complete your brand profile setup before creating campaigns.'
+      });
+    }
+
+    // Create campaign
+    const campaign = await prisma.campaign.create({
+      data: {
+        brand_id: brandProfile.id,
+        title: title,
+        description: description,
+        budget_min: parseFloat(budget),
+        budget_max: parseFloat(budget),
+        campaign_type: 'sponsored_content', // Default campaign type
+        content_guidelines: requirements,
+        target_demographics: { target_audience: targetAudience },
+        status: 'active'
+      }
+    });
+
+    // Convert BigInt to string for JSON serialization
+    const serializedCampaign = {
+      ...campaign,
+      id: campaign.id.toString(),
+      brand_id: campaign.brand_id.toString(),
+      budget_min: campaign.budget_min?.toString(),
+      budget_max: campaign.budget_max?.toString()
+    };
+
+    res.json({
+      success: true,
+      message: 'Campaign created successfully',
+      campaign: serializedCampaign
+    });
+
+  } catch (error) {
+    console.error('Create campaign error:', error);
+    res.status(500).json({ 
+      error: 'Failed to create campaign',
+      message: error.message 
+    });
+  }
+});
+
+
 
 module.exports = router; 

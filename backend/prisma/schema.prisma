@@ -54,6 +54,7 @@ model BrandProfile {
   industry         String?         // Single primary industry
   industries       Json?           // Array of selected industries
   role_in_organization String?
+  business_type    String?         // SME, Startup, Enterprise
   website_url      String?
   description      String?
   logo_url         String?
@@ -72,6 +73,7 @@ model BrandProfile {
   campaigns        Campaign[]
   collaborations   Collaboration[]
   invoices         Invoice[]
+  portfolio_items  PortfolioItem[]
 }
 
 model CreatorProfile {
@@ -431,7 +433,8 @@ model KYC {
 
 model PortfolioItem {
   id          BigInt             @id @default(autoincrement())
-  creator_id  BigInt
+  creator_id  BigInt?
+  brand_id    BigInt?
   title       String
   description String?
   media_url   String
@@ -443,9 +446,11 @@ model PortfolioItem {
   is_featured Boolean            @default(false)
   created_at  DateTime           @default(now())
   updated_at  DateTime           @updatedAt
-  creator     CreatorProfile     @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  creator     CreatorProfile?    @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  brand       BrandProfile?      @relation(fields: [brand_id], references: [id], onDelete: Cascade)
 
   @@index([creator_id])
+  @@index([brand_id])
   @@index([media_type])
 }
 

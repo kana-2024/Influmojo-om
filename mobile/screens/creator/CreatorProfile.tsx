@@ -22,8 +22,6 @@ const SCROLL_THRESHOLD = 40;
 const tabList = [
   { key: 'Packages', label: 'Packages' },
   { key: 'Portfolio', label: 'Portfolio' },
-  { key: 'Kyc', label: 'Kyc' },
-  { key: 'Payments', label: 'Payments' },
 ];
 
 // Utility to safely parse array from string or return array as-is
@@ -47,14 +45,16 @@ const CreatorProfile = () => {
   const route = useRoute();
   const dispatch = useAppDispatch();
   const showCreatePortfolio = useAppSelector(state => state.modal.showCreatePortfolio);
-  const showKycModal = useAppSelector(state => state.modal.showKycModal);
   const showCreatePackage = useAppSelector(state => state.modal.showCreatePackage);
   const showEditPackage = useAppSelector(state => state.modal.showEditPackage);
   const scrollViewRef = useRef(null);
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showKycModal, setShowKycModal] = useState(false);
+  const [showPaymentsModal, setShowPaymentsModal] = useState(false);
   const [editingPackage, setEditingPackage] = useState<any>(null);
+  const [showDeleteOverlay, setShowDeleteOverlay] = useState(false);
 
   console.log('🔍 CreatorProfile component loaded');
   console.log('🔍 Current user:', user);
@@ -65,8 +65,6 @@ const CreatorProfile = () => {
     if (route.params && (route.params as any).openModal) {
       if ((route.params as any).openModal === 'portfolio') {
         dispatch(setShowCreatePortfolio(true));
-      } else if ((route.params as any).openModal === 'kyc') {
-        dispatch(setShowKycModal(true));
       }
       // Optionally, reset the param so it doesn't trigger again
       (route.params as any).openModal = undefined;
@@ -169,12 +167,8 @@ const CreatorProfile = () => {
   const openCreatePortfolio = () => {
     dispatch(setShowCreatePortfolio(true));
   };
-  const openKycModal = () => {
-    dispatch(setShowKycModal(true));
-  };
   // Modal close handlers
   const closeCreatePortfolio = () => dispatch(setShowCreatePortfolio(false));
-  const closeKycModal = () => dispatch(setShowKycModal(false));
   const closeCreatePackage = () => dispatch(setShowCreatePackage(false));
   const closeEditPackage = () => {
     dispatch(setShowEditPackage(false));
@@ -203,8 +197,19 @@ const CreatorProfile = () => {
     }
   };
 
+  // Modal trigger functions
+  const handleKycPress = () => {
+    setShowAccountModal(false);
+    setShowKycModal(true);
+  };
+
+  const handlePaymentsPress = () => {
+    setShowAccountModal(false);
+    setShowPaymentsModal(true);
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+          <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle='dark-content' backgroundColor='#fff' />
       
       {/* Show error message for brand users */}
@@ -234,7 +239,7 @@ const CreatorProfile = () => {
               <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
             </TouchableOpacity>
           </View>
-          <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+          <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}>
             {/* Profile Card */}
             <View style={styles.profileCard}>
               {/* Cover block */}
@@ -300,33 +305,40 @@ const CreatorProfile = () => {
             <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
             {/* About */}
             <View style={{ marginHorizontal: 16 }}>
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>About</Text>
                 <Ionicons name="chevron-forward" size={18} color="#6B7280" />
               </TouchableOpacity>
-              <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 22 }}>{creatorProfile?.bio || 'No bio available yet.'}</Text>
+              <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 22, marginBottom: 16 }}>{creatorProfile?.bio || 'No bio available yet.'}</Text>
             </View>
-            {/* Divider */}
-            <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
+            
             {/* Tabs */}
-            <View style={{ flexDirection: 'row', backgroundColor: '#F3F4F6', borderRadius: 12, padding: 4, marginHorizontal: 16, marginTop: 8, marginBottom: 16 }}>
+            <View style={styles.tabRow}>
               {tabList.map(tab => (
                 <TouchableOpacity
                   key={tab.key}
-                  style={{ flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 8, backgroundColor: activeTab === tab.key ? '#fff' : 'transparent', borderWidth: activeTab === tab.key ? 0 : 1, borderColor: activeTab === tab.key ? 'transparent' : '#E5E7EB' }}
+                  style={activeTab === tab.key ? styles.tabBtnActive : styles.tabBtn}
                   onPress={() => handleTabPress(tab.key)}
                 >
-                  <Text style={{ fontSize: 15, fontWeight: activeTab === tab.key ? '700' : '500', color: activeTab === tab.key ? '#1A1D1F' : '#6B7280' }}>{tab.label}</Text>
+                  <Text style={activeTab === tab.key ? styles.tabBtnTextActive : styles.tabBtnText}>{tab.label}</Text>
                 </TouchableOpacity>
               ))}
             </View>
+            
             {/* Tab Content Area */}
-            <View style={{ flex: 1, width: '100%', marginBottom: 32, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ 
+              flex: 1, 
+              width: '100%', 
+              marginBottom: 32,
+              borderWidth: 1,
+              borderColor: 'rgba(255, 107, 44, 0.2)',
+              borderRadius: 12,
+              padding: 16
+            }}>
               {activeTab === 'Packages' && (
                 creatorProfile?.packages?.length > 0 ? (
-                  <View style={{ paddingHorizontal: 16, paddingTop: 16, flex: 1 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                      <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F' }}>My Packages</Text>
+                  <View style={{ paddingTop: 16, flex: 1 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24, paddingHorizontal: 16 }}>
                       <TouchableOpacity style={styles.addPortfolioBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
                         <Ionicons name="add" size={20} color="#FF6B2C" />
                         <Text style={styles.addPortfolioBtnText}>Create Package</Text>
@@ -335,7 +347,13 @@ const CreatorProfile = () => {
                     
                     <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
                       {creatorProfile.packages.map((pkg: any, index: number) => (
-                        <PackageCard key={pkg.id || index} item={pkg} onEdit={handleEditPackage} />
+                        <PackageCard 
+                          key={pkg.id || index} 
+                          item={pkg} 
+                          onEdit={handleEditPackage} 
+                          onDelete={loadCreatorProfile} 
+                          onShowOverlay={setShowDeleteOverlay}
+                        />
                       ))}
                     </ScrollView>
                   </View>
@@ -346,14 +364,15 @@ const CreatorProfile = () => {
                     <Text style={styles.emptyDesc}>To enjoy the benefits and brands wants to give business you need to add your packages for all your social platforms.</Text>
                     <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
                       <Text style={styles.createPackageBtnText}>Create Package</Text>
+                      <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
                     </TouchableOpacity>
                   </View>
                 )
               )}
               {activeTab === 'Portfolio' && (
                 creatorProfile?.portfolio_items?.length > 0 ? (
-                  <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <View style={{ paddingTop: 16 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 16 }}>
                       <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F' }}>Portfolio Items</Text>
                       <TouchableOpacity style={styles.addPortfolioBtn} onPress={openCreatePortfolio}>
                         <Ionicons name="add" size={20} color="#FF6B2C" />
@@ -420,32 +439,15 @@ const CreatorProfile = () => {
                     <Text style={styles.emptyDesc}>To showcase your work, you need to add your portfolio files for all your social platforms.</Text>
                     <TouchableOpacity style={styles.createPackageBtn} onPress={openCreatePortfolio}>
                       <Text style={styles.createPackageBtnText}>Add Files</Text>
+                      <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
                     </TouchableOpacity>
                   </View>
                 )
               )}
-              {activeTab === 'Kyc' && (
-                <View style={styles.emptyState}>
-                  <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
-                  <Text style={styles.emptyTitle}>Your KYC is not verified yet!</Text>
-                  <Text style={styles.emptyDesc}>To unlock all features and receive payments, please verify your identity by uploading your ID proof.</Text>
-                  <TouchableOpacity style={styles.createPackageBtn} onPress={openKycModal}>
-                    <Text style={styles.createPackageBtnText}>Verify ID</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-              {activeTab === 'Payments' && (
-                <View style={styles.emptyState}>
-                  <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
-                  <Text style={styles.emptyTitle}>No payment information available yet!</Text>
-                  <Text style={styles.emptyDesc}>Once you start collaborating and earning, your payment details will appear here.</Text>
-                  <TouchableOpacity style={styles.createPackageBtn} onPress={() => alert('Add Bank Account')}>
-                    <Text style={styles.createPackageBtnText}>Add Bank Account</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+
             </View>
           </ScrollView>
+          
           {/* Modals and BottomNavBar remain unchanged */}
           <AnimatedModalOverlay visible={showCreatePortfolio}>
             <CreatePortfolioScreen 
@@ -478,16 +480,70 @@ const CreatorProfile = () => {
               onSave={handleSaveEditedPackage}
             />
           </Modal>
-          <Modal visible={showKycModal} transparent animationType="slide" onRequestClose={closeKycModal}>
-            <KycModal onClose={closeKycModal} onBack={closeKycModal} />
+
+          <Modal visible={showKycModal} transparent animationType="slide" onRequestClose={() => {
+            setShowKycModal(false);
+            setShowAccountModal(true);
+          }}>
+            <KycModal 
+              onClose={() => {
+                setShowKycModal(false);
+                setShowAccountModal(true);
+              }} 
+              onBack={() => {
+                setShowKycModal(false);
+                setShowAccountModal(true);
+              }} 
+            />
           </Modal>
+
+          <Modal visible={showPaymentsModal} transparent animationType="slide" onRequestClose={() => setShowPaymentsModal(false)}>
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
+                <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginBottom: 16, textAlign: 'center' }}>Payments</Text>
+                <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 24, textAlign: 'center' }}>Payment management features will be available soon.</Text>
+                <TouchableOpacity 
+                  style={{ backgroundColor: '#FF6B2C', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
+                  onPress={() => setShowPaymentsModal(false)}
+                >
+                  <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Overlays for modals */}
+          {showAccountModal && (
+            <View style={styles.modalOverlay} />
+          )}
+          {showKycModal && (
+            <View style={styles.modalOverlay} />
+          )}
+          {showPaymentsModal && (
+            <View style={styles.modalOverlay} />
+          )}
+          {showCreatePortfolio && (
+            <View style={styles.modalOverlay} />
+          )}
+          {showCreatePackage && (
+            <View style={styles.modalOverlay} />
+          )}
+          {showEditPackage && (
+            <View style={styles.modalOverlay} />
+          )}
+          {showDeleteOverlay && (
+            <View style={styles.modalOverlay} />
+          )}
+
           <AccountModal 
             visible={showAccountModal}
             onClose={() => setShowAccountModal(false)}
+            onKycPress={handleKycPress}
+            onPaymentsPress={handlePaymentsPress}
             user={{
-              name: user?.name,
+              name: creatorProfile?.user?.name || user?.name,
               email: user?.email,
-              profile_image_url: user?.profileImage,
+              profile_image_url: creatorProfile?.user?.profile_image_url || user?.profileImage,
               user_type: user?.user_type,
               role_in_organization: creatorProfile?.role_in_organization
             }}
@@ -523,7 +579,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 18, fontWeight: '600', color: '#1A1D1F' },
   // --- Profile Card Styles ---
-  profileCard: { marginHorizontal: 16, marginTop: 8, backgroundColor: '#fff', borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  profileCard: { marginTop: 8, backgroundColor: '#fff', borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
   coverBlock: { height: 90, backgroundColor: '#FF6B2C', borderTopLeftRadius: 16, borderTopRightRadius: 16, justifyContent: 'flex-end', alignItems: 'flex-end', padding: 8 },
   coverCameraBtn: { backgroundColor: '#fff', borderRadius: 16, padding: 4 },
   avatarRow: { flexDirection: 'row', alignItems: 'flex-end', marginTop: -40, paddingHorizontal: 16 },
@@ -583,11 +639,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 4,
     marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#FF6B2C',
   },
   tabBtn: {
     flex: 1,
@@ -631,18 +684,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   createPackageBtn: {
-    backgroundColor: '#FF6B2C',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
+    flexDirection: 'row',
+    height: 36,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#FF6B2C',
+    borderRadius: 18,
+    backgroundColor: '#F8F9FB',
   },
   createPackageBtnText: {
-    color: '#fff',
+    color: '#FF6B2C',
     fontSize: 14,
     fontWeight: '600',
   },
   modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 1,
   },
   addPortfolioBtn: {
     flexDirection: 'row',
@@ -748,7 +814,6 @@ const styles = StyleSheet.create({
     color: '#B0B0B0',
     marginTop: 8,
   },
-
 });
 
 export default CreatorProfile; 

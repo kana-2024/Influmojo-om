@@ -1,6 +1,8 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import ConfirmationModal from './modals/ConfirmationModal';
+import { profileAPI } from '../services/apiService';
 
 interface PackageCardProps {
   item: {
@@ -15,55 +17,154 @@ interface PackageCardProps {
     price?: number;
   };
   onEdit?: (item: any) => void;
+  onDelete?: () => void;
+  onShowOverlay?: (show: boolean) => void;
 }
 
-const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit }) => {
+const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onShowOverlay }) => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  
   const title = item.title || `${item.platform?.toUpperCase()} ${item.content_type?.toUpperCase()}`;
+
+  // Get placeholder image URL based on platform
+  const getPlaceholderImageUrl = (platform?: string) => {
+    switch (platform?.toLowerCase()) {
+      case 'instagram':
+        return 'https://img.icons8.com/color/96/instagram-new.png';
+      case 'facebook':
+        return 'https://img.icons8.com/color/96/facebook-new.png';
+      case 'youtube':
+        return 'https://img.icons8.com/color/96/youtube-play.png';
+      case 'snapchat':
+        return 'https://img.icons8.com/color/96/snapchat.png';
+      default:
+        return 'https://img.icons8.com/color/96/social-network.png';
+    }
+  };
+
+  // Get platform icon and color for fallback
+  const getPlatformIcon = (platform?: string) => {
+    switch (platform?.toLowerCase()) {
+      case 'instagram':
+        return { name: 'logo-instagram', color: '#E4405F' };
+      case 'facebook':
+        return { name: 'logo-facebook', color: '#1877F2' };
+      case 'youtube':
+        return { name: 'logo-youtube', color: '#FF0000' };
+      case 'snapchat':
+        return { name: 'logo-snapchat', color: '#FFFC00' };
+      default:
+        return { name: 'share-social', color: '#6B7280' };
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await profileAPI.deletePackage(item.id);
+      Alert.alert('Success', 'Package deleted successfully!');
+      onDelete?.(); // Call the callback to refresh the package list
+    } catch (error) {
+      console.error('Delete package error:', error);
+      Alert.alert('Error', 'Failed to delete package. Please try again.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleShowDeleteModal = (show: boolean) => {
+    setShowDeleteModal(show);
+    onShowOverlay?.(show);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
   
   return (
-    <View style={styles.container}>
-      <View style={styles.contentRow}>
-        {/* Thumbnail placeholder */}
-        <View style={styles.thumbnail} />
-        
-        {/* Textual content */}
-        <View style={styles.textContent}>
-          <View style={styles.headerRow}>
-            <Text style={styles.title}>
-              {title}
-            </Text>
-            <TouchableOpacity style={styles.editButton} onPress={() => onEdit?.(item)}>
-              <Ionicons name="pencil" size={14} color="#B0B0B0" />
-            </TouchableOpacity>
+    <View>
+      <View style={styles.container}>
+        <View style={styles.contentRow}>
+          {/* Thumbnail with platform image or icon */}
+          <View style={styles.thumbnail}>
+            {!imageError ? (
+              <Image
+                source={{ uri: getPlaceholderImageUrl(item.platform) }}
+                style={styles.platformImage}
+                onError={handleImageError}
+                resizeMode="contain"
+              />
+            ) : (
+              <View style={[styles.platformIconContainer, { backgroundColor: getPlatformIcon(item.platform).color + '20' }]}>
+                <Ionicons 
+                  name={getPlatformIcon(item.platform).name as any} 
+                  size={24} 
+                  color={getPlatformIcon(item.platform).color} 
+                />
+              </View>
+            )}
+            <Text style={styles.platformText}>{item.platform}</Text>
           </View>
-          <Text style={styles.description}>
-            {item.description || `I craft eye-catching, scroll-stopping ${item.platform} ${item.content_type} designed to grab attention instantly, boost engagement, and turn viewers into loyal followers and customers.`}
+          
+          {/* Textual content */}
+          <View style={styles.textContent}>
+            <View style={styles.headerRow}>
+              <Text style={styles.title}>
+                {title}
+              </Text>
+              <View style={styles.actionButtons}>
+                <TouchableOpacity style={styles.actionButton} onPress={() => onEdit?.(item)}>
+                  <Ionicons name="pencil" size={14} color="#B0B0B0" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton} onPress={() => handleShowDeleteModal(true)}>
+                  <Ionicons name="trash" size={14} color="#FF6B2C" />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <Text style={styles.description}>
+              {item.description || `I craft eye-catching, scroll-stopping ${item.platform} ${item.content_type} designed to grab attention instantly, boost engagement, and turn viewers into loyal followers and customers.`}
+            </Text>
+          </View>
+        </View>
+
+        {/* Details row */}
+        <View style={styles.detailsRow}>
+          <Text style={styles.detailText}>
+            Duration: <Text style={styles.detailValue}>{item.duration1}</Text>
+          </Text>
+          <Text style={styles.detailText}>
+            Quantity: <Text style={styles.detailValue}>{item.quantity}</Text>
+          </Text>
+          <Text style={styles.detailText}>
+            Revisions : <Text style={styles.detailValue}>{item.revisions}</Text>
+          </Text>
+        </View>
+
+        {/* Price */}
+        <View style={styles.footerRow}>
+          <Text style={styles.priceLabel}>Price: </Text>
+          <Text style={styles.price}>
+            ₹{parseInt(item.price?.toString() || '0').toLocaleString()}/-
           </Text>
         </View>
       </View>
+      
+      {/* Divider */}
+      <View style={styles.divider} />
 
-      {/* Details row */}
-      <View style={styles.detailsRow}>
-        <Text style={styles.detailText}>
-          Duration: <Text style={styles.detailValue}>{item.duration1}</Text>
-        </Text>
-        <Text style={styles.detailText}>
-          Quantity: <Text style={styles.detailValue}>{item.quantity}</Text>
-        </Text>
-        <Text style={styles.detailText}>
-          Revisions : <Text style={styles.detailValue}>{item.revisions}</Text>
-        </Text>
-      </View>
-
-      {/* Price and Button */}
-      <View style={styles.footerRow}>
-        <Text style={styles.price}>
-          ₹{parseInt(item.price?.toString() || '0').toLocaleString()}/-
-        </Text>
-        <TouchableOpacity style={styles.addToCartButton}>
-          <Text style={styles.addToCartText}>Add to cart</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        visible={showDeleteModal}
+        onClose={() => handleShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="Delete Package"
+        message={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmColor="#FF3B30"
+      />
     </View>
   );
 };
@@ -71,8 +172,10 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
-    paddingHorizontal: 16,
-    marginBottom: 24,
+    paddingHorizontal: 4,
+    paddingBottom: 0,
+    marginTop: 8,
+    marginBottom: 8,
   },
   contentRow: {
     flexDirection: 'row',
@@ -81,8 +184,31 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 64,
     height: 64,
-    backgroundColor: '#F2F2F2',
-    borderRadius: 3,
+    backgroundColor: '#F8F9FB',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  platformImage: {
+    width: 32,
+    height: 32,
+    marginBottom: 4,
+  },
+  platformIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  platformText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#6B7280',
+    textTransform: 'uppercase',
   },
   textContent: {
     flex: 1,
@@ -104,9 +230,15 @@ const styles = StyleSheet.create({
     color: '#949494',
     fontSize: 12,
   },
-  editButton: {
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
     width: 16,
     height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   detailsRow: {
     flexDirection: 'row',
@@ -131,22 +263,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingRight: 16,
   },
+  priceLabel: {
+    color: '#222222',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   price: {
     color: '#2C1909',
     fontSize: 16,
     fontWeight: '700',
   },
-  addToCartButton: {
-    paddingVertical: 5,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#FD5D27',
-    borderRadius: 26,
-  },
-  addToCartText: {
-    color: '#FD5D27',
-    fontSize: 12,
-    fontWeight: '700',
+  divider: {
+    height: 1,
+    backgroundColor: '#D1D5DB',
+    marginTop: 16,
+    marginBottom: 16,
   },
 });
 

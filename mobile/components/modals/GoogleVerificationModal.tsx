@@ -18,8 +18,7 @@ const GoogleVerificationModal: React.FC<GoogleVerificationModalProps> = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.modal}>
+      <View style={styles.modal}>
           <View style={styles.iconContainer}>
             <Ionicons name="mail" size={48} color="#FF6B2C" />
           </View>
@@ -32,23 +31,19 @@ const GoogleVerificationModal: React.FC<GoogleVerificationModalProps> = ({
             <Text style={styles.loadingText}>Verifying...</Text>
           </View>
         </View>
-      </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   modal: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -150 }, { translateY: -100 }],
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 24,
-    margin: 20,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },

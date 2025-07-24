@@ -260,6 +260,13 @@ export const profileAPI = {
     });
   },
 
+  // Delete package
+  deletePackage: async (packageId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.DELETE_PACKAGE}/${packageId}`, {
+      method: 'DELETE',
+    });
+  },
+
   // Create portfolio item
   createPortfolio: async (data: {
     mediaUrl: string;
@@ -289,20 +296,7 @@ export const profileAPI = {
     });
   },
 
-  // Create project
-  createProject: async (data: {
-    title: string;
-    description: string;
-    budget: string;
-    timeline: string;
-    requirements: string;
-    deliverables: string;
-  }) => {
-    return await apiRequest(API_ENDPOINTS.CREATE_PROJECT, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
+
 
   // Submit KYC
   submitKYC: async (data: {
@@ -342,7 +336,7 @@ export const profileAPI = {
 
   // Get brand profile
   getBrandProfile: async () => {
-    const response = await apiRequest(API_ENDPOINTS.GET_BRAND_PROFILE, {
+    const response = await apiRequest(`${API_ENDPOINTS.GET_BRAND_PROFILE}?_t=${Date.now()}`, {
       method: 'GET',
     });
     
@@ -352,6 +346,7 @@ export const profileAPI = {
       response.data.languages = safeJsonParse(response.data.languages, []);
       response.data.campaigns = safeJsonParse(response.data.campaigns, []);
       response.data.collaborations = safeJsonParse(response.data.collaborations, []);
+      response.data.portfolio_items = safeJsonParse(response.data.portfolio_items, []);
     }
     
     return response;

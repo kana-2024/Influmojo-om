@@ -85,8 +85,7 @@ const OtpModal: React.FC<OtpModalProps> = ({ visible, onClose, onSuccess, phone 
       animationType="slide"
       onRequestClose={handleClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.modal}>
+      <View style={styles.modal}>
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Verify Phone Number</Text>
@@ -141,19 +140,16 @@ const OtpModal: React.FC<OtpModalProps> = ({ visible, onClose, onSuccess, phone 
             </TouchableOpacity>
           </View>
         </View>
-      </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   modal: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -200 }, { translateY: -200 }],
     backgroundColor: '#fff',
     borderRadius: 16,
     width: '90%',

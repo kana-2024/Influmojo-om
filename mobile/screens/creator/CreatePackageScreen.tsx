@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, FC } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Modal, StatusBar, Platform, Pressable, Dimensions, LayoutRectangle, findNodeHandle, UIManager, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, StatusBar, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as NavigationBar from 'expo-navigation-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomDropdownDefault from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
@@ -88,165 +87,192 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.3)' }}>
       <StatusBar barStyle='light-content' backgroundColor='#000' />
-      
-      {/* Header */}
-      <View style={styles.headerRow}>
-        <View style={{ flex: 1 }} />
-        <Text style={styles.header}>Create Package</Text>
-        <TouchableOpacity style={[styles.closeBtn, { flex: 1, alignItems: 'flex-end' }]} onPress={onClose}>
-          <Ionicons name="close" size={24} color="#6B7280" />
-        </TouchableOpacity>
-      </View>
-      
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.form}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        {/* Choose platform */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Choose platform<Text style={styles.required}>*</Text></Text>
-          <Dropdown
-            value={platform}
-            setValue={setPlatform}
-            options={platforms}
-          />
-        </View>
-
-        {/* Select Content type */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Select Content type<Text style={styles.required}>*</Text></Text>
-          <Dropdown
-            value={contentType}
-            setValue={setContentType}
-            options={contentTypes}
-          />
-        </View>
-
-        {/* Quantity */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Quantity<Text style={styles.required}>*</Text></Text>
-          <Dropdown
-            value={quantity}
-            setValue={setQuantity}
-            options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']}
-          />
-        </View>
-
-        {/* Revisions */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Revisions</Text>
-          <Dropdown
-            value={revisions}
-            setValue={setRevisions}
-            options={['0', '1', '2', '3', '4', '5']}
-          />
-        </View>
-
-        {/* Duration */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Duration<Text style={styles.required}>*</Text></Text>
-          <View style={styles.durationRow}>
-            <View style={styles.durationDropdown}>
-              <Dropdown
-                value={duration1}
-                setValue={setDuration1}
-                options={durations1}
-              />
-            </View>
-            <View style={styles.durationDropdown}>
-              <Dropdown
-                value={duration2}
-                setValue={setDuration2}
-                options={durations2}
-              />
-            </View>
+      <View style={[styles.safeArea, { paddingTop: insets.top + 8 }]}> 
+        <View style={styles.card}>
+          {/* Header */}
+          <View style={styles.headerRow}>
+            <TouchableOpacity style={styles.headerBtn} onPress={onClose}>
+              <Ionicons name="arrow-back" size={24} color="#6B7280" />
+            </TouchableOpacity>
+            <Text style={styles.header}>Create Package</Text>
+            <TouchableOpacity style={styles.headerBtn} onPress={onClose}>
+              <Ionicons name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Price */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Price (INR)<Text style={styles.required}>*</Text></Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={price}
-              onChangeText={setPrice}
-              keyboardType="numeric"
-              placeholder="50000"
-            />
-            <TouchableOpacity style={styles.arrowBtn}>
-              <Ionicons name="chevron-down" size={20} color="#6B7280" />
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.form}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Choose platform */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Choose platform<Text style={styles.required}>*</Text></Text>
+              <Dropdown
+                value={platform}
+                setValue={setPlatform}
+                options={platforms}
+              />
+            </View>
+
+            {/* Select Content type */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Select Content type<Text style={styles.required}>*</Text></Text>
+              <Dropdown
+                value={contentType}
+                setValue={setContentType}
+                options={contentTypes}
+              />
+            </View>
+
+            {/* Quantity */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Quantity<Text style={styles.required}>*</Text></Text>
+              <Dropdown
+                value={quantity}
+                setValue={setQuantity}
+                options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']}
+              />
+            </View>
+
+            {/* Revisions */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Revisions</Text>
+              <Dropdown
+                value={revisions}
+                setValue={setRevisions}
+                options={['0', '1', '2', '3', '4', '5']}
+              />
+            </View>
+
+            {/* Duration */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Duration<Text style={styles.required}>*</Text></Text>
+              <View style={styles.durationRow}>
+                <View style={styles.durationDropdown}>
+                  <Dropdown
+                    value={duration1}
+                    setValue={setDuration1}
+                    options={durations1}
+                  />
+                </View>
+                <View style={styles.durationDropdown}>
+                  <Dropdown
+                    value={duration2}
+                    setValue={setDuration2}
+                    options={durations2}
+                  />
+                </View>
+              </View>
+            </View>
+
+            {/* Price */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Price (INR)<Text style={styles.required}>*</Text></Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  value={price}
+                  onChangeText={setPrice}
+                  keyboardType="numeric"
+                  placeholder="50000"
+                />
+                <TouchableOpacity style={styles.arrowBtn}>
+                  <Ionicons name="chevron-down" size={20} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Brief Description */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Brief Description</Text>
+              <TextInput
+                style={styles.textArea}
+                value={desc}
+                onChangeText={setDesc}
+                placeholder="Brief description of your package has to be add here."
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            </View>
+          </ScrollView>
+
+          {/* Action Buttons */}
+          <View style={styles.btnRow}>
+            <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
+              <Text style={styles.cancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.submitBtn, loading && { opacity: 0.7 }]}
+              onPress={handleCreatePackage}
+              disabled={loading}
+            >
+              <Text style={styles.submitBtnText}>
+                {loading ? 'Creating...' : 'Submit'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* Brief Description */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Brief Description</Text>
-          <TextInput
-            style={styles.textArea}
-            value={desc}
-            onChangeText={setDesc}
-            placeholder="Brief description of your package has to be add here."
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </View>
-      </ScrollView>
-
-      {/* Action Buttons */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-          <Text style={styles.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.submitButton, loading && styles.submitButtonDisabled]} 
-          onPress={handleCreatePackage}
-          disabled={loading}
-        >
-          <Text style={styles.submitButtonText}>
-            {loading ? 'Creating...' : 'Submit'}
-          </Text>
-        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
+    backgroundColor: 'transparent',
+  },
+  card: {
+    flex: 1.2,
     backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: 0,
+    marginHorizontal: 0,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: -2 },
+    elevation: 8,
+    overflow: 'hidden',
+    paddingHorizontal: 0,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 12,
+    marginBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
   header: {
-    fontSize: 18,
+    flex: 2,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#1A1D1F',
     textAlign: 'center',
+    color: '#1A1D1F',
   },
-  closeBtn: {
-    padding: 4,
+  headerBtn: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
   },
   scrollView: {
     flex: 1,
   },
   form: {
     padding: 24,
-    paddingBottom: 100,
+    paddingBottom: 20,
   },
   formGroup: {
     marginBottom: 24,
@@ -297,41 +323,39 @@ const styles = StyleSheet.create({
     minHeight: 100,
     backgroundColor: '#fff',
   },
-  buttonRow: {
+  btnRow: {
     flexDirection: 'row',
     gap: 12,
-    padding: 24,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    marginHorizontal: 24,
+    marginTop: 12,
+    marginBottom: 24,
   },
-  cancelButton: {
+  cancelBtn: {
     flex: 1,
-    backgroundColor: '#FEF3C7',
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderWidth: 1.5,
+    borderColor: '#ffcba9',
+    borderRadius: 8,
+    paddingVertical: 12,
     alignItems: 'center',
+    backgroundColor: '#FFF4F0',
   },
-  cancelButtonText: {
+  cancelBtnText: {
+    color: '#FF6B2C',
+    fontWeight: '700',
     fontSize: 16,
-    fontWeight: '600',
-    color: '#92400E',
   },
-  submitButton: {
+  submitBtn: {
     flex: 1,
     backgroundColor: '#FF6B2C',
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 8,
+    paddingVertical: 12,
     alignItems: 'center',
   },
-  submitButtonDisabled: {
-    backgroundColor: '#FBBF24',
-  },
-  submitButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+  submitBtnText: {
     color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
   },
 });
 
-export default CreatePackageScreen; 
+export default CreatePackageScreen;

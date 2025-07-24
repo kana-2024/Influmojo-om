@@ -9,6 +9,8 @@ import { clearToken } from '../../services/storage';
 interface AccountModalProps {
   visible: boolean;
   onClose: () => void;
+  onKycPress?: () => void;
+  onPaymentsPress?: () => void;
   user: {
     name?: string;
     email?: string;
@@ -18,7 +20,7 @@ interface AccountModalProps {
   };
 }
 
-const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) => {
+const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, onKycPress, onPaymentsPress, user }) => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
 
@@ -67,8 +69,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.sheet}>
+      <View style={styles.sheet}>
           {/* Header */}
           <View style={styles.headerRow}>
             <TouchableOpacity onPress={onClose} style={styles.headerBtn}>
@@ -116,6 +117,28 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
               <View>
                 <Text style={styles.rowTitle}>Settings</Text>
                 <Text style={styles.rowDesc}>you can edit other settings</Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.row} onPress={onKycPress}>
+            <View style={styles.rowLeft}>
+              <Ionicons name="shield-checkmark-outline" size={22} color="#1A1D1F" style={styles.rowIcon} />
+              <View>
+                <Text style={styles.rowTitle}>KYC Verification</Text>
+                <Text style={styles.rowDesc}>Verify your identity</Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.row} onPress={onPaymentsPress}>
+            <View style={styles.rowLeft}>
+              <Ionicons name="card-outline" size={22} color="#1A1D1F" style={styles.rowIcon} />
+              <View>
+                <Text style={styles.rowTitle}>Payments</Text>
+                <Text style={styles.rowDesc}>Manage your payments</Text>
               </View>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
@@ -179,18 +202,16 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, user }) =
             <Ionicons name="chevron-forward" size={20} color="#B0B0B0" />
           </TouchableOpacity>
         </View>
-      </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
   sheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#fff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
