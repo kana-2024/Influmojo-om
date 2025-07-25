@@ -195,7 +195,9 @@ exports.Prisma.CreatorProfileScalarFieldEnum = {
   follower_count: 'follower_count',
   availability: 'availability',
   collaboration_types: 'collaboration_types',
-  interests: 'interests'
+  languages: 'languages',
+  interests: 'interests',
+  platform: 'platform'
 };
 
 exports.Prisma.SocialMediaAccountScalarFieldEnum = {

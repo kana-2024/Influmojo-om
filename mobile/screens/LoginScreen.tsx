@@ -15,9 +15,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { authAPI } from '../services/apiService';
 import googleAuthService from '../services/googleAuth';
 import OtpModal from '../components/modals/OtpModal';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { loginSuccess, setUserType } from '../store/slices/authSlice';
 
 export default function LoginScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
+  const dispatch = useAppDispatch();
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -79,7 +82,10 @@ export default function LoginScreen({ navigation }: any) {
         const apiResult = await authAPI.googleAuth(result.idToken, false, 'creator'); // isSignup = false, userType (not used for login)
         
         if (apiResult.success) {
-          // User exists and login successful, navigate to appropriate profile based on user type
+          // User exists and login successful, store user data and navigate
+          dispatch(loginSuccess(apiResult.user));
+          dispatch(setUserType(apiResult.user?.userType || apiResult.user?.user_type || 'creator'));
+          
           const userType = apiResult.user?.userType || apiResult.user?.user_type || 'creator';
           if (userType === 'brand') {
             navigation.navigate('BrandProfile');
@@ -103,7 +109,10 @@ export default function LoginScreen({ navigation }: any) {
   // Handle OTP verification success
   const handleOtpSuccess = (user: any) => {
     setShowOtpModal(false);
-    // Navigate to appropriate profile after successful OTP verification
+    // Store user data and navigate to appropriate profile after successful OTP verification
+    dispatch(loginSuccess(user));
+    dispatch(setUserType(user?.userType || user?.user_type || 'creator'));
+    
     const userType = user?.userType || user?.user_type;
     if (userType === 'brand') {
       navigation.navigate('BrandProfile');

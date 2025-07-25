@@ -19,9 +19,11 @@ interface PackageCardProps {
   onEdit?: (item: any) => void;
   onDelete?: () => void;
   onShowOverlay?: (show: boolean) => void;
+  readonly?: boolean;
+  onAddToCart?: (item: any) => void;
 }
 
-const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onShowOverlay }) => {
+const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onShowOverlay, readonly = false, onAddToCart }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -114,14 +116,16 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onSho
               <Text style={styles.title}>
                 {title}
               </Text>
-              <View style={styles.actionButtons}>
-                <TouchableOpacity style={styles.actionButton} onPress={() => onEdit?.(item)}>
-                  <Ionicons name="pencil" size={14} color="#B0B0B0" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={() => handleShowDeleteModal(true)}>
-                  <Ionicons name="trash" size={14} color="#FF6B2C" />
-                </TouchableOpacity>
-              </View>
+              {!readonly && (
+                <View style={styles.actionButtons}>
+                  <TouchableOpacity style={styles.actionButton} onPress={() => onEdit?.(item)}>
+                    <Ionicons name="pencil" size={14} color="#B0B0B0" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.actionButton} onPress={() => handleShowDeleteModal(true)}>
+                    <Ionicons name="trash" size={14} color="#FF6B2C" />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
             <Text style={styles.description}>
               {item.description || `I craft eye-catching, scroll-stopping ${item.platform} ${item.content_type} designed to grab attention instantly, boost engagement, and turn viewers into loyal followers and customers.`}
@@ -149,6 +153,16 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onSho
             ₹{parseInt(item.price?.toString() || '0').toLocaleString()}/-
           </Text>
         </View>
+
+        {/* Add to Cart Button - Only show in readonly mode */}
+        {readonly && onAddToCart && (
+          <TouchableOpacity 
+            style={styles.addToCartButton} 
+            onPress={() => onAddToCart(item)}
+          >
+            <Text style={styles.addToCartText}>Add to Cart</Text>
+          </TouchableOpacity>
+        )}
       </View>
       
       {/* Divider */}
@@ -278,6 +292,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#D1D5DB',
     marginTop: 16,
     marginBottom: 16,
+  },
+  addToCartButton: {
+    backgroundColor: '#FF6B2C',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    marginLeft: 74,
+    marginRight: 16,
+  },
+  addToCartText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

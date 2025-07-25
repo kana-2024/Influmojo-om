@@ -41,6 +41,11 @@ export const API_ENDPOINTS = {
   GET_CREATOR_PROFILE: `${ENV.API_BASE_URL}/api/profile/creator-profile`,
   GET_BRAND_PROFILE: `${ENV.API_BASE_URL}/api/profile/brand-profile`,
   
+  // Creator endpoints
+  GET_CREATORS: `${ENV.API_BASE_URL}/api/profile/creators`,
+  GET_CREATOR_BY_PLATFORM: `${ENV.API_BASE_URL}/api/profile/creators`,
+  GET_CREATOR_PROFILE_BY_ID: `${ENV.API_BASE_URL}/api/profile/creators`,
+  
   // Health check
   HEALTH: `${ENV.API_BASE_URL}/api/health`,
 };

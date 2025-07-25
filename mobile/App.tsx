@@ -21,6 +21,7 @@ import BrandProfileSetupScreen from './screens/brand/BrandProfileSetupScreen';
 
 import CreatorProfile from './screens/creator/CreatorProfile';
 import BrandProfile from './screens/brand/BrandProfile';
+import BrandHome from './screens/brand/BrandHome';
 import ProfileCompleteScreen from './screens/ProfileCompleteScreen';
 import CreatePackageScreen from './screens/creator/CreatePackageScreen';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -131,6 +132,7 @@ export default function App() {
 
             <Stack.Screen name="CreatorProfile" component={CreatorProfile} />
             <Stack.Screen name="BrandProfile" component={BrandProfile} />
+            <Stack.Screen name="BrandHome" component={BrandHome} />
             <Stack.Screen name="ProfileComplete" component={ProfileCompleteScreen} />
             <Stack.Screen name="CreatePackage" component={CreatePackageScreen} />
           </Stack.Navigator>

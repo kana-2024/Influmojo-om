@@ -314,11 +314,12 @@ router.post('/update-preferences', [
   body('categories').isArray({ min: 1, max: 5 }).withMessage('1-5 categories required'),
   body('about').notEmpty().withMessage('About is required'),
   body('languages').isArray({ min: 1 }).withMessage('At least one language required'),
+  body('platform').isArray({ min: 1 }).withMessage('At least one platform required'),
   body('role').optional(),
   body('dateOfBirth').optional().isISO8601().withMessage('Valid date required')
 ], validateRequest, authenticateToken, async (req, res) => {
   try {
-    const { categories, about, languages, role, dateOfBirth } = req.body;
+    const { categories, about, languages, platform, role, dateOfBirth } = req.body;
     const userId = BigInt(req.userId);
 
     console.log('Update preferences request:', {
@@ -326,6 +327,7 @@ router.post('/update-preferences', [
       categories,
       about,
       languages,
+      platform,
       role,
       dateOfBirth
     });
@@ -358,14 +360,16 @@ router.post('/update-preferences', [
         update: {
           content_categories: categories,
           bio: about,
-          interests: languages,
+          languages: languages,
+          platform: platform,
           date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
         },
         create: {
           user_id: userId,
           content_categories: categories,
           bio: about,
-          interests: languages,
+          languages: languages,
+          platform: platform,
           date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
         }
       });
@@ -867,12 +871,14 @@ router.post('/create-portfolio', [
 
 // Submit KYC (from KycModal)
 router.post('/submit-kyc', [
-  body('documentType').isIn(['aadhaar', 'pan']).withMessage('Valid document type required'),
-  body('frontImageUrl').notEmpty().withMessage('Front image URL is required'),
-  body('backImageUrl').notEmpty().withMessage('Back image URL is required')
+  body('documentType').isIn(['aadhaar', 'pan', 'ekyc']).withMessage('Valid document type required'),
+  body('frontImageUrl').optional(),
+  body('backImageUrl').optional(),
+  body('aadhaarData').optional(),
+  body('verificationMethod').optional()
 ], validateRequest, authenticateToken, async (req, res) => {
   try {
-    const { documentType, frontImageUrl, backImageUrl } = req.body;
+    const { documentType, frontImageUrl, backImageUrl, aadhaarData, verificationMethod } = req.body;
     const userId = BigInt(req.userId);
 
     // Get user to check user type
@@ -904,23 +910,52 @@ router.post('/submit-kyc', [
       });
     }
 
+    // Prepare KYC data based on document type
+    let kycData = {
+      document_type: documentType.toUpperCase(),
+      status: 'pending',
+      submitted_at: new Date()
+    };
+
+    if (documentType === 'ekyc') {
+      // Handle eKYC data
+      if (!aadhaarData) {
+        return res.status(400).json({ 
+          error: 'Aadhaar data is required for eKYC submission' 
+        });
+      }
+      
+      // Store eKYC data in additional fields or as JSON
+      kycData = {
+        ...kycData,
+        document_number: aadhaarData.uid,
+        document_front_url: null, // eKYC doesn't need image uploads
+        document_back_url: null,
+        // You might want to add additional fields to store eKYC data
+        // For now, we'll store it as a note or extend the schema
+      };
+    } else {
+      // Handle manual uploads
+      if (!frontImageUrl || !backImageUrl) {
+        return res.status(400).json({ 
+          error: 'Front and back image URLs are required for manual uploads' 
+        });
+      }
+      
+      kycData = {
+        ...kycData,
+        document_front_url: frontImageUrl,
+        document_back_url: backImageUrl,
+      };
+    }
+
     // Create or update KYC
     const kyc = await prisma.kYC.upsert({
       where: { creator_id: creatorProfile.id },
-      update: {
-        document_type: documentType.toUpperCase(),
-        document_front_url: frontImageUrl,
-        document_back_url: backImageUrl,
-        status: 'pending',
-        submitted_at: new Date()
-      },
+      update: kycData,
       create: {
         creator_id: creatorProfile.id,
-        document_type: documentType.toUpperCase(),
-        document_front_url: frontImageUrl,
-        document_back_url: backImageUrl,
-        status: 'pending',
-        submitted_at: new Date()
+        ...kycData
       }
     });
 
@@ -1014,6 +1049,7 @@ router.get('/profile', authenticateToken, async (req, res) => {
 // Get creator profile with all related data
 router.get('/creator-profile', authenticateToken, async (req, res) => {
   try {
+    console.log('🔍 Creator profile request received for user ID:', req.userId);
     const userId = BigInt(req.userId);
 
     const user = await prisma.user.findUnique({
@@ -1029,39 +1065,101 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
       }
     });
 
+    console.log('🔍 User found:', !!user);
+    if (user) {
+      console.log('🔍 User type:', user.user_type);
+      console.log('🔍 Creator profile exists:', !!user.creator_profiles);
+    }
+
     if (!user) {
+      console.log('❌ User not found for ID:', req.userId);
       return res.status(404).json({ error: 'User not found' });
     }
 
     if (user.user_type !== 'creator') {
+      console.log('❌ User is not a creator. User type:', user.user_type);
       return res.status(403).json({ error: 'User is not a creator' });
     }
 
+    if (!user.creator_profiles) {
+      console.log('❌ Creator profile not found for user ID:', req.userId);
+      return res.status(404).json({ error: 'Creator profile not found' });
+    }
+
+    console.log('🔍 Creator profile interests:', user.creator_profiles?.interests);
+    console.log('🔍 Creator profile packages from interests:', user.creator_profiles?.interests?.packages);
+    console.log('🔍 Creator profile packages type:', typeof user.creator_profiles?.interests?.packages);
+    console.log('🔍 Creator profile packages length:', user.creator_profiles?.interests?.packages?.length);
+    console.log('🔍 Creator profile packages stringified:', JSON.stringify(user.creator_profiles?.interests?.packages));
+    console.log('🔍 Creator profile gender:', user.creator_profiles?.gender);
+    console.log('🔍 Creator profile date_of_birth:', user.creator_profiles?.date_of_birth);
+    
     // Convert BigInt values to strings for JSON serialization
     const serializedProfile = {
       ...user.creator_profiles,
       id: user.creator_profiles?.id.toString(),
       user_id: user.creator_profiles?.user_id.toString(),
+      // Handle Decimal fields
+      min_rate: user.creator_profiles?.min_rate?.toString() || null,
+      max_rate: user.creator_profiles?.max_rate?.toString() || null,
+      rating: user.creator_profiles?.rating?.toString() || '0',
+      // Handle Date fields
+      created_at: user.creator_profiles?.created_at?.toISOString() || null,
+      updated_at: user.creator_profiles?.updated_at?.toISOString() || null,
+      date_of_birth: user.creator_profiles?.date_of_birth?.toISOString() || null,
       kyc: user.creator_profiles?.kyc ? {
         ...user.creator_profiles.kyc,
         id: user.creator_profiles.kyc.id.toString(),
-        creator_id: user.creator_profiles.kyc.creator_id.toString()
+        creator_id: user.creator_profiles.kyc.creator_id.toString(),
+        created_at: user.creator_profiles.kyc.created_at?.toISOString() || null,
+        updated_at: user.creator_profiles.kyc.updated_at?.toISOString() || null
       } : null,
       portfolio_items: user.creator_profiles?.portfolio_items?.map(item => ({
         ...item,
         id: item.id.toString(),
         creator_id: item.creator_id?.toString(),
         brand_id: item.brand_id?.toString(),
-        file_size: item.file_size?.toString()
+        file_size: item.file_size?.toString(),
+        created_at: item.created_at?.toISOString() || null,
+        updated_at: item.updated_at?.toISOString() || null
       })) || [],
       social_media_accounts: user.creator_profiles?.social_media_accounts?.map(account => ({
         ...account,
         id: account.id.toString(),
         creator_id: account.creator_id.toString(),
         follower_count: account.follower_count.toString(),
-        avg_views: account.avg_views.toString()
+        avg_views: account.avg_views.toString(),
+        created_at: account.created_at?.toISOString() || null,
+        updated_at: account.updated_at?.toISOString() || null
       })) || [],
-      packages: user.creator_profiles?.interests?.packages || [],
+      // Handle packages from interests
+      packages: (() => {
+        const interests = user.creator_profiles?.interests;
+        if (!interests) return [];
+        if (Array.isArray(interests.packages)) return interests.packages;
+        if (typeof interests.packages === 'string') {
+          try {
+            return JSON.parse(interests.packages);
+          } catch (e) {
+            console.warn('Failed to parse packages from interests:', e);
+            return [];
+          }
+        }
+        return [];
+      })(),
+      // Handle languages from interests
+      languages: (() => {
+        const interests = user.creator_profiles?.interests;
+        if (!interests) return [];
+        // Extract language values from interests object (excluding packages)
+        const languages = [];
+        for (const [key, value] of Object.entries(interests)) {
+          if (key !== 'packages' && typeof value === 'string') {
+            languages.push(value);
+          }
+        }
+        return languages;
+      })(),
       user: {
         id: user.id.toString(),
         name: user.name,
@@ -1077,10 +1175,12 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get creator profile error:', error);
+    console.error('❌ Get creator profile error:', error);
+    console.error('❌ Error stack:', error.stack);
     res.status(500).json({ 
       error: 'Failed to get creator profile',
-      message: error.message 
+      message: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });
@@ -1288,6 +1388,387 @@ router.post('/create-campaign', [
   }
 });
 
+// Get all creators for brand home screen
+router.get('/creators', authenticateToken, async (req, res) => {
+  try {
+    console.log('🔍 Fetching creators for brand home screen...');
+    
+    // Get all creator profiles with their related data
+    const influencers = await prisma.creatorProfile.findMany({
+      where: {
+        user: {
+          status: 'active' // Only active users
+        }
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profile_image_url: true,
+            email: true,
+            phone: true
+          }
+        },
+        social_media_accounts: {
+          select: {
+            id: true,
+            platform: true,
+            username: true,
+            follower_count: true,
+            engagement_rate: true,
+            avg_views: true,
+            verified: true
+          }
+        },
+        portfolio_items: {
+          select: {
+            id: true,
+            title: true,
+            media_url: true,
+            media_type: true,
+            platform: true
+          },
+          take: 5 // Limit to 5 portfolio items
+        }
+      },
+      orderBy: {
+        created_at: 'desc'
+      }
+    });
 
+    console.log(`✅ Found ${influencers.length} creators`);
+
+    // Group creators by platform for easier frontend consumption
+    const groupedCreators = {
+      youtube: [],
+      instagram: [],
+      tiktok: [],
+      twitter: [],
+      facebook: []
+    };
+
+    influencers.forEach(creator => {
+      // Convert BigInt to string for JSON serialization
+      const serializedCreator = {
+        id: creator.id.toString(),
+        user_id: creator.user_id.toString(),
+        name: creator.user.name,
+        profile_image_url: creator.user.profile_image_url,
+        email: creator.user.email,
+        phone: creator.user.phone,
+        bio: creator.bio,
+        gender: creator.gender,
+        date_of_birth: creator.date_of_birth,
+        location_city: creator.location_city,
+        location_state: creator.location_state,
+        content_categories: creator.content_categories,
+        interests: creator.interests,
+        platform: creator.platform,
+        rating: creator.rating?.toString(),
+        total_collaborations: creator.total_collaborations?.toString(),
+        average_response_time: creator.average_response_time,
+        verified: creator.verified,
+        featured: creator.featured,
+        social_accounts: creator.social_media_accounts.map(account => ({
+          id: account.id.toString(),
+          platform: account.platform,
+          username: account.username,
+          follower_count: account.follower_count.toString(),
+          engagement_rate: account.engagement_rate.toString(),
+          avg_views: account.avg_views.toString(),
+          verified: account.verified
+        })),
+        portfolio_items: creator.portfolio_items.map(item => ({
+          id: item.id.toString(),
+          title: item.title,
+          media_url: item.media_url,
+          media_type: item.media_type,
+          platform: item.platform
+        })),
+        packages: [] // Empty array for now since packages are not directly linked to creators in current schema
+      };
+
+      // Add to appropriate platform group based on their social accounts
+      creator.social_media_accounts.forEach(account => {
+        const platform = account.platform.toLowerCase();
+        if (groupedCreators[platform]) {
+          groupedCreators[platform].push(serializedCreator);
+        }
+      });
+
+      // If no social accounts, add to a default group
+      if (creator.social_media_accounts.length === 0) {
+        groupedCreators.instagram.push(serializedCreator);
+      }
+    });
+
+    console.log('📊 Grouped creators by platform:', {
+      youtube: groupedCreators.youtube.length,
+      instagram: groupedCreators.instagram.length,
+      tiktok: groupedCreators.tiktok.length,
+      twitter: groupedCreators.twitter.length,
+      facebook: groupedCreators.facebook.length
+    });
+
+    res.json({
+      success: true,
+      data: groupedCreators
+    });
+
+  } catch (error) {
+    console.error('❌ Get creators error:', error);
+    console.error('❌ Error stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to fetch creators',
+      message: error.message 
+    });
+  }
+});
+
+// Get creators by platform
+router.get('/creators/:platform', authenticateToken, async (req, res) => {
+  try {
+    const { platform } = req.params;
+    
+    // Validate platform parameter
+    if (!platform || platform === 'undefined' || platform === 'null') {
+      console.error('❌ Invalid platform parameter:', platform);
+      return res.status(400).json({ 
+        error: 'Invalid platform parameter',
+        message: 'Platform parameter is required and must be valid.'
+      });
+    }
+    
+    console.log(`🔍 Fetching creators for platform: ${platform}`);
+    
+    // Get influencers with the specified platform
+    const influencers = await prisma.creatorProfile.findMany({
+      where: {
+        user: {
+          status: 'active'
+        },
+        social_media_accounts: {
+          some: {
+            platform: platform.toUpperCase()
+          }
+        }
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profile_image_url: true,
+            email: true,
+            phone: true
+          }
+        },
+        social_media_accounts: {
+          where: {
+            platform: platform.toUpperCase()
+          },
+          select: {
+            id: true,
+            platform: true,
+            username: true,
+            follower_count: true,
+            engagement_rate: true,
+            avg_views: true,
+            verified: true
+          }
+        }
+      },
+      orderBy: {
+        created_at: 'desc'
+      }
+    });
+
+    console.log(`✅ Found ${influencers.length} influencers for ${platform}`);
+
+    // Serialize the data
+    const serializedInfluencers = influencers.map(influencer => ({
+      id: influencer.id.toString(),
+      user_id: influencer.user_id.toString(),
+      name: influencer.user.name,
+      profile_image_url: influencer.user.profile_image_url,
+      email: influencer.user.email,
+      phone: influencer.user.phone,
+      bio: influencer.bio,
+      gender: influencer.gender,
+      date_of_birth: influencer.date_of_birth,
+      location_city: influencer.location_city,
+      location_state: influencer.location_state,
+      content_categories: influencer.content_categories,
+      interests: influencer.interests,
+      platform: influencer.platform,
+      rating: influencer.rating?.toString(),
+      total_collaborations: influencer.total_collaborations?.toString(),
+      average_response_time: influencer.average_response_time,
+      verified: influencer.verified,
+      featured: influencer.featured,
+      social_account: influencer.social_media_accounts[0] ? {
+        id: influencer.social_media_accounts[0].id.toString(),
+        platform: influencer.social_media_accounts[0].platform,
+        username: influencer.social_media_accounts[0].username,
+        follower_count: influencer.social_media_accounts[0].follower_count.toString(),
+        engagement_rate: influencer.social_media_accounts[0].engagement_rate.toString(),
+        avg_views: influencer.social_media_accounts[0].avg_views.toString(),
+        verified: influencer.social_media_accounts[0].verified
+      } : null,
+      packages: [] // Empty array for now since packages are not directly linked to creators in current schema
+    }));
+
+    res.json({
+      success: true,
+      data: serializedInfluencers
+    });
+
+  } catch (error) {
+    console.error('❌ Get influencers by platform error:', error);
+    console.error('❌ Error stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to fetch influencers by platform',
+      message: error.message 
+    });
+  }
+});
+
+// Get individual creator profile
+router.get('/creators/:platform/:id', authenticateToken, async (req, res) => {
+  try {
+    const { platform, id } = req.params;
+    
+    // Validate parameters
+    if (!platform || platform === 'undefined' || platform === 'null') {
+      console.error('❌ Invalid platform parameter:', platform);
+      return res.status(400).json({ 
+        error: 'Invalid platform parameter',
+        message: 'Platform parameter is required and must be valid.'
+      });
+    }
+    
+    if (!id || id === 'undefined' || id === 'null') {
+      console.error('❌ Invalid creator ID:', id);
+      return res.status(400).json({ 
+        error: 'Invalid creator ID',
+        message: 'Creator ID is required and must be valid.'
+      });
+    }
+    
+    const creatorId = BigInt(id);
+    
+    console.log(`🔍 Fetching influencer profile: ${id}`);
+    
+    const creator = await prisma.creatorProfile.findUnique({
+      where: { id: creatorId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profile_image_url: true,
+            email: true,
+            phone: true
+          }
+        },
+        social_media_accounts: {
+          select: {
+            id: true,
+            platform: true,
+            username: true,
+            follower_count: true,
+            engagement_rate: true,
+            avg_views: true,
+            verified: true
+          }
+        },
+        portfolio_items: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            media_url: true,
+            media_type: true,
+            platform: true,
+            tags: true,
+            is_featured: true
+          }
+        }
+      }
+    });
+
+    if (!creator) {
+      return res.status(404).json({ 
+        error: 'Creator not found',
+        message: 'The requested creator profile does not exist.'
+      });
+    }
+
+    console.log(`✅ Found creator: ${creator.user.name}`);
+    console.log('🔍 Creator interests:', creator.interests);
+    console.log('🔍 Creator packages from interests:', creator.interests?.packages);
+    console.log('🔍 Creator packages type:', typeof creator.interests?.packages);
+    console.log('🔍 Creator packages length:', creator.interests?.packages?.length);
+    console.log('🔍 Creator gender:', creator.gender);
+    console.log('🔍 Creator date_of_birth:', creator.date_of_birth);
+
+    // Serialize the data
+    const serializedCreator = {
+      id: creator.id.toString(),
+      user_id: creator.user_id.toString(),
+      name: creator.user.name,
+      profile_image_url: creator.user.profile_image_url,
+      email: creator.user.email,
+      phone: creator.user.phone,
+      bio: creator.bio,
+      gender: creator.gender,
+      date_of_birth: creator.date_of_birth,
+      location_city: creator.location_city,
+      location_state: creator.location_state,
+      content_categories: creator.content_categories,
+      languages: creator.languages || (creator.interests ? Object.values(creator.interests).filter(val => typeof val === 'string') : []) || [],
+      platform: creator.platform,
+      rating: creator.rating?.toString(),
+      total_collaborations: creator.total_collaborations?.toString(),
+      average_response_time: creator.average_response_time,
+      verified: creator.verified,
+      featured: creator.featured,
+      social_media_accounts: creator.social_media_accounts.map(account => ({
+        id: account.id.toString(),
+        platform: account.platform,
+        username: account.username,
+        follower_count: account.follower_count.toString(),
+        engagement_rate: account.engagement_rate.toString(),
+        avg_views: account.avg_views.toString(),
+        verified: account.verified
+      })),
+      portfolio_items: creator.portfolio_items.map(item => ({
+        id: item.id.toString(),
+        title: item.title,
+        description: item.description,
+        media_url: item.media_url,
+        media_type: item.media_type,
+        platform: item.platform,
+        tags: item.tags,
+        is_featured: item.is_featured
+      })),
+      packages: Array.isArray(creator.interests?.packages) ? creator.interests.packages : (typeof creator.interests?.packages === 'string' ? JSON.parse(creator.interests.packages) : []) || []
+    };
+
+    res.json({
+      success: true,
+      data: serializedCreator
+    });
+
+  } catch (error) {
+    console.error('❌ Get creator profile error:', error);
+    console.error('❌ Error stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to fetch creator profile',
+      message: error.message 
+    });
+  }
+});
 
 module.exports = router; 

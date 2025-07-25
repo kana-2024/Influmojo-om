@@ -439,7 +439,7 @@ const BrandProfile = () => {
           role_in_organization: brandProfile?.role_in_organization
         }}
       />
-      <BottomNavBar navigation={navigation} userType="brand" />
+              <BottomNavBar navigation={navigation} />
         </>
       )}
     </SafeAreaView>

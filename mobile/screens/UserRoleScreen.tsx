@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Platform, SafeAreaView, StatusBar, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
+import { useAppDispatch } from '../store/hooks';
+import { setUserType } from '../store/slices/authSlice';
 
 interface UserRoleScreenProps {
   navigation: any;
@@ -12,6 +14,7 @@ const UserRoleScreen = ({ navigation, route }: UserRoleScreenProps) => {
   useEffect(() => {
   }, []);
 
+  const dispatch = useAppDispatch();
   const [selected, setSelected] = useState<'brand' | 'creator' | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const mode = route?.params?.mode || 'signup';
@@ -52,10 +55,15 @@ const UserRoleScreen = ({ navigation, route }: UserRoleScreenProps) => {
             style={[styles.continueButton, !selected && { opacity: 0.5 }]}
             disabled={!selected}
             onPress={() => {
-              if (selected === 'creator') {
-                navigation.navigate('SignUp', { userType: 'creator' });
-              } else if (selected === 'brand') {
-                navigation.navigate('SignUp', { userType: 'brand' });
+              if (selected) {
+                // Store user type in Redux
+                dispatch(setUserType(selected));
+                
+                if (selected === 'creator') {
+                  navigation.navigate('SignUp', { userType: 'creator' });
+                } else if (selected === 'brand') {
+                  navigation.navigate('SignUp', { userType: 'brand' });
+                }
               }
             }}
           >

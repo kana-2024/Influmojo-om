@@ -70,10 +70,6 @@ const GoogleVerifiedScreen = ({ navigation }: any) => {
         <Text style={styles.nextText}>{loading ? 'Loading...' : 'Next'}</Text>
         {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
       </TouchableOpacity>
-      {/* Login Link */}
-      <TouchableOpacity style={styles.loginRow} onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.loginText}>Already have an account ? <Text style={styles.loginLink}>Login here</Text></Text>
-      </TouchableOpacity>
     </View>
   );
 };

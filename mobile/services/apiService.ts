@@ -226,6 +226,7 @@ export const profileAPI = {
     categories: string[];
     about: string;
     languages: string[];
+    platform: string[];
     role?: string;
     dateOfBirth?: Date;
   }) => {
@@ -301,8 +302,10 @@ export const profileAPI = {
   // Submit KYC
   submitKYC: async (data: {
     documentType: string;
-    frontImageUrl: string;
-    backImageUrl: string;
+    frontImageUrl?: string;
+    backImageUrl?: string;
+    aadhaarData?: any;
+    verificationMethod?: string;
   }) => {
     return await apiRequest(API_ENDPOINTS.SUBMIT_KYC, {
       method: 'POST',
@@ -325,7 +328,7 @@ export const profileAPI = {
     
     // Safely parse JSON fields if they exist
     if (response.success && response.data) {
-      response.data.interests = safeJsonParse(response.data.interests, []);
+      response.data.languages = safeJsonParse(response.data.languages, []);
       response.data.content_categories = safeJsonParse(response.data.content_categories, []);
       response.data.social_media_accounts = safeJsonParse(response.data.social_media_accounts, []);
       response.data.portfolio_items = safeJsonParse(response.data.portfolio_items, []);
@@ -347,6 +350,79 @@ export const profileAPI = {
       response.data.campaigns = safeJsonParse(response.data.campaigns, []);
       response.data.collaborations = safeJsonParse(response.data.collaborations, []);
       response.data.portfolio_items = safeJsonParse(response.data.portfolio_items, []);
+    }
+    
+    return response;
+  },
+
+  // Get all creators for brand home screen
+  getCreators: async () => {
+    const response = await apiRequest(API_ENDPOINTS.GET_CREATORS, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      Object.keys(response.data).forEach(platform => {
+        response.data[platform] = response.data[platform].map((influencer: any) => ({
+          ...influencer,
+          packages: safeJsonParse(influencer.packages, []),
+          social_accounts: safeJsonParse(influencer.social_accounts, [])
+        }));
+      });
+    }
+    
+    return response;
+  },
+
+  // Get creators by platform
+  getCreatorsByPlatform: async (platform: string) => {
+    if (!platform || platform === 'undefined' || platform === 'null') {
+      console.error('❌ Invalid platform parameter:', platform);
+      return { success: false, error: 'Invalid platform parameter' };
+    }
+    
+    const response = await apiRequest(`${API_ENDPOINTS.GET_CREATORS}/${platform}`, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      response.data = response.data.map((influencer: any) => ({
+        ...influencer,
+        packages: safeJsonParse(influencer.packages, []),
+        social_account: influencer.social_account ? {
+          ...influencer.social_account,
+          follower_count: influencer.social_account.follower_count || '0',
+          engagement_rate: influencer.social_account.engagement_rate || '0',
+          avg_views: influencer.social_account.avg_views || '0'
+        } : null
+      }));
+    }
+    
+    return response;
+  },
+
+
+
+  // Get individual creator profile by ID (for brand viewing)
+  getCreatorProfileById: async (creatorId: string, platform: string = 'instagram') => {
+    if (!creatorId || creatorId === 'undefined' || creatorId === 'null') {
+      console.error('❌ Invalid creator ID:', creatorId);
+      return { success: false, error: 'Invalid creator ID' };
+    }
+    
+    const response = await apiRequest(`${API_ENDPOINTS.GET_CREATOR_PROFILE_BY_ID}/${platform}/${creatorId}`, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      response.data.languages = safeJsonParse(response.data.languages, []);
+      response.data.packages = safeJsonParse(response.data.packages, []);
+      response.data.social_media_accounts = safeJsonParse(response.data.social_media_accounts, []);
+      response.data.portfolio_items = safeJsonParse(response.data.portfolio_items, []);
+      response.data.reviews = safeJsonParse(response.data.reviews, []);
     }
     
     return response;

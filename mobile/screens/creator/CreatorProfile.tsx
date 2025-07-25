@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, StatusBar, Platform, Dimensions, Modal } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, StatusBar, Platform, Dimensions, Modal, Alert } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -36,6 +36,27 @@ const safeParseArray = (value: any): any[] => {
   }
 };
 
+const calculateAge = (dateOfBirth: any): number | null => {
+  if (!dateOfBirth) return null;
+  
+  try {
+    const birthDate = new Date(dateOfBirth);
+    if (isNaN(birthDate.getTime())) return null;
+    
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  } catch {
+    return null;
+  }
+};
+
 const CreatorProfile = () => {
   const user = useAppSelector(state => state.auth.user);
   const insets = useSafeAreaInsets();
@@ -44,6 +65,11 @@ const CreatorProfile = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useAppDispatch();
+  
+  // Read-only mode detection
+  const readonly = (route?.params as any)?.readonly || false;
+  const creatorId = (route?.params as any)?.creatorId;
+  const platform = (route?.params as any)?.platform || 'instagram';
   const showCreatePortfolio = useAppSelector(state => state.modal.showCreatePortfolio);
   const showCreatePackage = useAppSelector(state => state.modal.showCreatePackage);
   const showEditPackage = useAppSelector(state => state.modal.showEditPackage);
@@ -59,6 +85,9 @@ const CreatorProfile = () => {
   console.log('🔍 CreatorProfile component loaded');
   console.log('🔍 Current user:', user);
   console.log('🔍 Route params:', route.params);
+  console.log('🔍 Creator profile state:', creatorProfile);
+  console.log('🔍 Creator profile gender:', creatorProfile?.gender);
+  console.log('🔍 Creator profile date_of_birth:', creatorProfile?.date_of_birth);
 
   // Open modals only if navigation param is set
   useEffect(() => {
@@ -71,35 +100,47 @@ const CreatorProfile = () => {
     }
   }, [route.params]);
 
-  // Defensive reset on mount
-  useEffect(() => {
-    dispatch(resetModals());
-    
-    // Check if user is a brand and prevent creator profile loading
-    // First check the user prop, then check Redux store
-    const currentUser = user || null;
-    const userType = currentUser?.user_type;
-    
-    console.log('🔍 CreatorProfile: Current user from props:', currentUser);
-    console.log('🔍 CreatorProfile: User type from props:', userType);
-    
-    if (userType === 'brand') {
-      console.log('🔍 CreatorProfile: User is a brand, should not be on CreatorProfile screen');
+  // Defensive reset on mount - will be called after function declarations
+
+  const loadCreatorProfileForBrand = useCallback(async (creatorId: string, platform: string) => {
+    try {
+      setLoading(true);
+      console.log('🔍 Loading creator profile for brand view, creator ID:', creatorId, 'platform:', platform);
+      
+      // Use the API to get a specific creator's profile
+      const response = await profileAPI.getCreatorProfileById(creatorId, platform);
+      console.log('✅ Creator profile for brand response:', response);
+      
+      if (response.success) {
+        const profile = response.data;
+        console.log('🔍 Creator profile for brand data received:', profile);
+        console.log('🔍 Packages from API (brand view):', profile.packages);
+        console.log('🔍 Gender from API (brand view):', profile.gender);
+        console.log('🔍 Date of birth from API (brand view):', profile.date_of_birth);
+        const profileData = {
+          ...profile,
+          languages: safeParseArray(profile.languages),
+          content_categories: safeParseArray(profile.content_categories),
+          packages: safeParseArray(profile.packages),
+        };
+        console.log('🔍 Setting creator profile state (brand view):', profileData);
+        console.log('🔍 Packages in state (brand view):', profileData.packages);
+        console.log('🔍 Gender in state (brand view):', profileData.gender);
+        console.log('🔍 Date of birth in state (brand view):', profileData.date_of_birth);
+        setCreatorProfile(profileData);
+      } else {
+        console.error('❌ Creator profile for brand failed:', response.error);
+        Alert.alert('Error', 'Failed to load creator profile');
+      }
+    } catch (error) {
+      console.error('❌ Error loading creator profile for brand:', error);
+      Alert.alert('Error', 'Failed to load creator profile');
+    } finally {
       setLoading(false);
-      return;
     }
-    
-    // If user is null, try to get from Redux store
-    if (!currentUser) {
-      console.log('🔍 CreatorProfile: User is null, checking Redux store...');
-      // We'll still try to load the profile, but the API call will fail for brand users
-      // and show the error message we added
-    }
-    
-    loadCreatorProfile();
   }, [user]);
 
-  const loadCreatorProfile = async () => {
+  const loadCreatorProfile = useCallback(async () => {
     try {
       setLoading(true);
       console.log('🔍 Loading creator profile...');
@@ -115,11 +156,21 @@ const CreatorProfile = () => {
       console.log('✅ Creator profile response:', response);
       if (response.success) {
         const profile = response.data;
-        setCreatorProfile({
+        console.log('🔍 Creator profile data received:', profile);
+        console.log('🔍 Packages from API:', profile.packages);
+        console.log('🔍 Gender from API:', profile.gender);
+        console.log('🔍 Date of birth from API:', profile.date_of_birth);
+        const profileData = {
           ...profile,
-          interests: safeParseArray(profile.interests),
+          languages: safeParseArray(profile.languages),
           content_categories: safeParseArray(profile.content_categories),
-        });
+          packages: safeParseArray(profile.packages),
+        };
+        console.log('🔍 Setting creator profile state:', profileData);
+        console.log('🔍 Packages in state:', profileData.packages);
+        console.log('🔍 Gender in state:', profileData.gender);
+        console.log('🔍 Date of birth in state:', profileData.date_of_birth);
+        setCreatorProfile(profileData);
       } else {
         console.error('❌ Creator profile failed:', response.error);
       }
@@ -144,14 +195,53 @@ const CreatorProfile = () => {
         location_city: '',
         location_state: '',
         content_categories: [],
-        interests: [],
+        languages: [],
+        packages: [],
         portfolio_items: [],
         social_media_accounts: []
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  // Defensive reset on mount
+  useEffect(() => {
+    dispatch(resetModals());
+    
+    // Check if user is a brand and prevent creator profile loading
+    // First check the user prop, then check Redux store
+    const currentUser = user || null;
+    const userType = currentUser?.user_type;
+    
+    console.log('🔍 CreatorProfile: Current user from props:', currentUser);
+    console.log('🔍 CreatorProfile: User type from props:', userType);
+    console.log('🔍 CreatorProfile: Readonly mode:', readonly);
+    console.log('🔍 CreatorProfile: Creator ID:', creatorId);
+    
+    // If in readonly mode (brand viewing creator profile), allow it
+    if (readonly && creatorId) {
+      console.log('🔍 CreatorProfile: Readonly mode detected, loading creator profile for brand view');
+      loadCreatorProfileForBrand(creatorId, platform);
+      return;
+    }
+    
+    // Check if user is a brand and prevent creator profile loading (only for non-readonly mode)
+    if (userType === 'brand' && !readonly) {
+      console.log('🔍 CreatorProfile: User is a brand, should not be on CreatorProfile screen');
+      setLoading(false);
+      return;
+    }
+    
+    // If user is null, try to get from Redux store
+    if (!currentUser) {
+      console.log('🔍 CreatorProfile: User is null, checking Redux store...');
+      // We'll still try to load the profile, but the API call will fail for brand users
+      // and show the error message we added
+    }
+    
+    loadCreatorProfile();
+  }, [user, readonly, creatorId, platform, loadCreatorProfile, loadCreatorProfileForBrand]);
 
   const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -208,12 +298,25 @@ const CreatorProfile = () => {
     setShowPaymentsModal(true);
   };
 
+  // Handle add to cart for readonly mode
+  const handleAddToCart = (packageItem: any) => {
+    console.log('🔍 Adding package to cart:', packageItem);
+    Alert.alert(
+      'Added to Cart',
+      `"${packageItem.title || packageItem.platform} Package" has been added to your cart!`,
+      [
+        { text: 'Continue Shopping', style: 'default' },
+        { text: 'View Cart', style: 'default' }
+      ]
+    );
+  };
+
   return (
           <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle='dark-content' backgroundColor='#fff' />
       
-      {/* Show error message for brand users */}
-      {user && (user.user_type === 'brand' || (user as any).userType === 'brand') && (
+      {/* Show error message for brand users (only when not in readonly mode) */}
+      {user && (user.user_type === 'brand' || (user as any).userType === 'brand') && !readonly && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
           <Ionicons name="alert-circle" size={64} color="#FF6B2C" />
           <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
@@ -228,16 +331,28 @@ const CreatorProfile = () => {
         </View>
       )}
       
-      {/* Regular creator profile content */}
-      {(!user || (user.user_type !== 'brand' && (user as any).userType !== 'brand')) && (
+      {/* Regular creator profile content (show for creators OR brands in readonly mode) */}
+      {(!user || (user.user_type !== 'brand' && (user as any).userType !== 'brand') || readonly) && (
         <>
           {/* Header */}
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12, paddingHorizontal: 16 }}>
-            <View style={{ width: 32 }} />
-            <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' }}>My Profile</Text>
-            <TouchableOpacity onPress={() => setShowAccountModal(true)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
-            </TouchableOpacity>
+            {readonly ? (
+              <TouchableOpacity onPress={() => navigation.navigate('BrandHome' as never)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="arrow-back" size={24} color="#1A1D1F" />
+              </TouchableOpacity>
+            ) : (
+              <View style={{ width: 32 }} />
+            )}
+            <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' }}>
+              {readonly ? 'Creator Profile' : 'My Profile'}
+            </Text>
+            {!readonly ? (
+              <TouchableOpacity onPress={() => setShowAccountModal(true)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
+              </TouchableOpacity>
+            ) : (
+              <View style={{ width: 32 }} />
+            )}
           </View>
           <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}>
             {/* Profile Card */}
@@ -252,7 +367,7 @@ const CreatorProfile = () => {
               <View style={styles.avatarRow}>
                 <View style={styles.avatarOuterWrapper}>
                   <View style={styles.avatarWrapper}>
-                    <Image source={{ uri: creatorProfile?.user?.profile_image_url || 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
+                    <Image source={{ uri: creatorProfile?.profile_image_url || creatorProfile?.user?.profile_image_url || 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
                   </View>
                   <TouchableOpacity style={styles.avatarEditBtn}>
                     <Ionicons name="pencil" size={12} color="#fff" />
@@ -263,12 +378,24 @@ const CreatorProfile = () => {
               {/* Info Card - left aligned below avatar */}
               <View style={styles.infoCard}>
                 <View style={styles.infoNameRow}>
-                  <Text style={[styles.infoName, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">{creatorProfile?.user?.name || 'Creator Name'}</Text>
+                  <Text style={[styles.infoName, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">{creatorProfile?.name || creatorProfile?.user?.name || 'Creator Name'}</Text>
                   <Ionicons name="chevron-forward" size={18} color="#1A1D1F" />
                 </View>
-                <View style={styles.infoRow}><Ionicons name="male" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.gender || 'Not specified'}{creatorProfile?.date_of_birth ? ' ' + (new Date().getFullYear() - new Date(creatorProfile.date_of_birth).getFullYear()) : ''}</Text></View>
+                <View style={styles.infoRow}>
+                  <Ionicons name="male" size={15} color="#B0B0B0" style={styles.infoIcon} />
+                  <Text style={styles.infoText}>{creatorProfile?.gender || 'Not specified'}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Ionicons name="calendar-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
+                  <Text style={styles.infoText}>
+                    {(() => {
+                      const age = calculateAge(creatorProfile?.date_of_birth);
+                      return age ? `${age} years old` : 'Age not specified';
+                    })()}
+                  </Text>
+                </View>
                 <View style={styles.infoRow}><Ionicons name="location-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.location_state ? `${creatorProfile.location_state}, ` : ''}{creatorProfile?.location_city || 'City'}{creatorProfile?.location_pincode ? ` ${creatorProfile.location_pincode}` : ''}</Text></View>
-                <View style={styles.infoRow}><Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.interests?.length ? creatorProfile.interests.join(', ') : 'Languages not specified'}</Text></View>
+                <View style={styles.infoRow}><Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.languages?.length ? creatorProfile.languages.join(', ') : 'Languages not specified'}</Text></View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                   <Ionicons name="star" size={15} color="#FFD600" style={{ marginRight: 4 }} />
                   {(!creatorProfile?.rating || isNaN(Number(creatorProfile.rating)) || Number(creatorProfile.rating) === 0) ? (
@@ -338,12 +465,14 @@ const CreatorProfile = () => {
               {activeTab === 'Packages' && (
                 creatorProfile?.packages?.length > 0 ? (
                   <View style={{ paddingTop: 16, flex: 1 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24, paddingHorizontal: 16 }}>
-                      <TouchableOpacity style={styles.addPortfolioBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
-                        <Ionicons name="add" size={20} color="#FF6B2C" />
-                        <Text style={styles.addPortfolioBtnText}>Create Package</Text>
-                      </TouchableOpacity>
-                    </View>
+                    {!readonly && (
+                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24, paddingHorizontal: 16 }}>
+                        <TouchableOpacity style={styles.addPortfolioBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
+                          <Ionicons name="add" size={20} color="#FF6B2C" />
+                          <Text style={styles.addPortfolioBtnText}>Create Package</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
                     
                     <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
                       {creatorProfile.packages.map((pkg: any, index: number) => (
@@ -353,6 +482,8 @@ const CreatorProfile = () => {
                           onEdit={handleEditPackage} 
                           onDelete={loadCreatorProfile} 
                           onShowOverlay={setShowDeleteOverlay}
+                          readonly={readonly}
+                          onAddToCart={readonly ? handleAddToCart : undefined}
                         />
                       ))}
                     </ScrollView>
@@ -362,10 +493,12 @@ const CreatorProfile = () => {
                     <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
                     <Text style={styles.emptyTitle}>There are no Packages has been created yet!</Text>
                     <Text style={styles.emptyDesc}>To enjoy the benefits and brands wants to give business you need to add your packages for all your social platforms.</Text>
-                    <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
-                      <Text style={styles.createPackageBtnText}>Create Package</Text>
-                      <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
-                    </TouchableOpacity>
+                    {!readonly && (
+                      <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
+                        <Text style={styles.createPackageBtnText}>Create Package</Text>
+                        <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )
               )}
@@ -374,10 +507,12 @@ const CreatorProfile = () => {
                   <View style={{ paddingTop: 16 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 16 }}>
                       <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F' }}>Portfolio Items</Text>
-                      <TouchableOpacity style={styles.addPortfolioBtn} onPress={openCreatePortfolio}>
-                        <Ionicons name="add" size={20} color="#FF6B2C" />
-                        <Text style={styles.addPortfolioBtnText}>Add Files</Text>
-                      </TouchableOpacity>
+                      {!readonly && (
+                        <TouchableOpacity style={styles.addPortfolioBtn} onPress={openCreatePortfolio}>
+                          <Ionicons name="add" size={20} color="#FF6B2C" />
+                          <Text style={styles.addPortfolioBtnText}>Add Files</Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                     
                     <View style={styles.portfolioGrid}>
@@ -414,7 +549,7 @@ const CreatorProfile = () => {
                       ))}
                       
                       {/* Show placeholder slots if only 1 item exists */}
-                      {creatorProfile.portfolio_items.length === 1 && (
+                      {creatorProfile.portfolio_items.length === 1 && !readonly && (
                         <>
                           {[1, 2, 3].map((index) => (
                             <TouchableOpacity 
@@ -437,10 +572,12 @@ const CreatorProfile = () => {
                     <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
                     <Text style={styles.emptyTitle}>There are no Portfolio files added yet!</Text>
                     <Text style={styles.emptyDesc}>To showcase your work, you need to add your portfolio files for all your social platforms.</Text>
-                    <TouchableOpacity style={styles.createPackageBtn} onPress={openCreatePortfolio}>
-                      <Text style={styles.createPackageBtnText}>Add Files</Text>
-                      <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
-                    </TouchableOpacity>
+                    {!readonly && (
+                      <TouchableOpacity style={styles.createPackageBtn} onPress={openCreatePortfolio}>
+                        <Text style={styles.createPackageBtnText}>Add Files</Text>
+                        <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )
               )}
@@ -541,14 +678,14 @@ const CreatorProfile = () => {
             onKycPress={handleKycPress}
             onPaymentsPress={handlePaymentsPress}
             user={{
-              name: creatorProfile?.user?.name || user?.name,
+                              name: creatorProfile?.name || creatorProfile?.user?.name || user?.name,
               email: user?.email,
-              profile_image_url: creatorProfile?.user?.profile_image_url || user?.profileImage,
+                              profile_image_url: creatorProfile?.profile_image_url || creatorProfile?.user?.profile_image_url || user?.profileImage,
               user_type: user?.user_type,
               role_in_organization: creatorProfile?.role_in_organization
             }}
           />
-          <BottomNavBar navigation={navigation} userType="creator" />
+          {!readonly && <BottomNavBar navigation={navigation} />}
         </>
       )}
     </SafeAreaView>

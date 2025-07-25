@@ -1,0 +1,30 @@
+{
+  "name": "mobile-ekyc-dependencies",
+  "version": "1.0.0",
+  "description": "Additional dependencies required for eKYC integration",
+  "dependencies": {
+    "expo-document-picker": "~13.1.6",
+    "expo-file-system": "~17.0.0",
+    "react-native-zip-archive": "^6.1.0",
+    "react-native-xml2js": "^1.0.3",
+    "react-native-fs": "^2.20.0"
+  },
+  "devDependencies": {
+    "@types/react-native-xml2js": "^1.0.0"
+  },
+  "scripts": {
+    "install-ekyc-deps": "npm install expo-document-picker expo-file-system react-native-zip-archive react-native-xml2js react-native-fs",
+    "install-ekyc-types": "npm install --save-dev @types/react-native-xml2js"
+  },
+  "notes": [
+    "These dependencies are required for eKYC integration:",
+    "- expo-document-picker: For selecting UIDAI zip files",
+    "- expo-file-system: For reading and processing files",
+    "- react-native-zip-archive: For extracting zip files",
+    "- react-native-xml2js: For parsing UIDAI XML data",
+    "- react-native-fs: For file system operations",
+    "",
+    "Install with: npm run install-ekyc-deps",
+    "Install types with: npm run install-ekyc-types"
+  ]
+} 

@@ -31,6 +31,7 @@ interface AuthState {
   error: string | null;
   isAuthenticated: boolean;
   user: User | null;
+  userType: 'creator' | 'brand' | null;
 }
 
 const initialState: AuthState = {
@@ -46,6 +47,7 @@ const initialState: AuthState = {
   error: null,
   isAuthenticated: false,
   user: null,
+  userType: null,
 };
 
 
@@ -69,6 +71,9 @@ const authSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    setUserType: (state, action: PayloadAction<'creator' | 'brand' | null>) => {
+      state.userType = action.payload;
+    },
     signupSuccess: (state, action: PayloadAction<User>) => {
       state.isLoading = false;
       state.error = null;
@@ -81,6 +86,8 @@ const authSlice = createSlice({
       state.error = null;
       state.isAuthenticated = true;
       state.user = action.payload;
+      // Sync userType from user object if available
+      state.userType = action.payload.user_type as 'creator' | 'brand' || null;
     },
     signupFailure: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
@@ -89,6 +96,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
+      state.userType = null;
       state.error = null;
     },
   },
@@ -100,6 +108,7 @@ export const {
   clearSignupForm,
   setLoading,
   setError,
+  setUserType,
   signupSuccess,
   loginSuccess,
   signupFailure,

@@ -103,7 +103,9 @@ model CreatorProfile {
   follower_count        BigInt?               @default(0)
   availability          String? // Full-time, Part-time, etc.
   collaboration_types   Json? // Store as JSON array
-  interests             Json? // Store as JSON array (languages, etc.)
+  languages             Json? // Store as JSON array (languages selected during preferences)
+  interests             Json? // Store as JSON array (other interests, etc.)
+  platform              Json? // Store as JSON array (platforms selected during preferences)
   campaign_applications CampaignApplication[]
   collaborations        Collaboration[]
   user                  User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)

@@ -17,14 +17,18 @@ const CATEGORIES = [
 
 const LANGUAGES = ['Hindi', 'English', 'Telugu'];
 
+const PLATFORMS = ['Instagram', 'YouTube', 'Facebook', 'TikTok', 'Twitter', 'LinkedIn', 'Snapchat'];
+
 export default function CreatorPreferencesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [about, setAbout] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
 
   // Category selection logic
   const toggleCategory = (cat: string) => {
@@ -48,6 +52,19 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
     setSelectedLanguages(selectedLanguages.filter(l => l !== lang));
   };
 
+  // Platform selection logic
+  const togglePlatform = (platform: string) => {
+    if (selectedPlatforms.includes(platform)) {
+      setSelectedPlatforms(selectedPlatforms.filter(p => p !== platform));
+    } else {
+      setSelectedPlatforms([...selectedPlatforms, platform]);
+    }
+  };
+
+  const removePlatform = (platform: string) => {
+    setSelectedPlatforms(selectedPlatforms.filter(p => p !== platform));
+  };
+
 
 
   // Save preferences to database
@@ -67,12 +84,18 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
       return;
     }
 
+    if (selectedPlatforms.length === 0) {
+      Alert.alert('Error', 'Please select at least one platform');
+      return;
+    }
+
     setLoading(true);
     try {
       await profileAPI.updatePreferences({
         categories: selectedCategories,
         about: about.trim(),
-        languages: selectedLanguages
+        languages: selectedLanguages,
+        platform: selectedPlatforms
       });
 
       console.log('✅ Preferences saved successfully!');
@@ -220,6 +243,62 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
             {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 && (
               <View style={styles.languageOption}>
                 <Text style={[styles.languageOptionText, { color: '#6B7280' }]}>All languages selected</Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Platforms */}
+        <Text style={styles.sectionTitle}>Platforms</Text>
+        <Text style={styles.sectionSubtitle}>
+          Select the platforms you create content on.
+        </Text>
+        <View style={styles.languageBox}>
+          <View style={styles.languageChips}>
+            {selectedPlatforms.map(platform => (
+              <TouchableOpacity
+                key={platform}
+                style={styles.languageChip}
+                onPress={() => removePlatform(platform)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.languageText}>{platform}</Text>
+                <Ionicons name="close" size={14} color="#6B7280" style={{ marginLeft: 4 }} />
+              </TouchableOpacity>
+            ))}
+          </View>
+          <TouchableOpacity 
+            style={[styles.languageDropdown, PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).length === 0 && { opacity: 0.5 }]}
+            onPress={() => setShowPlatformDropdown(!showPlatformDropdown)}
+            activeOpacity={0.7}
+            disabled={PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).length === 0}
+          >
+            <Text style={styles.dropdownText}>
+              {PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).length === 0 ? 'All Selected' : 'Add Platform'}
+            </Text>
+            <Ionicons name={showPlatformDropdown ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
+          </TouchableOpacity>
+        </View>
+        
+        {/* Platform Dropdown Options */}
+        {showPlatformDropdown && (
+          <View style={styles.languageOptionsBox}>
+            {PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).map(platform => (
+              <TouchableOpacity
+                key={platform}
+                style={styles.languageOption}
+                onPress={() => {
+                  togglePlatform(platform);
+                  setShowPlatformDropdown(false);
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.languageOptionText}>{platform}</Text>
+              </TouchableOpacity>
+            ))}
+            {PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).length === 0 && (
+              <View style={styles.languageOption}>
+                <Text style={[styles.languageOptionText, { color: '#6B7280' }]}>All platforms selected</Text>
               </View>
             )}
           </View>

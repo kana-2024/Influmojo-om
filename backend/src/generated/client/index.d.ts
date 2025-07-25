@@ -6889,7 +6889,9 @@ export namespace Prisma {
     follower_count: number
     availability: number
     collaboration_types: number
+    languages: number
     interests: number
+    platform: number
     _all: number
   }
 
@@ -6993,7 +6995,9 @@ export namespace Prisma {
     follower_count?: true
     availability?: true
     collaboration_types?: true
+    languages?: true
     interests?: true
+    platform?: true
     _all?: true
   }
 
@@ -7110,7 +7114,9 @@ export namespace Prisma {
     follower_count: bigint | null
     availability: string | null
     collaboration_types: JsonValue | null
+    languages: JsonValue | null
     interests: JsonValue | null
+    platform: JsonValue | null
     _count: CreatorProfileCountAggregateOutputType | null
     _avg: CreatorProfileAvgAggregateOutputType | null
     _sum: CreatorProfileSumAggregateOutputType | null
@@ -7159,7 +7165,9 @@ export namespace Prisma {
     follower_count?: boolean
     availability?: boolean
     collaboration_types?: boolean
+    languages?: boolean
     interests?: boolean
+    platform?: boolean
     campaign_applications?: boolean | CreatorProfile$campaign_applicationsArgs<ExtArgs>
     collaborations?: boolean | CreatorProfile$collaborationsArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7197,7 +7205,9 @@ export namespace Prisma {
     follower_count?: boolean
     availability?: boolean
     collaboration_types?: boolean
+    languages?: boolean
     interests?: boolean
+    platform?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["creatorProfile"]>
 
@@ -7228,7 +7238,9 @@ export namespace Prisma {
     follower_count?: boolean
     availability?: boolean
     collaboration_types?: boolean
+    languages?: boolean
     interests?: boolean
+    platform?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["creatorProfile"]>
 
@@ -7259,10 +7271,12 @@ export namespace Prisma {
     follower_count?: boolean
     availability?: boolean
     collaboration_types?: boolean
+    languages?: boolean
     interests?: boolean
+    platform?: boolean
   }
 
-  export type CreatorProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "email" | "bio" | "location_country" | "location_city" | "location_state" | "location_pincode" | "content_categories" | "min_rate" | "max_rate" | "rate_currency" | "availability_status" | "verified" | "featured" | "rating" | "total_collaborations" | "created_at" | "updated_at" | "average_response_time" | "date_of_birth" | "gender" | "social_platforms" | "follower_count" | "availability" | "collaboration_types" | "interests", ExtArgs["result"]["creatorProfile"]>
+  export type CreatorProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "email" | "bio" | "location_country" | "location_city" | "location_state" | "location_pincode" | "content_categories" | "min_rate" | "max_rate" | "rate_currency" | "availability_status" | "verified" | "featured" | "rating" | "total_collaborations" | "created_at" | "updated_at" | "average_response_time" | "date_of_birth" | "gender" | "social_platforms" | "follower_count" | "availability" | "collaboration_types" | "languages" | "interests" | "platform", ExtArgs["result"]["creatorProfile"]>
   export type CreatorProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     campaign_applications?: boolean | CreatorProfile$campaign_applicationsArgs<ExtArgs>
     collaborations?: boolean | CreatorProfile$collaborationsArgs<ExtArgs>
@@ -7318,7 +7332,9 @@ export namespace Prisma {
       follower_count: bigint | null
       availability: string | null
       collaboration_types: Prisma.JsonValue | null
+      languages: Prisma.JsonValue | null
       interests: Prisma.JsonValue | null
+      platform: Prisma.JsonValue | null
     }, ExtArgs["result"]["creatorProfile"]>
     composites: {}
   }
@@ -7775,7 +7791,9 @@ export namespace Prisma {
     readonly follower_count: FieldRef<"CreatorProfile", 'BigInt'>
     readonly availability: FieldRef<"CreatorProfile", 'String'>
     readonly collaboration_types: FieldRef<"CreatorProfile", 'Json'>
+    readonly languages: FieldRef<"CreatorProfile", 'Json'>
     readonly interests: FieldRef<"CreatorProfile", 'Json'>
+    readonly platform: FieldRef<"CreatorProfile", 'Json'>
   }
     
 
@@ -32517,7 +32535,9 @@ export namespace Prisma {
     follower_count: 'follower_count',
     availability: 'availability',
     collaboration_types: 'collaboration_types',
-    interests: 'interests'
+    languages: 'languages',
+    interests: 'interests',
+    platform: 'platform'
   };
 
   export type CreatorProfileScalarFieldEnum = (typeof CreatorProfileScalarFieldEnum)[keyof typeof CreatorProfileScalarFieldEnum]
@@ -33662,7 +33682,9 @@ export namespace Prisma {
     follower_count?: BigIntNullableFilter<"CreatorProfile"> | bigint | number | null
     availability?: StringNullableFilter<"CreatorProfile"> | string | null
     collaboration_types?: JsonNullableFilter<"CreatorProfile">
+    languages?: JsonNullableFilter<"CreatorProfile">
     interests?: JsonNullableFilter<"CreatorProfile">
+    platform?: JsonNullableFilter<"CreatorProfile">
     campaign_applications?: CampaignApplicationListRelationFilter
     collaborations?: CollaborationListRelationFilter
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -33699,7 +33721,9 @@ export namespace Prisma {
     follower_count?: SortOrderInput | SortOrder
     availability?: SortOrderInput | SortOrder
     collaboration_types?: SortOrderInput | SortOrder
+    languages?: SortOrderInput | SortOrder
     interests?: SortOrderInput | SortOrder
+    platform?: SortOrderInput | SortOrder
     campaign_applications?: CampaignApplicationOrderByRelationAggregateInput
     collaborations?: CollaborationOrderByRelationAggregateInput
     user?: UserOrderByWithRelationInput
@@ -33739,7 +33763,9 @@ export namespace Prisma {
     follower_count?: BigIntNullableFilter<"CreatorProfile"> | bigint | number | null
     availability?: StringNullableFilter<"CreatorProfile"> | string | null
     collaboration_types?: JsonNullableFilter<"CreatorProfile">
+    languages?: JsonNullableFilter<"CreatorProfile">
     interests?: JsonNullableFilter<"CreatorProfile">
+    platform?: JsonNullableFilter<"CreatorProfile">
     campaign_applications?: CampaignApplicationListRelationFilter
     collaborations?: CollaborationListRelationFilter
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -33776,7 +33802,9 @@ export namespace Prisma {
     follower_count?: SortOrderInput | SortOrder
     availability?: SortOrderInput | SortOrder
     collaboration_types?: SortOrderInput | SortOrder
+    languages?: SortOrderInput | SortOrder
     interests?: SortOrderInput | SortOrder
+    platform?: SortOrderInput | SortOrder
     _count?: CreatorProfileCountOrderByAggregateInput
     _avg?: CreatorProfileAvgOrderByAggregateInput
     _max?: CreatorProfileMaxOrderByAggregateInput
@@ -33814,7 +33842,9 @@ export namespace Prisma {
     follower_count?: BigIntNullableWithAggregatesFilter<"CreatorProfile"> | bigint | number | null
     availability?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
     collaboration_types?: JsonNullableWithAggregatesFilter<"CreatorProfile">
+    languages?: JsonNullableWithAggregatesFilter<"CreatorProfile">
     interests?: JsonNullableWithAggregatesFilter<"CreatorProfile">
+    platform?: JsonNullableWithAggregatesFilter<"CreatorProfile">
   }
 
   export type SocialMediaAccountWhereInput = {
@@ -36056,7 +36086,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -36093,7 +36125,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -36128,7 +36162,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -36165,7 +36201,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
@@ -36201,7 +36239,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CreatorProfileUpdateManyMutationInput = {
@@ -36230,7 +36270,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CreatorProfileUncheckedUpdateManyInput = {
@@ -36260,7 +36302,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type SocialMediaAccountCreateInput = {
@@ -38889,7 +38933,9 @@ export namespace Prisma {
     follower_count?: SortOrder
     availability?: SortOrder
     collaboration_types?: SortOrder
+    languages?: SortOrder
     interests?: SortOrder
+    platform?: SortOrder
   }
 
   export type CreatorProfileAvgOrderByAggregateInput = {
@@ -43757,7 +43803,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceCreateNestedManyWithoutCreatorInput
@@ -43792,7 +43840,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -44345,7 +44395,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
@@ -44380,7 +44432,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
@@ -45785,7 +45839,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -45821,7 +45877,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -45871,7 +45929,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -45907,7 +45967,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
@@ -46298,7 +46360,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
     invoices?: InvoiceCreateNestedManyWithoutCreatorInput
@@ -46334,7 +46398,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
@@ -46494,7 +46560,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
     invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
@@ -46530,7 +46598,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
@@ -46766,7 +46836,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
     invoices?: InvoiceCreateNestedManyWithoutCreatorInput
@@ -46802,7 +46874,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
@@ -47236,7 +47310,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
     invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
@@ -47272,7 +47348,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
@@ -48747,7 +48825,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -48783,7 +48863,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
@@ -48949,7 +49031,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -48985,7 +49069,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
@@ -50910,7 +50996,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -50946,7 +51034,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -51077,7 +51167,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -51113,7 +51205,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
@@ -51234,7 +51328,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -51270,7 +51366,9 @@ export namespace Prisma {
     follower_count?: bigint | number | null
     availability?: string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -51379,7 +51477,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -51415,7 +51515,9 @@ export namespace Prisma {
     follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     availability?: NullableStringFieldUpdateOperationsInput | string | null
     collaboration_types?: NullableJsonNullValueInput | InputJsonValue
+    languages?: NullableJsonNullValueInput | InputJsonValue
     interests?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput

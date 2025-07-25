@@ -1,14 +1,15 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAppSelector } from '../../store/hooks';
 
 interface BottomNavBarProps {
   navigation: any;
   currentRoute?: string;
-  userType?: 'creator' | 'brand';
 }
 
-const BottomNavBar = ({ navigation, currentRoute = 'home', userType = 'creator' }: BottomNavBarProps) => {
+const BottomNavBar = ({ navigation, currentRoute = 'home' }: BottomNavBarProps) => {
+  const userType = useAppSelector(state => state.auth.userType) || 'creator';
   const navItems = [
     { name: 'home', icon: 'home-outline', label: 'Home' },
     { name: 'insights', icon: 'analytics-outline', label: 'Insights' },
@@ -17,15 +18,36 @@ const BottomNavBar = ({ navigation, currentRoute = 'home', userType = 'creator' 
   ];
 
   const handleNavigation = (routeName: string) => {
-    if (routeName === 'profile') {
+    if (routeName === 'home') {
+      // Navigate to the appropriate home based on user type
+      if (userType === 'brand') {
+        navigation.navigate('BrandHome');
+      } else {
+        // For creators, navigate to their profile as the home
+        navigation.navigate('CreatorProfile');
+      }
+    } else if (routeName === 'profile') {
       // Navigate to the appropriate profile based on user type
       if (userType === 'brand') {
         navigation.navigate('BrandProfile');
       } else {
+        // For creators, profile is the same as home
         navigation.navigate('CreatorProfile');
       }
     } else {
-      navigation.navigate(routeName);
+      // For other routes (insights, orders), navigate normally
+      // Note: These screens might not exist yet, so we'll handle gracefully
+      try {
+        navigation.navigate(routeName);
+      } catch (error) {
+        console.log(`Navigation to ${routeName} not implemented yet`);
+        // Fallback to home
+        if (userType === 'brand') {
+          navigation.navigate('BrandHome');
+        } else {
+          navigation.navigate('CreatorProfile');
+        }
+      }
     }
   };
 
