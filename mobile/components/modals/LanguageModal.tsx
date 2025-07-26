@@ -2,59 +2,57 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface PlatformModalProps {
+interface LanguageModalProps {
   visible: boolean;
   onClose: () => void;
-  onApplyChanges: (selectedPlatforms: string[]) => void;
-  initialSelectedPlatforms?: string[];
+  onApplyChanges: (selectedLanguages: string[]) => void;
+  initialSelectedLanguages?: string[];
 }
 
-const PlatformModal: React.FC<PlatformModalProps> = ({
+const LanguageModal: React.FC<LanguageModalProps> = ({
   visible,
   onClose,
   onApplyChanges,
-  initialSelectedPlatforms = []
+  initialSelectedLanguages = []
 }) => {
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(initialSelectedPlatforms);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(initialSelectedLanguages);
 
-  const platforms = [
-    { id: 'instagram', name: 'Instagram', icon: 'logo-instagram', color: '#E4405F' },
-    { id: 'facebook', name: 'Facebook', icon: 'logo-facebook', color: '#1877F2' },
-    { id: 'twitter', name: 'Twitter', icon: 'logo-twitter', color: '#1DA1F2' },
-    { id: 'snapchat', name: 'Snapchat', icon: 'logo-snapchat', color: '#FFFC00' },
-    { id: 'youtube', name: 'Youtube', icon: 'logo-youtube', color: '#FF0000' },
+  const languages = [
+    { id: 'hindi', name: 'Hindi' },
+    { id: 'english', name: 'English' },
+    { id: 'marathi', name: 'Marathi' },
+    { id: 'telugu', name: 'Telugu' },
+    { id: 'kannada', name: 'Kannada' },
   ];
 
   useEffect(() => {
-    setSelectedPlatforms(initialSelectedPlatforms);
-  }, [initialSelectedPlatforms]);
+    setSelectedLanguages(initialSelectedLanguages);
+  }, [initialSelectedLanguages]);
 
-  const handlePlatformToggle = (platformId: string) => {
-    setSelectedPlatforms(prev => 
-      prev.includes(platformId)
-        ? prev.filter(id => id !== platformId)
-        : [...prev, platformId]
+  const handleLanguageToggle = (languageId: string) => {
+    setSelectedLanguages(prev => 
+      prev.includes(languageId)
+        ? prev.filter(id => id !== languageId)
+        : [...prev, languageId]
     );
   };
 
   const handleChooseAll = () => {
-    if (selectedPlatforms.length === platforms.length) {
-      setSelectedPlatforms([]);
+    if (selectedLanguages.length === languages.length) {
+      setSelectedLanguages([]);
     } else {
-      setSelectedPlatforms(platforms.map(p => p.id));
+      setSelectedLanguages(languages.map(l => l.id));
     }
   };
 
   const handleResetToDefaults = () => {
-    setSelectedPlatforms(['youtube']);
+    setSelectedLanguages(['kannada']);
   };
 
   const handleApplyChanges = () => {
-    onApplyChanges(selectedPlatforms);
+    onApplyChanges(selectedLanguages);
     onClose();
   };
-
-  const isAllSelected = selectedPlatforms.length === platforms.length;
 
   if (!visible) {
     return null;
@@ -67,42 +65,37 @@ const PlatformModal: React.FC<PlatformModalProps> = ({
       transparent={true}
       onRequestClose={onClose}
     >
-      <View style={styles.platformSheet}>
+      <View style={styles.languageSheet}>
         {/* Header */}
-        <View style={styles.platformHeader}>
-          <Text style={styles.platformTitle}>Sort by Platforms</Text>
+        <View style={styles.languageHeader}>
+          <Text style={styles.languageTitle}>Sort by Language</Text>
           <TouchableOpacity onPress={onClose}>
             <Ionicons name="close" size={24} color="#000" />
           </TouchableOpacity>
         </View>
         
-        <ScrollView style={styles.platformContent} showsVerticalScrollIndicator={false}>
-          {/* Select Social Platform Section */}
-          <View style={styles.platformSectionHeader}>
-            <Text style={styles.platformSectionTitle}>Select Social Platform</Text>
+        <ScrollView style={styles.languageContent} showsVerticalScrollIndicator={false}>
+          {/* Select Language Section */}
+          <View style={styles.languageSectionHeader}>
+            <Text style={styles.languageSectionTitle}>Select Language</Text>
             <TouchableOpacity onPress={handleChooseAll}>
               <Text style={styles.chooseAllText}>Choose All</Text>
             </TouchableOpacity>
           </View>
           
-          {/* Platforms List */}
-          {platforms.map((platform) => (
+          {/* Languages List */}
+          {languages.map((language) => (
             <TouchableOpacity
-              key={platform.id}
-              style={styles.platformRow}
-              onPress={() => handlePlatformToggle(platform.id)}
+              key={language.id}
+              style={styles.languageRow}
+              onPress={() => handleLanguageToggle(language.id)}
             >
-              <View style={styles.platformInfo}>
-                <View style={[styles.platformIcon, { backgroundColor: platform.color }]}>
-                  <Ionicons name={platform.icon as any} size={20} color="#fff" />
-                </View>
-                <Text style={styles.platformName}>{platform.name}</Text>
-              </View>
+              <Text style={styles.languageName}>{language.name}</Text>
               <View style={[
                 styles.checkbox,
-                selectedPlatforms.includes(platform.id) && styles.checkboxSelected
+                selectedLanguages.includes(language.id) && styles.checkboxSelected
               ]}>
-                {selectedPlatforms.includes(platform.id) && (
+                {selectedLanguages.includes(language.id) && (
                   <Ionicons name="checkmark" size={16} color="#fff" />
                 )}
               </View>
@@ -125,7 +118,7 @@ const PlatformModal: React.FC<PlatformModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  platformSheet: {
+  languageSheet: {
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -139,27 +132,27 @@ const styles = StyleSheet.create({
     maxHeight: '80%',
     zIndex: 1000,
   },
-  platformHeader: {
+  languageHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 24,
   },
-  platformTitle: {
+  languageTitle: {
     fontSize: 20,
     fontWeight: '600',
     color: '#000',
   },
-  platformContent: {
+  languageContent: {
     flex: 1,
   },
-  platformSectionHeader: {
+  languageSectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
   },
-  platformSectionTitle: {
+  languageSectionTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000',
@@ -169,7 +162,7 @@ const styles = StyleSheet.create({
     color: '#FD5D27',
     fontWeight: '500',
   },
-  platformRow: {
+  languageRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -177,20 +170,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
   },
-  platformInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  platformIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  platformName: {
+  languageName: {
     fontSize: 16,
     color: '#1F2937',
     fontWeight: '500',
@@ -241,4 +221,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PlatformModal; 
+export default LanguageModal; 

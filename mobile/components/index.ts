@@ -13,6 +13,11 @@ export { default as FilterModal } from './modals/FilterModal';
 export { default as CategoryModal } from './modals/CategoryModal';
 export { default as FollowerRangeModal } from './modals/FollowerRangeModal';
 export { default as PlatformModal } from './modals/PlatformModal';
+export { default as LanguageModal } from './modals/LanguageModal';
+export { default as ResponseTimeModal } from './modals/ResponseTimeModal';
+export { default as GenderAgeModal } from './modals/GenderAgeModal';
+export { default as RatingModal } from './modals/RatingModal';
+export { default as RegionModal } from './modals/RegionModal';
 
 // UI Components
 export { default as AnimatedModalOverlay } from './AnimatedModalOverlay';

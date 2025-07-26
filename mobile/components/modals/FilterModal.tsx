@@ -4,6 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 import CategoryModal from './CategoryModal';
 import FollowerRangeModal from './FollowerRangeModal';
 import PlatformModal from './PlatformModal';
+import LanguageModal from './LanguageModal';
+import ResponseTimeModal from './ResponseTimeModal';
+import GenderAgeModal from './GenderAgeModal';
+import RatingModal from './RatingModal';
+import RegionModal from './RegionModal';
 
 interface FilterModalProps {
   visible: boolean;
@@ -17,6 +22,18 @@ interface FilterModalProps {
   followerRange?: { min: number; max: number };
   onPlatformChange?: (platforms: string[]) => void;
   selectedPlatforms?: string[];
+  onLanguageChange?: (languages: string[]) => void;
+  selectedLanguages?: string[];
+  onResponseTimeChange?: (responseTime: string) => void;
+  selectedResponseTime?: string;
+  onGenderAgeChange?: (gender: string, ageRange: { min: number; max: number }) => void;
+  selectedGender?: string;
+  selectedAgeRange?: { min: number; max: number };
+  onRatingChange?: (selectedRating: number) => void;
+  selectedRating?: number;
+  onRegionChange?: (states: string[], cities: string[]) => void;
+  selectedStates?: string[];
+  selectedCities?: string[];
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({
@@ -30,11 +47,28 @@ const FilterModal: React.FC<FilterModalProps> = ({
   onFollowerRangeChange,
   followerRange = { min: 5000, max: 800000 },
   onPlatformChange,
-  selectedPlatforms = []
+  selectedPlatforms = [],
+  onLanguageChange,
+  selectedLanguages = [],
+  onResponseTimeChange,
+  selectedResponseTime = '1-2',
+  onGenderAgeChange,
+  selectedGender = 'male',
+  selectedAgeRange = { min: 18, max: 40 },
+  onRatingChange,
+  selectedRating = 3,
+  onRegionChange,
+  selectedStates = [],
+  selectedCities = []
 }) => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showFollowerRangeModal, setShowFollowerRangeModal] = useState(false);
   const [showPlatformModal, setShowPlatformModal] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showResponseTimeModal, setShowResponseTimeModal] = useState(false);
+  const [showGenderAgeModal, setShowGenderAgeModal] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [showRegionModal, setShowRegionModal] = useState(false);
 
   const filterOptions = [
     { 
@@ -50,16 +84,33 @@ const FilterModal: React.FC<FilterModalProps> = ({
     { 
       title: 'Platforms', 
       subtitle: selectedPlatforms.length > 0 ? `${selectedPlatforms.length} selected` : 'All Platforms',
-      onPress: () => {
-        console.log('Platforms option clicked, setting showPlatformModal to true');
-        setShowPlatformModal(true);
-      }
+      onPress: () => setShowPlatformModal(true)
     },
-    { title: 'Gender & Age Group', subtitle: 'Select age and gender', onPress: () => console.log('Gender & Age Group clicked') },
-    { title: 'Response Time', subtitle: 'Quick responder', onPress: () => console.log('Response Time clicked') },
-    { title: 'Language', subtitle: 'Select language', onPress: () => console.log('Language clicked') },
-    { title: 'Region', subtitle: 'Select state and city', onPress: () => console.log('Region clicked') },
-    { title: 'Feedback Rating', subtitle: 'Select rating range', onPress: () => console.log('Feedback Rating clicked') },
+    { 
+      title: 'Gender & Age Group', 
+      subtitle: `${selectedGender.charAt(0).toUpperCase() + selectedGender.slice(1)}, ${selectedAgeRange.min}-${selectedAgeRange.max}+`,
+      onPress: () => setShowGenderAgeModal(true)
+    },
+    { 
+      title: 'Response Time', 
+      subtitle: selectedResponseTime === '1-2' ? 'Quick responder' : `Response in ${selectedResponseTime} Hrs`,
+      onPress: () => setShowResponseTimeModal(true)
+    },
+    { 
+      title: 'Language', 
+      subtitle: selectedLanguages.length > 0 ? `${selectedLanguages.length} selected` : 'Select language',
+      onPress: () => setShowLanguageModal(true)
+    },
+    { 
+      title: 'Region', 
+      subtitle: selectedStates.length > 0 ? `${selectedStates.length} states selected` : 'Select state and city',
+      onPress: () => setShowRegionModal(true)
+    },
+    { 
+      title: 'Feedback Rating', 
+      subtitle: `${selectedRating} stars`,
+      onPress: () => setShowRatingModal(true)
+    },
   ];
 
   const handleCategoryApply = (categories: string[]) => {
@@ -77,7 +128,32 @@ const FilterModal: React.FC<FilterModalProps> = ({
     setShowPlatformModal(false);
   };
 
-  console.log('FilterModal render - visible:', visible, 'showPlatformModal:', showPlatformModal);
+  const handleLanguageApply = (languages: string[]) => {
+    onLanguageChange?.(languages);
+    setShowLanguageModal(false);
+  };
+
+  const handleResponseTimeApply = (responseTime: string) => {
+    onResponseTimeChange?.(responseTime);
+    setShowResponseTimeModal(false);
+  };
+
+  const handleGenderAgeApply = (gender: string, ageRange: { min: number; max: number }) => {
+    onGenderAgeChange?.(gender, ageRange);
+    setShowGenderAgeModal(false);
+  };
+
+  const handleRatingApply = (selectedRating: number) => {
+    onRatingChange?.(selectedRating);
+    setShowRatingModal(false);
+  };
+
+  const handleRegionApply = (states: string[], cities: string[]) => {
+    onRegionChange?.(states, cities);
+    setShowRegionModal(false);
+  };
+
+
   
   return (
     <>
@@ -105,10 +181,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
               <View key={option.title}>
                 <TouchableOpacity 
                   style={styles.filterOptionRow}
-                  onPress={() => {
-                    console.log('Filter option clicked:', option.title);
-                    option.onPress?.();
-                  }}
+                  activeOpacity={0.7}
+                  onPress={option.onPress}
                 >
                   <View style={styles.filterOptionContent}>
                     <Text style={styles.filterOptionTitle}>{option.title}</Text>
@@ -152,17 +226,53 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
       {/* Platform Modal */}
       <PlatformModal
-        visible={true} // Temporarily always visible for testing
-        onClose={() => {
-          console.log('Platform modal closing');
-          setShowPlatformModal(false);
-        }}
+        visible={showPlatformModal}
+        onClose={() => setShowPlatformModal(false)}
         onApplyChanges={handlePlatformApply}
         initialSelectedPlatforms={selectedPlatforms}
       />
-      
-      {/* Debug: Show platform modal state */}
-      {console.log('FilterModal - showPlatformModal state:', showPlatformModal)}
+
+      {/* Language Modal */}
+      <LanguageModal
+        visible={showLanguageModal}
+        onClose={() => setShowLanguageModal(false)}
+        onApplyChanges={handleLanguageApply}
+        initialSelectedLanguages={selectedLanguages}
+      />
+
+      {/* Response Time Modal */}
+      <ResponseTimeModal
+        visible={showResponseTimeModal}
+        onClose={() => setShowResponseTimeModal(false)}
+        onApplyChanges={handleResponseTimeApply}
+        initialSelectedResponseTime={selectedResponseTime}
+      />
+
+      {/* Gender & Age Modal */}
+      <GenderAgeModal
+        visible={showGenderAgeModal}
+        onClose={() => setShowGenderAgeModal(false)}
+        onApplyChanges={handleGenderAgeApply}
+        initialGender={selectedGender}
+        initialAgeRange={selectedAgeRange}
+      />
+
+      {/* Rating Modal */}
+      <RatingModal
+        visible={showRatingModal}
+        onClose={() => setShowRatingModal(false)}
+        onApplyChanges={handleRatingApply}
+        initialSelectedRating={selectedRating}
+      />
+
+      {/* Region Modal */}
+      <RegionModal
+        visible={showRegionModal}
+        onClose={() => setShowRegionModal(false)}
+        onApplyChanges={handleRegionApply}
+        initialSelectedStates={selectedStates}
+        initialSelectedCities={selectedCities}
+      />
     </>
   );
 };
