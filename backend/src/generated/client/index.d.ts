@@ -6797,7 +6797,6 @@ export namespace Prisma {
     max_rate: Decimal | null
     rating: Decimal | null
     total_collaborations: number | null
-    follower_count: number | null
   }
 
   export type CreatorProfileSumAggregateOutputType = {
@@ -6807,15 +6806,12 @@ export namespace Prisma {
     max_rate: Decimal | null
     rating: Decimal | null
     total_collaborations: number | null
-    follower_count: bigint | null
   }
 
   export type CreatorProfileMinAggregateOutputType = {
     id: bigint | null
     user_id: bigint | null
-    email: string | null
     bio: string | null
-    location_country: string | null
     location_city: string | null
     location_state: string | null
     location_pincode: string | null
@@ -6829,19 +6825,14 @@ export namespace Prisma {
     total_collaborations: number | null
     created_at: Date | null
     updated_at: Date | null
-    average_response_time: string | null
     date_of_birth: Date | null
     gender: string | null
-    follower_count: bigint | null
-    availability: string | null
   }
 
   export type CreatorProfileMaxAggregateOutputType = {
     id: bigint | null
     user_id: bigint | null
-    email: string | null
     bio: string | null
-    location_country: string | null
     location_city: string | null
     location_state: string | null
     location_pincode: string | null
@@ -6855,19 +6846,14 @@ export namespace Prisma {
     total_collaborations: number | null
     created_at: Date | null
     updated_at: Date | null
-    average_response_time: string | null
     date_of_birth: Date | null
     gender: string | null
-    follower_count: bigint | null
-    availability: string | null
   }
 
   export type CreatorProfileCountAggregateOutputType = {
     id: number
     user_id: number
-    email: number
     bio: number
-    location_country: number
     location_city: number
     location_state: number
     location_pincode: number
@@ -6882,16 +6868,11 @@ export namespace Prisma {
     total_collaborations: number
     created_at: number
     updated_at: number
-    average_response_time: number
     date_of_birth: number
     gender: number
-    social_platforms: number
-    follower_count: number
-    availability: number
-    collaboration_types: number
     languages: number
-    interests: number
     platform: number
+    packages: number
     _all: number
   }
 
@@ -6903,7 +6884,6 @@ export namespace Prisma {
     max_rate?: true
     rating?: true
     total_collaborations?: true
-    follower_count?: true
   }
 
   export type CreatorProfileSumAggregateInputType = {
@@ -6913,15 +6893,12 @@ export namespace Prisma {
     max_rate?: true
     rating?: true
     total_collaborations?: true
-    follower_count?: true
   }
 
   export type CreatorProfileMinAggregateInputType = {
     id?: true
     user_id?: true
-    email?: true
     bio?: true
-    location_country?: true
     location_city?: true
     location_state?: true
     location_pincode?: true
@@ -6935,19 +6912,14 @@ export namespace Prisma {
     total_collaborations?: true
     created_at?: true
     updated_at?: true
-    average_response_time?: true
     date_of_birth?: true
     gender?: true
-    follower_count?: true
-    availability?: true
   }
 
   export type CreatorProfileMaxAggregateInputType = {
     id?: true
     user_id?: true
-    email?: true
     bio?: true
-    location_country?: true
     location_city?: true
     location_state?: true
     location_pincode?: true
@@ -6961,19 +6933,14 @@ export namespace Prisma {
     total_collaborations?: true
     created_at?: true
     updated_at?: true
-    average_response_time?: true
     date_of_birth?: true
     gender?: true
-    follower_count?: true
-    availability?: true
   }
 
   export type CreatorProfileCountAggregateInputType = {
     id?: true
     user_id?: true
-    email?: true
     bio?: true
-    location_country?: true
     location_city?: true
     location_state?: true
     location_pincode?: true
@@ -6988,16 +6955,11 @@ export namespace Prisma {
     total_collaborations?: true
     created_at?: true
     updated_at?: true
-    average_response_time?: true
     date_of_birth?: true
     gender?: true
-    social_platforms?: true
-    follower_count?: true
-    availability?: true
-    collaboration_types?: true
     languages?: true
-    interests?: true
     platform?: true
+    packages?: true
     _all?: true
   }
 
@@ -7090,9 +7052,7 @@ export namespace Prisma {
   export type CreatorProfileGroupByOutputType = {
     id: bigint
     user_id: bigint
-    email: string | null
     bio: string | null
-    location_country: string | null
     location_city: string | null
     location_state: string | null
     location_pincode: string | null
@@ -7107,16 +7067,11 @@ export namespace Prisma {
     total_collaborations: number
     created_at: Date
     updated_at: Date
-    average_response_time: string | null
     date_of_birth: Date | null
     gender: string | null
-    social_platforms: JsonValue | null
-    follower_count: bigint | null
-    availability: string | null
-    collaboration_types: JsonValue | null
     languages: JsonValue | null
-    interests: JsonValue | null
     platform: JsonValue | null
+    packages: JsonValue | null
     _count: CreatorProfileCountAggregateOutputType | null
     _avg: CreatorProfileAvgAggregateOutputType | null
     _sum: CreatorProfileSumAggregateOutputType | null
@@ -7141,9 +7096,7 @@ export namespace Prisma {
   export type CreatorProfileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     user_id?: boolean
-    email?: boolean
     bio?: boolean
-    location_country?: boolean
     location_city?: boolean
     location_state?: boolean
     location_pincode?: boolean
@@ -7158,16 +7111,11 @@ export namespace Prisma {
     total_collaborations?: boolean
     created_at?: boolean
     updated_at?: boolean
-    average_response_time?: boolean
     date_of_birth?: boolean
     gender?: boolean
-    social_platforms?: boolean
-    follower_count?: boolean
-    availability?: boolean
-    collaboration_types?: boolean
     languages?: boolean
-    interests?: boolean
     platform?: boolean
+    packages?: boolean
     campaign_applications?: boolean | CreatorProfile$campaign_applicationsArgs<ExtArgs>
     collaborations?: boolean | CreatorProfile$collaborationsArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7181,9 +7129,7 @@ export namespace Prisma {
   export type CreatorProfileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     user_id?: boolean
-    email?: boolean
     bio?: boolean
-    location_country?: boolean
     location_city?: boolean
     location_state?: boolean
     location_pincode?: boolean
@@ -7198,25 +7144,18 @@ export namespace Prisma {
     total_collaborations?: boolean
     created_at?: boolean
     updated_at?: boolean
-    average_response_time?: boolean
     date_of_birth?: boolean
     gender?: boolean
-    social_platforms?: boolean
-    follower_count?: boolean
-    availability?: boolean
-    collaboration_types?: boolean
     languages?: boolean
-    interests?: boolean
     platform?: boolean
+    packages?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["creatorProfile"]>
 
   export type CreatorProfileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     user_id?: boolean
-    email?: boolean
     bio?: boolean
-    location_country?: boolean
     location_city?: boolean
     location_state?: boolean
     location_pincode?: boolean
@@ -7231,25 +7170,18 @@ export namespace Prisma {
     total_collaborations?: boolean
     created_at?: boolean
     updated_at?: boolean
-    average_response_time?: boolean
     date_of_birth?: boolean
     gender?: boolean
-    social_platforms?: boolean
-    follower_count?: boolean
-    availability?: boolean
-    collaboration_types?: boolean
     languages?: boolean
-    interests?: boolean
     platform?: boolean
+    packages?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["creatorProfile"]>
 
   export type CreatorProfileSelectScalar = {
     id?: boolean
     user_id?: boolean
-    email?: boolean
     bio?: boolean
-    location_country?: boolean
     location_city?: boolean
     location_state?: boolean
     location_pincode?: boolean
@@ -7264,19 +7196,14 @@ export namespace Prisma {
     total_collaborations?: boolean
     created_at?: boolean
     updated_at?: boolean
-    average_response_time?: boolean
     date_of_birth?: boolean
     gender?: boolean
-    social_platforms?: boolean
-    follower_count?: boolean
-    availability?: boolean
-    collaboration_types?: boolean
     languages?: boolean
-    interests?: boolean
     platform?: boolean
+    packages?: boolean
   }
 
-  export type CreatorProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "email" | "bio" | "location_country" | "location_city" | "location_state" | "location_pincode" | "content_categories" | "min_rate" | "max_rate" | "rate_currency" | "availability_status" | "verified" | "featured" | "rating" | "total_collaborations" | "created_at" | "updated_at" | "average_response_time" | "date_of_birth" | "gender" | "social_platforms" | "follower_count" | "availability" | "collaboration_types" | "languages" | "interests" | "platform", ExtArgs["result"]["creatorProfile"]>
+  export type CreatorProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "bio" | "location_city" | "location_state" | "location_pincode" | "content_categories" | "min_rate" | "max_rate" | "rate_currency" | "availability_status" | "verified" | "featured" | "rating" | "total_collaborations" | "created_at" | "updated_at" | "date_of_birth" | "gender" | "languages" | "platform" | "packages", ExtArgs["result"]["creatorProfile"]>
   export type CreatorProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     campaign_applications?: boolean | CreatorProfile$campaign_applicationsArgs<ExtArgs>
     collaborations?: boolean | CreatorProfile$collaborationsArgs<ExtArgs>
@@ -7308,9 +7235,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
       user_id: bigint
-      email: string | null
       bio: string | null
-      location_country: string | null
       location_city: string | null
       location_state: string | null
       location_pincode: string | null
@@ -7325,16 +7250,11 @@ export namespace Prisma {
       total_collaborations: number
       created_at: Date
       updated_at: Date
-      average_response_time: string | null
       date_of_birth: Date | null
       gender: string | null
-      social_platforms: Prisma.JsonValue | null
-      follower_count: bigint | null
-      availability: string | null
-      collaboration_types: Prisma.JsonValue | null
       languages: Prisma.JsonValue | null
-      interests: Prisma.JsonValue | null
       platform: Prisma.JsonValue | null
+      packages: Prisma.JsonValue | null
     }, ExtArgs["result"]["creatorProfile"]>
     composites: {}
   }
@@ -7767,9 +7687,7 @@ export namespace Prisma {
   interface CreatorProfileFieldRefs {
     readonly id: FieldRef<"CreatorProfile", 'BigInt'>
     readonly user_id: FieldRef<"CreatorProfile", 'BigInt'>
-    readonly email: FieldRef<"CreatorProfile", 'String'>
     readonly bio: FieldRef<"CreatorProfile", 'String'>
-    readonly location_country: FieldRef<"CreatorProfile", 'String'>
     readonly location_city: FieldRef<"CreatorProfile", 'String'>
     readonly location_state: FieldRef<"CreatorProfile", 'String'>
     readonly location_pincode: FieldRef<"CreatorProfile", 'String'>
@@ -7784,16 +7702,11 @@ export namespace Prisma {
     readonly total_collaborations: FieldRef<"CreatorProfile", 'Int'>
     readonly created_at: FieldRef<"CreatorProfile", 'DateTime'>
     readonly updated_at: FieldRef<"CreatorProfile", 'DateTime'>
-    readonly average_response_time: FieldRef<"CreatorProfile", 'String'>
     readonly date_of_birth: FieldRef<"CreatorProfile", 'DateTime'>
     readonly gender: FieldRef<"CreatorProfile", 'String'>
-    readonly social_platforms: FieldRef<"CreatorProfile", 'Json'>
-    readonly follower_count: FieldRef<"CreatorProfile", 'BigInt'>
-    readonly availability: FieldRef<"CreatorProfile", 'String'>
-    readonly collaboration_types: FieldRef<"CreatorProfile", 'Json'>
     readonly languages: FieldRef<"CreatorProfile", 'Json'>
-    readonly interests: FieldRef<"CreatorProfile", 'Json'>
     readonly platform: FieldRef<"CreatorProfile", 'Json'>
+    readonly packages: FieldRef<"CreatorProfile", 'Json'>
   }
     
 
@@ -32511,9 +32424,7 @@ export namespace Prisma {
   export const CreatorProfileScalarFieldEnum: {
     id: 'id',
     user_id: 'user_id',
-    email: 'email',
     bio: 'bio',
-    location_country: 'location_country',
     location_city: 'location_city',
     location_state: 'location_state',
     location_pincode: 'location_pincode',
@@ -32528,16 +32439,11 @@ export namespace Prisma {
     total_collaborations: 'total_collaborations',
     created_at: 'created_at',
     updated_at: 'updated_at',
-    average_response_time: 'average_response_time',
     date_of_birth: 'date_of_birth',
     gender: 'gender',
-    social_platforms: 'social_platforms',
-    follower_count: 'follower_count',
-    availability: 'availability',
-    collaboration_types: 'collaboration_types',
     languages: 'languages',
-    interests: 'interests',
-    platform: 'platform'
+    platform: 'platform',
+    packages: 'packages'
   };
 
   export type CreatorProfileScalarFieldEnum = (typeof CreatorProfileScalarFieldEnum)[keyof typeof CreatorProfileScalarFieldEnum]
@@ -33658,9 +33564,7 @@ export namespace Prisma {
     NOT?: CreatorProfileWhereInput | CreatorProfileWhereInput[]
     id?: BigIntFilter<"CreatorProfile"> | bigint | number
     user_id?: BigIntFilter<"CreatorProfile"> | bigint | number
-    email?: StringNullableFilter<"CreatorProfile"> | string | null
     bio?: StringNullableFilter<"CreatorProfile"> | string | null
-    location_country?: StringNullableFilter<"CreatorProfile"> | string | null
     location_city?: StringNullableFilter<"CreatorProfile"> | string | null
     location_state?: StringNullableFilter<"CreatorProfile"> | string | null
     location_pincode?: StringNullableFilter<"CreatorProfile"> | string | null
@@ -33675,16 +33579,11 @@ export namespace Prisma {
     total_collaborations?: IntFilter<"CreatorProfile"> | number
     created_at?: DateTimeFilter<"CreatorProfile"> | Date | string
     updated_at?: DateTimeFilter<"CreatorProfile"> | Date | string
-    average_response_time?: StringNullableFilter<"CreatorProfile"> | string | null
     date_of_birth?: DateTimeNullableFilter<"CreatorProfile"> | Date | string | null
     gender?: StringNullableFilter<"CreatorProfile"> | string | null
-    social_platforms?: JsonNullableFilter<"CreatorProfile">
-    follower_count?: BigIntNullableFilter<"CreatorProfile"> | bigint | number | null
-    availability?: StringNullableFilter<"CreatorProfile"> | string | null
-    collaboration_types?: JsonNullableFilter<"CreatorProfile">
     languages?: JsonNullableFilter<"CreatorProfile">
-    interests?: JsonNullableFilter<"CreatorProfile">
     platform?: JsonNullableFilter<"CreatorProfile">
+    packages?: JsonNullableFilter<"CreatorProfile">
     campaign_applications?: CampaignApplicationListRelationFilter
     collaborations?: CollaborationListRelationFilter
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -33697,9 +33596,7 @@ export namespace Prisma {
   export type CreatorProfileOrderByWithRelationInput = {
     id?: SortOrder
     user_id?: SortOrder
-    email?: SortOrderInput | SortOrder
     bio?: SortOrderInput | SortOrder
-    location_country?: SortOrderInput | SortOrder
     location_city?: SortOrderInput | SortOrder
     location_state?: SortOrderInput | SortOrder
     location_pincode?: SortOrderInput | SortOrder
@@ -33714,16 +33611,11 @@ export namespace Prisma {
     total_collaborations?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
-    average_response_time?: SortOrderInput | SortOrder
     date_of_birth?: SortOrderInput | SortOrder
     gender?: SortOrderInput | SortOrder
-    social_platforms?: SortOrderInput | SortOrder
-    follower_count?: SortOrderInput | SortOrder
-    availability?: SortOrderInput | SortOrder
-    collaboration_types?: SortOrderInput | SortOrder
     languages?: SortOrderInput | SortOrder
-    interests?: SortOrderInput | SortOrder
     platform?: SortOrderInput | SortOrder
+    packages?: SortOrderInput | SortOrder
     campaign_applications?: CampaignApplicationOrderByRelationAggregateInput
     collaborations?: CollaborationOrderByRelationAggregateInput
     user?: UserOrderByWithRelationInput
@@ -33739,9 +33631,7 @@ export namespace Prisma {
     AND?: CreatorProfileWhereInput | CreatorProfileWhereInput[]
     OR?: CreatorProfileWhereInput[]
     NOT?: CreatorProfileWhereInput | CreatorProfileWhereInput[]
-    email?: StringNullableFilter<"CreatorProfile"> | string | null
     bio?: StringNullableFilter<"CreatorProfile"> | string | null
-    location_country?: StringNullableFilter<"CreatorProfile"> | string | null
     location_city?: StringNullableFilter<"CreatorProfile"> | string | null
     location_state?: StringNullableFilter<"CreatorProfile"> | string | null
     location_pincode?: StringNullableFilter<"CreatorProfile"> | string | null
@@ -33756,16 +33646,11 @@ export namespace Prisma {
     total_collaborations?: IntFilter<"CreatorProfile"> | number
     created_at?: DateTimeFilter<"CreatorProfile"> | Date | string
     updated_at?: DateTimeFilter<"CreatorProfile"> | Date | string
-    average_response_time?: StringNullableFilter<"CreatorProfile"> | string | null
     date_of_birth?: DateTimeNullableFilter<"CreatorProfile"> | Date | string | null
     gender?: StringNullableFilter<"CreatorProfile"> | string | null
-    social_platforms?: JsonNullableFilter<"CreatorProfile">
-    follower_count?: BigIntNullableFilter<"CreatorProfile"> | bigint | number | null
-    availability?: StringNullableFilter<"CreatorProfile"> | string | null
-    collaboration_types?: JsonNullableFilter<"CreatorProfile">
     languages?: JsonNullableFilter<"CreatorProfile">
-    interests?: JsonNullableFilter<"CreatorProfile">
     platform?: JsonNullableFilter<"CreatorProfile">
+    packages?: JsonNullableFilter<"CreatorProfile">
     campaign_applications?: CampaignApplicationListRelationFilter
     collaborations?: CollaborationListRelationFilter
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -33778,9 +33663,7 @@ export namespace Prisma {
   export type CreatorProfileOrderByWithAggregationInput = {
     id?: SortOrder
     user_id?: SortOrder
-    email?: SortOrderInput | SortOrder
     bio?: SortOrderInput | SortOrder
-    location_country?: SortOrderInput | SortOrder
     location_city?: SortOrderInput | SortOrder
     location_state?: SortOrderInput | SortOrder
     location_pincode?: SortOrderInput | SortOrder
@@ -33795,16 +33678,11 @@ export namespace Prisma {
     total_collaborations?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
-    average_response_time?: SortOrderInput | SortOrder
     date_of_birth?: SortOrderInput | SortOrder
     gender?: SortOrderInput | SortOrder
-    social_platforms?: SortOrderInput | SortOrder
-    follower_count?: SortOrderInput | SortOrder
-    availability?: SortOrderInput | SortOrder
-    collaboration_types?: SortOrderInput | SortOrder
     languages?: SortOrderInput | SortOrder
-    interests?: SortOrderInput | SortOrder
     platform?: SortOrderInput | SortOrder
+    packages?: SortOrderInput | SortOrder
     _count?: CreatorProfileCountOrderByAggregateInput
     _avg?: CreatorProfileAvgOrderByAggregateInput
     _max?: CreatorProfileMaxOrderByAggregateInput
@@ -33818,9 +33696,7 @@ export namespace Prisma {
     NOT?: CreatorProfileScalarWhereWithAggregatesInput | CreatorProfileScalarWhereWithAggregatesInput[]
     id?: BigIntWithAggregatesFilter<"CreatorProfile"> | bigint | number
     user_id?: BigIntWithAggregatesFilter<"CreatorProfile"> | bigint | number
-    email?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
     bio?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
-    location_country?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
     location_city?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
     location_state?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
     location_pincode?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
@@ -33835,16 +33711,11 @@ export namespace Prisma {
     total_collaborations?: IntWithAggregatesFilter<"CreatorProfile"> | number
     created_at?: DateTimeWithAggregatesFilter<"CreatorProfile"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"CreatorProfile"> | Date | string
-    average_response_time?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
     date_of_birth?: DateTimeNullableWithAggregatesFilter<"CreatorProfile"> | Date | string | null
     gender?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
-    social_platforms?: JsonNullableWithAggregatesFilter<"CreatorProfile">
-    follower_count?: BigIntNullableWithAggregatesFilter<"CreatorProfile"> | bigint | number | null
-    availability?: StringNullableWithAggregatesFilter<"CreatorProfile"> | string | null
-    collaboration_types?: JsonNullableWithAggregatesFilter<"CreatorProfile">
     languages?: JsonNullableWithAggregatesFilter<"CreatorProfile">
-    interests?: JsonNullableWithAggregatesFilter<"CreatorProfile">
     platform?: JsonNullableWithAggregatesFilter<"CreatorProfile">
+    packages?: JsonNullableWithAggregatesFilter<"CreatorProfile">
   }
 
   export type SocialMediaAccountWhereInput = {
@@ -36062,9 +35933,7 @@ export namespace Prisma {
 
   export type CreatorProfileCreateInput = {
     id?: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -36079,16 +35948,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -36101,9 +35965,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedCreateInput = {
     id?: bigint | number
     user_id: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -36118,16 +35980,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -36138,9 +35995,7 @@ export namespace Prisma {
 
   export type CreatorProfileUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36155,16 +36010,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -36177,9 +36027,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36194,16 +36042,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
@@ -36215,9 +36058,7 @@ export namespace Prisma {
   export type CreatorProfileCreateManyInput = {
     id?: bigint | number
     user_id: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -36232,23 +36073,16 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CreatorProfileUpdateManyMutationInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36263,24 +36097,17 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CreatorProfileUncheckedUpdateManyInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36295,16 +36122,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type SocialMediaAccountCreateInput = {
@@ -38870,17 +38692,6 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type BigIntNullableFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
-  }
-
   export type CampaignApplicationListRelationFilter = {
     every?: CampaignApplicationWhereInput
     some?: CampaignApplicationWhereInput
@@ -38909,9 +38720,7 @@ export namespace Prisma {
   export type CreatorProfileCountOrderByAggregateInput = {
     id?: SortOrder
     user_id?: SortOrder
-    email?: SortOrder
     bio?: SortOrder
-    location_country?: SortOrder
     location_city?: SortOrder
     location_state?: SortOrder
     location_pincode?: SortOrder
@@ -38926,16 +38735,11 @@ export namespace Prisma {
     total_collaborations?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
-    average_response_time?: SortOrder
     date_of_birth?: SortOrder
     gender?: SortOrder
-    social_platforms?: SortOrder
-    follower_count?: SortOrder
-    availability?: SortOrder
-    collaboration_types?: SortOrder
     languages?: SortOrder
-    interests?: SortOrder
     platform?: SortOrder
+    packages?: SortOrder
   }
 
   export type CreatorProfileAvgOrderByAggregateInput = {
@@ -38945,15 +38749,12 @@ export namespace Prisma {
     max_rate?: SortOrder
     rating?: SortOrder
     total_collaborations?: SortOrder
-    follower_count?: SortOrder
   }
 
   export type CreatorProfileMaxOrderByAggregateInput = {
     id?: SortOrder
     user_id?: SortOrder
-    email?: SortOrder
     bio?: SortOrder
-    location_country?: SortOrder
     location_city?: SortOrder
     location_state?: SortOrder
     location_pincode?: SortOrder
@@ -38967,19 +38768,14 @@ export namespace Prisma {
     total_collaborations?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
-    average_response_time?: SortOrder
     date_of_birth?: SortOrder
     gender?: SortOrder
-    follower_count?: SortOrder
-    availability?: SortOrder
   }
 
   export type CreatorProfileMinOrderByAggregateInput = {
     id?: SortOrder
     user_id?: SortOrder
-    email?: SortOrder
     bio?: SortOrder
-    location_country?: SortOrder
     location_city?: SortOrder
     location_state?: SortOrder
     location_pincode?: SortOrder
@@ -38993,11 +38789,8 @@ export namespace Prisma {
     total_collaborations?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
-    average_response_time?: SortOrder
     date_of_birth?: SortOrder
     gender?: SortOrder
-    follower_count?: SortOrder
-    availability?: SortOrder
   }
 
   export type CreatorProfileSumOrderByAggregateInput = {
@@ -39007,7 +38800,6 @@ export namespace Prisma {
     max_rate?: SortOrder
     rating?: SortOrder
     total_collaborations?: SortOrder
-    follower_count?: SortOrder
   }
 
   export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -39050,22 +38842,6 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedBigIntNullableFilter<$PrismaModel>
-    _min?: NestedBigIntNullableFilter<$PrismaModel>
-    _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
   export type EnumSocialPlatformFilter<$PrismaModel = never> = {
@@ -39187,6 +38963,17 @@ export namespace Prisma {
     not?: NestedEnumCampaignTypeFilter<$PrismaModel> | $Enums.CampaignType
   }
 
+  export type BigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
+  }
+
   export type EnumCampaignStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.CampaignStatus | EnumCampaignStatusFieldRefInput<$PrismaModel>
     in?: $Enums.CampaignStatus[] | ListEnumCampaignStatusFieldRefInput<$PrismaModel>
@@ -39304,6 +39091,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumCampaignTypeFilter<$PrismaModel>
     _max?: NestedEnumCampaignTypeFilter<$PrismaModel>
+  }
+
+  export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
   export type EnumCampaignStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -41557,14 +41360,6 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type NullableBigIntFieldUpdateOperationsInput = {
-    set?: bigint | number | null
-    increment?: bigint | number
-    decrement?: bigint | number
-    multiply?: bigint | number
-    divide?: bigint | number
-  }
-
   export type CampaignApplicationUpdateManyWithoutCreatorNestedInput = {
     create?: XOR<CampaignApplicationCreateWithoutCreatorInput, CampaignApplicationUncheckedCreateWithoutCreatorInput> | CampaignApplicationCreateWithoutCreatorInput[] | CampaignApplicationUncheckedCreateWithoutCreatorInput[]
     connectOrCreate?: CampaignApplicationCreateOrConnectWithoutCreatorInput | CampaignApplicationCreateOrConnectWithoutCreatorInput[]
@@ -41809,6 +41604,14 @@ export namespace Prisma {
 
   export type EnumCampaignTypeFieldUpdateOperationsInput = {
     set?: $Enums.CampaignType
+  }
+
+  export type NullableBigIntFieldUpdateOperationsInput = {
+    set?: bigint | number | null
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
   }
 
   export type EnumCampaignStatusFieldUpdateOperationsInput = {
@@ -43213,17 +43016,6 @@ export namespace Prisma {
     not?: NestedEnumAvailabilityStatusNullableFilter<$PrismaModel> | $Enums.AvailabilityStatus | null
   }
 
-  export type NestedBigIntNullableFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
-  }
-
   export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
@@ -43264,22 +43056,6 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedBigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedBigIntNullableFilter<$PrismaModel>
-    _min?: NestedBigIntNullableFilter<$PrismaModel>
-    _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumSocialPlatformFilter<$PrismaModel = never> = {
@@ -43333,6 +43109,17 @@ export namespace Prisma {
     not?: NestedEnumCampaignTypeFilter<$PrismaModel> | $Enums.CampaignType
   }
 
+  export type NestedBigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
+  }
+
   export type NestedEnumCampaignStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.CampaignStatus | EnumCampaignStatusFieldRefInput<$PrismaModel>
     in?: $Enums.CampaignStatus[] | ListEnumCampaignStatusFieldRefInput<$PrismaModel>
@@ -43348,6 +43135,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumCampaignTypeFilter<$PrismaModel>
     _max?: NestedEnumCampaignTypeFilter<$PrismaModel>
+  }
+
+  export type NestedBigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumCampaignStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -43779,9 +43582,7 @@ export namespace Prisma {
 
   export type CreatorProfileCreateWithoutUserInput = {
     id?: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -43796,16 +43597,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceCreateNestedManyWithoutCreatorInput
@@ -43816,9 +43612,7 @@ export namespace Prisma {
 
   export type CreatorProfileUncheckedCreateWithoutUserInput = {
     id?: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -43833,16 +43627,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -44371,9 +44160,7 @@ export namespace Prisma {
 
   export type CreatorProfileUpdateWithoutUserInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44388,16 +44175,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
@@ -44408,9 +44190,7 @@ export namespace Prisma {
 
   export type CreatorProfileUncheckedUpdateWithoutUserInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44425,16 +44205,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
@@ -45815,9 +45590,7 @@ export namespace Prisma {
 
   export type CreatorProfileCreateWithoutSocial_media_accountsInput = {
     id?: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -45832,16 +45605,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -45853,9 +45621,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedCreateWithoutSocial_media_accountsInput = {
     id?: bigint | number
     user_id: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -45870,16 +45636,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -45905,9 +45666,7 @@ export namespace Prisma {
 
   export type CreatorProfileUpdateWithoutSocial_media_accountsInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45922,16 +45681,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -45943,9 +45697,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedUpdateWithoutSocial_media_accountsInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45960,16 +45712,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
@@ -46336,9 +46083,7 @@ export namespace Prisma {
 
   export type CreatorProfileCreateWithoutCampaign_applicationsInput = {
     id?: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -46353,16 +46098,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
     invoices?: InvoiceCreateNestedManyWithoutCreatorInput
@@ -46374,9 +46114,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedCreateWithoutCampaign_applicationsInput = {
     id?: bigint | number
     user_id: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -46391,16 +46129,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
@@ -46536,9 +46269,7 @@ export namespace Prisma {
 
   export type CreatorProfileUpdateWithoutCampaign_applicationsInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46553,16 +46284,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
     invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
@@ -46574,9 +46300,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedUpdateWithoutCampaign_applicationsInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46591,16 +46315,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
@@ -46812,9 +46531,7 @@ export namespace Prisma {
 
   export type CreatorProfileCreateWithoutCollaborationsInput = {
     id?: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -46829,16 +46546,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
     invoices?: InvoiceCreateNestedManyWithoutCreatorInput
@@ -46850,9 +46562,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedCreateWithoutCollaborationsInput = {
     id?: bigint | number
     user_id: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -46867,16 +46577,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
@@ -47286,9 +46991,7 @@ export namespace Prisma {
 
   export type CreatorProfileUpdateWithoutCollaborationsInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47303,16 +47006,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
     invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
@@ -47324,9 +47022,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedUpdateWithoutCollaborationsInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47341,16 +47037,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
@@ -48801,9 +48492,7 @@ export namespace Prisma {
 
   export type CreatorProfileCreateWithoutInvoicesInput = {
     id?: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -48818,16 +48507,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -48839,9 +48523,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedCreateWithoutInvoicesInput = {
     id?: bigint | number
     user_id: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -48856,16 +48538,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
@@ -49007,9 +48684,7 @@ export namespace Prisma {
 
   export type CreatorProfileUpdateWithoutInvoicesInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49024,16 +48699,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -49045,9 +48715,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedUpdateWithoutInvoicesInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49062,16 +48730,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
@@ -50972,9 +50635,7 @@ export namespace Prisma {
 
   export type CreatorProfileCreateWithoutKycInput = {
     id?: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -50989,16 +50650,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -51010,9 +50666,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedCreateWithoutKycInput = {
     id?: bigint | number
     user_id: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -51027,16 +50681,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -51143,9 +50792,7 @@ export namespace Prisma {
 
   export type CreatorProfileUpdateWithoutKycInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51160,16 +50807,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -51181,9 +50823,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedUpdateWithoutKycInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51198,16 +50838,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
@@ -51304,9 +50939,7 @@ export namespace Prisma {
 
   export type CreatorProfileCreateWithoutPortfolio_itemsInput = {
     id?: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -51321,16 +50954,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
     user: UserCreateNestedOneWithoutCreator_profilesInput
@@ -51342,9 +50970,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedCreateWithoutPortfolio_itemsInput = {
     id?: bigint | number
     user_id: bigint | number
-    email?: string | null
     bio?: string | null
-    location_country?: string | null
     location_city?: string | null
     location_state?: string | null
     location_pincode?: string | null
@@ -51359,16 +50985,11 @@ export namespace Prisma {
     total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    average_response_time?: string | null
     date_of_birth?: Date | string | null
     gender?: string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: bigint | number | null
-    availability?: string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
@@ -51453,9 +51074,7 @@ export namespace Prisma {
 
   export type CreatorProfileUpdateWithoutPortfolio_itemsInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51470,16 +51089,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
     user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
@@ -51491,9 +51105,7 @@ export namespace Prisma {
   export type CreatorProfileUncheckedUpdateWithoutPortfolio_itemsInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     user_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
-    location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51508,16 +51120,11 @@ export namespace Prisma {
     total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    average_response_time?: NullableStringFieldUpdateOperationsInput | string | null
     date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
-    social_platforms?: NullableJsonNullValueInput | InputJsonValue
-    follower_count?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    availability?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration_types?: NullableJsonNullValueInput | InputJsonValue
     languages?: NullableJsonNullValueInput | InputJsonValue
-    interests?: NullableJsonNullValueInput | InputJsonValue
     platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
     campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput

@@ -171,9 +171,7 @@ exports.Prisma.BrandProfileScalarFieldEnum = {
 exports.Prisma.CreatorProfileScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
-  email: 'email',
   bio: 'bio',
-  location_country: 'location_country',
   location_city: 'location_city',
   location_state: 'location_state',
   location_pincode: 'location_pincode',
@@ -188,16 +186,11 @@ exports.Prisma.CreatorProfileScalarFieldEnum = {
   total_collaborations: 'total_collaborations',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  average_response_time: 'average_response_time',
   date_of_birth: 'date_of_birth',
   gender: 'gender',
-  social_platforms: 'social_platforms',
-  follower_count: 'follower_count',
-  availability: 'availability',
-  collaboration_types: 'collaboration_types',
   languages: 'languages',
-  interests: 'interests',
-  platform: 'platform'
+  platform: 'platform',
+  packages: 'packages'
 };
 
 exports.Prisma.SocialMediaAccountScalarFieldEnum = {

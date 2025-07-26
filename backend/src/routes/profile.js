@@ -138,7 +138,11 @@ router.post('/update-basic-info', [
     // Parse date of birth
     let dateOfBirth;
     try {
+      console.log('🔍 Debug: Received dob from frontend:', dob);
+      console.log('🔍 Debug: dob type:', typeof dob);
       dateOfBirth = new Date(dob);
+      console.log('🔍 Debug: Parsed dateOfBirth:', dateOfBirth);
+      console.log('🔍 Debug: dateOfBirth is valid:', !isNaN(dateOfBirth.getTime()));
       if (isNaN(dateOfBirth.getTime())) {
         return res.status(400).json({ 
           error: 'Invalid date format',
@@ -146,6 +150,7 @@ router.post('/update-basic-info', [
         });
       }
     } catch (error) {
+      console.error('🔍 Debug: Date parsing error:', error);
       return res.status(400).json({ 
         error: 'Invalid date format',
         message: 'Please provide a valid date of birth' 
@@ -208,6 +213,11 @@ router.post('/update-basic-info', [
 
     // Create or update profile based on user type
     if (user.user_type === 'creator') {
+      console.log('🔍 Debug: Creating/updating creator profile');
+      console.log('🔍 Debug: dateOfBirth to save:', dateOfBirth);
+      console.log('🔍 Debug: gender to save:', gender);
+      console.log('🔍 Debug: city to save:', city);
+      
       // Create or update creator profile
       const creatorProfile = await prisma.creatorProfile.upsert({
         where: { user_id: userId },
@@ -223,6 +233,11 @@ router.post('/update-basic-info', [
           location_city: city
         }
       });
+
+      console.log('🔍 Debug: Creator profile saved successfully');
+      console.log('🔍 Debug: Saved date_of_birth:', creatorProfile.date_of_birth);
+      console.log('🔍 Debug: Saved gender:', creatorProfile.gender);
+      console.log('🔍 Debug: Saved location_city:', creatorProfile.location_city);
 
       // Convert BigInt to string for JSON serialization
       const serializedProfile = {
@@ -342,6 +357,8 @@ router.post('/update-preferences', [
     }
 
     console.log('User type:', user.user_type);
+    console.log('🔍 Debug: dateOfBirth in update preferences:', dateOfBirth);
+    console.log('🔍 Debug: dateOfBirth type:', typeof dateOfBirth);
 
     // Additional validation for brand users
     if (user.user_type === 'brand') {
@@ -354,6 +371,10 @@ router.post('/update-preferences', [
     }
 
     if (user.user_type === 'creator') {
+      console.log('🔍 Debug: Creating/updating creator profile in update preferences');
+      console.log('🔍 Debug: dateOfBirth for update:', dateOfBirth);
+      console.log('🔍 Debug: Will update date_of_birth:', !!dateOfBirth);
+      
       // Create or update creator profile
       const creatorProfile = await prisma.creatorProfile.upsert({
         where: { user_id: userId },
@@ -362,7 +383,8 @@ router.post('/update-preferences', [
           bio: about,
           languages: languages,
           platform: platform || null,
-          date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
+          // Only update date_of_birth if it's provided in the request
+          ...(dateOfBirth && { date_of_birth: new Date(dateOfBirth) })
         },
         create: {
           user_id: userId,
@@ -370,9 +392,13 @@ router.post('/update-preferences', [
           bio: about,
           languages: languages,
           platform: platform || null,
-          date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
+          // Only set date_of_birth if it's provided in the request
+          ...(dateOfBirth && { date_of_birth: new Date(dateOfBirth) })
         }
       });
+
+      console.log('🔍 Debug: Creator profile updated successfully');
+      console.log('🔍 Debug: Final date_of_birth in profile:', creatorProfile.date_of_birth);
 
       // Update user onboarding step
       await prisma.user.update({
@@ -527,10 +553,12 @@ router.post('/create-package', [
       });
     }
 
-    // Store package data in the creator profile's interests field as JSON
-    const existingPackages = creatorProfile.interests?.packages || [];
+    // Get existing packages
+    const existingPackages = creatorProfile.packages || [];
+    
+    // Create new package
     const newPackage = {
-      id: Date.now().toString(), // Temporary ID
+      id: Date.now().toString(),
       platform: platform.toUpperCase(),
       content_type: contentType,
       quantity: parseInt(quantity),
@@ -538,22 +566,19 @@ router.post('/create-package', [
       duration1: duration1,
       duration2: duration2,
       price: parseFloat(price),
-      currency: 'INR',
+      currency: "INR",
       title: `${platform} ${contentType}`,
-      description: description || '',
+      description: description || "",
       created_at: new Date().toISOString()
     };
     
     const updatedPackages = [...existingPackages, newPackage];
     
-    // Update creator profile with new package in interests field
+    // Update creator profile with new package in packages field
     await prisma.creatorProfile.update({
       where: { id: creatorProfile.id },
       data: {
-        interests: {
-          ...creatorProfile.interests,
-          packages: updatedPackages
-        }
+        packages: updatedPackages
       }
     });
     
@@ -634,7 +659,7 @@ router.put('/update-package', [
     }
 
     // Get existing packages
-    const existingPackages = creatorProfile.interests?.packages || [];
+    const existingPackages = creatorProfile.packages || [];
     
     // Find and update the specific package
     const packageIndex = existingPackages.findIndex(pkg => pkg.id === id);
@@ -663,10 +688,7 @@ router.put('/update-package', [
     await prisma.creatorProfile.update({
       where: { id: creatorProfile.id },
       data: {
-        interests: {
-          ...creatorProfile.interests,
-          packages: existingPackages
-        }
+        packages: existingPackages
       }
     });
 
@@ -721,7 +743,7 @@ router.delete('/delete-package/:packageId', authenticateToken, async (req, res) 
     }
 
     // Get existing packages
-    const existingPackages = creatorProfile.interests?.packages || [];
+    const existingPackages = creatorProfile.packages || [];
 
     // Find the package to delete
     const packageIndex = existingPackages.findIndex(pkg => pkg.id === packageId);
@@ -737,10 +759,7 @@ router.delete('/delete-package/:packageId', authenticateToken, async (req, res) 
     await prisma.creatorProfile.update({
       where: { user_id: userId },
       data: {
-        interests: {
-          ...creatorProfile.interests,
-          packages: existingPackages
-        }
+        packages: existingPackages
       }
     });
 
@@ -1092,6 +1111,10 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
     console.log('🔍 Creator profile packages stringified:', JSON.stringify(user.creator_profiles?.interests?.packages));
     console.log('🔍 Creator profile gender:', user.creator_profiles?.gender);
     console.log('🔍 Creator profile date_of_birth:', user.creator_profiles?.date_of_birth);
+    console.log('🔍 Creator profile languages field:', user.creator_profiles?.languages);
+    console.log('🔍 Creator profile content_categories field:', user.creator_profiles?.content_categories);
+    console.log('🔍 Creator profile platform field:', user.creator_profiles?.platform);
+    console.log('🔍 Creator profile packages field:', user.creator_profiles?.packages);
     
     // Convert BigInt values to strings for JSON serialization
     const serializedProfile = {
@@ -1106,6 +1129,63 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
       created_at: user.creator_profiles?.created_at?.toISOString() || null,
       updated_at: user.creator_profiles?.updated_at?.toISOString() || null,
       date_of_birth: user.creator_profiles?.date_of_birth?.toISOString() || null,
+      // Handle JSON fields properly
+      languages: (() => {
+        const languages = user.creator_profiles?.languages;
+        if (!languages) return [];
+        if (Array.isArray(languages)) return languages;
+        if (typeof languages === 'string') {
+          try {
+            return JSON.parse(languages);
+          } catch (e) {
+            console.warn('Failed to parse languages:', e);
+            return [];
+          }
+        }
+        return [];
+      })(),
+      content_categories: (() => {
+        const categories = user.creator_profiles?.content_categories;
+        if (!categories) return [];
+        if (Array.isArray(categories)) return categories;
+        if (typeof categories === 'string') {
+          try {
+            return JSON.parse(categories);
+          } catch (e) {
+            console.warn('Failed to parse content_categories:', e);
+            return [];
+          }
+        }
+        return [];
+      })(),
+      platform: (() => {
+        const platform = user.creator_profiles?.platform;
+        if (!platform) return [];
+        if (Array.isArray(platform)) return platform;
+        if (typeof platform === 'string') {
+          try {
+            return JSON.parse(platform);
+          } catch (e) {
+            console.warn('Failed to parse platform:', e);
+            return [];
+          }
+        }
+        return [];
+      })(),
+      packages: (() => {
+        const packages = user.creator_profiles?.packages;
+        if (!packages) return [];
+        if (Array.isArray(packages)) return packages;
+        if (typeof packages === 'string') {
+          try {
+            return JSON.parse(packages);
+          } catch (e) {
+            console.warn('Failed to parse packages:', e);
+            return [];
+          }
+        }
+        return [];
+      })(),
       kyc: user.creator_profiles?.kyc ? {
         ...user.creator_profiles.kyc,
         id: user.creator_profiles.kyc.id.toString(),
@@ -1131,34 +1211,6 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
         created_at: account.created_at?.toISOString() || null,
         updated_at: account.updated_at?.toISOString() || null
       })) || [],
-      // Handle packages from interests
-      packages: (() => {
-        const interests = user.creator_profiles?.interests;
-        if (!interests) return [];
-        if (Array.isArray(interests.packages)) return interests.packages;
-        if (typeof interests.packages === 'string') {
-          try {
-            return JSON.parse(interests.packages);
-          } catch (e) {
-            console.warn('Failed to parse packages from interests:', e);
-            return [];
-          }
-        }
-        return [];
-      })(),
-      // Handle languages from interests
-      languages: (() => {
-        const interests = user.creator_profiles?.interests;
-        if (!interests) return [];
-        // Extract language values from interests object (excluding packages)
-        const languages = [];
-        for (const [key, value] of Object.entries(interests)) {
-          if (key !== 'packages' && typeof value === 'string') {
-            languages.push(value);
-          }
-        }
-        return languages;
-      })(),
       user: {
         id: user.id.toString(),
         name: user.name,
@@ -1709,12 +1761,13 @@ router.get('/creators/:platform/:id', authenticateToken, async (req, res) => {
     }
 
     console.log(`✅ Found creator: ${creator.user.name}`);
-    console.log('🔍 Creator interests:', creator.interests);
-    console.log('🔍 Creator packages from interests:', creator.interests?.packages);
-    console.log('🔍 Creator packages type:', typeof creator.interests?.packages);
-    console.log('🔍 Creator packages length:', creator.interests?.packages?.length);
+    console.log('🔍 Creator packages field:', creator.packages);
+    console.log('🔍 Creator packages type:', typeof creator.packages);
+    console.log('🔍 Creator packages length:', creator.packages?.length);
     console.log('🔍 Creator gender:', creator.gender);
     console.log('🔍 Creator date_of_birth:', creator.date_of_birth);
+    console.log('🔍 Creator languages field:', creator.languages);
+    console.log('🔍 Creator content_categories field:', creator.content_categories);
 
     // Serialize the data
     const serializedCreator = {
@@ -1726,15 +1779,53 @@ router.get('/creators/:platform/:id', authenticateToken, async (req, res) => {
       phone: creator.user.phone,
       bio: creator.bio,
       gender: creator.gender,
-      date_of_birth: creator.date_of_birth,
+      date_of_birth: creator.date_of_birth?.toISOString() || null,
       location_city: creator.location_city,
       location_state: creator.location_state,
-      content_categories: creator.content_categories,
-      languages: creator.languages || (creator.interests ? Object.values(creator.interests).filter(val => typeof val === 'string') : []) || [],
-      platform: creator.platform,
+      content_categories: (() => {
+        const categories = creator.content_categories;
+        if (!categories) return [];
+        if (Array.isArray(categories)) return categories;
+        if (typeof categories === 'string') {
+          try {
+            return JSON.parse(categories);
+          } catch (e) {
+            console.warn('Failed to parse content_categories:', e);
+            return [];
+          }
+        }
+        return [];
+      })(),
+      languages: (() => {
+        const languages = creator.languages;
+        if (!languages) return [];
+        if (Array.isArray(languages)) return languages;
+        if (typeof languages === 'string') {
+          try {
+            return JSON.parse(languages);
+          } catch (e) {
+            console.warn('Failed to parse languages:', e);
+            return [];
+          }
+        }
+        return [];
+      })(),
+      platform: (() => {
+        const platform = creator.platform;
+        if (!platform) return [];
+        if (Array.isArray(platform)) return platform;
+        if (typeof platform === 'string') {
+          try {
+            return JSON.parse(platform);
+          } catch (e) {
+            console.warn('Failed to parse platform:', e);
+            return [];
+          }
+        }
+        return [];
+      })(),
       rating: creator.rating?.toString(),
       total_collaborations: creator.total_collaborations?.toString(),
-      average_response_time: creator.average_response_time,
       verified: creator.verified,
       featured: creator.featured,
       social_media_accounts: creator.social_media_accounts.map(account => ({
@@ -1756,7 +1847,20 @@ router.get('/creators/:platform/:id', authenticateToken, async (req, res) => {
         tags: item.tags,
         is_featured: item.is_featured
       })),
-      packages: Array.isArray(creator.interests?.packages) ? creator.interests.packages : (typeof creator.interests?.packages === 'string' ? JSON.parse(creator.interests.packages) : []) || []
+      packages: (() => {
+        const packages = creator.packages;
+        if (!packages) return [];
+        if (Array.isArray(packages)) return packages;
+        if (typeof packages === 'string') {
+          try {
+            return JSON.parse(packages);
+          } catch (e) {
+            console.warn('Failed to parse packages:', e);
+            return [];
+          }
+        }
+        return [];
+      })()
     };
 
     res.json({

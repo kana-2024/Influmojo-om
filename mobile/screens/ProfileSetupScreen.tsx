@@ -194,6 +194,10 @@ export default function ProfileSetupScreen({ navigation }: any) {
 
       if (__DEV__) {
         console.log('Sending basic info data:', requestData);
+        console.log('🔍 Debug: selectedDate:', selectedDate);
+        console.log('🔍 Debug: dob format:', selectedDate.toISOString().split('T')[0]);
+        console.log('🔍 Debug: gender:', gender);
+        console.log('🔍 Debug: city:', city.trim());
       }
       await apiService.profileAPI.updateBasicInfo(requestData);
 

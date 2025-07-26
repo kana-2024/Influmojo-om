@@ -165,6 +165,13 @@ const CreatorProfile = () => {
         console.log('🔍 Packages from API:', profile.packages);
         console.log('🔍 Gender from API:', profile.gender);
         console.log('🔍 Date of birth from API:', profile.date_of_birth);
+        console.log('🔍 Languages from API:', profile.languages);
+        console.log('🔍 Languages type:', typeof profile.languages);
+        console.log('🔍 Languages is array:', Array.isArray(profile.languages));
+        console.log('🔍 Content categories from API:', profile.content_categories);
+        console.log('🔍 Content categories type:', typeof profile.content_categories);
+        console.log('🔍 Content categories is array:', Array.isArray(profile.content_categories));
+        
         const profileData = {
           ...profile,
           languages: safeParseArray(profile.languages),
@@ -178,6 +185,10 @@ const CreatorProfile = () => {
         console.log('🔍 Packages in state:', profileData.packages);
         console.log('🔍 Gender in state:', profileData.gender);
         console.log('🔍 Date of birth in state:', profileData.date_of_birth);
+        console.log('🔍 Languages in state:', profileData.languages);
+        console.log('🔍 Languages in state type:', typeof profileData.languages);
+        console.log('🔍 Languages in state is array:', Array.isArray(profileData.languages));
+        console.log('🔍 Content categories in state:', profileData.content_categories);
         setCreatorProfile(profileData);
       } else {
         console.error('❌ Creator profile failed:', response.error);
@@ -435,13 +446,26 @@ const CreatorProfile = () => {
                       <Ionicons name="calendar-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
                       <Text style={styles.infoText}>
                         {(() => {
+                          console.log('🔍 Debug: Calculating age for date_of_birth:', creatorProfile?.date_of_birth);
                           const age = calculateAge(creatorProfile?.date_of_birth);
+                          console.log('🔍 Debug: Calculated age:', age);
                           return age ? `${age} years old` : 'Age not specified';
                         })()}
                       </Text>
                     </View>
                     <View style={styles.infoRow}><Ionicons name="location-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.location_state ? `${creatorProfile.location_state}, ` : ''}{creatorProfile?.location_city || 'City'}{creatorProfile?.location_pincode ? ` ${creatorProfile.location_pincode}` : ''}</Text></View>
-                    <View style={styles.infoRow}><Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.languages && Array.isArray(creatorProfile.languages) && creatorProfile.languages.length > 0 ? creatorProfile.languages.join(', ') : 'Languages not specified'}</Text></View>
+                    <View style={styles.infoRow}>
+                      <Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
+                      <Text style={styles.infoText}>
+                        {(() => {
+                          console.log('🔍 Debug: Languages in render:', creatorProfile?.languages);
+                          console.log('🔍 Debug: Languages type in render:', typeof creatorProfile?.languages);
+                          console.log('🔍 Debug: Languages is array in render:', Array.isArray(creatorProfile?.languages));
+                          console.log('🔍 Debug: Languages length in render:', creatorProfile?.languages?.length);
+                          return creatorProfile?.languages && Array.isArray(creatorProfile.languages) && creatorProfile.languages.length > 0 ? creatorProfile.languages.join(', ') : 'Languages not specified';
+                        })()}
+                      </Text>
+                    </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                       <Ionicons name="star" size={15} color="#FFD600" style={{ marginRight: 4 }} />
                       {(!creatorProfile?.rating || isNaN(Number(creatorProfile.rating)) || Number(creatorProfile.rating) === 0) ? (
