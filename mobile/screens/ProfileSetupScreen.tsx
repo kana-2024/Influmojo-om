@@ -161,6 +161,11 @@ export default function ProfileSetupScreen({ navigation }: any) {
       return;
     }
     
+    if (!selectedDate) {
+      Alert.alert('Error', 'Please select your date of birth');
+      return;
+    }
+    
     if (!city.trim()) {
       Alert.alert('Error', 'Please enter your city');
       return;
@@ -170,7 +175,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
     try {
       const requestData: any = {
         gender,
-        dob: selectedDate ? selectedDate.toISOString().split('T')[0] : dob.trim(),
+        dob: selectedDate.toISOString().split('T')[0],
         city: city.trim()
       };
 

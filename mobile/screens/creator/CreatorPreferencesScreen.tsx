@@ -5,6 +5,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { profileAPI } from '../../services/apiService';
+import { CheckboxItem, SelectionModal } from '../../components';
 
 const CATEGORIES = [
   'Gaming', 'Travel', 'Food', 'Education', 'Pet', 'Beauty',
@@ -26,9 +27,9 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showPlatformModal, setShowPlatformModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-  const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
 
   // Category selection logic
   const toggleCategory = (cat: string) => {
@@ -48,10 +49,6 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
     }
   };
 
-  const removeLanguage = (lang: string) => {
-    setSelectedLanguages(selectedLanguages.filter(l => l !== lang));
-  };
-
   // Platform selection logic
   const togglePlatform = (platform: string) => {
     if (selectedPlatforms.includes(platform)) {
@@ -59,10 +56,6 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
     } else {
       setSelectedPlatforms([...selectedPlatforms, platform]);
     }
-  };
-
-  const removePlatform = (platform: string) => {
-    setSelectedPlatforms(selectedPlatforms.filter(p => p !== platform));
   };
 
 
@@ -203,7 +196,7 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
               <TouchableOpacity
                 key={lang}
                 style={styles.languageChip}
-                onPress={() => removeLanguage(lang)}
+                onPress={() => toggleLanguage(lang)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.languageText}>{lang}</Text>
@@ -212,41 +205,16 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
             ))}
           </View>
           <TouchableOpacity 
-            style={[styles.languageDropdown, LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 && { opacity: 0.5 }]}
-            onPress={() => setShowLanguageDropdown(!showLanguageDropdown)}
+            style={styles.languageDropdown}
+            onPress={() => setShowLanguageModal(true)}
             activeOpacity={0.7}
-            disabled={LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0}
           >
             <Text style={styles.dropdownText}>
-              {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 ? 'All Selected' : 'Add Language'}
+              {selectedLanguages.length === 0 ? 'Select Languages' : `${selectedLanguages.length} selected`}
             </Text>
-            <Ionicons name={showLanguageDropdown ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
+            <Ionicons name="chevron-down" size={20} color="#6B7280" />
           </TouchableOpacity>
         </View>
-        
-        {/* Language Dropdown Options */}
-        {showLanguageDropdown && (
-          <View style={styles.languageOptionsBox}>
-            {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).map(lang => (
-              <TouchableOpacity
-                key={lang}
-                style={styles.languageOption}
-                onPress={() => {
-                  toggleLanguage(lang);
-                  setShowLanguageDropdown(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.languageOptionText}>{lang}</Text>
-              </TouchableOpacity>
-            ))}
-            {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 && (
-              <View style={styles.languageOption}>
-                <Text style={[styles.languageOptionText, { color: '#6B7280' }]}>All languages selected</Text>
-              </View>
-            )}
-          </View>
-        )}
 
         {/* Platforms */}
         <Text style={styles.sectionTitle}>Platforms</Text>
@@ -259,7 +227,7 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
               <TouchableOpacity
                 key={platform}
                 style={styles.languageChip}
-                onPress={() => removePlatform(platform)}
+                onPress={() => togglePlatform(platform)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.languageText}>{platform}</Text>
@@ -268,41 +236,16 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
             ))}
           </View>
           <TouchableOpacity 
-            style={[styles.languageDropdown, PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).length === 0 && { opacity: 0.5 }]}
-            onPress={() => setShowPlatformDropdown(!showPlatformDropdown)}
+            style={styles.languageDropdown}
+            onPress={() => setShowPlatformModal(true)}
             activeOpacity={0.7}
-            disabled={PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).length === 0}
           >
             <Text style={styles.dropdownText}>
-              {PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).length === 0 ? 'All Selected' : 'Add Platform'}
+              {selectedPlatforms.length === 0 ? 'Select Platforms' : `${selectedPlatforms.length} selected`}
             </Text>
-            <Ionicons name={showPlatformDropdown ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
+            <Ionicons name="chevron-down" size={20} color="#6B7280" />
           </TouchableOpacity>
         </View>
-        
-        {/* Platform Dropdown Options */}
-        {showPlatformDropdown && (
-          <View style={styles.languageOptionsBox}>
-            {PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).map(platform => (
-              <TouchableOpacity
-                key={platform}
-                style={styles.languageOption}
-                onPress={() => {
-                  togglePlatform(platform);
-                  setShowPlatformDropdown(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.languageOptionText}>{platform}</Text>
-              </TouchableOpacity>
-            ))}
-            {PLATFORMS.filter(platform => !selectedPlatforms.includes(platform)).length === 0 && (
-              <View style={styles.languageOption}>
-                <Text style={[styles.languageOptionText, { color: '#6B7280' }]}>All platforms selected</Text>
-              </View>
-            )}
-          </View>
-        )}
 
         {/* Next Button */}
         <TouchableOpacity
@@ -317,6 +260,27 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* Language Selection Modal */}
+      <SelectionModal
+        visible={showLanguageModal}
+        onClose={() => setShowLanguageModal(false)}
+        title="Select Languages"
+        subtitle="Choose the languages you can create content in."
+        options={LANGUAGES}
+        selectedOptions={selectedLanguages}
+        onToggleOption={toggleLanguage}
+      />
+
+      {/* Platform Selection Modal */}
+      <SelectionModal
+        visible={showPlatformModal}
+        onClose={() => setShowPlatformModal(false)}
+        title="Select Platforms"
+        subtitle="Choose the platforms you create content on."
+        options={PLATFORMS}
+        selectedOptions={selectedPlatforms}
+        onToggleOption={togglePlatform}
+      />
 
     </SafeAreaView>
   );
@@ -365,6 +329,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
     paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, marginBottom: 8, marginTop: 12, minHeight: 48,
   },
+
   languageBox: { 
     backgroundColor: '#FFFFFF', 
     flexDirection: 'row', 
@@ -401,15 +366,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E7EB',
     marginBottom: 12,
-    paddingVertical: 4,
+    marginTop: 12,
+    overflow: 'hidden',
   },
-  languageOption: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  languageOptionText: { color: '#1A1D1F', fontSize: 14 },
+
   nextButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#FF6B2C', borderRadius: 8, paddingVertical: 14, marginBottom: 8,

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, SafeAreaView, ActivityIndicator, Modal, Alert } from 'react-native';
-import { Feather, Ionicons, Entypo } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BottomNavBar } from '../../components';
+import { BottomNavBar, CreatorSection } from '../../components';
 import { useAppSelector } from '../../store/hooks';
 import BrandProfile from './BrandProfile';
 import { profileAPI } from '../../services/apiService';
@@ -29,6 +29,7 @@ const BrandHome = ({ navigation, route }: any) => {
 
 
   const categories = ['Fashion', 'Trainer', 'Yoga', 'Business', 'Beauty'];
+  const platforms = ['youtube', 'instagram', 'tiktok', 'twitter', 'facebook'];
 
   // Fetch creators data
   useEffect(() => {
@@ -200,153 +201,19 @@ const BrandHome = ({ navigation, route }: any) => {
           ))}
         </ScrollView>
 
-        {/* YouTube Creators */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#222222' }}>Youtube Creators</Text>
-          <TouchableOpacity>
-            <Text style={{ fontSize: 12, color: '#000' }}>view all</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 24 }}>
-                     {getFilteredCreators('youtube').map((creator: any, index: number) => (
-             <TouchableOpacity 
-               key={index} 
-               style={{ 
-                 backgroundColor: '#fff', 
-                 width: 192, 
-                 borderRadius: 12, 
-                 marginRight: 16, 
-                 paddingHorizontal: 12, 
-                 paddingTop: 96, 
-                 paddingBottom: 16 
-               }}
-               onPress={() => handleCreatorClick(creator, 'youtube')}
-              activeOpacity={0.8}
-            >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <View style={{ 
-                  backgroundColor: '#F1F2F4', 
-                  width: 24, 
-                  height: 6, 
-                  borderRadius: 3 
-                }} />
-                <Entypo name="dots-three-vertical" size={12} color="#000" />
-              </View>
-              <Text style={{ fontSize: 8, fontWeight: 'bold', color: '#000', marginBottom: 4, textTransform: 'uppercase' }}>
-                {creator.name}
-              </Text>
-              <Text style={{ fontSize: 4, color: '#000', fontWeight: 'bold', marginBottom: 4 }}>
-                {creator.bio || 'A talented creator...'}
-              </Text>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                <Text style={{ fontSize: 4, color: '#A4A4A4' }}>
-                  {creator.gender || 'Not specified'} • {(() => {
-                    if (!creator.date_of_birth) return 'Age not specified';
-                    const birthDate = new Date(creator.date_of_birth);
-                    if (isNaN(birthDate.getTime())) return 'Age not specified';
-                    const today = new Date();
-                    let age = today.getFullYear() - birthDate.getFullYear();
-                    const monthDiff = today.getMonth() - birthDate.getMonth();
-                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                      age--;
-                    }
-                    return `${age} years old`;
-                  })()}
-                </Text>
-              </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ fontSize: 4, color: '#A4A4A4' }}>Response Time: {creator.average_response_time}</Text>
-                <View style={{ 
-                  backgroundColor: '#F1F2F4', 
-                  paddingHorizontal: 8, 
-                  paddingVertical: 1, 
-                  borderRadius: 12 
-                }}>
-                  <Text style={{ fontSize: 6, fontWeight: 'bold', color: '#000' }}>
-                    {creator.social_accounts?.[0]?.follower_count ? 
-                      `${(parseInt(creator.social_accounts[0].follower_count) / 1000).toFixed(1)}K` : 
-                      'New'
-                    }
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        {/* Instagram Creators */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#222222' }}>Instagram Creators</Text>
-          <TouchableOpacity>
-            <Text style={{ fontSize: 12, color: '#000' }}>view all</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 24 }}>
-                     {getFilteredCreators('instagram').map((creator: any, index: number) => (
-             <TouchableOpacity 
-               key={index} 
-               style={{ 
-                 backgroundColor: '#fff', 
-                 width: 192, 
-                 borderRadius: 12, 
-                 marginRight: 16, 
-                 paddingHorizontal: 12, 
-                 paddingTop: 96, 
-                 paddingBottom: 16 
-               }}
-               onPress={() => handleCreatorClick(creator, 'instagram')}
-              activeOpacity={0.8}
-            >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <View style={{ 
-                  backgroundColor: '#F1F2F4', 
-                  width: 24, 
-                  height: 6, 
-                  borderRadius: 3 
-                }} />
-                <Entypo name="dots-three-vertical" size={12} color="#000" />
-              </View>
-              <Text style={{ fontSize: 8, fontWeight: 'bold', color: '#000', marginBottom: 4, textTransform: 'uppercase' }}>
-                {creator.name}
-              </Text>
-              <Text style={{ fontSize: 4, color: '#000', fontWeight: 'bold', marginBottom: 4 }}>
-                {creator.bio || 'A talented creator...'}
-              </Text>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                <Text style={{ fontSize: 4, color: '#A4A4A4' }}>
-                  {creator.gender || 'Not specified'} • {(() => {
-                    if (!creator.date_of_birth) return 'Age not specified';
-                    const birthDate = new Date(creator.date_of_birth);
-                    if (isNaN(birthDate.getTime())) return 'Age not specified';
-                    const today = new Date();
-                    let age = today.getFullYear() - birthDate.getFullYear();
-                    const monthDiff = today.getMonth() - birthDate.getMonth();
-                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                      age--;
-                    }
-                    return `${age} years old`;
-                  })()}
-                </Text>
-              </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ fontSize: 4, color: '#A4A4A4' }}>Response Time: {creator.average_response_time}</Text>
-                <View style={{ 
-                  backgroundColor: '#F1F2F4', 
-                  paddingHorizontal: 8, 
-                  paddingVertical: 1, 
-                  borderRadius: 12 
-                }}>
-                  <Text style={{ fontSize: 6, fontWeight: 'bold', color: '#000' }}>
-                    {creator.social_accounts?.[0]?.follower_count ? 
-                      `${(parseInt(creator.social_accounts[0].follower_count) / 1000).toFixed(1)}K` : 
-                      'New'
-                    }
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        {/* Platform Creator Sections */}
+        {platforms.map((platform) => (
+          <CreatorSection
+            key={platform}
+            platform={platform}
+            creators={getFilteredCreators(platform)}
+            onCreatorPress={handleCreatorClick}
+            onViewAllPress={() => {
+              // TODO: Navigate to platform-specific view all screen
+              console.log(`View all ${platform} creators`);
+            }}
+          />
+        ))}
 
         {/* Bottom spacing for navigation */}
         <View style={{ height: 100 }} />

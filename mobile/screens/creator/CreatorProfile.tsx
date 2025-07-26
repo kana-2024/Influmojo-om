@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, StatusBar, Platform, Dimensions, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, StatusBar, Platform, Dimensions, Modal, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -76,6 +76,7 @@ const CreatorProfile = () => {
   const scrollViewRef = useRef(null);
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showKycModal, setShowKycModal] = useState(false);
   const [showPaymentsModal, setShowPaymentsModal] = useState(false);
@@ -105,6 +106,7 @@ const CreatorProfile = () => {
   const loadCreatorProfileForBrand = useCallback(async (creatorId: string, platform: string) => {
     try {
       setLoading(true);
+      setError(null);
       console.log('🔍 Loading creator profile for brand view, creator ID:', creatorId, 'platform:', platform);
       
       // Use the API to get a specific creator's profile
@@ -122,6 +124,9 @@ const CreatorProfile = () => {
           languages: safeParseArray(profile.languages),
           content_categories: safeParseArray(profile.content_categories),
           packages: safeParseArray(profile.packages),
+          // Ensure date_of_birth is properly handled
+          date_of_birth: profile.date_of_birth,
+          gender: profile.gender,
         };
         console.log('🔍 Setting creator profile state (brand view):', profileData);
         console.log('🔍 Packages in state (brand view):', profileData.packages);
@@ -130,11 +135,11 @@ const CreatorProfile = () => {
         setCreatorProfile(profileData);
       } else {
         console.error('❌ Creator profile for brand failed:', response.error);
-        Alert.alert('Error', 'Failed to load creator profile');
+        setError(response.error || 'Failed to load creator profile');
       }
     } catch (error) {
       console.error('❌ Error loading creator profile for brand:', error);
-      Alert.alert('Error', 'Failed to load creator profile');
+      setError('Failed to load creator profile');
     } finally {
       setLoading(false);
     }
@@ -165,6 +170,9 @@ const CreatorProfile = () => {
           languages: safeParseArray(profile.languages),
           content_categories: safeParseArray(profile.content_categories),
           packages: safeParseArray(profile.packages),
+          // Ensure date_of_birth is properly handled
+          date_of_birth: profile.date_of_birth,
+          gender: profile.gender,
         };
         console.log('🔍 Setting creator profile state:', profileData);
         console.log('🔍 Packages in state:', profileData.packages);
@@ -334,358 +342,398 @@ const CreatorProfile = () => {
       {/* Regular creator profile content (show for creators OR brands in readonly mode) */}
       {(!user || (user.user_type !== 'brand' && (user as any).userType !== 'brand') || readonly) && (
         <>
-          {/* Header */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12, paddingHorizontal: 16 }}>
-            {readonly ? (
-              <TouchableOpacity onPress={() => navigation.navigate('BrandHome' as never)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons name="arrow-back" size={24} color="#1A1D1F" />
+          {/* Show loading state while fetching creator profile data */}
+          {loading && readonly ? (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+              <ActivityIndicator size="large" color="#FF6B2C" />
+              <Text style={{ marginTop: 16, fontSize: 16, color: '#6B7280' }}>
+                Loading creator profile...
+              </Text>
+            </View>
+          ) : error && readonly ? (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff', padding: 20 }}>
+              <Ionicons name="alert-circle" size={64} color="#FF6B2C" />
+              <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
+                Failed to Load Profile
+              </Text>
+              <Text style={{ fontSize: 14, color: '#6B7280', marginTop: 8, textAlign: 'center', lineHeight: 20 }}>
+                {error}
+              </Text>
+              <TouchableOpacity 
+                style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 12, backgroundColor: '#FF6B2C', borderRadius: 8 }}
+                onPress={() => {
+                  setError(null);
+                  if (creatorId) {
+                    loadCreatorProfileForBrand(creatorId, platform);
+                  }
+                }}
+              >
+                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
               </TouchableOpacity>
-            ) : (
-              <View style={{ width: 32 }} />
-            )}
-            <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' }}>
-              {readonly ? 'Creator Profile' : 'My Profile'}
-            </Text>
-            {!readonly ? (
-              <TouchableOpacity onPress={() => setShowAccountModal(true)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
-              </TouchableOpacity>
-            ) : (
-              <View style={{ width: 32 }} />
-            )}
-          </View>
-          <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}>
-            {/* Profile Card */}
-            <View style={styles.profileCard}>
-              {/* Cover block */}
-              <View style={styles.coverBlock}>
-                <TouchableOpacity style={styles.coverCameraBtn}>
-                  <Ionicons name="camera" size={18} color="#FF6B2C" />
-                </TouchableOpacity>
-              </View>
-              {/* Avatar - left aligned and overlapping cover */}
-              <View style={styles.avatarRow}>
-                <View style={styles.avatarOuterWrapper}>
-                  <View style={styles.avatarWrapper}>
-                    <Image source={{ uri: creatorProfile?.profile_image_url || creatorProfile?.user?.profile_image_url || 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
-                  </View>
-                  <TouchableOpacity style={styles.avatarEditBtn}>
-                    <Ionicons name="pencil" size={12} color="#fff" />
+            </View>
+          ) : !creatorProfile && readonly ? (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+              <ActivityIndicator size="large" color="#FF6B2C" />
+              <Text style={{ marginTop: 16, fontSize: 16, color: '#6B7280' }}>
+                Loading creator profile...
+              </Text>
+            </View>
+          ) : (
+            <>
+              {/* Header */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12, paddingHorizontal: 16 }}>
+                {readonly ? (
+                  <TouchableOpacity onPress={() => navigation.navigate('BrandHome' as never)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
+                    <Ionicons name="arrow-back" size={24} color="#1A1D1F" />
                   </TouchableOpacity>
-                </View>
-                <View style={styles.avatarSpacer} />
-              </View>
-              {/* Info Card - left aligned below avatar */}
-              <View style={styles.infoCard}>
-                <View style={styles.infoNameRow}>
-                  <Text style={[styles.infoName, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">{creatorProfile?.name || creatorProfile?.user?.name || 'Creator Name'}</Text>
-                  <Ionicons name="chevron-forward" size={18} color="#1A1D1F" />
-                </View>
-                <View style={styles.infoRow}>
-                  <Ionicons name="male" size={15} color="#B0B0B0" style={styles.infoIcon} />
-                  <Text style={styles.infoText}>{creatorProfile?.gender || 'Not specified'}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Ionicons name="calendar-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-                  <Text style={styles.infoText}>
-                    {(() => {
-                      const age = calculateAge(creatorProfile?.date_of_birth);
-                      return age ? `${age} years old` : 'Age not specified';
-                    })()}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}><Ionicons name="location-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.location_state ? `${creatorProfile.location_state}, ` : ''}{creatorProfile?.location_city || 'City'}{creatorProfile?.location_pincode ? ` ${creatorProfile.location_pincode}` : ''}</Text></View>
-                <View style={styles.infoRow}><Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.languages?.length ? creatorProfile.languages.join(', ') : 'Languages not specified'}</Text></View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                  <Ionicons name="star" size={15} color="#FFD600" style={{ marginRight: 4 }} />
-                  {(!creatorProfile?.rating || isNaN(Number(creatorProfile.rating)) || Number(creatorProfile.rating) === 0) ? (
-                    <Text style={{ color: '#6B7280', fontSize: 14 }}>No ratings yet</Text>
-                  ) : (
-                    <Text style={{ color: '#6B7280', fontSize: 14 }}>{Number(creatorProfile.rating).toFixed(1)}</Text>
-                  )}
-                </View>
-              </View>
-            </View>
-            {/* Divider */}
-            <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
-            {/* Categories */}
-            <View style={{ marginHorizontal: 16 }}>
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>Categories</Text>
-                <Ionicons name="chevron-forward" size={18} color="#6B7280" />
-              </TouchableOpacity>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 }}>
-                {creatorProfile?.content_categories?.length
-                  ? creatorProfile.content_categories.map((cat: string, index: number) => (
-                      <View key={cat} style={{ backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, marginRight: 8, marginBottom: 8 }}>
-                        <Text style={{ color: '#000', fontSize: 14, fontWeight: '500' }}>{cat}</Text>
-                      </View>
-                    ))
-                  : categories.map((cat, index) => (
-                      <View key={cat} style={{ backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D', paddingHorizontal: 12, paddingVertical: 6, marginRight: 8, marginBottom: 8 }}>
-                        <Text style={{ color: '#000', fontSize: 14, fontWeight: '500' }}>{cat}</Text>
-                      </View>
-                    ))}
-              </View>
-            </View>
-            {/* Divider */}
-            <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
-            {/* About */}
-            <View style={{ marginHorizontal: 16 }}>
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>About</Text>
-                <Ionicons name="chevron-forward" size={18} color="#6B7280" />
-              </TouchableOpacity>
-              <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 22, marginBottom: 16 }}>{creatorProfile?.bio || 'No bio available yet.'}</Text>
-            </View>
-            
-            {/* Tabs */}
-            <View style={styles.tabRow}>
-              {tabList.map(tab => (
-                <TouchableOpacity
-                  key={tab.key}
-                  style={activeTab === tab.key ? styles.tabBtnActive : styles.tabBtn}
-                  onPress={() => handleTabPress(tab.key)}
-                >
-                  <Text style={activeTab === tab.key ? styles.tabBtnTextActive : styles.tabBtnText}>{tab.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            
-            {/* Tab Content Area */}
-            <View style={{ 
-              flex: 1, 
-              width: '100%', 
-              marginBottom: 32,
-              borderWidth: 1,
-              borderColor: 'rgba(255, 107, 44, 0.2)',
-              borderRadius: 12,
-              padding: 16
-            }}>
-              {activeTab === 'Packages' && (
-                creatorProfile?.packages?.length > 0 ? (
-                  <View style={{ paddingTop: 16, flex: 1 }}>
-                    {!readonly && (
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24, paddingHorizontal: 16 }}>
-                        <TouchableOpacity style={styles.addPortfolioBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
-                          <Ionicons name="add" size={20} color="#FF6B2C" />
-                          <Text style={styles.addPortfolioBtnText}>Create Package</Text>
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                    
-                    <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
-                      {creatorProfile.packages.map((pkg: any, index: number) => (
-                        <PackageCard 
-                          key={pkg.id || index} 
-                          item={pkg} 
-                          onEdit={handleEditPackage} 
-                          onDelete={loadCreatorProfile} 
-                          onShowOverlay={setShowDeleteOverlay}
-                          readonly={readonly}
-                          onAddToCart={readonly ? handleAddToCart : undefined}
-                        />
-                      ))}
-                    </ScrollView>
-                  </View>
                 ) : (
-                  <View style={styles.emptyState}>
-                    <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
-                    <Text style={styles.emptyTitle}>There are no Packages has been created yet!</Text>
-                    <Text style={styles.emptyDesc}>To enjoy the benefits and brands wants to give business you need to add your packages for all your social platforms.</Text>
-                    {!readonly && (
-                      <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
-                        <Text style={styles.createPackageBtnText}>Create Package</Text>
-                        <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
-                      </TouchableOpacity>
-                    )}
+                  <View style={{ width: 32 }} />
+                )}
+                <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' }}>
+                  {readonly ? 'Creator Profile' : 'My Profile'}
+                </Text>
+                {!readonly ? (
+                  <TouchableOpacity onPress={() => setShowAccountModal(true)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
+                    <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
+                  </TouchableOpacity>
+                ) : (
+                  <View style={{ width: 32 }} />
+                )}
+              </View>
+              <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}>
+                {/* Profile Card */}
+                <View style={styles.profileCard}>
+                  {/* Cover block */}
+                  <View style={styles.coverBlock}>
+                    <TouchableOpacity style={styles.coverCameraBtn}>
+                      <Ionicons name="camera" size={18} color="#FF6B2C" />
+                    </TouchableOpacity>
                   </View>
-                )
-              )}
-              {activeTab === 'Portfolio' && (
-                creatorProfile?.portfolio_items?.length > 0 ? (
-                  <View style={{ paddingTop: 16 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 16 }}>
-                      <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F' }}>Portfolio Items</Text>
-                      {!readonly && (
-                        <TouchableOpacity style={styles.addPortfolioBtn} onPress={openCreatePortfolio}>
-                          <Ionicons name="add" size={20} color="#FF6B2C" />
-                          <Text style={styles.addPortfolioBtnText}>Add Files</Text>
-                        </TouchableOpacity>
+                  {/* Avatar - left aligned and overlapping cover */}
+                  <View style={styles.avatarRow}>
+                    <View style={styles.avatarOuterWrapper}>
+                      <View style={styles.avatarWrapper}>
+                        <Image source={{ uri: creatorProfile?.profile_image_url || creatorProfile?.user?.profile_image_url || 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
+                      </View>
+                      <TouchableOpacity style={styles.avatarEditBtn}>
+                        <Ionicons name="pencil" size={12} color="#fff" />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.avatarSpacer} />
+                  </View>
+                  {/* Info Card - left aligned below avatar */}
+                  <View style={styles.infoCard}>
+                    <View style={styles.infoNameRow}>
+                      <Text style={[styles.infoName, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">{creatorProfile?.name || creatorProfile?.user?.name || 'Creator Name'}</Text>
+                      <Ionicons name="chevron-forward" size={18} color="#1A1D1F" />
+                    </View>
+                    <View style={styles.infoRow}>
+                      <Ionicons name="male" size={15} color="#B0B0B0" style={styles.infoIcon} />
+                      <Text style={styles.infoText}>{creatorProfile?.gender || 'Not specified'}</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                      <Ionicons name="calendar-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
+                      <Text style={styles.infoText}>
+                        {(() => {
+                          const age = calculateAge(creatorProfile?.date_of_birth);
+                          return age ? `${age} years old` : 'Age not specified';
+                        })()}
+                      </Text>
+                    </View>
+                    <View style={styles.infoRow}><Ionicons name="location-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.location_state ? `${creatorProfile.location_state}, ` : ''}{creatorProfile?.location_city || 'City'}{creatorProfile?.location_pincode ? ` ${creatorProfile.location_pincode}` : ''}</Text></View>
+                    <View style={styles.infoRow}><Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.languages && Array.isArray(creatorProfile.languages) && creatorProfile.languages.length > 0 ? creatorProfile.languages.join(', ') : 'Languages not specified'}</Text></View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                      <Ionicons name="star" size={15} color="#FFD600" style={{ marginRight: 4 }} />
+                      {(!creatorProfile?.rating || isNaN(Number(creatorProfile.rating)) || Number(creatorProfile.rating) === 0) ? (
+                        <Text style={{ color: '#6B7280', fontSize: 14 }}>No ratings yet</Text>
+                      ) : (
+                        <Text style={{ color: '#6B7280', fontSize: 14 }}>{Number(creatorProfile.rating).toFixed(1)}</Text>
                       )}
                     </View>
-                    
-                    <View style={styles.portfolioGrid}>
-                      {/* Display existing portfolio items */}
-                      {creatorProfile.portfolio_items.map((item: any, index: number) => (
-                        <View key={item.id || index} style={styles.portfolioItem}>
-                          {item.media_type === 'image' ? (
-                            <Image 
-                              source={{ uri: item.media_url }} 
-                              style={styles.portfolioImage}
-                              resizeMode="cover"
-                            />
-                          ) : item.media_type === 'video' ? (
-                            <View style={styles.portfolioVideoContainer}>
-                              <Image 
-                                source={{ uri: item.media_url.replace('/upload/', '/upload/w_200,h_200,c_fill/') }} 
-                                style={styles.portfolioImage}
-                                resizeMode="cover"
-                              />
-                              <View style={styles.videoOverlay}>
-                                <Ionicons name="play-circle" size={32} color="#fff" />
-                              </View>
-                            </View>
-                          ) : (
-                            <View style={styles.portfolioFileContainer}>
-                              <Ionicons name="document" size={32} color="#2D5BFF" />
-                              <Text style={styles.portfolioFileName} numberOfLines={1}>
-                                {item.title || 'Document'}
-                              </Text>
-                            </View>
-                          )}
-                          
-                        </View>
-                      ))}
-                      
-                      {/* Show placeholder slots if only 1 item exists */}
-                      {creatorProfile.portfolio_items.length === 1 && !readonly && (
-                        <>
-                          {[1, 2, 3].map((index) => (
-                            <TouchableOpacity 
-                              key={`placeholder-${index}`} 
-                              style={styles.portfolioPlaceholder}
-                              onPress={openCreatePortfolio}
-                            >
-                              <View style={styles.placeholderContent}>
-                                <Ionicons name="add" size={32} color="#B0B0B0" />
-                                <Text style={styles.placeholderText}>Add File</Text>
-                              </View>
+                  </View>
+                </View>
+                {/* Divider */}
+                <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
+                {/* Categories */}
+                <View style={{ marginHorizontal: 16 }}>
+                  <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>Categories</Text>
+                    <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+                  </TouchableOpacity>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 }}>
+                    {creatorProfile?.content_categories?.length
+                      ? creatorProfile.content_categories.map((cat: string, index: number) => (
+                          <View key={cat} style={{ backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, marginRight: 8, marginBottom: 8 }}>
+                            <Text style={{ color: '#000', fontSize: 14, fontWeight: '500' }}>{cat}</Text>
+                          </View>
+                        ))
+                      : categories.map((cat, index) => (
+                          <View key={cat} style={{ backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D', paddingHorizontal: 12, paddingVertical: 6, marginRight: 8, marginBottom: 8 }}>
+                            <Text style={{ color: '#000', fontSize: 14, fontWeight: '500' }}>{cat}</Text>
+                          </View>
+                        ))}
+                  </View>
+                </View>
+                {/* Divider */}
+                <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
+                {/* About */}
+                <View style={{ marginHorizontal: 16 }}>
+                  <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>About</Text>
+                    <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+                  </TouchableOpacity>
+                  <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 22, marginBottom: 16 }}>{creatorProfile?.bio || 'No bio available yet.'}</Text>
+                </View>
+                
+                {/* Tabs */}
+                <View style={styles.tabRow}>
+                  {tabList.map(tab => (
+                    <TouchableOpacity
+                      key={tab.key}
+                      style={activeTab === tab.key ? styles.tabBtnActive : styles.tabBtn}
+                      onPress={() => handleTabPress(tab.key)}
+                    >
+                      <Text style={activeTab === tab.key ? styles.tabBtnTextActive : styles.tabBtnText}>{tab.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                
+                {/* Tab Content Area */}
+                <View style={{ 
+                  flex: 1, 
+                  width: '100%', 
+                  marginBottom: 32,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255, 107, 44, 0.2)',
+                  borderRadius: 12,
+                  padding: 16
+                }}>
+                  {activeTab === 'Packages' && (
+                    creatorProfile?.packages?.length > 0 ? (
+                      <View style={{ paddingTop: 16, flex: 1 }}>
+                        {!readonly && (
+                          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24, paddingHorizontal: 16 }}>
+                            <TouchableOpacity style={styles.addPortfolioBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
+                              <Ionicons name="add" size={20} color="#FF6B2C" />
+                              <Text style={styles.addPortfolioBtnText}>Create Package</Text>
                             </TouchableOpacity>
+                          </View>
+                        )}
+                        
+                        <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+                          {creatorProfile.packages.map((pkg: any, index: number) => (
+                            <PackageCard 
+                              key={pkg.id || index} 
+                              item={pkg} 
+                              onEdit={handleEditPackage} 
+                              onDelete={loadCreatorProfile} 
+                              onShowOverlay={setShowDeleteOverlay}
+                              readonly={readonly}
+                              onAddToCart={readonly ? handleAddToCart : undefined}
+                            />
                           ))}
-                        </>
-                      )}
-                    </View>
+                        </ScrollView>
+                      </View>
+                    ) : (
+                      <View style={styles.emptyState}>
+                        <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
+                        <Text style={styles.emptyTitle}>There are no Packages has been created yet!</Text>
+                        <Text style={styles.emptyDesc}>To enjoy the benefits and brands wants to give business you need to add your packages for all your social platforms.</Text>
+                        {!readonly && (
+                          <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
+                            <Text style={styles.createPackageBtnText}>Create Package</Text>
+                            <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    )
+                  )}
+                  {activeTab === 'Portfolio' && (
+                    creatorProfile?.portfolio_items?.length > 0 ? (
+                      <View style={{ paddingTop: 16 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 16 }}>
+                          <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F' }}>Portfolio Items</Text>
+                          {!readonly && (
+                            <TouchableOpacity style={styles.addPortfolioBtn} onPress={openCreatePortfolio}>
+                              <Ionicons name="add" size={20} color="#FF6B2C" />
+                              <Text style={styles.addPortfolioBtnText}>Add Files</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                        
+                        <View style={styles.portfolioGrid}>
+                          {/* Display existing portfolio items */}
+                          {creatorProfile.portfolio_items.map((item: any, index: number) => (
+                            <View key={item.id || index} style={styles.portfolioItem}>
+                              {item.media_type === 'image' ? (
+                                <Image 
+                                  source={{ uri: item.media_url }} 
+                                  style={styles.portfolioImage}
+                                  resizeMode="cover"
+                                />
+                              ) : item.media_type === 'video' ? (
+                                <View style={styles.portfolioVideoContainer}>
+                                  <Image 
+                                    source={{ uri: item.media_url.replace('/upload/', '/upload/w_200,h_200,c_fill/') }} 
+                                    style={styles.portfolioImage}
+                                    resizeMode="cover"
+                                  />
+                                  <View style={styles.videoOverlay}>
+                                    <Ionicons name="play-circle" size={32} color="#fff" />
+                                  </View>
+                                </View>
+                              ) : (
+                                <View style={styles.portfolioFileContainer}>
+                                  <Ionicons name="document" size={32} color="#2D5BFF" />
+                                  <Text style={styles.portfolioFileName} numberOfLines={1}>
+                                    {item.title || 'Document'}
+                                  </Text>
+                                </View>
+                              )}
+                              
+                            </View>
+                          ))}
+                          
+                          {/* Show placeholder slots if only 1 item exists */}
+                          {creatorProfile.portfolio_items.length === 1 && !readonly && (
+                            <>
+                              {[1, 2, 3].map((index) => (
+                                <TouchableOpacity 
+                                  key={`placeholder-${index}`} 
+                                  style={styles.portfolioPlaceholder}
+                                  onPress={openCreatePortfolio}
+                                >
+                                  <View style={styles.placeholderContent}>
+                                    <Ionicons name="add" size={32} color="#B0B0B0" />
+                                    <Text style={styles.placeholderText}>Add File</Text>
+                                  </View>
+                                </TouchableOpacity>
+                              ))}
+                            </>
+                          )}
+                        </View>
+                      </View>
+                    ) : (
+                      <View style={styles.emptyState}>
+                        <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
+                        <Text style={styles.emptyTitle}>There are no Portfolio files added yet!</Text>
+                        <Text style={styles.emptyDesc}>To showcase your work, you need to add your portfolio files for all your social platforms.</Text>
+                        {!readonly && (
+                          <TouchableOpacity style={styles.createPackageBtn} onPress={openCreatePortfolio}>
+                            <Text style={styles.createPackageBtnText}>Add Files</Text>
+                            <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    )
+                  )}
+
+                </View>
+              </ScrollView>
+              
+              {/* Modals and BottomNavBar remain unchanged */}
+              <AnimatedModalOverlay visible={showCreatePortfolio}>
+                <CreatePortfolioScreen 
+                  onClose={closeCreatePortfolio} 
+                  onBack={closeCreatePortfolio}
+                  onPortfolioCreated={loadCreatorProfile}
+                />
+              </AnimatedModalOverlay>
+              <Modal 
+                visible={showCreatePackage} 
+                animationType="slide" 
+                presentationStyle="fullScreen"
+                onRequestClose={closeCreatePackage}
+              >
+                <CreatePackageScreen 
+                  onClose={closeCreatePackage} 
+                  CustomDropdown={CustomDropdown}
+                  onPackageCreated={loadCreatorProfile}
+                />
+              </Modal>
+              <Modal 
+                visible={showEditPackage} 
+                animationType="slide" 
+                presentationStyle="fullScreen"
+                onRequestClose={closeEditPackage}
+              >
+                <EditPackageScreen 
+                  package={editingPackage}
+                  onClose={closeEditPackage}
+                  onSave={handleSaveEditedPackage}
+                />
+              </Modal>
+
+              <Modal visible={showKycModal} transparent animationType="slide" onRequestClose={() => {
+                setShowKycModal(false);
+                setShowAccountModal(true);
+              }}>
+                <KycModal 
+                  onClose={() => {
+                    setShowKycModal(false);
+                    setShowAccountModal(true);
+                  }} 
+                  onBack={() => {
+                    setShowKycModal(false);
+                    setShowAccountModal(true);
+                  }} 
+                />
+              </Modal>
+
+              <Modal visible={showPaymentsModal} transparent animationType="slide" onRequestClose={() => setShowPaymentsModal(false)}>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+                  <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginBottom: 16, textAlign: 'center' }}>Payments</Text>
+                    <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 24, textAlign: 'center' }}>Payment management features will be available soon.</Text>
+                    <TouchableOpacity 
+                      style={{ backgroundColor: '#FF6B2C', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
+                      onPress={() => setShowPaymentsModal(false)}
+                    >
+                      <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Close</Text>
+                    </TouchableOpacity>
                   </View>
-                ) : (
-                  <View style={styles.emptyState}>
-                    <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
-                    <Text style={styles.emptyTitle}>There are no Portfolio files added yet!</Text>
-                    <Text style={styles.emptyDesc}>To showcase your work, you need to add your portfolio files for all your social platforms.</Text>
-                    {!readonly && (
-                      <TouchableOpacity style={styles.createPackageBtn} onPress={openCreatePortfolio}>
-                        <Text style={styles.createPackageBtnText}>Add Files</Text>
-                        <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )
+                </View>
+              </Modal>
+
+              {/* Overlays for modals */}
+              {showAccountModal && (
+                <View style={styles.modalOverlay} />
+              )}
+              {showKycModal && (
+                <View style={styles.modalOverlay} />
+              )}
+              {showPaymentsModal && (
+                <View style={styles.modalOverlay} />
+              )}
+              {showCreatePortfolio && (
+                <View style={styles.modalOverlay} />
+              )}
+              {showCreatePackage && (
+                <View style={styles.modalOverlay} />
+              )}
+              {showEditPackage && (
+                <View style={styles.modalOverlay} />
+              )}
+              {showDeleteOverlay && (
+                <View style={styles.modalOverlay} />
               )}
 
-            </View>
-          </ScrollView>
-          
-          {/* Modals and BottomNavBar remain unchanged */}
-          <AnimatedModalOverlay visible={showCreatePortfolio}>
-            <CreatePortfolioScreen 
-              onClose={closeCreatePortfolio} 
-              onBack={closeCreatePortfolio}
-              onPortfolioCreated={loadCreatorProfile}
-            />
-          </AnimatedModalOverlay>
-          <Modal 
-            visible={showCreatePackage} 
-            animationType="slide" 
-            presentationStyle="fullScreen"
-            onRequestClose={closeCreatePackage}
-          >
-            <CreatePackageScreen 
-              onClose={closeCreatePackage} 
-              CustomDropdown={CustomDropdown}
-              onPackageCreated={loadCreatorProfile}
-            />
-          </Modal>
-          <Modal 
-            visible={showEditPackage} 
-            animationType="slide" 
-            presentationStyle="fullScreen"
-            onRequestClose={closeEditPackage}
-          >
-            <EditPackageScreen 
-              package={editingPackage}
-              onClose={closeEditPackage}
-              onSave={handleSaveEditedPackage}
-            />
-          </Modal>
-
-          <Modal visible={showKycModal} transparent animationType="slide" onRequestClose={() => {
-            setShowKycModal(false);
-            setShowAccountModal(true);
-          }}>
-            <KycModal 
-              onClose={() => {
-                setShowKycModal(false);
-                setShowAccountModal(true);
-              }} 
-              onBack={() => {
-                setShowKycModal(false);
-                setShowAccountModal(true);
-              }} 
-            />
-          </Modal>
-
-          <Modal visible={showPaymentsModal} transparent animationType="slide" onRequestClose={() => setShowPaymentsModal(false)}>
-            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-              <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
-                <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginBottom: 16, textAlign: 'center' }}>Payments</Text>
-                <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 24, textAlign: 'center' }}>Payment management features will be available soon.</Text>
-                <TouchableOpacity 
-                  style={{ backgroundColor: '#FF6B2C', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
-                  onPress={() => setShowPaymentsModal(false)}
-                >
-                  <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-
-          {/* Overlays for modals */}
-          {showAccountModal && (
-            <View style={styles.modalOverlay} />
-          )}
-          {showKycModal && (
-            <View style={styles.modalOverlay} />
-          )}
-          {showPaymentsModal && (
-            <View style={styles.modalOverlay} />
-          )}
-          {showCreatePortfolio && (
-            <View style={styles.modalOverlay} />
-          )}
-          {showCreatePackage && (
-            <View style={styles.modalOverlay} />
-          )}
-          {showEditPackage && (
-            <View style={styles.modalOverlay} />
-          )}
-          {showDeleteOverlay && (
-            <View style={styles.modalOverlay} />
-          )}
-
-          <AccountModal 
-            visible={showAccountModal}
-            onClose={() => setShowAccountModal(false)}
-            onKycPress={handleKycPress}
-            onPaymentsPress={handlePaymentsPress}
-            user={{
+              <AccountModal 
+                visible={showAccountModal}
+                onClose={() => setShowAccountModal(false)}
+                onKycPress={handleKycPress}
+                onPaymentsPress={handlePaymentsPress}
+                user={{
                               name: creatorProfile?.name || creatorProfile?.user?.name || user?.name,
-              email: user?.email,
+                  email: user?.email,
                               profile_image_url: creatorProfile?.profile_image_url || creatorProfile?.user?.profile_image_url || user?.profileImage,
-              user_type: user?.user_type,
-              role_in_organization: creatorProfile?.role_in_organization
-            }}
-          />
-          {!readonly && <BottomNavBar navigation={navigation} />}
+                  user_type: user?.user_type,
+                  role_in_organization: creatorProfile?.role_in_organization
+                }}
+              />
+              {!readonly && <BottomNavBar navigation={navigation} />}
+            </>
+          )}
         </>
       )}
     </SafeAreaView>

@@ -226,7 +226,7 @@ export const profileAPI = {
     categories: string[];
     about: string;
     languages: string[];
-    platform: string[];
+    platform?: string[];
     role?: string;
     dateOfBirth?: Date;
   }) => {

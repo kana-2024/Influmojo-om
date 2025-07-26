@@ -5,6 +5,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { profileAPI } from '../../services/apiService';
+import { CheckboxItem, SelectionModal } from '../../components';
 
 export default function BrandPreferencesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -12,8 +13,8 @@ export default function BrandPreferencesScreen({ navigation }: any) {
   const [about, setAbout] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [industries, setIndustries] = useState<string[]>([]);
 
   const [industriesLoading, setIndustriesLoading] = useState(true);
@@ -77,9 +78,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
     }
   };
 
-  const removeLanguage = (lang: string) => {
-    setSelectedLanguages(selectedLanguages.filter(l => l !== lang));
-  };
+
 
 
 
@@ -99,6 +98,8 @@ export default function BrandPreferencesScreen({ navigation }: any) {
       Alert.alert('Error', 'Please select at least one language');
       return;
     }
+
+
 
     setLoading(true);
     try {
@@ -235,7 +236,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
               <TouchableOpacity
                 key={lang}
                 style={styles.languageChip}
-                onPress={() => removeLanguage(lang)}
+                onPress={() => toggleLanguage(lang)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.languageText}>{lang}</Text>
@@ -244,41 +245,18 @@ export default function BrandPreferencesScreen({ navigation }: any) {
             ))}
           </View>
           <TouchableOpacity 
-            style={[styles.languageDropdown, LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 && { opacity: 0.5 }]}
-            onPress={() => setShowLanguageDropdown(!showLanguageDropdown)}
+            style={styles.languageDropdown}
+            onPress={() => setShowLanguageModal(true)}
             activeOpacity={0.7}
-            disabled={LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0}
           >
             <Text style={styles.dropdownText}>
-              {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 ? 'All Selected' : 'Add Language'}
+              {selectedLanguages.length === 0 ? 'Select Languages' : `${selectedLanguages.length} selected`}
             </Text>
-            <Ionicons name={showLanguageDropdown ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
+            <Ionicons name="chevron-down" size={20} color="#6B7280" />
           </TouchableOpacity>
         </View>
-        
-        {/* Language Dropdown Options */}
-        {showLanguageDropdown && (
-          <View style={styles.languageOptionsBox}>
-            {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).map(lang => (
-              <TouchableOpacity
-                key={lang}
-                style={styles.languageOption}
-                onPress={() => {
-                  toggleLanguage(lang);
-                  setShowLanguageDropdown(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.languageOptionText}>{lang}</Text>
-              </TouchableOpacity>
-            ))}
-            {LANGUAGES.filter(lang => !selectedLanguages.includes(lang)).length === 0 && (
-              <View style={styles.languageOption}>
-                <Text style={[styles.languageOptionText, { color: '#6B7280' }]}>All languages selected</Text>
-              </View>
-            )}
-          </View>
-        )}
+
+
 
         {/* Next Button */}
         <TouchableOpacity
@@ -292,6 +270,18 @@ export default function BrandPreferencesScreen({ navigation }: any) {
           {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Language Selection Modal */}
+      <SelectionModal
+        visible={showLanguageModal}
+        onClose={() => setShowLanguageModal(false)}
+        title="Select Languages"
+        subtitle="Choose the languages you want to work with creators in."
+        options={LANGUAGES}
+        selectedOptions={selectedLanguages}
+        onToggleOption={toggleLanguage}
+      />
+
 
 
     </SafeAreaView>
@@ -368,6 +358,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   languageBox: { 
     backgroundColor: '#FFFFFF', 
     flexDirection: 'row', 
@@ -404,15 +395,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E7EB',
     marginBottom: 12,
-    paddingVertical: 4,
+    marginTop: 12,
+    overflow: 'hidden',
   },
-  languageOption: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  languageOptionText: { color: '#1A1D1F', fontSize: 14 },
+
   nextButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#FF6B2C', borderRadius: 8, paddingVertical: 14, marginBottom: 8,

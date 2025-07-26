@@ -314,7 +314,7 @@ router.post('/update-preferences', [
   body('categories').isArray({ min: 1, max: 5 }).withMessage('1-5 categories required'),
   body('about').notEmpty().withMessage('About is required'),
   body('languages').isArray({ min: 1 }).withMessage('At least one language required'),
-  body('platform').isArray({ min: 1 }).withMessage('At least one platform required'),
+  body('platform').optional().isArray().withMessage('Platform must be an array'),
   body('role').optional(),
   body('dateOfBirth').optional().isISO8601().withMessage('Valid date required')
 ], validateRequest, authenticateToken, async (req, res) => {
@@ -361,7 +361,7 @@ router.post('/update-preferences', [
           content_categories: categories,
           bio: about,
           languages: languages,
-          platform: platform,
+          platform: platform || null,
           date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
         },
         create: {
@@ -369,7 +369,7 @@ router.post('/update-preferences', [
           content_categories: categories,
           bio: about,
           languages: languages,
-          platform: platform,
+          platform: platform || null,
           date_of_birth: dateOfBirth ? new Date(dateOfBirth) : null
         }
       });
@@ -461,9 +461,8 @@ router.post('/update-preferences', [
         message: 'Brand preferences updated successfully',
         profile: serializedProfile
       });
-
     } else {
-      return res.status(400).json({ error: 'Invalid user type' });
+      res.status(400).json({ error: 'Invalid user type' });
     }
 
   } catch (error) {
@@ -1489,16 +1488,22 @@ router.get('/creators', authenticateToken, async (req, res) => {
         packages: [] // Empty array for now since packages are not directly linked to creators in current schema
       };
 
-      // Add to appropriate platform group based on their social accounts
-      creator.social_media_accounts.forEach(account => {
-        const platform = account.platform.toLowerCase();
-        if (groupedCreators[platform]) {
-          groupedCreators[platform].push(serializedCreator);
-        }
-      });
+      // Add to appropriate platform group based on their platform preferences
+      if (creator.platform && Array.isArray(creator.platform)) {
+        creator.platform.forEach(platform => {
+          const platformKey = platform.toLowerCase();
+          if (groupedCreators[platformKey]) {
+            // Check if creator is already in this platform group to avoid duplicates
+            const existingCreator = groupedCreators[platformKey].find(c => c.id === serializedCreator.id);
+            if (!existingCreator) {
+              groupedCreators[platformKey].push(serializedCreator);
+            }
+          }
+        });
+      }
 
-      // If no social accounts, add to a default group
-      if (creator.social_media_accounts.length === 0) {
+      // If no platform preferences, add to a default group
+      if (!creator.platform || !Array.isArray(creator.platform) || creator.platform.length === 0) {
         groupedCreators.instagram.push(serializedCreator);
       }
     });
@@ -1542,16 +1547,14 @@ router.get('/creators/:platform', authenticateToken, async (req, res) => {
     
     console.log(`🔍 Fetching creators for platform: ${platform}`);
     
-    // Get influencers with the specified platform
+    // Get influencers with the specified platform preference
     const influencers = await prisma.creatorProfile.findMany({
       where: {
         user: {
           status: 'active'
         },
-        social_media_accounts: {
-          some: {
-            platform: platform.toUpperCase()
-          }
+        platform: {
+          array_contains: [platform]
         }
       },
       include: {
