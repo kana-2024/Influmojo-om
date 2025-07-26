@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CheckboxItem from './CheckboxItem';
 
 interface SelectionModalProps {
@@ -25,23 +24,20 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
   onToggleOption,
   maxSelections
 }) => {
-  const insets = useSafeAreaInsets();
-
   return (
     <Modal
       visible={visible}
+      transparent
       animationType="slide"
-      presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={styles.sheet}>
         {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color="#6B7280" />
-          </TouchableOpacity>
+        <View style={styles.headerRow}>
           <Text style={styles.headerTitle}>{title}</Text>
-          <View style={{ width: 40 }} />
+          <TouchableOpacity onPress={onClose} style={styles.headerBtn}>
+            <Ionicons name="close" size={24} color="#1A1D1F" />
+          </TouchableOpacity>
         </View>
 
         {/* Content */}
@@ -64,7 +60,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
         </ScrollView>
 
         {/* Footer */}
-        <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
+        <View style={styles.footer}>
           <TouchableOpacity style={styles.doneButton} onPress={onClose}>
             <Text style={styles.doneButtonText}>Done</Text>
           </TouchableOpacity>
@@ -75,40 +71,44 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F9FB',
+  sheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 32,
+    maxHeight: '80%',
   },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    marginBottom: 24,
   },
-  closeButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
+  headerBtn: {
+    width: 32,
+    height: 32,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: '700',
     color: '#1A1D1F',
+    flex: 1,
+    textAlign: 'center',
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
   },
   subtitle: {
     fontSize: 14,
     color: '#6B7280',
-    marginTop: 16,
-    marginBottom: 8,
+    marginBottom: 16,
     lineHeight: 20,
   },
   optionsContainer: {
@@ -116,15 +116,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    marginTop: 16,
     overflow: 'hidden',
   },
   footer: {
-    paddingHorizontal: 20,
     paddingTop: 16,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
   },
   doneButton: {
     backgroundColor: '#FF6B2C',

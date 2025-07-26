@@ -8,6 +8,11 @@ export { default as OtpModal } from './modals/OtpModal';
 export { default as DatePickerModal } from './modals/DatePickerModal';
 export { default as CityModal } from './modals/CityModal';
 export { default as RoleModal } from './modals/RoleModal';
+export { default as CartModal } from './modals/CartModal';
+export { default as FilterModal } from './modals/FilterModal';
+export { default as CategoryModal } from './modals/CategoryModal';
+export { default as FollowerRangeModal } from './modals/FollowerRangeModal';
+export { default as PlatformModal } from './modals/PlatformModal';
 
 // UI Components
 export { default as AnimatedModalOverlay } from './AnimatedModalOverlay';

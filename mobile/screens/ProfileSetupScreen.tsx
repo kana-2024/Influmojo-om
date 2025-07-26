@@ -482,6 +482,9 @@ export default function ProfileSetupScreen({ navigation }: any) {
       {googleVerifying && (
         <View style={styles.modalOverlay} />
       )}
+      {showCityModal && (
+        <View style={styles.modalOverlay} />
+      )}
       
 
 

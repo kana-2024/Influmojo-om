@@ -6,16 +6,28 @@ import { useAppSelector } from '../../store/hooks';
 interface BottomNavBarProps {
   navigation: any;
   currentRoute?: string;
+  onCartPress?: () => void;
 }
 
-const BottomNavBar = ({ navigation, currentRoute = 'home' }: BottomNavBarProps) => {
+const BottomNavBar = ({ navigation, currentRoute = 'home', onCartPress }: BottomNavBarProps) => {
   const userType = useAppSelector(state => state.auth.userType) || 'creator';
-  const navItems = [
+  
+  // Different nav items for brand vs creator
+  const brandNavItems = [
+    { name: 'home', icon: 'home-outline', label: 'Home' },
+    { name: 'cart', icon: 'cart-outline', label: 'Cart' },
+    { name: 'insights', icon: 'analytics-outline', label: 'Insights' },
+    { name: 'profile', icon: 'person-outline', label: 'Profile' },
+  ];
+  
+  const creatorNavItems = [
     { name: 'home', icon: 'home-outline', label: 'Home' },
     { name: 'insights', icon: 'analytics-outline', label: 'Insights' },
     { name: 'orders', icon: 'list-outline', label: 'Orders' },
     { name: 'profile', icon: 'person-outline', label: 'Profile' },
   ];
+  
+  const navItems = userType === 'brand' ? brandNavItems : creatorNavItems;
 
   const handleNavigation = (routeName: string) => {
     if (routeName === 'home') {
@@ -33,6 +45,11 @@ const BottomNavBar = ({ navigation, currentRoute = 'home' }: BottomNavBarProps) 
       } else {
         // For creators, profile is the same as home
         navigation.navigate('CreatorProfile');
+      }
+    } else if (routeName === 'cart') {
+      // Handle cart navigation for brand users
+      if (userType === 'brand' && onCartPress) {
+        onCartPress();
       }
     } else {
       // For other routes (insights, orders), navigate normally

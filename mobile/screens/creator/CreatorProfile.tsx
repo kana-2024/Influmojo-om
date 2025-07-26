@@ -4,7 +4,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
-import { BottomNavBar, KycModal, AccountModal, PackageCard } from '../../components';
+import { BottomNavBar, KycModal, AccountModal, PackageCard, CartModal } from '../../components';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CreatePackageScreen from './CreatePackageScreen';
 import EditPackageScreen from './EditPackageScreen';
@@ -82,6 +82,8 @@ const CreatorProfile = () => {
   const [showPaymentsModal, setShowPaymentsModal] = useState(false);
   const [editingPackage, setEditingPackage] = useState<any>(null);
   const [showDeleteOverlay, setShowDeleteOverlay] = useState(false);
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [cartItems, setCartItems] = useState<any[]>([]);
 
   console.log('🔍 CreatorProfile component loaded');
   console.log('🔍 Current user:', user);
@@ -320,14 +322,62 @@ const CreatorProfile = () => {
   // Handle add to cart for readonly mode
   const handleAddToCart = (packageItem: any) => {
     console.log('🔍 Adding package to cart:', packageItem);
+    // Add the package to cart items
+    const newCartItem = {
+      id: packageItem.id || `package_${Date.now()}`,
+      name: packageItem.title || `${packageItem.platform} Package`,
+      price: packageItem.price || 0,
+      quantity: 1,
+      creator: creatorProfile?.name || creatorProfile?.user?.name || 'Creator',
+      platform: packageItem.platform || 'Unknown'
+    };
+    
+    setCartItems(prev => {
+      // Check if item already exists in cart
+      const existingItem = prev.find(item => item.id === newCartItem.id);
+      if (existingItem) {
+        // Update quantity if item exists
+        return prev.map(item => 
+          item.id === newCartItem.id 
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        // Add new item if it doesn't exist
+        return [...prev, newCartItem];
+      }
+    });
+    
     Alert.alert(
       'Added to Cart',
       `"${packageItem.title || packageItem.platform} Package" has been added to your cart!`,
       [
         { text: 'Continue Shopping', style: 'default' },
-        { text: 'View Cart', style: 'default' }
+        { text: 'View Cart', style: 'default', onPress: () => setShowCartModal(true) }
       ]
     );
+  };
+
+  const handleCartPress = () => {
+    setShowCartModal(true);
+  };
+
+  const handleRemoveCartItem = (itemId: string) => {
+    setCartItems(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const handleUpdateCartQuantity = (itemId: string, quantity: number) => {
+    setCartItems(prev => 
+      prev.map(item => 
+        item.id === itemId ? { ...item, quantity } : item
+      )
+    );
+  };
+
+  const handleCheckout = () => {
+    // TODO: Implement checkout functionality
+    Alert.alert('Checkout', 'Checkout functionality will be implemented soon!');
+    setShowCartModal(false);
   };
 
   return (
@@ -416,9 +466,11 @@ const CreatorProfile = () => {
                 <View style={styles.profileCard}>
                   {/* Cover block */}
                   <View style={styles.coverBlock}>
-                    <TouchableOpacity style={styles.coverCameraBtn}>
-                      <Ionicons name="camera" size={18} color="#FF6B2C" />
-                    </TouchableOpacity>
+                    {!readonly && (
+                      <TouchableOpacity style={styles.coverCameraBtn}>
+                        <Ionicons name="camera" size={18} color="#FF6B2C" />
+                      </TouchableOpacity>
+                    )}
                   </View>
                   {/* Avatar - left aligned and overlapping cover */}
                   <View style={styles.avatarRow}>
@@ -426,9 +478,11 @@ const CreatorProfile = () => {
                       <View style={styles.avatarWrapper}>
                         <Image source={{ uri: creatorProfile?.profile_image_url || creatorProfile?.user?.profile_image_url || 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
                       </View>
-                      <TouchableOpacity style={styles.avatarEditBtn}>
-                        <Ionicons name="pencil" size={12} color="#fff" />
-                      </TouchableOpacity>
+                      {!readonly && (
+                        <TouchableOpacity style={styles.avatarEditBtn}>
+                          <Ionicons name="pencil" size={12} color="#fff" />
+                        </TouchableOpacity>
+                      )}
                     </View>
                     <View style={styles.avatarSpacer} />
                   </View>
@@ -436,7 +490,9 @@ const CreatorProfile = () => {
                   <View style={styles.infoCard}>
                     <View style={styles.infoNameRow}>
                       <Text style={[styles.infoName, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">{creatorProfile?.name || creatorProfile?.user?.name || 'Creator Name'}</Text>
-                      <Ionicons name="chevron-forward" size={18} color="#1A1D1F" />
+                      {!readonly && (
+                        <Ionicons name="chevron-forward" size={18} color="#1A1D1F" />
+                      )}
                     </View>
                     <View style={styles.infoRow}>
                       <Ionicons name="male" size={15} color="#B0B0B0" style={styles.infoIcon} />
@@ -480,10 +536,12 @@ const CreatorProfile = () => {
                 <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
                 {/* Categories */}
                 <View style={{ marginHorizontal: 16 }}>
-                  <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>Categories</Text>
-                    <Ionicons name="chevron-forward" size={18} color="#6B7280" />
-                  </TouchableOpacity>
+                    {!readonly && (
+                      <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+                    )}
+                  </View>
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 }}>
                     {creatorProfile?.content_categories?.length
                       ? creatorProfile.content_categories.map((cat: string, index: number) => (
@@ -502,10 +560,12 @@ const CreatorProfile = () => {
                 <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
                 {/* About */}
                 <View style={{ marginHorizontal: 16 }}>
-                  <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>About</Text>
-                    <Ionicons name="chevron-forward" size={18} color="#6B7280" />
-                  </TouchableOpacity>
+                    {!readonly && (
+                      <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+                    )}
+                  </View>
                   <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 22, marginBottom: 16 }}>{creatorProfile?.bio || 'No bio available yet.'}</Text>
                 </View>
                 
@@ -755,7 +815,33 @@ const CreatorProfile = () => {
                   role_in_organization: creatorProfile?.role_in_organization
                 }}
               />
-              {!readonly && <BottomNavBar navigation={navigation} />}
+              {/* Show BottomNavBar for creators OR for brands in readonly mode */}
+              {(!readonly || (readonly && user && (user.user_type === 'brand' || (user as any).userType === 'brand'))) && (
+                <BottomNavBar 
+                  navigation={navigation} 
+                  currentRoute="home"
+                  onCartPress={readonly ? handleCartPress : undefined}
+                />
+              )}
+
+              {/* Cart Modal - only show in readonly mode for brand users */}
+              {readonly && (
+                <>
+                  <CartModal
+                    visible={showCartModal}
+                    onClose={() => setShowCartModal(false)}
+                    items={cartItems}
+                    onRemoveItem={handleRemoveCartItem}
+                    onUpdateQuantity={handleUpdateCartQuantity}
+                    onCheckout={handleCheckout}
+                  />
+
+                  {/* Overlay for cart modal */}
+                  {showCartModal && (
+                    <View style={styles.modalOverlay} />
+                  )}
+                </>
+              )}
             </>
           )}
         </>

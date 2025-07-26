@@ -4,7 +4,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAppSelector } from '../../store/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
-import { BottomNavBar, AccountModal } from '../../components';
+import { BottomNavBar, AccountModal, CartModal } from '../../components';
 import KycModal from '../../components/modals/KycModal';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CreateCampaignModal from './CreateCampaignModal';
@@ -47,10 +47,34 @@ const BrandProfile = () => {
   const [brandProfile, setBrandProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [cartItems, setCartItems] = useState<any[]>([]);
 
   useEffect(() => {
     loadBrandProfile();
   }, []);
+
+  const handleCartPress = () => {
+    setShowCartModal(true);
+  };
+
+  const handleRemoveCartItem = (itemId: string) => {
+    setCartItems(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const handleUpdateCartQuantity = (itemId: string, quantity: number) => {
+    setCartItems(prev => 
+      prev.map(item => 
+        item.id === itemId ? { ...item, quantity } : item
+      )
+    );
+  };
+
+  const handleCheckout = () => {
+    // TODO: Implement checkout functionality
+    Alert.alert('Checkout', 'Checkout functionality will be implemented soon!');
+    setShowCartModal(false);
+  };
 
   const loadBrandProfile = async (forceRefresh = false) => {
     try {
@@ -378,6 +402,21 @@ const BrandProfile = () => {
         />
       </AnimatedModalOverlay>
 
+      {/* Cart Modal */}
+      <CartModal
+        visible={showCartModal}
+        onClose={() => setShowCartModal(false)}
+        items={cartItems}
+        onRemoveItem={handleRemoveCartItem}
+        onUpdateQuantity={handleUpdateCartQuantity}
+        onCheckout={handleCheckout}
+      />
+
+      {/* Overlay for cart modal */}
+      {showCartModal && (
+        <View style={styles.modalOverlay} />
+      )}
+
       <AnimatedModalOverlay
         visible={showCreatePortfolio}
       >
@@ -439,7 +478,11 @@ const BrandProfile = () => {
           role_in_organization: brandProfile?.role_in_organization
         }}
       />
-              <BottomNavBar navigation={navigation} />
+              <BottomNavBar 
+        navigation={navigation} 
+        currentRoute="profile"
+        onCartPress={handleCartPress}
+      />
         </>
       )}
     </SafeAreaView>

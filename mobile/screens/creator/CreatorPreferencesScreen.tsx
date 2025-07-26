@@ -260,6 +260,14 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* Overlays for modals */}
+      {showLanguageModal && (
+        <View style={styles.modalOverlay} />
+      )}
+      {showPlatformModal && (
+        <View style={styles.modalOverlay} />
+      )}
+
       {/* Language Selection Modal */}
       <SelectionModal
         visible={showLanguageModal}
@@ -378,4 +386,13 @@ const styles = StyleSheet.create({
   bottomRow: { alignItems: 'center', marginTop: 8 },
   bottomText: { color: '#6B7280', fontSize: 14, textAlign: 'center' },
   loginLink: { color: '#2563EB', fontWeight: '500' },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 1,
+  },
 }); 

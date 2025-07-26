@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, SafeAreaView, ActivityIndicator, Modal, Alert } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, SafeAreaView, ActivityIndicator, Modal, Alert, StyleSheet } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BottomNavBar, CreatorSection } from '../../components';
+import { BottomNavBar, CreatorSection, CartModal, FilterModal } from '../../components';
 import { useAppSelector } from '../../store/hooks';
 import BrandProfile from './BrandProfile';
 import { profileAPI } from '../../services/apiService';
@@ -24,8 +24,12 @@ const BrandHome = ({ navigation, route }: any) => {
   const [error, setError] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [followerRange, setFollowerRange] = useState({ min: 5000, max: 800000 });
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<string>('all');
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [cartItems, setCartItems] = useState<any[]>([]);
 
 
   const categories = ['Fashion', 'Trainer', 'Yoga', 'Business', 'Beauty'];
@@ -79,6 +83,28 @@ const BrandHome = ({ navigation, route }: any) => {
     });
   };
 
+  const handleCartPress = () => {
+    setShowCartModal(true);
+  };
+
+  const handleRemoveCartItem = (itemId: string) => {
+    setCartItems(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const handleUpdateCartQuantity = (itemId: string, quantity: number) => {
+    setCartItems(prev => 
+      prev.map(item => 
+        item.id === itemId ? { ...item, quantity } : item
+      )
+    );
+  };
+
+  const handleCheckout = () => {
+    // TODO: Implement checkout functionality
+    Alert.alert('Checkout', 'Checkout functionality will be implemented soon!');
+    setShowCartModal(false);
+  };
+
 
 
   const getFilteredCreators = (platform: string) => {
@@ -87,9 +113,22 @@ const BrandHome = ({ navigation, route }: any) => {
     // Apply filters
     let filtered = platformCreators;
     
-    if (selectedCategory !== 'all') {
+    if (selectedCategories.length > 0) {
       filtered = filtered.filter((creator: any) => 
-        creator.content_categories?.includes(selectedCategory)
+        creator.content_categories?.some((category: string) => selectedCategories.includes(category))
+      );
+    }
+    
+    if (followerRange.min > 5000 || followerRange.max < 800000) {
+      filtered = filtered.filter((creator: any) => {
+        const creatorFollowers = creator.followers_count || 0;
+        return creatorFollowers >= followerRange.min && creatorFollowers <= followerRange.max;
+      });
+    }
+    
+    if (selectedPlatforms.length > 0) {
+      filtered = filtered.filter((creator: any) => 
+        selectedPlatforms.includes(creator.platform?.toLowerCase())
       );
     }
     
@@ -222,109 +261,68 @@ const BrandHome = ({ navigation, route }: any) => {
       
 
 
+      {/* Overlay for filter modal */}
+      {showFilters && (
+        <View style={styles.modalOverlay} />
+      )}
+
       {/* Filter Modal */}
-      <Modal
+      <FilterModal
         visible={showFilters}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowFilters(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <Text style={{ fontSize: 18, fontWeight: '600' }}>Filters</Text>
-              <TouchableOpacity onPress={() => setShowFilters(false)}>
-                <Ionicons name="close" size={24} color="#000" />
-              </TouchableOpacity>
-            </View>
-            
-            {/* Platform Filter */}
-            <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 10 }}>Platform</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 20 }}>
-              {['all', 'youtube', 'instagram'].map((platform) => (
-                <TouchableOpacity
-                  key={platform}
-                  style={{
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    borderRadius: 20,
-                    marginRight: 8,
-                    marginBottom: 8,
-                    backgroundColor: selectedPlatform === platform ? '#FF6B2C' : '#F3F4F6'
-                  }}
-                  onPress={() => setSelectedPlatform(platform)}
-                >
-                  <Text style={{ color: selectedPlatform === platform ? '#fff' : '#000' }}>
-                    {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+        onClose={() => setShowFilters(false)}
+        onClearAll={() => {
+          setSelectedPlatform('all');
+          setSelectedCategories([]);
+          setFollowerRange({ min: 5000, max: 800000 });
+          setSelectedPlatforms([]);
+          setPriceRange('all');
+        }}
+        onApplyFilters={() => setShowFilters(false)}
+        onCategoryChange={setSelectedCategories}
+        selectedCategories={selectedCategories}
+        onFollowerRangeChange={(min, max) => setFollowerRange({ min, max })}
+        followerRange={followerRange}
+        onPlatformChange={setSelectedPlatforms}
+        selectedPlatforms={selectedPlatforms}
+        resultCount={20}
+      />
 
-            {/* Category Filter */}
-            <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 10 }}>Category</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 20 }}>
-              {['all', ...categories].map((category) => (
-                <TouchableOpacity
-                  key={category}
-                  style={{
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    borderRadius: 20,
-                    marginRight: 8,
-                    marginBottom: 8,
-                    backgroundColor: selectedCategory === category ? '#FF6B2C' : '#F3F4F6'
-                  }}
-                  onPress={() => setSelectedCategory(category)}
-                >
-                  <Text style={{ color: selectedCategory === category ? '#fff' : '#000' }}>
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+      {/* Cart Modal */}
+      <CartModal
+        visible={showCartModal}
+        onClose={() => setShowCartModal(false)}
+        items={cartItems}
+        onRemoveItem={handleRemoveCartItem}
+        onUpdateQuantity={handleUpdateCartQuantity}
+        onCheckout={handleCheckout}
+      />
 
-            {/* Price Range Filter */}
-            <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 10 }}>Price Range</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 20 }}>
-              {['all', '0-1000', '1000-5000', '500+'].map((range) => (
-                <TouchableOpacity
-                  key={range}
-                  style={{
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    borderRadius: 20,
-                    marginRight: 8,
-                    marginBottom: 8,
-                    backgroundColor: priceRange === range ? '#FF6B2C' : '#F3F4F6'
-                  }}
-                  onPress={() => setPriceRange(range)}
-                >
-                  <Text style={{ color: priceRange === range ? '#fff' : '#000' }}>
-                    {range === 'all' ? 'All Prices' : `${range}`}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            {/* Apply Filters Button */}
-            <TouchableOpacity
-              style={{ backgroundColor: '#FF6B2C', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
-              onPress={() => setShowFilters(false)}
-            >
-              <Text style={{ color: '#fff', fontWeight: '600', fontSize: 16 }}>Apply Filters</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      {/* Overlay for cart modal */}
+      {showCartModal && (
+        <View style={styles.modalOverlay} />
+      )}
 
       {/* Bottom Navigation Bar */}
       <BottomNavBar 
         navigation={navigation} 
         currentRoute={activeTab === 'profile' ? 'profile' : 'home'}
+        onCartPress={handleCartPress}
       />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 1,
+    justifyContent: 'flex-end',
+  },
+});
 
 export default BrandHome; 

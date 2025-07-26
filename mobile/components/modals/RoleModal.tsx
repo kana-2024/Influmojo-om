@@ -31,18 +31,17 @@ const RoleModal: React.FC<RoleModalProps> = ({ visible, onClose, onSelectRole, s
   return (
     <Modal
       visible={visible}
-      transparent={false}
+      transparent
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.container}>
+      <View style={styles.sheet}>
         {/* Header */}
         <View style={styles.headerRow}>
+          <Text style={styles.headerTitle}>Select Role</Text>
           <TouchableOpacity onPress={onClose} style={styles.headerBtn}>
             <Ionicons name="close" size={24} color="#1A1D1F" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Select Role</Text>
-          <View style={{ width: 32 }} />
         </View>
 
         {/* Search Input */}
@@ -100,12 +99,18 @@ const RoleModal: React.FC<RoleModalProps> = ({ visible, onClose, onSelectRole, s
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  sheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     paddingHorizontal: 24,
     paddingTop: 32,
     paddingBottom: 32,
+    maxHeight: '80%',
   },
   headerRow: {
     flexDirection: 'row',

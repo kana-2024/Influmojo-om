@@ -271,6 +271,11 @@ export default function BrandPreferencesScreen({ navigation }: any) {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* Overlays for modals */}
+      {showLanguageModal && (
+        <View style={styles.modalOverlay} />
+      )}
+
       {/* Language Selection Modal */}
       <SelectionModal
         visible={showLanguageModal}
@@ -416,5 +421,14 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#6B7280',
     fontSize: 16,
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 1,
   },
 }); 

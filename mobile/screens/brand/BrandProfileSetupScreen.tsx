@@ -561,6 +561,12 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
       {googleVerifying && (
         <View style={styles.modalOverlay} />
       )}
+      {showCityModal && (
+        <View style={styles.modalOverlay} />
+      )}
+      {showRoleModal && (
+        <View style={styles.modalOverlay} />
+      )}
       
 
 

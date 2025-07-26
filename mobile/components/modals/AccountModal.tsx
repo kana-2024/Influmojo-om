@@ -72,11 +72,10 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, onKycPres
       <View style={styles.sheet}>
           {/* Header */}
           <View style={styles.headerRow}>
-            <TouchableOpacity onPress={onClose} style={styles.headerBtn}>
-              <Ionicons name="arrow-back" size={24} color="#1A1D1F" />
-            </TouchableOpacity>
             <Text style={styles.headerTitle}>{user.name || 'Account'}</Text>
-            <View style={{ width: 32 }} />
+            <TouchableOpacity onPress={onClose} style={styles.headerBtn}>
+              <Ionicons name="close" size={24} color="#1A1D1F" />
+            </TouchableOpacity>
           </View>
           
           {/* Profile Info */}
