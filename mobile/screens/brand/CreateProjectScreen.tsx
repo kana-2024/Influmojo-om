@@ -132,6 +132,7 @@ const CreateProjectScreen: React.FC<CreateProjectScreenProps> = ({ navigation, o
             <TextInput
               style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
               placeholder="Brief description of your project has to be add here."
+              placeholderTextColor="#B0B0B0"
               value={desc}
               onChangeText={setDesc}
               multiline
@@ -161,7 +162,7 @@ const CreateProjectScreen: React.FC<CreateProjectScreenProps> = ({ navigation, o
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
   },
   safeArea: {
     flex: 1,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1.2, // Make the card a bit taller (was 1)
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -226,11 +227,11 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    borderRadius: 10,
+    borderRadius: 8,
     padding: 16,
     fontSize: 15,
     marginBottom: 24,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#F5F5F5',
     color: '#1A1D1F',
   },
   dropdown: {
@@ -239,29 +240,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    borderRadius: 10,
+    borderRadius: 8,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     marginBottom: 0,
     position: 'relative',
     zIndex: 10, // Ensure dropdown container is above others
   },
   dropdownList: {
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    borderRadius: 10,
+    borderRadius: 8,
     marginTop: 2,
     position: 'absolute',
     top: '100%',
     left: 0,
     right: 0,
     zIndex: 100,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
     overflow: 'hidden',
   },
   dropdownItem: {
@@ -282,22 +278,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#FFF4F0',
+    backgroundColor: '#f8f4e8',
   },
   cancelBtnText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontWeight: '700',
     fontSize: 16,
   },
   submitBtn: {
     flex: 1,
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
   },
   submitBtnText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '700',
     fontSize: 16,
   },
@@ -306,7 +302,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.08)',
   },
   dropdownListModal: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 10,

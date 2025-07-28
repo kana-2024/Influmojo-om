@@ -114,6 +114,11 @@ export type CollaborationChannel = $Result.DefaultSelection<Prisma.$Collaboratio
  */
 export type Package = $Result.DefaultSelection<Prisma.$PackagePayload>
 /**
+ * Model Order
+ * 
+ */
+export type Order = $Result.DefaultSelection<Prisma.$OrderPayload>
+/**
  * Model PhoneVerification
  * 
  */
@@ -343,6 +348,18 @@ export const PortfolioMediaType: {
 
 export type PortfolioMediaType = (typeof PortfolioMediaType)[keyof typeof PortfolioMediaType]
 
+
+export const OrderStatus: {
+  pending: 'pending',
+  confirmed: 'confirmed',
+  in_progress: 'in_progress',
+  completed: 'completed',
+  cancelled: 'cancelled',
+  refunded: 'refunded'
+};
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
 }
 
 export type UserType = $Enums.UserType
@@ -428,6 +445,10 @@ export const KYCStatus: typeof $Enums.KYCStatus
 export type PortfolioMediaType = $Enums.PortfolioMediaType
 
 export const PortfolioMediaType: typeof $Enums.PortfolioMediaType
+
+export type OrderStatus = $Enums.OrderStatus
+
+export const OrderStatus: typeof $Enums.OrderStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -753,6 +774,16 @@ export class PrismaClient<
     * ```
     */
   get package(): Prisma.PackageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.order`: Exposes CRUD operations for the **Order** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Orders
+    * const orders = await prisma.order.findMany()
+    * ```
+    */
+  get order(): Prisma.OrderDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.phoneVerification`: Exposes CRUD operations for the **PhoneVerification** model.
@@ -1243,6 +1274,7 @@ export namespace Prisma {
     PlatformSetting: 'PlatformSetting',
     CollaborationChannel: 'CollaborationChannel',
     Package: 'Package',
+    Order: 'Order',
     PhoneVerification: 'PhoneVerification',
     KYC: 'KYC',
     PortfolioItem: 'PortfolioItem'
@@ -1264,7 +1296,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "brandProfile" | "creatorProfile" | "socialMediaAccount" | "campaign" | "campaignApplication" | "collaboration" | "contentSubmission" | "contentReview" | "payment" | "invoice" | "message" | "review" | "campaignAnalytics" | "contentPerformance" | "category" | "notification" | "platformSetting" | "collaborationChannel" | "package" | "phoneVerification" | "kYC" | "portfolioItem"
+      modelProps: "user" | "brandProfile" | "creatorProfile" | "socialMediaAccount" | "campaign" | "campaignApplication" | "collaboration" | "contentSubmission" | "contentReview" | "payment" | "invoice" | "message" | "review" | "campaignAnalytics" | "contentPerformance" | "category" | "notification" | "platformSetting" | "collaborationChannel" | "package" | "order" | "phoneVerification" | "kYC" | "portfolioItem"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2748,6 +2780,80 @@ export namespace Prisma {
           }
         }
       }
+      Order: {
+        payload: Prisma.$OrderPayload<ExtArgs>
+        fields: Prisma.OrderFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.OrderFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.OrderFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload>
+          }
+          findFirst: {
+            args: Prisma.OrderFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.OrderFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload>
+          }
+          findMany: {
+            args: Prisma.OrderFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload>[]
+          }
+          create: {
+            args: Prisma.OrderCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload>
+          }
+          createMany: {
+            args: Prisma.OrderCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.OrderCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload>[]
+          }
+          delete: {
+            args: Prisma.OrderDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload>
+          }
+          update: {
+            args: Prisma.OrderUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload>
+          }
+          deleteMany: {
+            args: Prisma.OrderDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.OrderUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.OrderUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload>[]
+          }
+          upsert: {
+            args: Prisma.OrderUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderPayload>
+          }
+          aggregate: {
+            args: Prisma.OrderAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOrder>
+          }
+          groupBy: {
+            args: Prisma.OrderGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OrderGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.OrderCountArgs<ExtArgs>
+            result: $Utils.Optional<OrderCountAggregateOutputType> | number
+          }
+        }
+      }
       PhoneVerification: {
         payload: Prisma.$PhoneVerificationPayload<ExtArgs>
         fields: Prisma.PhoneVerificationFieldRefs
@@ -3074,6 +3180,7 @@ export namespace Prisma {
     platformSetting?: PlatformSettingOmit
     collaborationChannel?: CollaborationChannelOmit
     package?: PackageOmit
+    order?: OrderOmit
     phoneVerification?: PhoneVerificationOmit
     kYC?: KYCOmit
     portfolioItem?: PortfolioItemOmit
@@ -3177,7 +3284,6 @@ export namespace Prisma {
     admin_content_submissions: number
     sent_messages: number
     notifications: number
-    admin_packages: number
     admin_payments: number
     payments_payee: number
     payments_payer: number
@@ -3194,7 +3300,6 @@ export namespace Prisma {
     admin_content_submissions?: boolean | UserCountOutputTypeCountAdmin_content_submissionsArgs
     sent_messages?: boolean | UserCountOutputTypeCountSent_messagesArgs
     notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
-    admin_packages?: boolean | UserCountOutputTypeCountAdmin_packagesArgs
     admin_payments?: boolean | UserCountOutputTypeCountAdmin_paymentsArgs
     payments_payee?: boolean | UserCountOutputTypeCountPayments_payeeArgs
     payments_payer?: boolean | UserCountOutputTypeCountPayments_payerArgs
@@ -3260,13 +3365,6 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountAdmin_packagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PackageWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
   export type UserCountOutputTypeCountAdmin_paymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PaymentWhereInput
   }
@@ -3323,6 +3421,7 @@ export namespace Prisma {
     collaborations: number
     invoices: number
     portfolio_items: number
+    orders_placed: number
   }
 
   export type BrandProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3330,6 +3429,7 @@ export namespace Prisma {
     collaborations?: boolean | BrandProfileCountOutputTypeCountCollaborationsArgs
     invoices?: boolean | BrandProfileCountOutputTypeCountInvoicesArgs
     portfolio_items?: boolean | BrandProfileCountOutputTypeCountPortfolio_itemsArgs
+    orders_placed?: boolean | BrandProfileCountOutputTypeCountOrders_placedArgs
   }
 
   // Custom InputTypes
@@ -3371,6 +3471,13 @@ export namespace Prisma {
     where?: PortfolioItemWhereInput
   }
 
+  /**
+   * BrandProfileCountOutputType without action
+   */
+  export type BrandProfileCountOutputTypeCountOrders_placedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderWhereInput
+  }
+
 
   /**
    * Count Type CreatorProfileCountOutputType
@@ -3382,6 +3489,8 @@ export namespace Prisma {
     invoices: number
     social_media_accounts: number
     portfolio_items: number
+    packages_created: number
+    orders_received: number
   }
 
   export type CreatorProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3390,6 +3499,8 @@ export namespace Prisma {
     invoices?: boolean | CreatorProfileCountOutputTypeCountInvoicesArgs
     social_media_accounts?: boolean | CreatorProfileCountOutputTypeCountSocial_media_accountsArgs
     portfolio_items?: boolean | CreatorProfileCountOutputTypeCountPortfolio_itemsArgs
+    packages_created?: boolean | CreatorProfileCountOutputTypeCountPackages_createdArgs
+    orders_received?: boolean | CreatorProfileCountOutputTypeCountOrders_receivedArgs
   }
 
   // Custom InputTypes
@@ -3436,6 +3547,20 @@ export namespace Prisma {
    */
   export type CreatorProfileCountOutputTypeCountPortfolio_itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PortfolioItemWhereInput
+  }
+
+  /**
+   * CreatorProfileCountOutputType without action
+   */
+  export type CreatorProfileCountOutputTypeCountPackages_createdArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PackageWhereInput
+  }
+
+  /**
+   * CreatorProfileCountOutputType without action
+   */
+  export type CreatorProfileCountOutputTypeCountOrders_receivedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderWhereInput
   }
 
 
@@ -3495,7 +3620,6 @@ export namespace Prisma {
   export type CollaborationCountOutputType = {
     content_submissions: number
     invoices: number
-    packages: number
     payments: number
     reviews: number
   }
@@ -3503,7 +3627,6 @@ export namespace Prisma {
   export type CollaborationCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     content_submissions?: boolean | CollaborationCountOutputTypeCountContent_submissionsArgs
     invoices?: boolean | CollaborationCountOutputTypeCountInvoicesArgs
-    packages?: boolean | CollaborationCountOutputTypeCountPackagesArgs
     payments?: boolean | CollaborationCountOutputTypeCountPaymentsArgs
     reviews?: boolean | CollaborationCountOutputTypeCountReviewsArgs
   }
@@ -3531,13 +3654,6 @@ export namespace Prisma {
    */
   export type CollaborationCountOutputTypeCountInvoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InvoiceWhereInput
-  }
-
-  /**
-   * CollaborationCountOutputType without action
-   */
-  export type CollaborationCountOutputTypeCountPackagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PackageWhereInput
   }
 
   /**
@@ -3658,6 +3774,77 @@ export namespace Prisma {
 
 
   /**
+   * Count Type PackageCountOutputType
+   */
+
+  export type PackageCountOutputType = {
+    orders: number
+  }
+
+  export type PackageCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    orders?: boolean | PackageCountOutputTypeCountOrdersArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PackageCountOutputType without action
+   */
+  export type PackageCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageCountOutputType
+     */
+    select?: PackageCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PackageCountOutputType without action
+   */
+  export type PackageCountOutputTypeCountOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderWhereInput
+  }
+
+
+  /**
+   * Count Type OrderCountOutputType
+   */
+
+  export type OrderCountOutputType = {
+    payments: number
+    invoices: number
+  }
+
+  export type OrderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    payments?: boolean | OrderCountOutputTypeCountPaymentsArgs
+    invoices?: boolean | OrderCountOutputTypeCountInvoicesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * OrderCountOutputType without action
+   */
+  export type OrderCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderCountOutputType
+     */
+    select?: OrderCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * OrderCountOutputType without action
+   */
+  export type OrderCountOutputTypeCountPaymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PaymentWhereInput
+  }
+
+  /**
+   * OrderCountOutputType without action
+   */
+  export type OrderCountOutputTypeCountInvoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InvoiceWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -3694,6 +3881,7 @@ export namespace Prisma {
     first_name: string | null
     last_name: string | null
     profile_image_url: string | null
+    cover_image_url: string | null
     phone: string | null
     timezone: string | null
     language: string | null
@@ -3718,6 +3906,7 @@ export namespace Prisma {
     first_name: string | null
     last_name: string | null
     profile_image_url: string | null
+    cover_image_url: string | null
     phone: string | null
     timezone: string | null
     language: string | null
@@ -3742,6 +3931,7 @@ export namespace Prisma {
     first_name: number
     last_name: number
     profile_image_url: number
+    cover_image_url: number
     phone: number
     timezone: number
     language: number
@@ -3780,6 +3970,7 @@ export namespace Prisma {
     first_name?: true
     last_name?: true
     profile_image_url?: true
+    cover_image_url?: true
     phone?: true
     timezone?: true
     language?: true
@@ -3804,6 +3995,7 @@ export namespace Prisma {
     first_name?: true
     last_name?: true
     profile_image_url?: true
+    cover_image_url?: true
     phone?: true
     timezone?: true
     language?: true
@@ -3828,6 +4020,7 @@ export namespace Prisma {
     first_name?: true
     last_name?: true
     profile_image_url?: true
+    cover_image_url?: true
     phone?: true
     timezone?: true
     language?: true
@@ -3939,6 +4132,7 @@ export namespace Prisma {
     first_name: string | null
     last_name: string | null
     profile_image_url: string | null
+    cover_image_url: string | null
     phone: string | null
     timezone: string | null
     language: string | null
@@ -3982,6 +4176,7 @@ export namespace Prisma {
     first_name?: boolean
     last_name?: boolean
     profile_image_url?: boolean
+    cover_image_url?: boolean
     phone?: boolean
     timezone?: boolean
     language?: boolean
@@ -4002,7 +4197,6 @@ export namespace Prisma {
     creator_profiles?: boolean | User$creator_profilesArgs<ExtArgs>
     sent_messages?: boolean | User$sent_messagesArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
-    admin_packages?: boolean | User$admin_packagesArgs<ExtArgs>
     admin_payments?: boolean | User$admin_paymentsArgs<ExtArgs>
     payments_payee?: boolean | User$payments_payeeArgs<ExtArgs>
     payments_payer?: boolean | User$payments_payerArgs<ExtArgs>
@@ -4022,6 +4216,7 @@ export namespace Prisma {
     first_name?: boolean
     last_name?: boolean
     profile_image_url?: boolean
+    cover_image_url?: boolean
     phone?: boolean
     timezone?: boolean
     language?: boolean
@@ -4046,6 +4241,7 @@ export namespace Prisma {
     first_name?: boolean
     last_name?: boolean
     profile_image_url?: boolean
+    cover_image_url?: boolean
     phone?: boolean
     timezone?: boolean
     language?: boolean
@@ -4070,6 +4266,7 @@ export namespace Prisma {
     first_name?: boolean
     last_name?: boolean
     profile_image_url?: boolean
+    cover_image_url?: boolean
     phone?: boolean
     timezone?: boolean
     language?: boolean
@@ -4085,7 +4282,7 @@ export namespace Prisma {
     age?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password_hash" | "user_type" | "name" | "first_name" | "last_name" | "profile_image_url" | "phone" | "timezone" | "language" | "email_verified" | "status" | "created_at" | "updated_at" | "last_login_at" | "auth_provider" | "phone_verified" | "onboarding_completed" | "onboarding_step" | "age", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password_hash" | "user_type" | "name" | "first_name" | "last_name" | "profile_image_url" | "cover_image_url" | "phone" | "timezone" | "language" | "email_verified" | "status" | "created_at" | "updated_at" | "last_login_at" | "auth_provider" | "phone_verified" | "onboarding_completed" | "onboarding_step" | "age", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     brand_profiles?: boolean | User$brand_profilesArgs<ExtArgs>
     admin_channels?: boolean | User$admin_channelsArgs<ExtArgs>
@@ -4094,7 +4291,6 @@ export namespace Prisma {
     creator_profiles?: boolean | User$creator_profilesArgs<ExtArgs>
     sent_messages?: boolean | User$sent_messagesArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
-    admin_packages?: boolean | User$admin_packagesArgs<ExtArgs>
     admin_payments?: boolean | User$admin_paymentsArgs<ExtArgs>
     payments_payee?: boolean | User$payments_payeeArgs<ExtArgs>
     payments_payer?: boolean | User$payments_payerArgs<ExtArgs>
@@ -4117,7 +4313,6 @@ export namespace Prisma {
       creator_profiles: Prisma.$CreatorProfilePayload<ExtArgs> | null
       sent_messages: Prisma.$MessagePayload<ExtArgs>[]
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
-      admin_packages: Prisma.$PackagePayload<ExtArgs>[]
       admin_payments: Prisma.$PaymentPayload<ExtArgs>[]
       payments_payee: Prisma.$PaymentPayload<ExtArgs>[]
       payments_payer: Prisma.$PaymentPayload<ExtArgs>[]
@@ -4135,6 +4330,7 @@ export namespace Prisma {
       first_name: string | null
       last_name: string | null
       profile_image_url: string | null
+      cover_image_url: string | null
       phone: string | null
       timezone: string | null
       language: string | null
@@ -4549,7 +4745,6 @@ export namespace Prisma {
     creator_profiles<T extends User$creator_profilesArgs<ExtArgs> = {}>(args?: Subset<T, User$creator_profilesArgs<ExtArgs>>): Prisma__CreatorProfileClient<$Result.GetResult<Prisma.$CreatorProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     sent_messages<T extends User$sent_messagesArgs<ExtArgs> = {}>(args?: Subset<T, User$sent_messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notifications<T extends User$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    admin_packages<T extends User$admin_packagesArgs<ExtArgs> = {}>(args?: Subset<T, User$admin_packagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     admin_payments<T extends User$admin_paymentsArgs<ExtArgs> = {}>(args?: Subset<T, User$admin_paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payments_payee<T extends User$payments_payeeArgs<ExtArgs> = {}>(args?: Subset<T, User$payments_payeeArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payments_payer<T extends User$payments_payerArgs<ExtArgs> = {}>(args?: Subset<T, User$payments_payerArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4594,6 +4789,7 @@ export namespace Prisma {
     readonly first_name: FieldRef<"User", 'String'>
     readonly last_name: FieldRef<"User", 'String'>
     readonly profile_image_url: FieldRef<"User", 'String'>
+    readonly cover_image_url: FieldRef<"User", 'String'>
     readonly phone: FieldRef<"User", 'String'>
     readonly timezone: FieldRef<"User", 'String'>
     readonly language: FieldRef<"User", 'String'>
@@ -5158,30 +5354,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.admin_packages
-   */
-  export type User$admin_packagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Package
-     */
-    select?: PackageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Package
-     */
-    omit?: PackageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PackageInclude<ExtArgs> | null
-    where?: PackageWhereInput
-    orderBy?: PackageOrderByWithRelationInput | PackageOrderByWithRelationInput[]
-    cursor?: PackageWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: PackageScalarFieldEnum | PackageScalarFieldEnum[]
-  }
-
-  /**
    * User.admin_payments
    */
   export type User$admin_paymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5695,6 +5867,7 @@ export namespace Prisma {
     collaborations?: boolean | BrandProfile$collaborationsArgs<ExtArgs>
     invoices?: boolean | BrandProfile$invoicesArgs<ExtArgs>
     portfolio_items?: boolean | BrandProfile$portfolio_itemsArgs<ExtArgs>
+    orders_placed?: boolean | BrandProfile$orders_placedArgs<ExtArgs>
     _count?: boolean | BrandProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["brandProfile"]>
 
@@ -5779,6 +5952,7 @@ export namespace Prisma {
     collaborations?: boolean | BrandProfile$collaborationsArgs<ExtArgs>
     invoices?: boolean | BrandProfile$invoicesArgs<ExtArgs>
     portfolio_items?: boolean | BrandProfile$portfolio_itemsArgs<ExtArgs>
+    orders_placed?: boolean | BrandProfile$orders_placedArgs<ExtArgs>
     _count?: boolean | BrandProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BrandProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5796,6 +5970,7 @@ export namespace Prisma {
       collaborations: Prisma.$CollaborationPayload<ExtArgs>[]
       invoices: Prisma.$InvoicePayload<ExtArgs>[]
       portfolio_items: Prisma.$PortfolioItemPayload<ExtArgs>[]
+      orders_placed: Prisma.$OrderPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
@@ -6218,6 +6393,7 @@ export namespace Prisma {
     collaborations<T extends BrandProfile$collaborationsArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfile$collaborationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CollaborationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invoices<T extends BrandProfile$invoicesArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfile$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     portfolio_items<T extends BrandProfile$portfolio_itemsArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfile$portfolio_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PortfolioItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    orders_placed<T extends BrandProfile$orders_placedArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfile$orders_placedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6760,6 +6936,30 @@ export namespace Prisma {
   }
 
   /**
+   * BrandProfile.orders_placed
+   */
+  export type BrandProfile$orders_placedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    cursor?: OrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
+  }
+
+  /**
    * BrandProfile without action
    */
   export type BrandProfileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7123,6 +7323,8 @@ export namespace Prisma {
     social_media_accounts?: boolean | CreatorProfile$social_media_accountsArgs<ExtArgs>
     kyc?: boolean | CreatorProfile$kycArgs<ExtArgs>
     portfolio_items?: boolean | CreatorProfile$portfolio_itemsArgs<ExtArgs>
+    packages_created?: boolean | CreatorProfile$packages_createdArgs<ExtArgs>
+    orders_received?: boolean | CreatorProfile$orders_receivedArgs<ExtArgs>
     _count?: boolean | CreatorProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["creatorProfile"]>
 
@@ -7212,6 +7414,8 @@ export namespace Prisma {
     social_media_accounts?: boolean | CreatorProfile$social_media_accountsArgs<ExtArgs>
     kyc?: boolean | CreatorProfile$kycArgs<ExtArgs>
     portfolio_items?: boolean | CreatorProfile$portfolio_itemsArgs<ExtArgs>
+    packages_created?: boolean | CreatorProfile$packages_createdArgs<ExtArgs>
+    orders_received?: boolean | CreatorProfile$orders_receivedArgs<ExtArgs>
     _count?: boolean | CreatorProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CreatorProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7231,6 +7435,8 @@ export namespace Prisma {
       social_media_accounts: Prisma.$SocialMediaAccountPayload<ExtArgs>[]
       kyc: Prisma.$KYCPayload<ExtArgs> | null
       portfolio_items: Prisma.$PortfolioItemPayload<ExtArgs>[]
+      packages_created: Prisma.$PackagePayload<ExtArgs>[]
+      orders_received: Prisma.$OrderPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
@@ -7656,6 +7862,8 @@ export namespace Prisma {
     social_media_accounts<T extends CreatorProfile$social_media_accountsArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfile$social_media_accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SocialMediaAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kyc<T extends CreatorProfile$kycArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfile$kycArgs<ExtArgs>>): Prisma__KYCClient<$Result.GetResult<Prisma.$KYCPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     portfolio_items<T extends CreatorProfile$portfolio_itemsArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfile$portfolio_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PortfolioItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    packages_created<T extends CreatorProfile$packages_createdArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfile$packages_createdArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    orders_received<T extends CreatorProfile$orders_receivedArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfile$orders_receivedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8239,6 +8447,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PortfolioItemScalarFieldEnum | PortfolioItemScalarFieldEnum[]
+  }
+
+  /**
+   * CreatorProfile.packages_created
+   */
+  export type CreatorProfile$packages_createdArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Package
+     */
+    select?: PackageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Package
+     */
+    omit?: PackageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageInclude<ExtArgs> | null
+    where?: PackageWhereInput
+    orderBy?: PackageOrderByWithRelationInput | PackageOrderByWithRelationInput[]
+    cursor?: PackageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PackageScalarFieldEnum | PackageScalarFieldEnum[]
+  }
+
+  /**
+   * CreatorProfile.orders_received
+   */
+  export type CreatorProfile$orders_receivedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    cursor?: OrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
   }
 
   /**
@@ -12343,7 +12599,6 @@ export namespace Prisma {
     channels?: boolean | Collaboration$channelsArgs<ExtArgs>
     content_submissions?: boolean | Collaboration$content_submissionsArgs<ExtArgs>
     invoices?: boolean | Collaboration$invoicesArgs<ExtArgs>
-    packages?: boolean | Collaboration$packagesArgs<ExtArgs>
     payments?: boolean | Collaboration$paymentsArgs<ExtArgs>
     reviews?: boolean | Collaboration$reviewsArgs<ExtArgs>
     _count?: boolean | CollaborationCountOutputTypeDefaultArgs<ExtArgs>
@@ -12411,7 +12666,6 @@ export namespace Prisma {
     channels?: boolean | Collaboration$channelsArgs<ExtArgs>
     content_submissions?: boolean | Collaboration$content_submissionsArgs<ExtArgs>
     invoices?: boolean | Collaboration$invoicesArgs<ExtArgs>
-    packages?: boolean | Collaboration$packagesArgs<ExtArgs>
     payments?: boolean | Collaboration$paymentsArgs<ExtArgs>
     reviews?: boolean | Collaboration$reviewsArgs<ExtArgs>
     _count?: boolean | CollaborationCountOutputTypeDefaultArgs<ExtArgs>
@@ -12439,7 +12693,6 @@ export namespace Prisma {
       channels: Prisma.$CollaborationChannelPayload<ExtArgs> | null
       content_submissions: Prisma.$ContentSubmissionPayload<ExtArgs>[]
       invoices: Prisma.$InvoicePayload<ExtArgs>[]
-      packages: Prisma.$PackagePayload<ExtArgs>[]
       payments: Prisma.$PaymentPayload<ExtArgs>[]
       reviews: Prisma.$ReviewPayload<ExtArgs>[]
     }
@@ -12857,7 +13110,6 @@ export namespace Prisma {
     channels<T extends Collaboration$channelsArgs<ExtArgs> = {}>(args?: Subset<T, Collaboration$channelsArgs<ExtArgs>>): Prisma__CollaborationChannelClient<$Result.GetResult<Prisma.$CollaborationChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     content_submissions<T extends Collaboration$content_submissionsArgs<ExtArgs> = {}>(args?: Subset<T, Collaboration$content_submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContentSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invoices<T extends Collaboration$invoicesArgs<ExtArgs> = {}>(args?: Subset<T, Collaboration$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    packages<T extends Collaboration$packagesArgs<ExtArgs> = {}>(args?: Subset<T, Collaboration$packagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payments<T extends Collaboration$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Collaboration$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     reviews<T extends Collaboration$reviewsArgs<ExtArgs> = {}>(args?: Subset<T, Collaboration$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -13361,30 +13613,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
-  }
-
-  /**
-   * Collaboration.packages
-   */
-  export type Collaboration$packagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Package
-     */
-    select?: PackageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Package
-     */
-    omit?: PackageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PackageInclude<ExtArgs> | null
-    where?: PackageWhereInput
-    orderBy?: PackageOrderByWithRelationInput | PackageOrderByWithRelationInput[]
-    cursor?: PackageWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: PackageScalarFieldEnum | PackageScalarFieldEnum[]
   }
 
   /**
@@ -15877,6 +16105,7 @@ export namespace Prisma {
 
   export type PaymentAvgAggregateOutputType = {
     id: number | null
+    order_id: number | null
     collaboration_id: number | null
     payer_id: number | null
     payee_id: number | null
@@ -15888,6 +16117,7 @@ export namespace Prisma {
 
   export type PaymentSumAggregateOutputType = {
     id: bigint | null
+    order_id: bigint | null
     collaboration_id: bigint | null
     payer_id: bigint | null
     payee_id: bigint | null
@@ -15899,6 +16129,7 @@ export namespace Prisma {
 
   export type PaymentMinAggregateOutputType = {
     id: bigint | null
+    order_id: bigint | null
     collaboration_id: bigint | null
     payer_id: bigint | null
     payee_id: bigint | null
@@ -15917,6 +16148,7 @@ export namespace Prisma {
 
   export type PaymentMaxAggregateOutputType = {
     id: bigint | null
+    order_id: bigint | null
     collaboration_id: bigint | null
     payer_id: bigint | null
     payee_id: bigint | null
@@ -15935,6 +16167,7 @@ export namespace Prisma {
 
   export type PaymentCountAggregateOutputType = {
     id: number
+    order_id: number
     collaboration_id: number
     payer_id: number
     payee_id: number
@@ -15955,6 +16188,7 @@ export namespace Prisma {
 
   export type PaymentAvgAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     payer_id?: true
     payee_id?: true
@@ -15966,6 +16200,7 @@ export namespace Prisma {
 
   export type PaymentSumAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     payer_id?: true
     payee_id?: true
@@ -15977,6 +16212,7 @@ export namespace Prisma {
 
   export type PaymentMinAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     payer_id?: true
     payee_id?: true
@@ -15995,6 +16231,7 @@ export namespace Prisma {
 
   export type PaymentMaxAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     payer_id?: true
     payee_id?: true
@@ -16013,6 +16250,7 @@ export namespace Prisma {
 
   export type PaymentCountAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     payer_id?: true
     payee_id?: true
@@ -16118,7 +16356,8 @@ export namespace Prisma {
 
   export type PaymentGroupByOutputType = {
     id: bigint
-    collaboration_id: bigint
+    order_id: bigint | null
+    collaboration_id: bigint | null
     payer_id: bigint
     payee_id: bigint
     admin_id: bigint
@@ -16155,6 +16394,7 @@ export namespace Prisma {
 
   export type PaymentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    order_id?: boolean
     collaboration_id?: boolean
     payer_id?: boolean
     payee_id?: boolean
@@ -16170,13 +16410,15 @@ export namespace Prisma {
     completed_at?: boolean
     failure_reason?: boolean
     admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Payment$orderArgs<ExtArgs>
+    collaboration?: boolean | Payment$collaborationArgs<ExtArgs>
     payee?: boolean | UserDefaultArgs<ExtArgs>
     payer?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["payment"]>
 
   export type PaymentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    order_id?: boolean
     collaboration_id?: boolean
     payer_id?: boolean
     payee_id?: boolean
@@ -16192,13 +16434,15 @@ export namespace Prisma {
     completed_at?: boolean
     failure_reason?: boolean
     admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Payment$orderArgs<ExtArgs>
+    collaboration?: boolean | Payment$collaborationArgs<ExtArgs>
     payee?: boolean | UserDefaultArgs<ExtArgs>
     payer?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["payment"]>
 
   export type PaymentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    order_id?: boolean
     collaboration_id?: boolean
     payer_id?: boolean
     payee_id?: boolean
@@ -16214,13 +16458,15 @@ export namespace Prisma {
     completed_at?: boolean
     failure_reason?: boolean
     admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Payment$orderArgs<ExtArgs>
+    collaboration?: boolean | Payment$collaborationArgs<ExtArgs>
     payee?: boolean | UserDefaultArgs<ExtArgs>
     payer?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["payment"]>
 
   export type PaymentSelectScalar = {
     id?: boolean
+    order_id?: boolean
     collaboration_id?: boolean
     payer_id?: boolean
     payee_id?: boolean
@@ -16237,22 +16483,25 @@ export namespace Prisma {
     failure_reason?: boolean
   }
 
-  export type PaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "collaboration_id" | "payer_id" | "payee_id" | "admin_id" | "amount" | "currency" | "platform_fee" | "net_amount" | "payment_method" | "transaction_id" | "status" | "initiated_at" | "completed_at" | "failure_reason", ExtArgs["result"]["payment"]>
+  export type PaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "order_id" | "collaboration_id" | "payer_id" | "payee_id" | "admin_id" | "amount" | "currency" | "platform_fee" | "net_amount" | "payment_method" | "transaction_id" | "status" | "initiated_at" | "completed_at" | "failure_reason", ExtArgs["result"]["payment"]>
   export type PaymentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Payment$orderArgs<ExtArgs>
+    collaboration?: boolean | Payment$collaborationArgs<ExtArgs>
     payee?: boolean | UserDefaultArgs<ExtArgs>
     payer?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type PaymentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Payment$orderArgs<ExtArgs>
+    collaboration?: boolean | Payment$collaborationArgs<ExtArgs>
     payee?: boolean | UserDefaultArgs<ExtArgs>
     payer?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type PaymentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Payment$orderArgs<ExtArgs>
+    collaboration?: boolean | Payment$collaborationArgs<ExtArgs>
     payee?: boolean | UserDefaultArgs<ExtArgs>
     payer?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -16261,13 +16510,15 @@ export namespace Prisma {
     name: "Payment"
     objects: {
       admin: Prisma.$UserPayload<ExtArgs>
-      collaboration: Prisma.$CollaborationPayload<ExtArgs>
+      order: Prisma.$OrderPayload<ExtArgs> | null
+      collaboration: Prisma.$CollaborationPayload<ExtArgs> | null
       payee: Prisma.$UserPayload<ExtArgs>
       payer: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
-      collaboration_id: bigint
+      order_id: bigint | null
+      collaboration_id: bigint | null
       payer_id: bigint
       payee_id: bigint
       admin_id: bigint
@@ -16676,7 +16927,8 @@ export namespace Prisma {
   export interface Prisma__PaymentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     admin<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    collaboration<T extends CollaborationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CollaborationDefaultArgs<ExtArgs>>): Prisma__CollaborationClient<$Result.GetResult<Prisma.$CollaborationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    order<T extends Payment$orderArgs<ExtArgs> = {}>(args?: Subset<T, Payment$orderArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    collaboration<T extends Payment$collaborationArgs<ExtArgs> = {}>(args?: Subset<T, Payment$collaborationArgs<ExtArgs>>): Prisma__CollaborationClient<$Result.GetResult<Prisma.$CollaborationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     payee<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     payer<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
@@ -16709,6 +16961,7 @@ export namespace Prisma {
    */
   interface PaymentFieldRefs {
     readonly id: FieldRef<"Payment", 'BigInt'>
+    readonly order_id: FieldRef<"Payment", 'BigInt'>
     readonly collaboration_id: FieldRef<"Payment", 'BigInt'>
     readonly payer_id: FieldRef<"Payment", 'BigInt'>
     readonly payee_id: FieldRef<"Payment", 'BigInt'>
@@ -17119,6 +17372,44 @@ export namespace Prisma {
   }
 
   /**
+   * Payment.order
+   */
+  export type Payment$orderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+  }
+
+  /**
+   * Payment.collaboration
+   */
+  export type Payment$collaborationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collaboration
+     */
+    select?: CollaborationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collaboration
+     */
+    omit?: CollaborationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollaborationInclude<ExtArgs> | null
+    where?: CollaborationWhereInput
+  }
+
+  /**
    * Payment without action
    */
   export type PaymentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -17151,6 +17442,7 @@ export namespace Prisma {
 
   export type InvoiceAvgAggregateOutputType = {
     id: number | null
+    order_id: number | null
     collaboration_id: number | null
     brand_id: number | null
     creator_id: number | null
@@ -17161,6 +17453,7 @@ export namespace Prisma {
 
   export type InvoiceSumAggregateOutputType = {
     id: bigint | null
+    order_id: bigint | null
     collaboration_id: bigint | null
     brand_id: bigint | null
     creator_id: bigint | null
@@ -17171,6 +17464,7 @@ export namespace Prisma {
 
   export type InvoiceMinAggregateOutputType = {
     id: bigint | null
+    order_id: bigint | null
     collaboration_id: bigint | null
     brand_id: bigint | null
     creator_id: bigint | null
@@ -17187,6 +17481,7 @@ export namespace Prisma {
 
   export type InvoiceMaxAggregateOutputType = {
     id: bigint | null
+    order_id: bigint | null
     collaboration_id: bigint | null
     brand_id: bigint | null
     creator_id: bigint | null
@@ -17203,6 +17498,7 @@ export namespace Prisma {
 
   export type InvoiceCountAggregateOutputType = {
     id: number
+    order_id: number
     collaboration_id: number
     brand_id: number
     creator_id: number
@@ -17221,6 +17517,7 @@ export namespace Prisma {
 
   export type InvoiceAvgAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     brand_id?: true
     creator_id?: true
@@ -17231,6 +17528,7 @@ export namespace Prisma {
 
   export type InvoiceSumAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     brand_id?: true
     creator_id?: true
@@ -17241,6 +17539,7 @@ export namespace Prisma {
 
   export type InvoiceMinAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     brand_id?: true
     creator_id?: true
@@ -17257,6 +17556,7 @@ export namespace Prisma {
 
   export type InvoiceMaxAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     brand_id?: true
     creator_id?: true
@@ -17273,6 +17573,7 @@ export namespace Prisma {
 
   export type InvoiceCountAggregateInputType = {
     id?: true
+    order_id?: true
     collaboration_id?: true
     brand_id?: true
     creator_id?: true
@@ -17376,7 +17677,8 @@ export namespace Prisma {
 
   export type InvoiceGroupByOutputType = {
     id: bigint
-    collaboration_id: bigint
+    order_id: bigint | null
+    collaboration_id: bigint | null
     brand_id: bigint
     creator_id: bigint
     invoice_number: string
@@ -17411,6 +17713,7 @@ export namespace Prisma {
 
   export type InvoiceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    order_id?: boolean
     collaboration_id?: boolean
     brand_id?: boolean
     creator_id?: boolean
@@ -17424,12 +17727,14 @@ export namespace Prisma {
     issued_at?: boolean
     paid_at?: boolean
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Invoice$orderArgs<ExtArgs>
+    collaboration?: boolean | Invoice$collaborationArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["invoice"]>
 
   export type InvoiceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    order_id?: boolean
     collaboration_id?: boolean
     brand_id?: boolean
     creator_id?: boolean
@@ -17443,12 +17748,14 @@ export namespace Prisma {
     issued_at?: boolean
     paid_at?: boolean
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Invoice$orderArgs<ExtArgs>
+    collaboration?: boolean | Invoice$collaborationArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["invoice"]>
 
   export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    order_id?: boolean
     collaboration_id?: boolean
     brand_id?: boolean
     creator_id?: boolean
@@ -17462,12 +17769,14 @@ export namespace Prisma {
     issued_at?: boolean
     paid_at?: boolean
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Invoice$orderArgs<ExtArgs>
+    collaboration?: boolean | Invoice$collaborationArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["invoice"]>
 
   export type InvoiceSelectScalar = {
     id?: boolean
+    order_id?: boolean
     collaboration_id?: boolean
     brand_id?: boolean
     creator_id?: boolean
@@ -17482,20 +17791,23 @@ export namespace Prisma {
     paid_at?: boolean
   }
 
-  export type InvoiceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "collaboration_id" | "brand_id" | "creator_id" | "invoice_number" | "amount" | "currency" | "tax_amount" | "total_amount" | "due_date" | "status" | "issued_at" | "paid_at", ExtArgs["result"]["invoice"]>
+  export type InvoiceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "order_id" | "collaboration_id" | "brand_id" | "creator_id" | "invoice_number" | "amount" | "currency" | "tax_amount" | "total_amount" | "due_date" | "status" | "issued_at" | "paid_at", ExtArgs["result"]["invoice"]>
   export type InvoiceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Invoice$orderArgs<ExtArgs>
+    collaboration?: boolean | Invoice$collaborationArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }
   export type InvoiceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Invoice$orderArgs<ExtArgs>
+    collaboration?: boolean | Invoice$collaborationArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }
   export type InvoiceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    order?: boolean | Invoice$orderArgs<ExtArgs>
+    collaboration?: boolean | Invoice$collaborationArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }
 
@@ -17503,12 +17815,14 @@ export namespace Prisma {
     name: "Invoice"
     objects: {
       brand: Prisma.$BrandProfilePayload<ExtArgs>
-      collaboration: Prisma.$CollaborationPayload<ExtArgs>
+      order: Prisma.$OrderPayload<ExtArgs> | null
+      collaboration: Prisma.$CollaborationPayload<ExtArgs> | null
       creator: Prisma.$CreatorProfilePayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
-      collaboration_id: bigint
+      order_id: bigint | null
+      collaboration_id: bigint | null
       brand_id: bigint
       creator_id: bigint
       invoice_number: string
@@ -17915,7 +18229,8 @@ export namespace Prisma {
   export interface Prisma__InvoiceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     brand<T extends BrandProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfileDefaultArgs<ExtArgs>>): Prisma__BrandProfileClient<$Result.GetResult<Prisma.$BrandProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    collaboration<T extends CollaborationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CollaborationDefaultArgs<ExtArgs>>): Prisma__CollaborationClient<$Result.GetResult<Prisma.$CollaborationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    order<T extends Invoice$orderArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$orderArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    collaboration<T extends Invoice$collaborationArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$collaborationArgs<ExtArgs>>): Prisma__CollaborationClient<$Result.GetResult<Prisma.$CollaborationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     creator<T extends CreatorProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfileDefaultArgs<ExtArgs>>): Prisma__CreatorProfileClient<$Result.GetResult<Prisma.$CreatorProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -17947,6 +18262,7 @@ export namespace Prisma {
    */
   interface InvoiceFieldRefs {
     readonly id: FieldRef<"Invoice", 'BigInt'>
+    readonly order_id: FieldRef<"Invoice", 'BigInt'>
     readonly collaboration_id: FieldRef<"Invoice", 'BigInt'>
     readonly brand_id: FieldRef<"Invoice", 'BigInt'>
     readonly creator_id: FieldRef<"Invoice", 'BigInt'>
@@ -18352,6 +18668,44 @@ export namespace Prisma {
      * Limit how many Invoices to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Invoice.order
+   */
+  export type Invoice$orderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+  }
+
+  /**
+   * Invoice.collaboration
+   */
+  export type Invoice$collaborationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collaboration
+     */
+    select?: CollaborationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collaboration
+     */
+    omit?: CollaborationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollaborationInclude<ExtArgs> | null
+    where?: CollaborationWhereInput
   }
 
   /**
@@ -27507,100 +27861,108 @@ export namespace Prisma {
 
   export type PackageAvgAggregateOutputType = {
     id: number | null
-    collaboration_id: number | null
-    admin_id: number | null
+    creator_id: number | null
     price: Decimal | null
   }
 
   export type PackageSumAggregateOutputType = {
     id: bigint | null
-    collaboration_id: bigint | null
-    admin_id: bigint | null
+    creator_id: bigint | null
     price: Decimal | null
   }
 
   export type PackageMinAggregateOutputType = {
     id: bigint | null
-    collaboration_id: bigint | null
-    admin_id: bigint | null
+    creator_id: bigint | null
     type: $Enums.PackageType | null
     title: string | null
     description: string | null
     price: Decimal | null
+    currency: string | null
+    is_active: boolean | null
     created_at: Date | null
+    updated_at: Date | null
   }
 
   export type PackageMaxAggregateOutputType = {
     id: bigint | null
-    collaboration_id: bigint | null
-    admin_id: bigint | null
+    creator_id: bigint | null
     type: $Enums.PackageType | null
     title: string | null
     description: string | null
     price: Decimal | null
+    currency: string | null
+    is_active: boolean | null
     created_at: Date | null
+    updated_at: Date | null
   }
 
   export type PackageCountAggregateOutputType = {
     id: number
-    collaboration_id: number
-    admin_id: number
+    creator_id: number
     type: number
     title: number
     description: number
     price: number
+    currency: number
     deliverables: number
+    is_active: number
     created_at: number
+    updated_at: number
     _all: number
   }
 
 
   export type PackageAvgAggregateInputType = {
     id?: true
-    collaboration_id?: true
-    admin_id?: true
+    creator_id?: true
     price?: true
   }
 
   export type PackageSumAggregateInputType = {
     id?: true
-    collaboration_id?: true
-    admin_id?: true
+    creator_id?: true
     price?: true
   }
 
   export type PackageMinAggregateInputType = {
     id?: true
-    collaboration_id?: true
-    admin_id?: true
+    creator_id?: true
     type?: true
     title?: true
     description?: true
     price?: true
+    currency?: true
+    is_active?: true
     created_at?: true
+    updated_at?: true
   }
 
   export type PackageMaxAggregateInputType = {
     id?: true
-    collaboration_id?: true
-    admin_id?: true
+    creator_id?: true
     type?: true
     title?: true
     description?: true
     price?: true
+    currency?: true
+    is_active?: true
     created_at?: true
+    updated_at?: true
   }
 
   export type PackageCountAggregateInputType = {
     id?: true
-    collaboration_id?: true
-    admin_id?: true
+    creator_id?: true
     type?: true
     title?: true
     description?: true
     price?: true
+    currency?: true
     deliverables?: true
+    is_active?: true
     created_at?: true
+    updated_at?: true
     _all?: true
   }
 
@@ -27692,14 +28054,16 @@ export namespace Prisma {
 
   export type PackageGroupByOutputType = {
     id: bigint
-    collaboration_id: bigint
-    admin_id: bigint
+    creator_id: bigint
     type: $Enums.PackageType
     title: string
     description: string | null
     price: Decimal
+    currency: string
     deliverables: JsonValue | null
+    is_active: boolean
     created_at: Date
+    updated_at: Date
     _count: PackageCountAggregateOutputType | null
     _avg: PackageAvgAggregateOutputType | null
     _sum: PackageSumAggregateOutputType | null
@@ -27723,88 +28087,96 @@ export namespace Prisma {
 
   export type PackageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    collaboration_id?: boolean
-    admin_id?: boolean
+    creator_id?: boolean
     type?: boolean
     title?: boolean
     description?: boolean
     price?: boolean
+    currency?: boolean
     deliverables?: boolean
+    is_active?: boolean
     created_at?: boolean
-    admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    updated_at?: boolean
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    orders?: boolean | Package$ordersArgs<ExtArgs>
+    _count?: boolean | PackageCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["package"]>
 
   export type PackageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    collaboration_id?: boolean
-    admin_id?: boolean
+    creator_id?: boolean
     type?: boolean
     title?: boolean
     description?: boolean
     price?: boolean
+    currency?: boolean
     deliverables?: boolean
+    is_active?: boolean
     created_at?: boolean
-    admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    updated_at?: boolean
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["package"]>
 
   export type PackageSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    collaboration_id?: boolean
-    admin_id?: boolean
+    creator_id?: boolean
     type?: boolean
     title?: boolean
     description?: boolean
     price?: boolean
+    currency?: boolean
     deliverables?: boolean
+    is_active?: boolean
     created_at?: boolean
-    admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    updated_at?: boolean
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["package"]>
 
   export type PackageSelectScalar = {
     id?: boolean
-    collaboration_id?: boolean
-    admin_id?: boolean
+    creator_id?: boolean
     type?: boolean
     title?: boolean
     description?: boolean
     price?: boolean
+    currency?: boolean
     deliverables?: boolean
+    is_active?: boolean
     created_at?: boolean
+    updated_at?: boolean
   }
 
-  export type PackageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "collaboration_id" | "admin_id" | "type" | "title" | "description" | "price" | "deliverables" | "created_at", ExtArgs["result"]["package"]>
+  export type PackageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "creator_id" | "type" | "title" | "description" | "price" | "currency" | "deliverables" | "is_active" | "created_at" | "updated_at", ExtArgs["result"]["package"]>
   export type PackageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    orders?: boolean | Package$ordersArgs<ExtArgs>
+    _count?: boolean | PackageCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PackageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }
   export type PackageIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    admin?: boolean | UserDefaultArgs<ExtArgs>
-    collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
   }
 
   export type $PackagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Package"
     objects: {
-      admin: Prisma.$UserPayload<ExtArgs>
-      collaboration: Prisma.$CollaborationPayload<ExtArgs>
+      creator: Prisma.$CreatorProfilePayload<ExtArgs>
+      orders: Prisma.$OrderPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
-      collaboration_id: bigint
-      admin_id: bigint
+      creator_id: bigint
       type: $Enums.PackageType
       title: string
       description: string | null
       price: Prisma.Decimal
+      currency: string
       deliverables: Prisma.JsonValue | null
+      is_active: boolean
       created_at: Date
+      updated_at: Date
     }, ExtArgs["result"]["package"]>
     composites: {}
   }
@@ -28199,8 +28571,8 @@ export namespace Prisma {
    */
   export interface Prisma__PackageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    admin<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    collaboration<T extends CollaborationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CollaborationDefaultArgs<ExtArgs>>): Prisma__CollaborationClient<$Result.GetResult<Prisma.$CollaborationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    creator<T extends CreatorProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfileDefaultArgs<ExtArgs>>): Prisma__CreatorProfileClient<$Result.GetResult<Prisma.$CreatorProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    orders<T extends Package$ordersArgs<ExtArgs> = {}>(args?: Subset<T, Package$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -28231,14 +28603,16 @@ export namespace Prisma {
    */
   interface PackageFieldRefs {
     readonly id: FieldRef<"Package", 'BigInt'>
-    readonly collaboration_id: FieldRef<"Package", 'BigInt'>
-    readonly admin_id: FieldRef<"Package", 'BigInt'>
+    readonly creator_id: FieldRef<"Package", 'BigInt'>
     readonly type: FieldRef<"Package", 'PackageType'>
     readonly title: FieldRef<"Package", 'String'>
     readonly description: FieldRef<"Package", 'String'>
     readonly price: FieldRef<"Package", 'Decimal'>
+    readonly currency: FieldRef<"Package", 'String'>
     readonly deliverables: FieldRef<"Package", 'Json'>
+    readonly is_active: FieldRef<"Package", 'Boolean'>
     readonly created_at: FieldRef<"Package", 'DateTime'>
+    readonly updated_at: FieldRef<"Package", 'DateTime'>
   }
     
 
@@ -28635,6 +29009,30 @@ export namespace Prisma {
   }
 
   /**
+   * Package.orders
+   */
+  export type Package$ordersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    cursor?: OrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
+  }
+
+  /**
    * Package without action
    */
   export type PackageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -28650,6 +29048,1270 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: PackageInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Order
+   */
+
+  export type AggregateOrder = {
+    _count: OrderCountAggregateOutputType | null
+    _avg: OrderAvgAggregateOutputType | null
+    _sum: OrderSumAggregateOutputType | null
+    _min: OrderMinAggregateOutputType | null
+    _max: OrderMaxAggregateOutputType | null
+  }
+
+  export type OrderAvgAggregateOutputType = {
+    id: number | null
+    package_id: number | null
+    brand_id: number | null
+    creator_id: number | null
+    quantity: number | null
+    total_amount: Decimal | null
+  }
+
+  export type OrderSumAggregateOutputType = {
+    id: bigint | null
+    package_id: bigint | null
+    brand_id: bigint | null
+    creator_id: bigint | null
+    quantity: number | null
+    total_amount: Decimal | null
+  }
+
+  export type OrderMinAggregateOutputType = {
+    id: bigint | null
+    package_id: bigint | null
+    brand_id: bigint | null
+    creator_id: bigint | null
+    quantity: number | null
+    total_amount: Decimal | null
+    currency: string | null
+    status: $Enums.OrderStatus | null
+    order_date: Date | null
+    completed_at: Date | null
+    rejection_message: string | null
+  }
+
+  export type OrderMaxAggregateOutputType = {
+    id: bigint | null
+    package_id: bigint | null
+    brand_id: bigint | null
+    creator_id: bigint | null
+    quantity: number | null
+    total_amount: Decimal | null
+    currency: string | null
+    status: $Enums.OrderStatus | null
+    order_date: Date | null
+    completed_at: Date | null
+    rejection_message: string | null
+  }
+
+  export type OrderCountAggregateOutputType = {
+    id: number
+    package_id: number
+    brand_id: number
+    creator_id: number
+    quantity: number
+    total_amount: number
+    currency: number
+    status: number
+    order_date: number
+    completed_at: number
+    rejection_message: number
+    _all: number
+  }
+
+
+  export type OrderAvgAggregateInputType = {
+    id?: true
+    package_id?: true
+    brand_id?: true
+    creator_id?: true
+    quantity?: true
+    total_amount?: true
+  }
+
+  export type OrderSumAggregateInputType = {
+    id?: true
+    package_id?: true
+    brand_id?: true
+    creator_id?: true
+    quantity?: true
+    total_amount?: true
+  }
+
+  export type OrderMinAggregateInputType = {
+    id?: true
+    package_id?: true
+    brand_id?: true
+    creator_id?: true
+    quantity?: true
+    total_amount?: true
+    currency?: true
+    status?: true
+    order_date?: true
+    completed_at?: true
+    rejection_message?: true
+  }
+
+  export type OrderMaxAggregateInputType = {
+    id?: true
+    package_id?: true
+    brand_id?: true
+    creator_id?: true
+    quantity?: true
+    total_amount?: true
+    currency?: true
+    status?: true
+    order_date?: true
+    completed_at?: true
+    rejection_message?: true
+  }
+
+  export type OrderCountAggregateInputType = {
+    id?: true
+    package_id?: true
+    brand_id?: true
+    creator_id?: true
+    quantity?: true
+    total_amount?: true
+    currency?: true
+    status?: true
+    order_date?: true
+    completed_at?: true
+    rejection_message?: true
+    _all?: true
+  }
+
+  export type OrderAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Order to aggregate.
+     */
+    where?: OrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Orders to fetch.
+     */
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: OrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Orders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Orders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Orders
+    **/
+    _count?: true | OrderCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: OrderAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: OrderSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: OrderMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: OrderMaxAggregateInputType
+  }
+
+  export type GetOrderAggregateType<T extends OrderAggregateArgs> = {
+        [P in keyof T & keyof AggregateOrder]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateOrder[P]>
+      : GetScalarType<T[P], AggregateOrder[P]>
+  }
+
+
+
+
+  export type OrderGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderWhereInput
+    orderBy?: OrderOrderByWithAggregationInput | OrderOrderByWithAggregationInput[]
+    by: OrderScalarFieldEnum[] | OrderScalarFieldEnum
+    having?: OrderScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: OrderCountAggregateInputType | true
+    _avg?: OrderAvgAggregateInputType
+    _sum?: OrderSumAggregateInputType
+    _min?: OrderMinAggregateInputType
+    _max?: OrderMaxAggregateInputType
+  }
+
+  export type OrderGroupByOutputType = {
+    id: bigint
+    package_id: bigint
+    brand_id: bigint
+    creator_id: bigint
+    quantity: number
+    total_amount: Decimal
+    currency: string
+    status: $Enums.OrderStatus
+    order_date: Date
+    completed_at: Date | null
+    rejection_message: string | null
+    _count: OrderCountAggregateOutputType | null
+    _avg: OrderAvgAggregateOutputType | null
+    _sum: OrderSumAggregateOutputType | null
+    _min: OrderMinAggregateOutputType | null
+    _max: OrderMaxAggregateOutputType | null
+  }
+
+  type GetOrderGroupByPayload<T extends OrderGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<OrderGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof OrderGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], OrderGroupByOutputType[P]>
+            : GetScalarType<T[P], OrderGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type OrderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    package_id?: boolean
+    brand_id?: boolean
+    creator_id?: boolean
+    quantity?: boolean
+    total_amount?: boolean
+    currency?: boolean
+    status?: boolean
+    order_date?: boolean
+    completed_at?: boolean
+    rejection_message?: boolean
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+    brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    payments?: boolean | Order$paymentsArgs<ExtArgs>
+    invoices?: boolean | Order$invoicesArgs<ExtArgs>
+    _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["order"]>
+
+  export type OrderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    package_id?: boolean
+    brand_id?: boolean
+    creator_id?: boolean
+    quantity?: boolean
+    total_amount?: boolean
+    currency?: boolean
+    status?: boolean
+    order_date?: boolean
+    completed_at?: boolean
+    rejection_message?: boolean
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+    brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["order"]>
+
+  export type OrderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    package_id?: boolean
+    brand_id?: boolean
+    creator_id?: boolean
+    quantity?: boolean
+    total_amount?: boolean
+    currency?: boolean
+    status?: boolean
+    order_date?: boolean
+    completed_at?: boolean
+    rejection_message?: boolean
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+    brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["order"]>
+
+  export type OrderSelectScalar = {
+    id?: boolean
+    package_id?: boolean
+    brand_id?: boolean
+    creator_id?: boolean
+    quantity?: boolean
+    total_amount?: boolean
+    currency?: boolean
+    status?: boolean
+    order_date?: boolean
+    completed_at?: boolean
+    rejection_message?: boolean
+  }
+
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "package_id" | "brand_id" | "creator_id" | "quantity" | "total_amount" | "currency" | "status" | "order_date" | "completed_at" | "rejection_message", ExtArgs["result"]["order"]>
+  export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+    brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+    payments?: boolean | Order$paymentsArgs<ExtArgs>
+    invoices?: boolean | Order$invoicesArgs<ExtArgs>
+    _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type OrderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+    brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+  }
+  export type OrderIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+    brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
+    creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
+  }
+
+  export type $OrderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Order"
+    objects: {
+      package: Prisma.$PackagePayload<ExtArgs>
+      brand: Prisma.$BrandProfilePayload<ExtArgs>
+      creator: Prisma.$CreatorProfilePayload<ExtArgs>
+      payments: Prisma.$PaymentPayload<ExtArgs>[]
+      invoices: Prisma.$InvoicePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: bigint
+      package_id: bigint
+      brand_id: bigint
+      creator_id: bigint
+      quantity: number
+      total_amount: Prisma.Decimal
+      currency: string
+      status: $Enums.OrderStatus
+      order_date: Date
+      completed_at: Date | null
+      rejection_message: string | null
+    }, ExtArgs["result"]["order"]>
+    composites: {}
+  }
+
+  type OrderGetPayload<S extends boolean | null | undefined | OrderDefaultArgs> = $Result.GetResult<Prisma.$OrderPayload, S>
+
+  type OrderCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<OrderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: OrderCountAggregateInputType | true
+    }
+
+  export interface OrderDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Order'], meta: { name: 'Order' } }
+    /**
+     * Find zero or one Order that matches the filter.
+     * @param {OrderFindUniqueArgs} args - Arguments to find a Order
+     * @example
+     * // Get one Order
+     * const order = await prisma.order.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends OrderFindUniqueArgs>(args: SelectSubset<T, OrderFindUniqueArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Order that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {OrderFindUniqueOrThrowArgs} args - Arguments to find a Order
+     * @example
+     * // Get one Order
+     * const order = await prisma.order.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends OrderFindUniqueOrThrowArgs>(args: SelectSubset<T, OrderFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Order that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderFindFirstArgs} args - Arguments to find a Order
+     * @example
+     * // Get one Order
+     * const order = await prisma.order.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends OrderFindFirstArgs>(args?: SelectSubset<T, OrderFindFirstArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Order that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderFindFirstOrThrowArgs} args - Arguments to find a Order
+     * @example
+     * // Get one Order
+     * const order = await prisma.order.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends OrderFindFirstOrThrowArgs>(args?: SelectSubset<T, OrderFindFirstOrThrowArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Orders that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Orders
+     * const orders = await prisma.order.findMany()
+     * 
+     * // Get first 10 Orders
+     * const orders = await prisma.order.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const orderWithIdOnly = await prisma.order.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends OrderFindManyArgs>(args?: SelectSubset<T, OrderFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Order.
+     * @param {OrderCreateArgs} args - Arguments to create a Order.
+     * @example
+     * // Create one Order
+     * const Order = await prisma.order.create({
+     *   data: {
+     *     // ... data to create a Order
+     *   }
+     * })
+     * 
+     */
+    create<T extends OrderCreateArgs>(args: SelectSubset<T, OrderCreateArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Orders.
+     * @param {OrderCreateManyArgs} args - Arguments to create many Orders.
+     * @example
+     * // Create many Orders
+     * const order = await prisma.order.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends OrderCreateManyArgs>(args?: SelectSubset<T, OrderCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Orders and returns the data saved in the database.
+     * @param {OrderCreateManyAndReturnArgs} args - Arguments to create many Orders.
+     * @example
+     * // Create many Orders
+     * const order = await prisma.order.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Orders and only return the `id`
+     * const orderWithIdOnly = await prisma.order.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends OrderCreateManyAndReturnArgs>(args?: SelectSubset<T, OrderCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Order.
+     * @param {OrderDeleteArgs} args - Arguments to delete one Order.
+     * @example
+     * // Delete one Order
+     * const Order = await prisma.order.delete({
+     *   where: {
+     *     // ... filter to delete one Order
+     *   }
+     * })
+     * 
+     */
+    delete<T extends OrderDeleteArgs>(args: SelectSubset<T, OrderDeleteArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Order.
+     * @param {OrderUpdateArgs} args - Arguments to update one Order.
+     * @example
+     * // Update one Order
+     * const order = await prisma.order.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends OrderUpdateArgs>(args: SelectSubset<T, OrderUpdateArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Orders.
+     * @param {OrderDeleteManyArgs} args - Arguments to filter Orders to delete.
+     * @example
+     * // Delete a few Orders
+     * const { count } = await prisma.order.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends OrderDeleteManyArgs>(args?: SelectSubset<T, OrderDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Orders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Orders
+     * const order = await prisma.order.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends OrderUpdateManyArgs>(args: SelectSubset<T, OrderUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Orders and returns the data updated in the database.
+     * @param {OrderUpdateManyAndReturnArgs} args - Arguments to update many Orders.
+     * @example
+     * // Update many Orders
+     * const order = await prisma.order.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Orders and only return the `id`
+     * const orderWithIdOnly = await prisma.order.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends OrderUpdateManyAndReturnArgs>(args: SelectSubset<T, OrderUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Order.
+     * @param {OrderUpsertArgs} args - Arguments to update or create a Order.
+     * @example
+     * // Update or create a Order
+     * const order = await prisma.order.upsert({
+     *   create: {
+     *     // ... data to create a Order
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Order we want to update
+     *   }
+     * })
+     */
+    upsert<T extends OrderUpsertArgs>(args: SelectSubset<T, OrderUpsertArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Orders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderCountArgs} args - Arguments to filter Orders to count.
+     * @example
+     * // Count the number of Orders
+     * const count = await prisma.order.count({
+     *   where: {
+     *     // ... the filter for the Orders we want to count
+     *   }
+     * })
+    **/
+    count<T extends OrderCountArgs>(
+      args?: Subset<T, OrderCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], OrderCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Order.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends OrderAggregateArgs>(args: Subset<T, OrderAggregateArgs>): Prisma.PrismaPromise<GetOrderAggregateType<T>>
+
+    /**
+     * Group by Order.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends OrderGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: OrderGroupByArgs['orderBy'] }
+        : { orderBy?: OrderGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, OrderGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOrderGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Order model
+   */
+  readonly fields: OrderFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Order.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__OrderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    package<T extends PackageDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PackageDefaultArgs<ExtArgs>>): Prisma__PackageClient<$Result.GetResult<Prisma.$PackagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    brand<T extends BrandProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BrandProfileDefaultArgs<ExtArgs>>): Prisma__BrandProfileClient<$Result.GetResult<Prisma.$BrandProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    creator<T extends CreatorProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfileDefaultArgs<ExtArgs>>): Prisma__CreatorProfileClient<$Result.GetResult<Prisma.$CreatorProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    payments<T extends Order$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Order$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    invoices<T extends Order$invoicesArgs<ExtArgs> = {}>(args?: Subset<T, Order$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Order model
+   */
+  interface OrderFieldRefs {
+    readonly id: FieldRef<"Order", 'BigInt'>
+    readonly package_id: FieldRef<"Order", 'BigInt'>
+    readonly brand_id: FieldRef<"Order", 'BigInt'>
+    readonly creator_id: FieldRef<"Order", 'BigInt'>
+    readonly quantity: FieldRef<"Order", 'Int'>
+    readonly total_amount: FieldRef<"Order", 'Decimal'>
+    readonly currency: FieldRef<"Order", 'String'>
+    readonly status: FieldRef<"Order", 'OrderStatus'>
+    readonly order_date: FieldRef<"Order", 'DateTime'>
+    readonly completed_at: FieldRef<"Order", 'DateTime'>
+    readonly rejection_message: FieldRef<"Order", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Order findUnique
+   */
+  export type OrderFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
+     * Filter, which Order to fetch.
+     */
+    where: OrderWhereUniqueInput
+  }
+
+  /**
+   * Order findUniqueOrThrow
+   */
+  export type OrderFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
+     * Filter, which Order to fetch.
+     */
+    where: OrderWhereUniqueInput
+  }
+
+  /**
+   * Order findFirst
+   */
+  export type OrderFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
+     * Filter, which Order to fetch.
+     */
+    where?: OrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Orders to fetch.
+     */
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Orders.
+     */
+    cursor?: OrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Orders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Orders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Orders.
+     */
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
+  }
+
+  /**
+   * Order findFirstOrThrow
+   */
+  export type OrderFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
+     * Filter, which Order to fetch.
+     */
+    where?: OrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Orders to fetch.
+     */
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Orders.
+     */
+    cursor?: OrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Orders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Orders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Orders.
+     */
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
+  }
+
+  /**
+   * Order findMany
+   */
+  export type OrderFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
+     * Filter, which Orders to fetch.
+     */
+    where?: OrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Orders to fetch.
+     */
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Orders.
+     */
+    cursor?: OrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Orders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Orders.
+     */
+    skip?: number
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
+  }
+
+  /**
+   * Order create
+   */
+  export type OrderCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Order.
+     */
+    data: XOR<OrderCreateInput, OrderUncheckedCreateInput>
+  }
+
+  /**
+   * Order createMany
+   */
+  export type OrderCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Orders.
+     */
+    data: OrderCreateManyInput | OrderCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Order createManyAndReturn
+   */
+  export type OrderCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * The data used to create many Orders.
+     */
+    data: OrderCreateManyInput | OrderCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Order update
+   */
+  export type OrderUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Order.
+     */
+    data: XOR<OrderUpdateInput, OrderUncheckedUpdateInput>
+    /**
+     * Choose, which Order to update.
+     */
+    where: OrderWhereUniqueInput
+  }
+
+  /**
+   * Order updateMany
+   */
+  export type OrderUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Orders.
+     */
+    data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyInput>
+    /**
+     * Filter which Orders to update
+     */
+    where?: OrderWhereInput
+    /**
+     * Limit how many Orders to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Order updateManyAndReturn
+   */
+  export type OrderUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * The data used to update Orders.
+     */
+    data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyInput>
+    /**
+     * Filter which Orders to update
+     */
+    where?: OrderWhereInput
+    /**
+     * Limit how many Orders to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Order upsert
+   */
+  export type OrderUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Order to update in case it exists.
+     */
+    where: OrderWhereUniqueInput
+    /**
+     * In case the Order found by the `where` argument doesn't exist, create a new Order with this data.
+     */
+    create: XOR<OrderCreateInput, OrderUncheckedCreateInput>
+    /**
+     * In case the Order was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<OrderUpdateInput, OrderUncheckedUpdateInput>
+  }
+
+  /**
+   * Order delete
+   */
+  export type OrderDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
+     * Filter which Order to delete.
+     */
+    where: OrderWhereUniqueInput
+  }
+
+  /**
+   * Order deleteMany
+   */
+  export type OrderDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Orders to delete
+     */
+    where?: OrderWhereInput
+    /**
+     * Limit how many Orders to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Order.payments
+   */
+  export type Order$paymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: PaymentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: PaymentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentInclude<ExtArgs> | null
+    where?: PaymentWhereInput
+    orderBy?: PaymentOrderByWithRelationInput | PaymentOrderByWithRelationInput[]
+    cursor?: PaymentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PaymentScalarFieldEnum | PaymentScalarFieldEnum[]
+  }
+
+  /**
+   * Order.invoices
+   */
+  export type Order$invoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Invoice
+     */
+    select?: InvoiceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Invoice
+     */
+    omit?: InvoiceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InvoiceInclude<ExtArgs> | null
+    where?: InvoiceWhereInput
+    orderBy?: InvoiceOrderByWithRelationInput | InvoiceOrderByWithRelationInput[]
+    cursor?: InvoiceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * Order without action
+   */
+  export type OrderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
   }
 
 
@@ -32376,6 +34038,7 @@ export namespace Prisma {
     first_name: 'first_name',
     last_name: 'last_name',
     profile_image_url: 'profile_image_url',
+    cover_image_url: 'cover_image_url',
     phone: 'phone',
     timezone: 'timezone',
     language: 'language',
@@ -32564,6 +34227,7 @@ export namespace Prisma {
 
   export const PaymentScalarFieldEnum: {
     id: 'id',
+    order_id: 'order_id',
     collaboration_id: 'collaboration_id',
     payer_id: 'payer_id',
     payee_id: 'payee_id',
@@ -32585,6 +34249,7 @@ export namespace Prisma {
 
   export const InvoiceScalarFieldEnum: {
     id: 'id',
+    order_id: 'order_id',
     collaboration_id: 'collaboration_id',
     brand_id: 'brand_id',
     creator_id: 'creator_id',
@@ -32712,17 +34377,36 @@ export namespace Prisma {
 
   export const PackageScalarFieldEnum: {
     id: 'id',
-    collaboration_id: 'collaboration_id',
-    admin_id: 'admin_id',
+    creator_id: 'creator_id',
     type: 'type',
     title: 'title',
     description: 'description',
     price: 'price',
+    currency: 'currency',
     deliverables: 'deliverables',
-    created_at: 'created_at'
+    is_active: 'is_active',
+    created_at: 'created_at',
+    updated_at: 'updated_at'
   };
 
   export type PackageScalarFieldEnum = (typeof PackageScalarFieldEnum)[keyof typeof PackageScalarFieldEnum]
+
+
+  export const OrderScalarFieldEnum: {
+    id: 'id',
+    package_id: 'package_id',
+    brand_id: 'brand_id',
+    creator_id: 'creator_id',
+    quantity: 'quantity',
+    total_amount: 'total_amount',
+    currency: 'currency',
+    status: 'status',
+    order_date: 'order_date',
+    completed_at: 'completed_at',
+    rejection_message: 'rejection_message'
+  };
+
+  export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
 
 
   export const PhoneVerificationScalarFieldEnum: {
@@ -33186,6 +34870,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'OrderStatus'
+   */
+  export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'OrderStatus[]'
+   */
+  export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'KYCStatus'
    */
   export type EnumKYCStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'KYCStatus'>
@@ -33242,6 +34940,7 @@ export namespace Prisma {
     first_name?: StringNullableFilter<"User"> | string | null
     last_name?: StringNullableFilter<"User"> | string | null
     profile_image_url?: StringNullableFilter<"User"> | string | null
+    cover_image_url?: StringNullableFilter<"User"> | string | null
     phone?: StringNullableFilter<"User"> | string | null
     timezone?: StringNullableFilter<"User"> | string | null
     language?: StringNullableFilter<"User"> | string | null
@@ -33262,7 +34961,6 @@ export namespace Prisma {
     creator_profiles?: XOR<CreatorProfileNullableScalarRelationFilter, CreatorProfileWhereInput> | null
     sent_messages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
-    admin_packages?: PackageListRelationFilter
     admin_payments?: PaymentListRelationFilter
     payments_payee?: PaymentListRelationFilter
     payments_payer?: PaymentListRelationFilter
@@ -33281,6 +34979,7 @@ export namespace Prisma {
     first_name?: SortOrderInput | SortOrder
     last_name?: SortOrderInput | SortOrder
     profile_image_url?: SortOrderInput | SortOrder
+    cover_image_url?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     timezone?: SortOrderInput | SortOrder
     language?: SortOrderInput | SortOrder
@@ -33301,7 +35000,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileOrderByWithRelationInput
     sent_messages?: MessageOrderByRelationAggregateInput
     notifications?: NotificationOrderByRelationAggregateInput
-    admin_packages?: PackageOrderByRelationAggregateInput
     admin_payments?: PaymentOrderByRelationAggregateInput
     payments_payee?: PaymentOrderByRelationAggregateInput
     payments_payer?: PaymentOrderByRelationAggregateInput
@@ -33324,6 +35022,7 @@ export namespace Prisma {
     first_name?: StringNullableFilter<"User"> | string | null
     last_name?: StringNullableFilter<"User"> | string | null
     profile_image_url?: StringNullableFilter<"User"> | string | null
+    cover_image_url?: StringNullableFilter<"User"> | string | null
     timezone?: StringNullableFilter<"User"> | string | null
     language?: StringNullableFilter<"User"> | string | null
     email_verified?: BoolFilter<"User"> | boolean
@@ -33343,7 +35042,6 @@ export namespace Prisma {
     creator_profiles?: XOR<CreatorProfileNullableScalarRelationFilter, CreatorProfileWhereInput> | null
     sent_messages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
-    admin_packages?: PackageListRelationFilter
     admin_payments?: PaymentListRelationFilter
     payments_payee?: PaymentListRelationFilter
     payments_payer?: PaymentListRelationFilter
@@ -33362,6 +35060,7 @@ export namespace Prisma {
     first_name?: SortOrderInput | SortOrder
     last_name?: SortOrderInput | SortOrder
     profile_image_url?: SortOrderInput | SortOrder
+    cover_image_url?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     timezone?: SortOrderInput | SortOrder
     language?: SortOrderInput | SortOrder
@@ -33394,6 +35093,7 @@ export namespace Prisma {
     first_name?: StringNullableWithAggregatesFilter<"User"> | string | null
     last_name?: StringNullableWithAggregatesFilter<"User"> | string | null
     profile_image_url?: StringNullableWithAggregatesFilter<"User"> | string | null
+    cover_image_url?: StringNullableWithAggregatesFilter<"User"> | string | null
     phone?: StringNullableWithAggregatesFilter<"User"> | string | null
     timezone?: StringNullableWithAggregatesFilter<"User"> | string | null
     language?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -33439,6 +35139,7 @@ export namespace Prisma {
     collaborations?: CollaborationListRelationFilter
     invoices?: InvoiceListRelationFilter
     portfolio_items?: PortfolioItemListRelationFilter
+    orders_placed?: OrderListRelationFilter
   }
 
   export type BrandProfileOrderByWithRelationInput = {
@@ -33468,6 +35169,7 @@ export namespace Prisma {
     collaborations?: CollaborationOrderByRelationAggregateInput
     invoices?: InvoiceOrderByRelationAggregateInput
     portfolio_items?: PortfolioItemOrderByRelationAggregateInput
+    orders_placed?: OrderOrderByRelationAggregateInput
   }
 
   export type BrandProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -33500,6 +35202,7 @@ export namespace Prisma {
     collaborations?: CollaborationListRelationFilter
     invoices?: InvoiceListRelationFilter
     portfolio_items?: PortfolioItemListRelationFilter
+    orders_placed?: OrderListRelationFilter
   }, "id">
 
   export type BrandProfileOrderByWithAggregationInput = {
@@ -33591,6 +35294,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountListRelationFilter
     kyc?: XOR<KYCNullableScalarRelationFilter, KYCWhereInput> | null
     portfolio_items?: PortfolioItemListRelationFilter
+    packages_created?: PackageListRelationFilter
+    orders_received?: OrderListRelationFilter
   }
 
   export type CreatorProfileOrderByWithRelationInput = {
@@ -33623,6 +35328,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountOrderByRelationAggregateInput
     kyc?: KYCOrderByWithRelationInput
     portfolio_items?: PortfolioItemOrderByRelationAggregateInput
+    packages_created?: PackageOrderByRelationAggregateInput
+    orders_received?: OrderOrderByRelationAggregateInput
   }
 
   export type CreatorProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -33658,6 +35365,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountListRelationFilter
     kyc?: XOR<KYCNullableScalarRelationFilter, KYCWhereInput> | null
     portfolio_items?: PortfolioItemListRelationFilter
+    packages_created?: PackageListRelationFilter
+    orders_received?: OrderListRelationFilter
   }, "id" | "user_id">
 
   export type CreatorProfileOrderByWithAggregationInput = {
@@ -34074,7 +35783,6 @@ export namespace Prisma {
     channels?: XOR<CollaborationChannelNullableScalarRelationFilter, CollaborationChannelWhereInput> | null
     content_submissions?: ContentSubmissionListRelationFilter
     invoices?: InvoiceListRelationFilter
-    packages?: PackageListRelationFilter
     payments?: PaymentListRelationFilter
     reviews?: ReviewListRelationFilter
   }
@@ -34099,7 +35807,6 @@ export namespace Prisma {
     channels?: CollaborationChannelOrderByWithRelationInput
     content_submissions?: ContentSubmissionOrderByRelationAggregateInput
     invoices?: InvoiceOrderByRelationAggregateInput
-    packages?: PackageOrderByRelationAggregateInput
     payments?: PaymentOrderByRelationAggregateInput
     reviews?: ReviewOrderByRelationAggregateInput
   }
@@ -34127,7 +35834,6 @@ export namespace Prisma {
     channels?: XOR<CollaborationChannelNullableScalarRelationFilter, CollaborationChannelWhereInput> | null
     content_submissions?: ContentSubmissionListRelationFilter
     invoices?: InvoiceListRelationFilter
-    packages?: PackageListRelationFilter
     payments?: PaymentListRelationFilter
     reviews?: ReviewListRelationFilter
   }, "id" | "application_id">
@@ -34356,7 +36062,8 @@ export namespace Prisma {
     OR?: PaymentWhereInput[]
     NOT?: PaymentWhereInput | PaymentWhereInput[]
     id?: BigIntFilter<"Payment"> | bigint | number
-    collaboration_id?: BigIntFilter<"Payment"> | bigint | number
+    order_id?: BigIntNullableFilter<"Payment"> | bigint | number | null
+    collaboration_id?: BigIntNullableFilter<"Payment"> | bigint | number | null
     payer_id?: BigIntFilter<"Payment"> | bigint | number
     payee_id?: BigIntFilter<"Payment"> | bigint | number
     admin_id?: BigIntFilter<"Payment"> | bigint | number
@@ -34371,14 +36078,16 @@ export namespace Prisma {
     completed_at?: DateTimeNullableFilter<"Payment"> | Date | string | null
     failure_reason?: StringNullableFilter<"Payment"> | string | null
     admin?: XOR<UserScalarRelationFilter, UserWhereInput>
-    collaboration?: XOR<CollaborationScalarRelationFilter, CollaborationWhereInput>
+    order?: XOR<OrderNullableScalarRelationFilter, OrderWhereInput> | null
+    collaboration?: XOR<CollaborationNullableScalarRelationFilter, CollaborationWhereInput> | null
     payee?: XOR<UserScalarRelationFilter, UserWhereInput>
     payer?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type PaymentOrderByWithRelationInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
+    order_id?: SortOrderInput | SortOrder
+    collaboration_id?: SortOrderInput | SortOrder
     payer_id?: SortOrder
     payee_id?: SortOrder
     admin_id?: SortOrder
@@ -34393,6 +36102,7 @@ export namespace Prisma {
     completed_at?: SortOrderInput | SortOrder
     failure_reason?: SortOrderInput | SortOrder
     admin?: UserOrderByWithRelationInput
+    order?: OrderOrderByWithRelationInput
     collaboration?: CollaborationOrderByWithRelationInput
     payee?: UserOrderByWithRelationInput
     payer?: UserOrderByWithRelationInput
@@ -34403,7 +36113,8 @@ export namespace Prisma {
     AND?: PaymentWhereInput | PaymentWhereInput[]
     OR?: PaymentWhereInput[]
     NOT?: PaymentWhereInput | PaymentWhereInput[]
-    collaboration_id?: BigIntFilter<"Payment"> | bigint | number
+    order_id?: BigIntNullableFilter<"Payment"> | bigint | number | null
+    collaboration_id?: BigIntNullableFilter<"Payment"> | bigint | number | null
     payer_id?: BigIntFilter<"Payment"> | bigint | number
     payee_id?: BigIntFilter<"Payment"> | bigint | number
     admin_id?: BigIntFilter<"Payment"> | bigint | number
@@ -34418,14 +36129,16 @@ export namespace Prisma {
     completed_at?: DateTimeNullableFilter<"Payment"> | Date | string | null
     failure_reason?: StringNullableFilter<"Payment"> | string | null
     admin?: XOR<UserScalarRelationFilter, UserWhereInput>
-    collaboration?: XOR<CollaborationScalarRelationFilter, CollaborationWhereInput>
+    order?: XOR<OrderNullableScalarRelationFilter, OrderWhereInput> | null
+    collaboration?: XOR<CollaborationNullableScalarRelationFilter, CollaborationWhereInput> | null
     payee?: XOR<UserScalarRelationFilter, UserWhereInput>
     payer?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type PaymentOrderByWithAggregationInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
+    order_id?: SortOrderInput | SortOrder
+    collaboration_id?: SortOrderInput | SortOrder
     payer_id?: SortOrder
     payee_id?: SortOrder
     admin_id?: SortOrder
@@ -34451,7 +36164,8 @@ export namespace Prisma {
     OR?: PaymentScalarWhereWithAggregatesInput[]
     NOT?: PaymentScalarWhereWithAggregatesInput | PaymentScalarWhereWithAggregatesInput[]
     id?: BigIntWithAggregatesFilter<"Payment"> | bigint | number
-    collaboration_id?: BigIntWithAggregatesFilter<"Payment"> | bigint | number
+    order_id?: BigIntNullableWithAggregatesFilter<"Payment"> | bigint | number | null
+    collaboration_id?: BigIntNullableWithAggregatesFilter<"Payment"> | bigint | number | null
     payer_id?: BigIntWithAggregatesFilter<"Payment"> | bigint | number
     payee_id?: BigIntWithAggregatesFilter<"Payment"> | bigint | number
     admin_id?: BigIntWithAggregatesFilter<"Payment"> | bigint | number
@@ -34472,7 +36186,8 @@ export namespace Prisma {
     OR?: InvoiceWhereInput[]
     NOT?: InvoiceWhereInput | InvoiceWhereInput[]
     id?: BigIntFilter<"Invoice"> | bigint | number
-    collaboration_id?: BigIntFilter<"Invoice"> | bigint | number
+    order_id?: BigIntNullableFilter<"Invoice"> | bigint | number | null
+    collaboration_id?: BigIntNullableFilter<"Invoice"> | bigint | number | null
     brand_id?: BigIntFilter<"Invoice"> | bigint | number
     creator_id?: BigIntFilter<"Invoice"> | bigint | number
     invoice_number?: StringFilter<"Invoice"> | string
@@ -34485,13 +36200,15 @@ export namespace Prisma {
     issued_at?: DateTimeFilter<"Invoice"> | Date | string
     paid_at?: DateTimeNullableFilter<"Invoice"> | Date | string | null
     brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
-    collaboration?: XOR<CollaborationScalarRelationFilter, CollaborationWhereInput>
+    order?: XOR<OrderNullableScalarRelationFilter, OrderWhereInput> | null
+    collaboration?: XOR<CollaborationNullableScalarRelationFilter, CollaborationWhereInput> | null
     creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
   }
 
   export type InvoiceOrderByWithRelationInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
+    order_id?: SortOrderInput | SortOrder
+    collaboration_id?: SortOrderInput | SortOrder
     brand_id?: SortOrder
     creator_id?: SortOrder
     invoice_number?: SortOrder
@@ -34504,6 +36221,7 @@ export namespace Prisma {
     issued_at?: SortOrder
     paid_at?: SortOrderInput | SortOrder
     brand?: BrandProfileOrderByWithRelationInput
+    order?: OrderOrderByWithRelationInput
     collaboration?: CollaborationOrderByWithRelationInput
     creator?: CreatorProfileOrderByWithRelationInput
   }
@@ -34514,7 +36232,8 @@ export namespace Prisma {
     AND?: InvoiceWhereInput | InvoiceWhereInput[]
     OR?: InvoiceWhereInput[]
     NOT?: InvoiceWhereInput | InvoiceWhereInput[]
-    collaboration_id?: BigIntFilter<"Invoice"> | bigint | number
+    order_id?: BigIntNullableFilter<"Invoice"> | bigint | number | null
+    collaboration_id?: BigIntNullableFilter<"Invoice"> | bigint | number | null
     brand_id?: BigIntFilter<"Invoice"> | bigint | number
     creator_id?: BigIntFilter<"Invoice"> | bigint | number
     amount?: DecimalFilter<"Invoice"> | Decimal | DecimalJsLike | number | string
@@ -34526,13 +36245,15 @@ export namespace Prisma {
     issued_at?: DateTimeFilter<"Invoice"> | Date | string
     paid_at?: DateTimeNullableFilter<"Invoice"> | Date | string | null
     brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
-    collaboration?: XOR<CollaborationScalarRelationFilter, CollaborationWhereInput>
+    order?: XOR<OrderNullableScalarRelationFilter, OrderWhereInput> | null
+    collaboration?: XOR<CollaborationNullableScalarRelationFilter, CollaborationWhereInput> | null
     creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
   }, "id" | "invoice_number">
 
   export type InvoiceOrderByWithAggregationInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
+    order_id?: SortOrderInput | SortOrder
+    collaboration_id?: SortOrderInput | SortOrder
     brand_id?: SortOrder
     creator_id?: SortOrder
     invoice_number?: SortOrder
@@ -34556,7 +36277,8 @@ export namespace Prisma {
     OR?: InvoiceScalarWhereWithAggregatesInput[]
     NOT?: InvoiceScalarWhereWithAggregatesInput | InvoiceScalarWhereWithAggregatesInput[]
     id?: BigIntWithAggregatesFilter<"Invoice"> | bigint | number
-    collaboration_id?: BigIntWithAggregatesFilter<"Invoice"> | bigint | number
+    order_id?: BigIntNullableWithAggregatesFilter<"Invoice"> | bigint | number | null
+    collaboration_id?: BigIntNullableWithAggregatesFilter<"Invoice"> | bigint | number | null
     brand_id?: BigIntWithAggregatesFilter<"Invoice"> | bigint | number
     creator_id?: BigIntWithAggregatesFilter<"Invoice"> | bigint | number
     invoice_number?: StringWithAggregatesFilter<"Invoice"> | string
@@ -35148,30 +36870,34 @@ export namespace Prisma {
     OR?: PackageWhereInput[]
     NOT?: PackageWhereInput | PackageWhereInput[]
     id?: BigIntFilter<"Package"> | bigint | number
-    collaboration_id?: BigIntFilter<"Package"> | bigint | number
-    admin_id?: BigIntFilter<"Package"> | bigint | number
+    creator_id?: BigIntFilter<"Package"> | bigint | number
     type?: EnumPackageTypeFilter<"Package"> | $Enums.PackageType
     title?: StringFilter<"Package"> | string
     description?: StringNullableFilter<"Package"> | string | null
     price?: DecimalFilter<"Package"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Package"> | string
     deliverables?: JsonNullableFilter<"Package">
+    is_active?: BoolFilter<"Package"> | boolean
     created_at?: DateTimeFilter<"Package"> | Date | string
-    admin?: XOR<UserScalarRelationFilter, UserWhereInput>
-    collaboration?: XOR<CollaborationScalarRelationFilter, CollaborationWhereInput>
+    updated_at?: DateTimeFilter<"Package"> | Date | string
+    creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
+    orders?: OrderListRelationFilter
   }
 
   export type PackageOrderByWithRelationInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
-    admin_id?: SortOrder
+    creator_id?: SortOrder
     type?: SortOrder
     title?: SortOrder
     description?: SortOrderInput | SortOrder
     price?: SortOrder
+    currency?: SortOrder
     deliverables?: SortOrderInput | SortOrder
+    is_active?: SortOrder
     created_at?: SortOrder
-    admin?: UserOrderByWithRelationInput
-    collaboration?: CollaborationOrderByWithRelationInput
+    updated_at?: SortOrder
+    creator?: CreatorProfileOrderByWithRelationInput
+    orders?: OrderOrderByRelationAggregateInput
   }
 
   export type PackageWhereUniqueInput = Prisma.AtLeast<{
@@ -35179,28 +36905,32 @@ export namespace Prisma {
     AND?: PackageWhereInput | PackageWhereInput[]
     OR?: PackageWhereInput[]
     NOT?: PackageWhereInput | PackageWhereInput[]
-    collaboration_id?: BigIntFilter<"Package"> | bigint | number
-    admin_id?: BigIntFilter<"Package"> | bigint | number
+    creator_id?: BigIntFilter<"Package"> | bigint | number
     type?: EnumPackageTypeFilter<"Package"> | $Enums.PackageType
     title?: StringFilter<"Package"> | string
     description?: StringNullableFilter<"Package"> | string | null
     price?: DecimalFilter<"Package"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Package"> | string
     deliverables?: JsonNullableFilter<"Package">
+    is_active?: BoolFilter<"Package"> | boolean
     created_at?: DateTimeFilter<"Package"> | Date | string
-    admin?: XOR<UserScalarRelationFilter, UserWhereInput>
-    collaboration?: XOR<CollaborationScalarRelationFilter, CollaborationWhereInput>
+    updated_at?: DateTimeFilter<"Package"> | Date | string
+    creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
+    orders?: OrderListRelationFilter
   }, "id">
 
   export type PackageOrderByWithAggregationInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
-    admin_id?: SortOrder
+    creator_id?: SortOrder
     type?: SortOrder
     title?: SortOrder
     description?: SortOrderInput | SortOrder
     price?: SortOrder
+    currency?: SortOrder
     deliverables?: SortOrderInput | SortOrder
+    is_active?: SortOrder
     created_at?: SortOrder
+    updated_at?: SortOrder
     _count?: PackageCountOrderByAggregateInput
     _avg?: PackageAvgOrderByAggregateInput
     _max?: PackageMaxOrderByAggregateInput
@@ -35213,14 +36943,115 @@ export namespace Prisma {
     OR?: PackageScalarWhereWithAggregatesInput[]
     NOT?: PackageScalarWhereWithAggregatesInput | PackageScalarWhereWithAggregatesInput[]
     id?: BigIntWithAggregatesFilter<"Package"> | bigint | number
-    collaboration_id?: BigIntWithAggregatesFilter<"Package"> | bigint | number
-    admin_id?: BigIntWithAggregatesFilter<"Package"> | bigint | number
+    creator_id?: BigIntWithAggregatesFilter<"Package"> | bigint | number
     type?: EnumPackageTypeWithAggregatesFilter<"Package"> | $Enums.PackageType
     title?: StringWithAggregatesFilter<"Package"> | string
     description?: StringNullableWithAggregatesFilter<"Package"> | string | null
     price?: DecimalWithAggregatesFilter<"Package"> | Decimal | DecimalJsLike | number | string
+    currency?: StringWithAggregatesFilter<"Package"> | string
     deliverables?: JsonNullableWithAggregatesFilter<"Package">
+    is_active?: BoolWithAggregatesFilter<"Package"> | boolean
     created_at?: DateTimeWithAggregatesFilter<"Package"> | Date | string
+    updated_at?: DateTimeWithAggregatesFilter<"Package"> | Date | string
+  }
+
+  export type OrderWhereInput = {
+    AND?: OrderWhereInput | OrderWhereInput[]
+    OR?: OrderWhereInput[]
+    NOT?: OrderWhereInput | OrderWhereInput[]
+    id?: BigIntFilter<"Order"> | bigint | number
+    package_id?: BigIntFilter<"Order"> | bigint | number
+    brand_id?: BigIntFilter<"Order"> | bigint | number
+    creator_id?: BigIntFilter<"Order"> | bigint | number
+    quantity?: IntFilter<"Order"> | number
+    total_amount?: DecimalFilter<"Order"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Order"> | string
+    status?: EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
+    order_date?: DateTimeFilter<"Order"> | Date | string
+    completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
+    rejection_message?: StringNullableFilter<"Order"> | string | null
+    package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
+    brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
+    creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
+    payments?: PaymentListRelationFilter
+    invoices?: InvoiceListRelationFilter
+  }
+
+  export type OrderOrderByWithRelationInput = {
+    id?: SortOrder
+    package_id?: SortOrder
+    brand_id?: SortOrder
+    creator_id?: SortOrder
+    quantity?: SortOrder
+    total_amount?: SortOrder
+    currency?: SortOrder
+    status?: SortOrder
+    order_date?: SortOrder
+    completed_at?: SortOrderInput | SortOrder
+    rejection_message?: SortOrderInput | SortOrder
+    package?: PackageOrderByWithRelationInput
+    brand?: BrandProfileOrderByWithRelationInput
+    creator?: CreatorProfileOrderByWithRelationInput
+    payments?: PaymentOrderByRelationAggregateInput
+    invoices?: InvoiceOrderByRelationAggregateInput
+  }
+
+  export type OrderWhereUniqueInput = Prisma.AtLeast<{
+    id?: bigint | number
+    AND?: OrderWhereInput | OrderWhereInput[]
+    OR?: OrderWhereInput[]
+    NOT?: OrderWhereInput | OrderWhereInput[]
+    package_id?: BigIntFilter<"Order"> | bigint | number
+    brand_id?: BigIntFilter<"Order"> | bigint | number
+    creator_id?: BigIntFilter<"Order"> | bigint | number
+    quantity?: IntFilter<"Order"> | number
+    total_amount?: DecimalFilter<"Order"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Order"> | string
+    status?: EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
+    order_date?: DateTimeFilter<"Order"> | Date | string
+    completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
+    rejection_message?: StringNullableFilter<"Order"> | string | null
+    package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
+    brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
+    creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
+    payments?: PaymentListRelationFilter
+    invoices?: InvoiceListRelationFilter
+  }, "id">
+
+  export type OrderOrderByWithAggregationInput = {
+    id?: SortOrder
+    package_id?: SortOrder
+    brand_id?: SortOrder
+    creator_id?: SortOrder
+    quantity?: SortOrder
+    total_amount?: SortOrder
+    currency?: SortOrder
+    status?: SortOrder
+    order_date?: SortOrder
+    completed_at?: SortOrderInput | SortOrder
+    rejection_message?: SortOrderInput | SortOrder
+    _count?: OrderCountOrderByAggregateInput
+    _avg?: OrderAvgOrderByAggregateInput
+    _max?: OrderMaxOrderByAggregateInput
+    _min?: OrderMinOrderByAggregateInput
+    _sum?: OrderSumOrderByAggregateInput
+  }
+
+  export type OrderScalarWhereWithAggregatesInput = {
+    AND?: OrderScalarWhereWithAggregatesInput | OrderScalarWhereWithAggregatesInput[]
+    OR?: OrderScalarWhereWithAggregatesInput[]
+    NOT?: OrderScalarWhereWithAggregatesInput | OrderScalarWhereWithAggregatesInput[]
+    id?: BigIntWithAggregatesFilter<"Order"> | bigint | number
+    package_id?: BigIntWithAggregatesFilter<"Order"> | bigint | number
+    brand_id?: BigIntWithAggregatesFilter<"Order"> | bigint | number
+    creator_id?: BigIntWithAggregatesFilter<"Order"> | bigint | number
+    quantity?: IntWithAggregatesFilter<"Order"> | number
+    total_amount?: DecimalWithAggregatesFilter<"Order"> | Decimal | DecimalJsLike | number | string
+    currency?: StringWithAggregatesFilter<"Order"> | string
+    status?: EnumOrderStatusWithAggregatesFilter<"Order"> | $Enums.OrderStatus
+    order_date?: DateTimeWithAggregatesFilter<"Order"> | Date | string
+    completed_at?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
+    rejection_message?: StringNullableWithAggregatesFilter<"Order"> | string | null
   }
 
   export type PhoneVerificationWhereInput = {
@@ -35529,6 +37360,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -35549,7 +37381,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -35568,6 +37399,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -35588,7 +37420,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -35607,6 +37438,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35627,7 +37459,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -35646,6 +37477,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35666,7 +37498,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -35685,6 +37516,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -35709,6 +37541,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35733,6 +37566,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35774,6 +37608,7 @@ export namespace Prisma {
     collaborations?: CollaborationCreateNestedManyWithoutBrandInput
     invoices?: InvoiceCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateInput = {
@@ -35802,6 +37637,7 @@ export namespace Prisma {
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUpdateInput = {
@@ -35830,6 +37666,7 @@ export namespace Prisma {
     collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateInput = {
@@ -35858,6 +37695,7 @@ export namespace Prisma {
     collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileCreateManyInput = {
@@ -35960,6 +37798,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountCreateNestedManyWithoutCreatorInput
     kyc?: KYCCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileUncheckedCreateInput = {
@@ -35991,6 +37831,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
     kyc?: KYCUncheckedCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageUncheckedCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileUpdateInput = {
@@ -36022,6 +37864,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUpdateManyWithoutCreatorNestedInput
   }
 
   export type CreatorProfileUncheckedUpdateInput = {
@@ -36053,6 +37897,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUncheckedUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type CreatorProfileCreateManyInput = {
@@ -36528,7 +38374,6 @@ export namespace Prisma {
     channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     payments?: PaymentCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewCreateNestedManyWithoutCollaborationInput
   }
@@ -36549,7 +38394,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
   }
@@ -36570,7 +38414,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
   }
@@ -36591,7 +38434,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
   }
@@ -36843,14 +38685,16 @@ export namespace Prisma {
     completed_at?: Date | string | null
     failure_reason?: string | null
     admin: UserCreateNestedOneWithoutAdmin_paymentsInput
-    collaboration: CollaborationCreateNestedOneWithoutPaymentsInput
+    order?: OrderCreateNestedOneWithoutPaymentsInput
+    collaboration?: CollaborationCreateNestedOneWithoutPaymentsInput
     payee: UserCreateNestedOneWithoutPayments_payeeInput
     payer: UserCreateNestedOneWithoutPayments_payerInput
   }
 
   export type PaymentUncheckedCreateInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     payer_id: bigint | number
     payee_id: bigint | number
     admin_id: bigint | number
@@ -36879,14 +38723,16 @@ export namespace Prisma {
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: UserUpdateOneRequiredWithoutAdmin_paymentsNestedInput
-    collaboration?: CollaborationUpdateOneRequiredWithoutPaymentsNestedInput
+    order?: OrderUpdateOneWithoutPaymentsNestedInput
+    collaboration?: CollaborationUpdateOneWithoutPaymentsNestedInput
     payee?: UserUpdateOneRequiredWithoutPayments_payeeNestedInput
     payer?: UserUpdateOneRequiredWithoutPayments_payerNestedInput
   }
 
   export type PaymentUncheckedUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
     payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -36904,7 +38750,8 @@ export namespace Prisma {
 
   export type PaymentCreateManyInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     payer_id: bigint | number
     payee_id: bigint | number
     admin_id: bigint | number
@@ -36936,7 +38783,8 @@ export namespace Prisma {
 
   export type PaymentUncheckedUpdateManyInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
     payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -36964,13 +38812,15 @@ export namespace Prisma {
     issued_at?: Date | string
     paid_at?: Date | string | null
     brand: BrandProfileCreateNestedOneWithoutInvoicesInput
-    collaboration: CollaborationCreateNestedOneWithoutInvoicesInput
+    order?: OrderCreateNestedOneWithoutInvoicesInput
+    collaboration?: CollaborationCreateNestedOneWithoutInvoicesInput
     creator: CreatorProfileCreateNestedOneWithoutInvoicesInput
   }
 
   export type InvoiceUncheckedCreateInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     brand_id: bigint | number
     creator_id: bigint | number
     invoice_number: string
@@ -36996,13 +38846,15 @@ export namespace Prisma {
     issued_at?: DateTimeFieldUpdateOperationsInput | Date | string
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     brand?: BrandProfileUpdateOneRequiredWithoutInvoicesNestedInput
-    collaboration?: CollaborationUpdateOneRequiredWithoutInvoicesNestedInput
+    order?: OrderUpdateOneWithoutInvoicesNestedInput
+    collaboration?: CollaborationUpdateOneWithoutInvoicesNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutInvoicesNestedInput
   }
 
   export type InvoiceUncheckedUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
     creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
     invoice_number?: StringFieldUpdateOperationsInput | string
@@ -37018,7 +38870,8 @@ export namespace Prisma {
 
   export type InvoiceCreateManyInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     brand_id: bigint | number
     creator_id: bigint | number
     invoice_number: string
@@ -37047,7 +38900,8 @@ export namespace Prisma {
 
   export type InvoiceUncheckedUpdateManyInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
     creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
     invoice_number?: StringFieldUpdateOperationsInput | string
@@ -37646,22 +39500,28 @@ export namespace Prisma {
     title: string
     description?: string | null
     price: Decimal | DecimalJsLike | number | string
+    currency?: string
     deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: boolean
     created_at?: Date | string
-    admin: UserCreateNestedOneWithoutAdmin_packagesInput
-    collaboration: CollaborationCreateNestedOneWithoutPackagesInput
+    updated_at?: Date | string
+    creator: CreatorProfileCreateNestedOneWithoutPackages_createdInput
+    orders?: OrderCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUncheckedCreateInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
-    admin_id: bigint | number
+    creator_id: bigint | number
     type: $Enums.PackageType
     title: string
     description?: string | null
     price: Decimal | DecimalJsLike | number | string
+    currency?: string
     deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: boolean
     created_at?: Date | string
+    updated_at?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUpdateInput = {
@@ -37670,34 +39530,42 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
     deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    admin?: UserUpdateOneRequiredWithoutAdmin_packagesNestedInput
-    collaboration?: CollaborationUpdateOneRequiredWithoutPackagesNestedInput
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: CreatorProfileUpdateOneRequiredWithoutPackages_createdNestedInput
+    orders?: OrderUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
     type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
     deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageCreateManyInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
-    admin_id: bigint | number
+    creator_id: bigint | number
     type: $Enums.PackageType
     title: string
     description?: string | null
     price: Decimal | DecimalJsLike | number | string
+    currency?: string
     deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: boolean
     created_at?: Date | string
+    updated_at?: Date | string
   }
 
   export type PackageUpdateManyMutationInput = {
@@ -37706,20 +39574,128 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
     deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PackageUncheckedUpdateManyInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
     type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
     deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderCreateInput = {
+    id?: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    package: PackageCreateNestedOneWithoutOrdersInput
+    brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
+    creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
+    payments?: PaymentCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUncheckedCreateInput = {
+    id?: bigint | number
+    package_id: bigint | number
+    brand_id: bigint | number
+    creator_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
+    brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
+    creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
+    payments?: PaymentUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    package_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderCreateManyInput = {
+    id?: bigint | number
+    package_id: bigint | number
+    brand_id: bigint | number
+    creator_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+  }
+
+  export type OrderUpdateManyMutationInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type OrderUncheckedUpdateManyInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    package_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PhoneVerificationCreateInput = {
@@ -38187,12 +40163,6 @@ export namespace Prisma {
     none?: NotificationWhereInput
   }
 
-  export type PackageListRelationFilter = {
-    every?: PackageWhereInput
-    some?: PackageWhereInput
-    none?: PackageWhereInput
-  }
-
   export type PaymentListRelationFilter = {
     every?: PaymentWhereInput
     some?: PaymentWhereInput
@@ -38246,10 +40216,6 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type PackageOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type PaymentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -38275,6 +40241,7 @@ export namespace Prisma {
     first_name?: SortOrder
     last_name?: SortOrder
     profile_image_url?: SortOrder
+    cover_image_url?: SortOrder
     phone?: SortOrder
     timezone?: SortOrder
     language?: SortOrder
@@ -38305,6 +40272,7 @@ export namespace Prisma {
     first_name?: SortOrder
     last_name?: SortOrder
     profile_image_url?: SortOrder
+    cover_image_url?: SortOrder
     phone?: SortOrder
     timezone?: SortOrder
     language?: SortOrder
@@ -38329,6 +40297,7 @@ export namespace Prisma {
     first_name?: SortOrder
     last_name?: SortOrder
     profile_image_url?: SortOrder
+    cover_image_url?: SortOrder
     phone?: SortOrder
     timezone?: SortOrder
     language?: SortOrder
@@ -38533,6 +40502,12 @@ export namespace Prisma {
     none?: PortfolioItemWhereInput
   }
 
+  export type OrderListRelationFilter = {
+    every?: OrderWhereInput
+    some?: OrderWhereInput
+    none?: OrderWhereInput
+  }
+
   export type CampaignOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -38546,6 +40521,10 @@ export namespace Prisma {
   }
 
   export type PortfolioItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type OrderOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -38709,11 +40688,21 @@ export namespace Prisma {
     isNot?: KYCWhereInput | null
   }
 
+  export type PackageListRelationFilter = {
+    every?: PackageWhereInput
+    some?: PackageWhereInput
+    none?: PackageWhereInput
+  }
+
   export type CampaignApplicationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type SocialMediaAccountOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PackageOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -39481,8 +41470,14 @@ export namespace Prisma {
     not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
   }
 
+  export type OrderNullableScalarRelationFilter = {
+    is?: OrderWhereInput | null
+    isNot?: OrderWhereInput | null
+  }
+
   export type PaymentCountOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     payer_id?: SortOrder
     payee_id?: SortOrder
@@ -39501,6 +41496,7 @@ export namespace Prisma {
 
   export type PaymentAvgOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     payer_id?: SortOrder
     payee_id?: SortOrder
@@ -39512,6 +41508,7 @@ export namespace Prisma {
 
   export type PaymentMaxOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     payer_id?: SortOrder
     payee_id?: SortOrder
@@ -39530,6 +41527,7 @@ export namespace Prisma {
 
   export type PaymentMinOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     payer_id?: SortOrder
     payee_id?: SortOrder
@@ -39548,6 +41546,7 @@ export namespace Prisma {
 
   export type PaymentSumOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     payer_id?: SortOrder
     payee_id?: SortOrder
@@ -39586,6 +41585,7 @@ export namespace Prisma {
 
   export type InvoiceCountOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     brand_id?: SortOrder
     creator_id?: SortOrder
@@ -39602,6 +41602,7 @@ export namespace Prisma {
 
   export type InvoiceAvgOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     brand_id?: SortOrder
     creator_id?: SortOrder
@@ -39612,6 +41613,7 @@ export namespace Prisma {
 
   export type InvoiceMaxOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     brand_id?: SortOrder
     creator_id?: SortOrder
@@ -39628,6 +41630,7 @@ export namespace Prisma {
 
   export type InvoiceMinOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     brand_id?: SortOrder
     creator_id?: SortOrder
@@ -39644,6 +41647,7 @@ export namespace Prisma {
 
   export type InvoiceSumOrderByAggregateInput = {
     id?: SortOrder
+    order_id?: SortOrder
     collaboration_id?: SortOrder
     brand_id?: SortOrder
     creator_id?: SortOrder
@@ -40107,49 +42111,53 @@ export namespace Prisma {
 
   export type PackageCountOrderByAggregateInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
-    admin_id?: SortOrder
+    creator_id?: SortOrder
     type?: SortOrder
     title?: SortOrder
     description?: SortOrder
     price?: SortOrder
+    currency?: SortOrder
     deliverables?: SortOrder
+    is_active?: SortOrder
     created_at?: SortOrder
+    updated_at?: SortOrder
   }
 
   export type PackageAvgOrderByAggregateInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
-    admin_id?: SortOrder
+    creator_id?: SortOrder
     price?: SortOrder
   }
 
   export type PackageMaxOrderByAggregateInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
-    admin_id?: SortOrder
+    creator_id?: SortOrder
     type?: SortOrder
     title?: SortOrder
     description?: SortOrder
     price?: SortOrder
+    currency?: SortOrder
+    is_active?: SortOrder
     created_at?: SortOrder
+    updated_at?: SortOrder
   }
 
   export type PackageMinOrderByAggregateInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
-    admin_id?: SortOrder
+    creator_id?: SortOrder
     type?: SortOrder
     title?: SortOrder
     description?: SortOrder
     price?: SortOrder
+    currency?: SortOrder
+    is_active?: SortOrder
     created_at?: SortOrder
+    updated_at?: SortOrder
   }
 
   export type PackageSumOrderByAggregateInput = {
     id?: SortOrder
-    collaboration_id?: SortOrder
-    admin_id?: SortOrder
+    creator_id?: SortOrder
     price?: SortOrder
   }
 
@@ -40161,6 +42169,88 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPackageTypeFilter<$PrismaModel>
     _max?: NestedEnumPackageTypeFilter<$PrismaModel>
+  }
+
+  export type EnumOrderStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderStatus | EnumOrderStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumOrderStatusFilter<$PrismaModel> | $Enums.OrderStatus
+  }
+
+  export type PackageScalarRelationFilter = {
+    is?: PackageWhereInput
+    isNot?: PackageWhereInput
+  }
+
+  export type OrderCountOrderByAggregateInput = {
+    id?: SortOrder
+    package_id?: SortOrder
+    brand_id?: SortOrder
+    creator_id?: SortOrder
+    quantity?: SortOrder
+    total_amount?: SortOrder
+    currency?: SortOrder
+    status?: SortOrder
+    order_date?: SortOrder
+    completed_at?: SortOrder
+    rejection_message?: SortOrder
+  }
+
+  export type OrderAvgOrderByAggregateInput = {
+    id?: SortOrder
+    package_id?: SortOrder
+    brand_id?: SortOrder
+    creator_id?: SortOrder
+    quantity?: SortOrder
+    total_amount?: SortOrder
+  }
+
+  export type OrderMaxOrderByAggregateInput = {
+    id?: SortOrder
+    package_id?: SortOrder
+    brand_id?: SortOrder
+    creator_id?: SortOrder
+    quantity?: SortOrder
+    total_amount?: SortOrder
+    currency?: SortOrder
+    status?: SortOrder
+    order_date?: SortOrder
+    completed_at?: SortOrder
+    rejection_message?: SortOrder
+  }
+
+  export type OrderMinOrderByAggregateInput = {
+    id?: SortOrder
+    package_id?: SortOrder
+    brand_id?: SortOrder
+    creator_id?: SortOrder
+    quantity?: SortOrder
+    total_amount?: SortOrder
+    currency?: SortOrder
+    status?: SortOrder
+    order_date?: SortOrder
+    completed_at?: SortOrder
+    rejection_message?: SortOrder
+  }
+
+  export type OrderSumOrderByAggregateInput = {
+    id?: SortOrder
+    package_id?: SortOrder
+    brand_id?: SortOrder
+    creator_id?: SortOrder
+    quantity?: SortOrder
+    total_amount?: SortOrder
+  }
+
+  export type EnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderStatus | EnumOrderStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumOrderStatusWithAggregatesFilter<$PrismaModel> | $Enums.OrderStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOrderStatusFilter<$PrismaModel>
+    _max?: NestedEnumOrderStatusFilter<$PrismaModel>
   }
 
   export type UserNullableScalarRelationFilter = {
@@ -40450,13 +42540,6 @@ export namespace Prisma {
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
   }
 
-  export type PackageCreateNestedManyWithoutAdminInput = {
-    create?: XOR<PackageCreateWithoutAdminInput, PackageUncheckedCreateWithoutAdminInput> | PackageCreateWithoutAdminInput[] | PackageUncheckedCreateWithoutAdminInput[]
-    connectOrCreate?: PackageCreateOrConnectWithoutAdminInput | PackageCreateOrConnectWithoutAdminInput[]
-    createMany?: PackageCreateManyAdminInputEnvelope
-    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-  }
-
   export type PaymentCreateNestedManyWithoutAdminInput = {
     create?: XOR<PaymentCreateWithoutAdminInput, PaymentUncheckedCreateWithoutAdminInput> | PaymentCreateWithoutAdminInput[] | PaymentUncheckedCreateWithoutAdminInput[]
     connectOrCreate?: PaymentCreateOrConnectWithoutAdminInput | PaymentCreateOrConnectWithoutAdminInput[]
@@ -40552,13 +42635,6 @@ export namespace Prisma {
     connectOrCreate?: NotificationCreateOrConnectWithoutUserInput | NotificationCreateOrConnectWithoutUserInput[]
     createMany?: NotificationCreateManyUserInputEnvelope
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
-  }
-
-  export type PackageUncheckedCreateNestedManyWithoutAdminInput = {
-    create?: XOR<PackageCreateWithoutAdminInput, PackageUncheckedCreateWithoutAdminInput> | PackageCreateWithoutAdminInput[] | PackageUncheckedCreateWithoutAdminInput[]
-    connectOrCreate?: PackageCreateOrConnectWithoutAdminInput | PackageCreateOrConnectWithoutAdminInput[]
-    createMany?: PackageCreateManyAdminInputEnvelope
-    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
   }
 
   export type PaymentUncheckedCreateNestedManyWithoutAdminInput = {
@@ -40746,20 +42822,6 @@ export namespace Prisma {
     update?: NotificationUpdateWithWhereUniqueWithoutUserInput | NotificationUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: NotificationUpdateManyWithWhereWithoutUserInput | NotificationUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
-  }
-
-  export type PackageUpdateManyWithoutAdminNestedInput = {
-    create?: XOR<PackageCreateWithoutAdminInput, PackageUncheckedCreateWithoutAdminInput> | PackageCreateWithoutAdminInput[] | PackageUncheckedCreateWithoutAdminInput[]
-    connectOrCreate?: PackageCreateOrConnectWithoutAdminInput | PackageCreateOrConnectWithoutAdminInput[]
-    upsert?: PackageUpsertWithWhereUniqueWithoutAdminInput | PackageUpsertWithWhereUniqueWithoutAdminInput[]
-    createMany?: PackageCreateManyAdminInputEnvelope
-    set?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    disconnect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    delete?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    update?: PackageUpdateWithWhereUniqueWithoutAdminInput | PackageUpdateWithWhereUniqueWithoutAdminInput[]
-    updateMany?: PackageUpdateManyWithWhereWithoutAdminInput | PackageUpdateManyWithWhereWithoutAdminInput[]
-    deleteMany?: PackageScalarWhereInput | PackageScalarWhereInput[]
   }
 
   export type PaymentUpdateManyWithoutAdminNestedInput = {
@@ -40954,20 +43016,6 @@ export namespace Prisma {
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
   }
 
-  export type PackageUncheckedUpdateManyWithoutAdminNestedInput = {
-    create?: XOR<PackageCreateWithoutAdminInput, PackageUncheckedCreateWithoutAdminInput> | PackageCreateWithoutAdminInput[] | PackageUncheckedCreateWithoutAdminInput[]
-    connectOrCreate?: PackageCreateOrConnectWithoutAdminInput | PackageCreateOrConnectWithoutAdminInput[]
-    upsert?: PackageUpsertWithWhereUniqueWithoutAdminInput | PackageUpsertWithWhereUniqueWithoutAdminInput[]
-    createMany?: PackageCreateManyAdminInputEnvelope
-    set?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    disconnect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    delete?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    update?: PackageUpdateWithWhereUniqueWithoutAdminInput | PackageUpdateWithWhereUniqueWithoutAdminInput[]
-    updateMany?: PackageUpdateManyWithWhereWithoutAdminInput | PackageUpdateManyWithWhereWithoutAdminInput[]
-    deleteMany?: PackageScalarWhereInput | PackageScalarWhereInput[]
-  }
-
   export type PaymentUncheckedUpdateManyWithoutAdminNestedInput = {
     create?: XOR<PaymentCreateWithoutAdminInput, PaymentUncheckedCreateWithoutAdminInput> | PaymentCreateWithoutAdminInput[] | PaymentUncheckedCreateWithoutAdminInput[]
     connectOrCreate?: PaymentCreateOrConnectWithoutAdminInput | PaymentCreateOrConnectWithoutAdminInput[]
@@ -41100,6 +43148,13 @@ export namespace Prisma {
     connect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
   }
 
+  export type OrderCreateNestedManyWithoutBrandInput = {
+    create?: XOR<OrderCreateWithoutBrandInput, OrderUncheckedCreateWithoutBrandInput> | OrderCreateWithoutBrandInput[] | OrderUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutBrandInput | OrderCreateOrConnectWithoutBrandInput[]
+    createMany?: OrderCreateManyBrandInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
   export type CampaignUncheckedCreateNestedManyWithoutBrandInput = {
     create?: XOR<CampaignCreateWithoutBrandInput, CampaignUncheckedCreateWithoutBrandInput> | CampaignCreateWithoutBrandInput[] | CampaignUncheckedCreateWithoutBrandInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutBrandInput | CampaignCreateOrConnectWithoutBrandInput[]
@@ -41126,6 +43181,13 @@ export namespace Prisma {
     connectOrCreate?: PortfolioItemCreateOrConnectWithoutBrandInput | PortfolioItemCreateOrConnectWithoutBrandInput[]
     createMany?: PortfolioItemCreateManyBrandInputEnvelope
     connect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+  }
+
+  export type OrderUncheckedCreateNestedManyWithoutBrandInput = {
+    create?: XOR<OrderCreateWithoutBrandInput, OrderUncheckedCreateWithoutBrandInput> | OrderCreateWithoutBrandInput[] | OrderUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutBrandInput | OrderCreateOrConnectWithoutBrandInput[]
+    createMany?: OrderCreateManyBrandInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
   }
 
   export type NullableEnumCompanySizeFieldUpdateOperationsInput = {
@@ -41196,6 +43258,20 @@ export namespace Prisma {
     deleteMany?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
   }
 
+  export type OrderUpdateManyWithoutBrandNestedInput = {
+    create?: XOR<OrderCreateWithoutBrandInput, OrderUncheckedCreateWithoutBrandInput> | OrderCreateWithoutBrandInput[] | OrderUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutBrandInput | OrderCreateOrConnectWithoutBrandInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutBrandInput | OrderUpsertWithWhereUniqueWithoutBrandInput[]
+    createMany?: OrderCreateManyBrandInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutBrandInput | OrderUpdateWithWhereUniqueWithoutBrandInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutBrandInput | OrderUpdateManyWithWhereWithoutBrandInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
   export type CampaignUncheckedUpdateManyWithoutBrandNestedInput = {
     create?: XOR<CampaignCreateWithoutBrandInput, CampaignUncheckedCreateWithoutBrandInput> | CampaignCreateWithoutBrandInput[] | CampaignUncheckedCreateWithoutBrandInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutBrandInput | CampaignCreateOrConnectWithoutBrandInput[]
@@ -41252,6 +43328,20 @@ export namespace Prisma {
     deleteMany?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
   }
 
+  export type OrderUncheckedUpdateManyWithoutBrandNestedInput = {
+    create?: XOR<OrderCreateWithoutBrandInput, OrderUncheckedCreateWithoutBrandInput> | OrderCreateWithoutBrandInput[] | OrderUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutBrandInput | OrderCreateOrConnectWithoutBrandInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutBrandInput | OrderUpsertWithWhereUniqueWithoutBrandInput[]
+    createMany?: OrderCreateManyBrandInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutBrandInput | OrderUpdateWithWhereUniqueWithoutBrandInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutBrandInput | OrderUpdateManyWithWhereWithoutBrandInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
   export type CampaignApplicationCreateNestedManyWithoutCreatorInput = {
     create?: XOR<CampaignApplicationCreateWithoutCreatorInput, CampaignApplicationUncheckedCreateWithoutCreatorInput> | CampaignApplicationCreateWithoutCreatorInput[] | CampaignApplicationUncheckedCreateWithoutCreatorInput[]
     connectOrCreate?: CampaignApplicationCreateOrConnectWithoutCreatorInput | CampaignApplicationCreateOrConnectWithoutCreatorInput[]
@@ -41299,6 +43389,20 @@ export namespace Prisma {
     connect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
   }
 
+  export type PackageCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<PackageCreateWithoutCreatorInput, PackageUncheckedCreateWithoutCreatorInput> | PackageCreateWithoutCreatorInput[] | PackageUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: PackageCreateOrConnectWithoutCreatorInput | PackageCreateOrConnectWithoutCreatorInput[]
+    createMany?: PackageCreateManyCreatorInputEnvelope
+    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+  }
+
+  export type OrderCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<OrderCreateWithoutCreatorInput, OrderUncheckedCreateWithoutCreatorInput> | OrderCreateWithoutCreatorInput[] | OrderUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutCreatorInput | OrderCreateOrConnectWithoutCreatorInput[]
+    createMany?: OrderCreateManyCreatorInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
   export type CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput = {
     create?: XOR<CampaignApplicationCreateWithoutCreatorInput, CampaignApplicationUncheckedCreateWithoutCreatorInput> | CampaignApplicationCreateWithoutCreatorInput[] | CampaignApplicationUncheckedCreateWithoutCreatorInput[]
     connectOrCreate?: CampaignApplicationCreateOrConnectWithoutCreatorInput | CampaignApplicationCreateOrConnectWithoutCreatorInput[]
@@ -41338,6 +43442,20 @@ export namespace Prisma {
     connectOrCreate?: PortfolioItemCreateOrConnectWithoutCreatorInput | PortfolioItemCreateOrConnectWithoutCreatorInput[]
     createMany?: PortfolioItemCreateManyCreatorInputEnvelope
     connect?: PortfolioItemWhereUniqueInput | PortfolioItemWhereUniqueInput[]
+  }
+
+  export type PackageUncheckedCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<PackageCreateWithoutCreatorInput, PackageUncheckedCreateWithoutCreatorInput> | PackageCreateWithoutCreatorInput[] | PackageUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: PackageCreateOrConnectWithoutCreatorInput | PackageCreateOrConnectWithoutCreatorInput[]
+    createMany?: PackageCreateManyCreatorInputEnvelope
+    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+  }
+
+  export type OrderUncheckedCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<OrderCreateWithoutCreatorInput, OrderUncheckedCreateWithoutCreatorInput> | OrderCreateWithoutCreatorInput[] | OrderUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutCreatorInput | OrderCreateOrConnectWithoutCreatorInput[]
+    createMany?: OrderCreateManyCreatorInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
   }
 
   export type NullableDecimalFieldUpdateOperationsInput = {
@@ -41448,6 +43566,34 @@ export namespace Prisma {
     deleteMany?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
   }
 
+  export type PackageUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<PackageCreateWithoutCreatorInput, PackageUncheckedCreateWithoutCreatorInput> | PackageCreateWithoutCreatorInput[] | PackageUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: PackageCreateOrConnectWithoutCreatorInput | PackageCreateOrConnectWithoutCreatorInput[]
+    upsert?: PackageUpsertWithWhereUniqueWithoutCreatorInput | PackageUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: PackageCreateManyCreatorInputEnvelope
+    set?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+    disconnect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+    delete?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+    update?: PackageUpdateWithWhereUniqueWithoutCreatorInput | PackageUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: PackageUpdateManyWithWhereWithoutCreatorInput | PackageUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: PackageScalarWhereInput | PackageScalarWhereInput[]
+  }
+
+  export type OrderUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<OrderCreateWithoutCreatorInput, OrderUncheckedCreateWithoutCreatorInput> | OrderCreateWithoutCreatorInput[] | OrderUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutCreatorInput | OrderCreateOrConnectWithoutCreatorInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutCreatorInput | OrderUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: OrderCreateManyCreatorInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutCreatorInput | OrderUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutCreatorInput | OrderUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
   export type CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput = {
     create?: XOR<CampaignApplicationCreateWithoutCreatorInput, CampaignApplicationUncheckedCreateWithoutCreatorInput> | CampaignApplicationCreateWithoutCreatorInput[] | CampaignApplicationUncheckedCreateWithoutCreatorInput[]
     connectOrCreate?: CampaignApplicationCreateOrConnectWithoutCreatorInput | CampaignApplicationCreateOrConnectWithoutCreatorInput[]
@@ -41526,6 +43672,34 @@ export namespace Prisma {
     update?: PortfolioItemUpdateWithWhereUniqueWithoutCreatorInput | PortfolioItemUpdateWithWhereUniqueWithoutCreatorInput[]
     updateMany?: PortfolioItemUpdateManyWithWhereWithoutCreatorInput | PortfolioItemUpdateManyWithWhereWithoutCreatorInput[]
     deleteMany?: PortfolioItemScalarWhereInput | PortfolioItemScalarWhereInput[]
+  }
+
+  export type PackageUncheckedUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<PackageCreateWithoutCreatorInput, PackageUncheckedCreateWithoutCreatorInput> | PackageCreateWithoutCreatorInput[] | PackageUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: PackageCreateOrConnectWithoutCreatorInput | PackageCreateOrConnectWithoutCreatorInput[]
+    upsert?: PackageUpsertWithWhereUniqueWithoutCreatorInput | PackageUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: PackageCreateManyCreatorInputEnvelope
+    set?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+    disconnect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+    delete?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+    update?: PackageUpdateWithWhereUniqueWithoutCreatorInput | PackageUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: PackageUpdateManyWithWhereWithoutCreatorInput | PackageUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: PackageScalarWhereInput | PackageScalarWhereInput[]
+  }
+
+  export type OrderUncheckedUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<OrderCreateWithoutCreatorInput, OrderUncheckedCreateWithoutCreatorInput> | OrderCreateWithoutCreatorInput[] | OrderUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutCreatorInput | OrderCreateOrConnectWithoutCreatorInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutCreatorInput | OrderUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: OrderCreateManyCreatorInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutCreatorInput | OrderUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutCreatorInput | OrderUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
   }
 
   export type CreatorProfileCreateNestedOneWithoutSocial_media_accountsInput = {
@@ -41818,13 +43992,6 @@ export namespace Prisma {
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
   }
 
-  export type PackageCreateNestedManyWithoutCollaborationInput = {
-    create?: XOR<PackageCreateWithoutCollaborationInput, PackageUncheckedCreateWithoutCollaborationInput> | PackageCreateWithoutCollaborationInput[] | PackageUncheckedCreateWithoutCollaborationInput[]
-    connectOrCreate?: PackageCreateOrConnectWithoutCollaborationInput | PackageCreateOrConnectWithoutCollaborationInput[]
-    createMany?: PackageCreateManyCollaborationInputEnvelope
-    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-  }
-
   export type PaymentCreateNestedManyWithoutCollaborationInput = {
     create?: XOR<PaymentCreateWithoutCollaborationInput, PaymentUncheckedCreateWithoutCollaborationInput> | PaymentCreateWithoutCollaborationInput[] | PaymentUncheckedCreateWithoutCollaborationInput[]
     connectOrCreate?: PaymentCreateOrConnectWithoutCollaborationInput | PaymentCreateOrConnectWithoutCollaborationInput[]
@@ -41857,13 +44024,6 @@ export namespace Prisma {
     connectOrCreate?: InvoiceCreateOrConnectWithoutCollaborationInput | InvoiceCreateOrConnectWithoutCollaborationInput[]
     createMany?: InvoiceCreateManyCollaborationInputEnvelope
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
-  }
-
-  export type PackageUncheckedCreateNestedManyWithoutCollaborationInput = {
-    create?: XOR<PackageCreateWithoutCollaborationInput, PackageUncheckedCreateWithoutCollaborationInput> | PackageCreateWithoutCollaborationInput[] | PackageUncheckedCreateWithoutCollaborationInput[]
-    connectOrCreate?: PackageCreateOrConnectWithoutCollaborationInput | PackageCreateOrConnectWithoutCollaborationInput[]
-    createMany?: PackageCreateManyCollaborationInputEnvelope
-    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
   }
 
   export type PaymentUncheckedCreateNestedManyWithoutCollaborationInput = {
@@ -41954,20 +44114,6 @@ export namespace Prisma {
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
   }
 
-  export type PackageUpdateManyWithoutCollaborationNestedInput = {
-    create?: XOR<PackageCreateWithoutCollaborationInput, PackageUncheckedCreateWithoutCollaborationInput> | PackageCreateWithoutCollaborationInput[] | PackageUncheckedCreateWithoutCollaborationInput[]
-    connectOrCreate?: PackageCreateOrConnectWithoutCollaborationInput | PackageCreateOrConnectWithoutCollaborationInput[]
-    upsert?: PackageUpsertWithWhereUniqueWithoutCollaborationInput | PackageUpsertWithWhereUniqueWithoutCollaborationInput[]
-    createMany?: PackageCreateManyCollaborationInputEnvelope
-    set?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    disconnect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    delete?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    update?: PackageUpdateWithWhereUniqueWithoutCollaborationInput | PackageUpdateWithWhereUniqueWithoutCollaborationInput[]
-    updateMany?: PackageUpdateManyWithWhereWithoutCollaborationInput | PackageUpdateManyWithWhereWithoutCollaborationInput[]
-    deleteMany?: PackageScalarWhereInput | PackageScalarWhereInput[]
-  }
-
   export type PaymentUpdateManyWithoutCollaborationNestedInput = {
     create?: XOR<PaymentCreateWithoutCollaborationInput, PaymentUncheckedCreateWithoutCollaborationInput> | PaymentCreateWithoutCollaborationInput[] | PaymentUncheckedCreateWithoutCollaborationInput[]
     connectOrCreate?: PaymentCreateOrConnectWithoutCollaborationInput | PaymentCreateOrConnectWithoutCollaborationInput[]
@@ -42032,20 +44178,6 @@ export namespace Prisma {
     update?: InvoiceUpdateWithWhereUniqueWithoutCollaborationInput | InvoiceUpdateWithWhereUniqueWithoutCollaborationInput[]
     updateMany?: InvoiceUpdateManyWithWhereWithoutCollaborationInput | InvoiceUpdateManyWithWhereWithoutCollaborationInput[]
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
-  }
-
-  export type PackageUncheckedUpdateManyWithoutCollaborationNestedInput = {
-    create?: XOR<PackageCreateWithoutCollaborationInput, PackageUncheckedCreateWithoutCollaborationInput> | PackageCreateWithoutCollaborationInput[] | PackageUncheckedCreateWithoutCollaborationInput[]
-    connectOrCreate?: PackageCreateOrConnectWithoutCollaborationInput | PackageCreateOrConnectWithoutCollaborationInput[]
-    upsert?: PackageUpsertWithWhereUniqueWithoutCollaborationInput | PackageUpsertWithWhereUniqueWithoutCollaborationInput[]
-    createMany?: PackageCreateManyCollaborationInputEnvelope
-    set?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    disconnect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    delete?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
-    update?: PackageUpdateWithWhereUniqueWithoutCollaborationInput | PackageUpdateWithWhereUniqueWithoutCollaborationInput[]
-    updateMany?: PackageUpdateManyWithWhereWithoutCollaborationInput | PackageUpdateManyWithWhereWithoutCollaborationInput[]
-    deleteMany?: PackageScalarWhereInput | PackageScalarWhereInput[]
   }
 
   export type PaymentUncheckedUpdateManyWithoutCollaborationNestedInput = {
@@ -42234,6 +44366,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type OrderCreateNestedOneWithoutPaymentsInput = {
+    create?: XOR<OrderCreateWithoutPaymentsInput, OrderUncheckedCreateWithoutPaymentsInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutPaymentsInput
+    connect?: OrderWhereUniqueInput
+  }
+
   export type CollaborationCreateNestedOneWithoutPaymentsInput = {
     create?: XOR<CollaborationCreateWithoutPaymentsInput, CollaborationUncheckedCreateWithoutPaymentsInput>
     connectOrCreate?: CollaborationCreateOrConnectWithoutPaymentsInput
@@ -42268,10 +44406,22 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAdmin_paymentsInput, UserUpdateWithoutAdmin_paymentsInput>, UserUncheckedUpdateWithoutAdmin_paymentsInput>
   }
 
-  export type CollaborationUpdateOneRequiredWithoutPaymentsNestedInput = {
+  export type OrderUpdateOneWithoutPaymentsNestedInput = {
+    create?: XOR<OrderCreateWithoutPaymentsInput, OrderUncheckedCreateWithoutPaymentsInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutPaymentsInput
+    upsert?: OrderUpsertWithoutPaymentsInput
+    disconnect?: OrderWhereInput | boolean
+    delete?: OrderWhereInput | boolean
+    connect?: OrderWhereUniqueInput
+    update?: XOR<XOR<OrderUpdateToOneWithWhereWithoutPaymentsInput, OrderUpdateWithoutPaymentsInput>, OrderUncheckedUpdateWithoutPaymentsInput>
+  }
+
+  export type CollaborationUpdateOneWithoutPaymentsNestedInput = {
     create?: XOR<CollaborationCreateWithoutPaymentsInput, CollaborationUncheckedCreateWithoutPaymentsInput>
     connectOrCreate?: CollaborationCreateOrConnectWithoutPaymentsInput
     upsert?: CollaborationUpsertWithoutPaymentsInput
+    disconnect?: CollaborationWhereInput | boolean
+    delete?: CollaborationWhereInput | boolean
     connect?: CollaborationWhereUniqueInput
     update?: XOR<XOR<CollaborationUpdateToOneWithWhereWithoutPaymentsInput, CollaborationUpdateWithoutPaymentsInput>, CollaborationUncheckedUpdateWithoutPaymentsInput>
   }
@@ -42298,6 +44448,12 @@ export namespace Prisma {
     connect?: BrandProfileWhereUniqueInput
   }
 
+  export type OrderCreateNestedOneWithoutInvoicesInput = {
+    create?: XOR<OrderCreateWithoutInvoicesInput, OrderUncheckedCreateWithoutInvoicesInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutInvoicesInput
+    connect?: OrderWhereUniqueInput
+  }
+
   export type CollaborationCreateNestedOneWithoutInvoicesInput = {
     create?: XOR<CollaborationCreateWithoutInvoicesInput, CollaborationUncheckedCreateWithoutInvoicesInput>
     connectOrCreate?: CollaborationCreateOrConnectWithoutInvoicesInput
@@ -42322,10 +44478,22 @@ export namespace Prisma {
     update?: XOR<XOR<BrandProfileUpdateToOneWithWhereWithoutInvoicesInput, BrandProfileUpdateWithoutInvoicesInput>, BrandProfileUncheckedUpdateWithoutInvoicesInput>
   }
 
-  export type CollaborationUpdateOneRequiredWithoutInvoicesNestedInput = {
+  export type OrderUpdateOneWithoutInvoicesNestedInput = {
+    create?: XOR<OrderCreateWithoutInvoicesInput, OrderUncheckedCreateWithoutInvoicesInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutInvoicesInput
+    upsert?: OrderUpsertWithoutInvoicesInput
+    disconnect?: OrderWhereInput | boolean
+    delete?: OrderWhereInput | boolean
+    connect?: OrderWhereUniqueInput
+    update?: XOR<XOR<OrderUpdateToOneWithWhereWithoutInvoicesInput, OrderUpdateWithoutInvoicesInput>, OrderUncheckedUpdateWithoutInvoicesInput>
+  }
+
+  export type CollaborationUpdateOneWithoutInvoicesNestedInput = {
     create?: XOR<CollaborationCreateWithoutInvoicesInput, CollaborationUncheckedCreateWithoutInvoicesInput>
     connectOrCreate?: CollaborationCreateOrConnectWithoutInvoicesInput
     upsert?: CollaborationUpsertWithoutInvoicesInput
+    disconnect?: CollaborationWhereInput | boolean
+    delete?: CollaborationWhereInput | boolean
     connect?: CollaborationWhereUniqueInput
     update?: XOR<XOR<CollaborationUpdateToOneWithWhereWithoutInvoicesInput, CollaborationUpdateWithoutInvoicesInput>, CollaborationUncheckedUpdateWithoutInvoicesInput>
   }
@@ -42590,36 +44758,194 @@ export namespace Prisma {
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
-  export type UserCreateNestedOneWithoutAdmin_packagesInput = {
-    create?: XOR<UserCreateWithoutAdmin_packagesInput, UserUncheckedCreateWithoutAdmin_packagesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutAdmin_packagesInput
-    connect?: UserWhereUniqueInput
+  export type CreatorProfileCreateNestedOneWithoutPackages_createdInput = {
+    create?: XOR<CreatorProfileCreateWithoutPackages_createdInput, CreatorProfileUncheckedCreateWithoutPackages_createdInput>
+    connectOrCreate?: CreatorProfileCreateOrConnectWithoutPackages_createdInput
+    connect?: CreatorProfileWhereUniqueInput
   }
 
-  export type CollaborationCreateNestedOneWithoutPackagesInput = {
-    create?: XOR<CollaborationCreateWithoutPackagesInput, CollaborationUncheckedCreateWithoutPackagesInput>
-    connectOrCreate?: CollaborationCreateOrConnectWithoutPackagesInput
-    connect?: CollaborationWhereUniqueInput
+  export type OrderCreateNestedManyWithoutPackageInput = {
+    create?: XOR<OrderCreateWithoutPackageInput, OrderUncheckedCreateWithoutPackageInput> | OrderCreateWithoutPackageInput[] | OrderUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutPackageInput | OrderCreateOrConnectWithoutPackageInput[]
+    createMany?: OrderCreateManyPackageInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
+  export type OrderUncheckedCreateNestedManyWithoutPackageInput = {
+    create?: XOR<OrderCreateWithoutPackageInput, OrderUncheckedCreateWithoutPackageInput> | OrderCreateWithoutPackageInput[] | OrderUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutPackageInput | OrderCreateOrConnectWithoutPackageInput[]
+    createMany?: OrderCreateManyPackageInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
   }
 
   export type EnumPackageTypeFieldUpdateOperationsInput = {
     set?: $Enums.PackageType
   }
 
-  export type UserUpdateOneRequiredWithoutAdmin_packagesNestedInput = {
-    create?: XOR<UserCreateWithoutAdmin_packagesInput, UserUncheckedCreateWithoutAdmin_packagesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutAdmin_packagesInput
-    upsert?: UserUpsertWithoutAdmin_packagesInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAdmin_packagesInput, UserUpdateWithoutAdmin_packagesInput>, UserUncheckedUpdateWithoutAdmin_packagesInput>
+  export type CreatorProfileUpdateOneRequiredWithoutPackages_createdNestedInput = {
+    create?: XOR<CreatorProfileCreateWithoutPackages_createdInput, CreatorProfileUncheckedCreateWithoutPackages_createdInput>
+    connectOrCreate?: CreatorProfileCreateOrConnectWithoutPackages_createdInput
+    upsert?: CreatorProfileUpsertWithoutPackages_createdInput
+    connect?: CreatorProfileWhereUniqueInput
+    update?: XOR<XOR<CreatorProfileUpdateToOneWithWhereWithoutPackages_createdInput, CreatorProfileUpdateWithoutPackages_createdInput>, CreatorProfileUncheckedUpdateWithoutPackages_createdInput>
   }
 
-  export type CollaborationUpdateOneRequiredWithoutPackagesNestedInput = {
-    create?: XOR<CollaborationCreateWithoutPackagesInput, CollaborationUncheckedCreateWithoutPackagesInput>
-    connectOrCreate?: CollaborationCreateOrConnectWithoutPackagesInput
-    upsert?: CollaborationUpsertWithoutPackagesInput
-    connect?: CollaborationWhereUniqueInput
-    update?: XOR<XOR<CollaborationUpdateToOneWithWhereWithoutPackagesInput, CollaborationUpdateWithoutPackagesInput>, CollaborationUncheckedUpdateWithoutPackagesInput>
+  export type OrderUpdateManyWithoutPackageNestedInput = {
+    create?: XOR<OrderCreateWithoutPackageInput, OrderUncheckedCreateWithoutPackageInput> | OrderCreateWithoutPackageInput[] | OrderUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutPackageInput | OrderCreateOrConnectWithoutPackageInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutPackageInput | OrderUpsertWithWhereUniqueWithoutPackageInput[]
+    createMany?: OrderCreateManyPackageInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutPackageInput | OrderUpdateWithWhereUniqueWithoutPackageInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutPackageInput | OrderUpdateManyWithWhereWithoutPackageInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
+  export type OrderUncheckedUpdateManyWithoutPackageNestedInput = {
+    create?: XOR<OrderCreateWithoutPackageInput, OrderUncheckedCreateWithoutPackageInput> | OrderCreateWithoutPackageInput[] | OrderUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutPackageInput | OrderCreateOrConnectWithoutPackageInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutPackageInput | OrderUpsertWithWhereUniqueWithoutPackageInput[]
+    createMany?: OrderCreateManyPackageInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutPackageInput | OrderUpdateWithWhereUniqueWithoutPackageInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutPackageInput | OrderUpdateManyWithWhereWithoutPackageInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
+  export type PackageCreateNestedOneWithoutOrdersInput = {
+    create?: XOR<PackageCreateWithoutOrdersInput, PackageUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: PackageCreateOrConnectWithoutOrdersInput
+    connect?: PackageWhereUniqueInput
+  }
+
+  export type BrandProfileCreateNestedOneWithoutOrders_placedInput = {
+    create?: XOR<BrandProfileCreateWithoutOrders_placedInput, BrandProfileUncheckedCreateWithoutOrders_placedInput>
+    connectOrCreate?: BrandProfileCreateOrConnectWithoutOrders_placedInput
+    connect?: BrandProfileWhereUniqueInput
+  }
+
+  export type CreatorProfileCreateNestedOneWithoutOrders_receivedInput = {
+    create?: XOR<CreatorProfileCreateWithoutOrders_receivedInput, CreatorProfileUncheckedCreateWithoutOrders_receivedInput>
+    connectOrCreate?: CreatorProfileCreateOrConnectWithoutOrders_receivedInput
+    connect?: CreatorProfileWhereUniqueInput
+  }
+
+  export type PaymentCreateNestedManyWithoutOrderInput = {
+    create?: XOR<PaymentCreateWithoutOrderInput, PaymentUncheckedCreateWithoutOrderInput> | PaymentCreateWithoutOrderInput[] | PaymentUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutOrderInput | PaymentCreateOrConnectWithoutOrderInput[]
+    createMany?: PaymentCreateManyOrderInputEnvelope
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+  }
+
+  export type InvoiceCreateNestedManyWithoutOrderInput = {
+    create?: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput> | InvoiceCreateWithoutOrderInput[] | InvoiceUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrderInput | InvoiceCreateOrConnectWithoutOrderInput[]
+    createMany?: InvoiceCreateManyOrderInputEnvelope
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+  }
+
+  export type PaymentUncheckedCreateNestedManyWithoutOrderInput = {
+    create?: XOR<PaymentCreateWithoutOrderInput, PaymentUncheckedCreateWithoutOrderInput> | PaymentCreateWithoutOrderInput[] | PaymentUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutOrderInput | PaymentCreateOrConnectWithoutOrderInput[]
+    createMany?: PaymentCreateManyOrderInputEnvelope
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+  }
+
+  export type InvoiceUncheckedCreateNestedManyWithoutOrderInput = {
+    create?: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput> | InvoiceCreateWithoutOrderInput[] | InvoiceUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrderInput | InvoiceCreateOrConnectWithoutOrderInput[]
+    createMany?: InvoiceCreateManyOrderInputEnvelope
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+  }
+
+  export type EnumOrderStatusFieldUpdateOperationsInput = {
+    set?: $Enums.OrderStatus
+  }
+
+  export type PackageUpdateOneRequiredWithoutOrdersNestedInput = {
+    create?: XOR<PackageCreateWithoutOrdersInput, PackageUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: PackageCreateOrConnectWithoutOrdersInput
+    upsert?: PackageUpsertWithoutOrdersInput
+    connect?: PackageWhereUniqueInput
+    update?: XOR<XOR<PackageUpdateToOneWithWhereWithoutOrdersInput, PackageUpdateWithoutOrdersInput>, PackageUncheckedUpdateWithoutOrdersInput>
+  }
+
+  export type BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput = {
+    create?: XOR<BrandProfileCreateWithoutOrders_placedInput, BrandProfileUncheckedCreateWithoutOrders_placedInput>
+    connectOrCreate?: BrandProfileCreateOrConnectWithoutOrders_placedInput
+    upsert?: BrandProfileUpsertWithoutOrders_placedInput
+    connect?: BrandProfileWhereUniqueInput
+    update?: XOR<XOR<BrandProfileUpdateToOneWithWhereWithoutOrders_placedInput, BrandProfileUpdateWithoutOrders_placedInput>, BrandProfileUncheckedUpdateWithoutOrders_placedInput>
+  }
+
+  export type CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput = {
+    create?: XOR<CreatorProfileCreateWithoutOrders_receivedInput, CreatorProfileUncheckedCreateWithoutOrders_receivedInput>
+    connectOrCreate?: CreatorProfileCreateOrConnectWithoutOrders_receivedInput
+    upsert?: CreatorProfileUpsertWithoutOrders_receivedInput
+    connect?: CreatorProfileWhereUniqueInput
+    update?: XOR<XOR<CreatorProfileUpdateToOneWithWhereWithoutOrders_receivedInput, CreatorProfileUpdateWithoutOrders_receivedInput>, CreatorProfileUncheckedUpdateWithoutOrders_receivedInput>
+  }
+
+  export type PaymentUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<PaymentCreateWithoutOrderInput, PaymentUncheckedCreateWithoutOrderInput> | PaymentCreateWithoutOrderInput[] | PaymentUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutOrderInput | PaymentCreateOrConnectWithoutOrderInput[]
+    upsert?: PaymentUpsertWithWhereUniqueWithoutOrderInput | PaymentUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: PaymentCreateManyOrderInputEnvelope
+    set?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    disconnect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    delete?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    update?: PaymentUpdateWithWhereUniqueWithoutOrderInput | PaymentUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: PaymentUpdateManyWithWhereWithoutOrderInput | PaymentUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+  }
+
+  export type InvoiceUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput> | InvoiceCreateWithoutOrderInput[] | InvoiceUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrderInput | InvoiceCreateOrConnectWithoutOrderInput[]
+    upsert?: InvoiceUpsertWithWhereUniqueWithoutOrderInput | InvoiceUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: InvoiceCreateManyOrderInputEnvelope
+    set?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    disconnect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    delete?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    update?: InvoiceUpdateWithWhereUniqueWithoutOrderInput | InvoiceUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: InvoiceUpdateManyWithWhereWithoutOrderInput | InvoiceUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+  }
+
+  export type PaymentUncheckedUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<PaymentCreateWithoutOrderInput, PaymentUncheckedCreateWithoutOrderInput> | PaymentCreateWithoutOrderInput[] | PaymentUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: PaymentCreateOrConnectWithoutOrderInput | PaymentCreateOrConnectWithoutOrderInput[]
+    upsert?: PaymentUpsertWithWhereUniqueWithoutOrderInput | PaymentUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: PaymentCreateManyOrderInputEnvelope
+    set?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    disconnect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    delete?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
+    update?: PaymentUpdateWithWhereUniqueWithoutOrderInput | PaymentUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: PaymentUpdateManyWithWhereWithoutOrderInput | PaymentUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+  }
+
+  export type InvoiceUncheckedUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput> | InvoiceCreateWithoutOrderInput[] | InvoiceUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: InvoiceCreateOrConnectWithoutOrderInput | InvoiceCreateOrConnectWithoutOrderInput[]
+    upsert?: InvoiceUpsertWithWhereUniqueWithoutOrderInput | InvoiceUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: InvoiceCreateManyOrderInputEnvelope
+    set?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    disconnect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    delete?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+    update?: InvoiceUpdateWithWhereUniqueWithoutOrderInput | InvoiceUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: InvoiceUpdateManyWithWhereWithoutOrderInput | InvoiceUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutPhone_verificationsInput = {
@@ -43367,6 +45693,23 @@ export namespace Prisma {
     _max?: NestedEnumPackageTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumOrderStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderStatus | EnumOrderStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumOrderStatusFilter<$PrismaModel> | $Enums.OrderStatus
+  }
+
+  export type NestedEnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderStatus | EnumOrderStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumOrderStatusWithAggregatesFilter<$PrismaModel> | $Enums.OrderStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOrderStatusFilter<$PrismaModel>
+    _max?: NestedEnumOrderStatusFilter<$PrismaModel>
+  }
+
   export type NestedEnumKYCStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.KYCStatus | EnumKYCStatusFieldRefInput<$PrismaModel>
     in?: $Enums.KYCStatus[] | ListEnumKYCStatusFieldRefInput<$PrismaModel>
@@ -43443,6 +45786,7 @@ export namespace Prisma {
     collaborations?: CollaborationCreateNestedManyWithoutBrandInput
     invoices?: InvoiceCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateWithoutUserInput = {
@@ -43470,6 +45814,7 @@ export namespace Prisma {
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileCreateOrConnectWithoutUserInput = {
@@ -43608,6 +45953,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountCreateNestedManyWithoutCreatorInput
     kyc?: KYCCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileUncheckedCreateWithoutUserInput = {
@@ -43638,6 +45985,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
     kyc?: KYCUncheckedCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageUncheckedCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileCreateOrConnectWithoutUserInput = {
@@ -43707,38 +46056,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type PackageCreateWithoutAdminInput = {
-    id?: bigint | number
-    type: $Enums.PackageType
-    title: string
-    description?: string | null
-    price: Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: Date | string
-    collaboration: CollaborationCreateNestedOneWithoutPackagesInput
-  }
-
-  export type PackageUncheckedCreateWithoutAdminInput = {
-    id?: bigint | number
-    collaboration_id: bigint | number
-    type: $Enums.PackageType
-    title: string
-    description?: string | null
-    price: Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: Date | string
-  }
-
-  export type PackageCreateOrConnectWithoutAdminInput = {
-    where: PackageWhereUniqueInput
-    create: XOR<PackageCreateWithoutAdminInput, PackageUncheckedCreateWithoutAdminInput>
-  }
-
-  export type PackageCreateManyAdminInputEnvelope = {
-    data: PackageCreateManyAdminInput | PackageCreateManyAdminInput[]
-    skipDuplicates?: boolean
-  }
-
   export type PaymentCreateWithoutAdminInput = {
     id?: bigint | number
     amount: Decimal | DecimalJsLike | number | string
@@ -43751,14 +46068,16 @@ export namespace Prisma {
     initiated_at?: Date | string
     completed_at?: Date | string | null
     failure_reason?: string | null
-    collaboration: CollaborationCreateNestedOneWithoutPaymentsInput
+    order?: OrderCreateNestedOneWithoutPaymentsInput
+    collaboration?: CollaborationCreateNestedOneWithoutPaymentsInput
     payee: UserCreateNestedOneWithoutPayments_payeeInput
     payer: UserCreateNestedOneWithoutPayments_payerInput
   }
 
   export type PaymentUncheckedCreateWithoutAdminInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     payer_id: bigint | number
     payee_id: bigint | number
     amount: Decimal | DecimalJsLike | number | string
@@ -43796,13 +46115,15 @@ export namespace Prisma {
     completed_at?: Date | string | null
     failure_reason?: string | null
     admin: UserCreateNestedOneWithoutAdmin_paymentsInput
-    collaboration: CollaborationCreateNestedOneWithoutPaymentsInput
+    order?: OrderCreateNestedOneWithoutPaymentsInput
+    collaboration?: CollaborationCreateNestedOneWithoutPaymentsInput
     payer: UserCreateNestedOneWithoutPayments_payerInput
   }
 
   export type PaymentUncheckedCreateWithoutPayeeInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     payer_id: bigint | number
     admin_id: bigint | number
     amount: Decimal | DecimalJsLike | number | string
@@ -43840,13 +46161,15 @@ export namespace Prisma {
     completed_at?: Date | string | null
     failure_reason?: string | null
     admin: UserCreateNestedOneWithoutAdmin_paymentsInput
-    collaboration: CollaborationCreateNestedOneWithoutPaymentsInput
+    order?: OrderCreateNestedOneWithoutPaymentsInput
+    collaboration?: CollaborationCreateNestedOneWithoutPaymentsInput
     payee: UserCreateNestedOneWithoutPayments_payeeInput
   }
 
   export type PaymentUncheckedCreateWithoutPayerInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     payee_id: bigint | number
     admin_id: bigint | number
     amount: Decimal | DecimalJsLike | number | string
@@ -44186,6 +46509,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUpdateManyWithoutCreatorNestedInput
   }
 
   export type CreatorProfileUncheckedUpdateWithoutUserInput = {
@@ -44216,6 +46541,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUncheckedUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type MessageUpsertWithWhereUniqueWithoutSenderInput = {
@@ -44279,37 +46606,6 @@ export namespace Prisma {
     created_at?: DateTimeFilter<"Notification"> | Date | string
   }
 
-  export type PackageUpsertWithWhereUniqueWithoutAdminInput = {
-    where: PackageWhereUniqueInput
-    update: XOR<PackageUpdateWithoutAdminInput, PackageUncheckedUpdateWithoutAdminInput>
-    create: XOR<PackageCreateWithoutAdminInput, PackageUncheckedCreateWithoutAdminInput>
-  }
-
-  export type PackageUpdateWithWhereUniqueWithoutAdminInput = {
-    where: PackageWhereUniqueInput
-    data: XOR<PackageUpdateWithoutAdminInput, PackageUncheckedUpdateWithoutAdminInput>
-  }
-
-  export type PackageUpdateManyWithWhereWithoutAdminInput = {
-    where: PackageScalarWhereInput
-    data: XOR<PackageUpdateManyMutationInput, PackageUncheckedUpdateManyWithoutAdminInput>
-  }
-
-  export type PackageScalarWhereInput = {
-    AND?: PackageScalarWhereInput | PackageScalarWhereInput[]
-    OR?: PackageScalarWhereInput[]
-    NOT?: PackageScalarWhereInput | PackageScalarWhereInput[]
-    id?: BigIntFilter<"Package"> | bigint | number
-    collaboration_id?: BigIntFilter<"Package"> | bigint | number
-    admin_id?: BigIntFilter<"Package"> | bigint | number
-    type?: EnumPackageTypeFilter<"Package"> | $Enums.PackageType
-    title?: StringFilter<"Package"> | string
-    description?: StringNullableFilter<"Package"> | string | null
-    price?: DecimalFilter<"Package"> | Decimal | DecimalJsLike | number | string
-    deliverables?: JsonNullableFilter<"Package">
-    created_at?: DateTimeFilter<"Package"> | Date | string
-  }
-
   export type PaymentUpsertWithWhereUniqueWithoutAdminInput = {
     where: PaymentWhereUniqueInput
     update: XOR<PaymentUpdateWithoutAdminInput, PaymentUncheckedUpdateWithoutAdminInput>
@@ -44331,7 +46627,8 @@ export namespace Prisma {
     OR?: PaymentScalarWhereInput[]
     NOT?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
     id?: BigIntFilter<"Payment"> | bigint | number
-    collaboration_id?: BigIntFilter<"Payment"> | bigint | number
+    order_id?: BigIntNullableFilter<"Payment"> | bigint | number | null
+    collaboration_id?: BigIntNullableFilter<"Payment"> | bigint | number | null
     payer_id?: BigIntFilter<"Payment"> | bigint | number
     payee_id?: BigIntFilter<"Payment"> | bigint | number
     admin_id?: BigIntFilter<"Payment"> | bigint | number
@@ -44504,6 +46801,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -44523,7 +46821,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -44542,6 +46839,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -44561,7 +46859,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -44655,7 +46952,6 @@ export namespace Prisma {
     channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     payments?: PaymentCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewCreateNestedManyWithoutCollaborationInput
   }
@@ -44675,7 +46971,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
   }
@@ -44701,13 +46996,15 @@ export namespace Prisma {
     status?: $Enums.InvoiceStatus
     issued_at?: Date | string
     paid_at?: Date | string | null
-    collaboration: CollaborationCreateNestedOneWithoutInvoicesInput
+    order?: OrderCreateNestedOneWithoutInvoicesInput
+    collaboration?: CollaborationCreateNestedOneWithoutInvoicesInput
     creator: CreatorProfileCreateNestedOneWithoutInvoicesInput
   }
 
   export type InvoiceUncheckedCreateWithoutBrandInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     creator_id: bigint | number
     invoice_number: string
     amount: Decimal | DecimalJsLike | number | string
@@ -44772,6 +47069,46 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type OrderCreateWithoutBrandInput = {
+    id?: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    package: PackageCreateNestedOneWithoutOrdersInput
+    creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
+    payments?: PaymentCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUncheckedCreateWithoutBrandInput = {
+    id?: bigint | number
+    package_id: bigint | number
+    creator_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderCreateOrConnectWithoutBrandInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutBrandInput, OrderUncheckedCreateWithoutBrandInput>
+  }
+
+  export type OrderCreateManyBrandInputEnvelope = {
+    data: OrderCreateManyBrandInput | OrderCreateManyBrandInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutBrand_profilesInput = {
     update: XOR<UserUpdateWithoutBrand_profilesInput, UserUncheckedUpdateWithoutBrand_profilesInput>
     create: XOR<UserCreateWithoutBrand_profilesInput, UserUncheckedCreateWithoutBrand_profilesInput>
@@ -44792,6 +47129,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44811,7 +47149,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -44830,6 +47167,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44849,7 +47187,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -44958,7 +47295,8 @@ export namespace Prisma {
     OR?: InvoiceScalarWhereInput[]
     NOT?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
     id?: BigIntFilter<"Invoice"> | bigint | number
-    collaboration_id?: BigIntFilter<"Invoice"> | bigint | number
+    order_id?: BigIntNullableFilter<"Invoice"> | bigint | number | null
+    collaboration_id?: BigIntNullableFilter<"Invoice"> | bigint | number | null
     brand_id?: BigIntFilter<"Invoice"> | bigint | number
     creator_id?: BigIntFilter<"Invoice"> | bigint | number
     invoice_number?: StringFilter<"Invoice"> | string
@@ -45006,6 +47344,39 @@ export namespace Prisma {
     is_featured?: BoolFilter<"PortfolioItem"> | boolean
     created_at?: DateTimeFilter<"PortfolioItem"> | Date | string
     updated_at?: DateTimeFilter<"PortfolioItem"> | Date | string
+  }
+
+  export type OrderUpsertWithWhereUniqueWithoutBrandInput = {
+    where: OrderWhereUniqueInput
+    update: XOR<OrderUpdateWithoutBrandInput, OrderUncheckedUpdateWithoutBrandInput>
+    create: XOR<OrderCreateWithoutBrandInput, OrderUncheckedCreateWithoutBrandInput>
+  }
+
+  export type OrderUpdateWithWhereUniqueWithoutBrandInput = {
+    where: OrderWhereUniqueInput
+    data: XOR<OrderUpdateWithoutBrandInput, OrderUncheckedUpdateWithoutBrandInput>
+  }
+
+  export type OrderUpdateManyWithWhereWithoutBrandInput = {
+    where: OrderScalarWhereInput
+    data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyWithoutBrandInput>
+  }
+
+  export type OrderScalarWhereInput = {
+    AND?: OrderScalarWhereInput | OrderScalarWhereInput[]
+    OR?: OrderScalarWhereInput[]
+    NOT?: OrderScalarWhereInput | OrderScalarWhereInput[]
+    id?: BigIntFilter<"Order"> | bigint | number
+    package_id?: BigIntFilter<"Order"> | bigint | number
+    brand_id?: BigIntFilter<"Order"> | bigint | number
+    creator_id?: BigIntFilter<"Order"> | bigint | number
+    quantity?: IntFilter<"Order"> | number
+    total_amount?: DecimalFilter<"Order"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Order"> | string
+    status?: EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
+    order_date?: DateTimeFilter<"Order"> | Date | string
+    completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
+    rejection_message?: StringNullableFilter<"Order"> | string | null
   }
 
   export type CampaignApplicationCreateWithoutCreatorInput = {
@@ -45061,7 +47432,6 @@ export namespace Prisma {
     channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     payments?: PaymentCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewCreateNestedManyWithoutCollaborationInput
   }
@@ -45081,7 +47451,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
   }
@@ -45105,6 +47474,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -45124,7 +47494,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionCreateNestedManyWithoutAdminInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -45143,6 +47512,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -45162,7 +47532,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutAdminInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -45189,12 +47558,14 @@ export namespace Prisma {
     issued_at?: Date | string
     paid_at?: Date | string | null
     brand: BrandProfileCreateNestedOneWithoutInvoicesInput
-    collaboration: CollaborationCreateNestedOneWithoutInvoicesInput
+    order?: OrderCreateNestedOneWithoutInvoicesInput
+    collaboration?: CollaborationCreateNestedOneWithoutInvoicesInput
   }
 
   export type InvoiceUncheckedCreateWithoutCreatorInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     brand_id: bigint | number
     invoice_number: string
     amount: Decimal | DecimalJsLike | number | string
@@ -45338,6 +47709,84 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PackageCreateWithoutCreatorInput = {
+    id?: bigint | number
+    type: $Enums.PackageType
+    title: string
+    description?: string | null
+    price: Decimal | DecimalJsLike | number | string
+    currency?: string
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    orders?: OrderCreateNestedManyWithoutPackageInput
+  }
+
+  export type PackageUncheckedCreateWithoutCreatorInput = {
+    id?: bigint | number
+    type: $Enums.PackageType
+    title: string
+    description?: string | null
+    price: Decimal | DecimalJsLike | number | string
+    currency?: string
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    orders?: OrderUncheckedCreateNestedManyWithoutPackageInput
+  }
+
+  export type PackageCreateOrConnectWithoutCreatorInput = {
+    where: PackageWhereUniqueInput
+    create: XOR<PackageCreateWithoutCreatorInput, PackageUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type PackageCreateManyCreatorInputEnvelope = {
+    data: PackageCreateManyCreatorInput | PackageCreateManyCreatorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OrderCreateWithoutCreatorInput = {
+    id?: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    package: PackageCreateNestedOneWithoutOrdersInput
+    brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
+    payments?: PaymentCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUncheckedCreateWithoutCreatorInput = {
+    id?: bigint | number
+    package_id: bigint | number
+    brand_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderCreateOrConnectWithoutCreatorInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutCreatorInput, OrderUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type OrderCreateManyCreatorInputEnvelope = {
+    data: OrderCreateManyCreatorInput | OrderCreateManyCreatorInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CampaignApplicationUpsertWithWhereUniqueWithoutCreatorInput = {
     where: CampaignApplicationWhereUniqueInput
     update: XOR<CampaignApplicationUpdateWithoutCreatorInput, CampaignApplicationUncheckedUpdateWithoutCreatorInput>
@@ -45407,6 +47856,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45426,7 +47876,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionUpdateManyWithoutAdminNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -45445,6 +47894,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45464,7 +47914,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutAdminNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -45588,6 +48037,55 @@ export namespace Prisma {
     data: XOR<PortfolioItemUpdateManyMutationInput, PortfolioItemUncheckedUpdateManyWithoutCreatorInput>
   }
 
+  export type PackageUpsertWithWhereUniqueWithoutCreatorInput = {
+    where: PackageWhereUniqueInput
+    update: XOR<PackageUpdateWithoutCreatorInput, PackageUncheckedUpdateWithoutCreatorInput>
+    create: XOR<PackageCreateWithoutCreatorInput, PackageUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type PackageUpdateWithWhereUniqueWithoutCreatorInput = {
+    where: PackageWhereUniqueInput
+    data: XOR<PackageUpdateWithoutCreatorInput, PackageUncheckedUpdateWithoutCreatorInput>
+  }
+
+  export type PackageUpdateManyWithWhereWithoutCreatorInput = {
+    where: PackageScalarWhereInput
+    data: XOR<PackageUpdateManyMutationInput, PackageUncheckedUpdateManyWithoutCreatorInput>
+  }
+
+  export type PackageScalarWhereInput = {
+    AND?: PackageScalarWhereInput | PackageScalarWhereInput[]
+    OR?: PackageScalarWhereInput[]
+    NOT?: PackageScalarWhereInput | PackageScalarWhereInput[]
+    id?: BigIntFilter<"Package"> | bigint | number
+    creator_id?: BigIntFilter<"Package"> | bigint | number
+    type?: EnumPackageTypeFilter<"Package"> | $Enums.PackageType
+    title?: StringFilter<"Package"> | string
+    description?: StringNullableFilter<"Package"> | string | null
+    price?: DecimalFilter<"Package"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"Package"> | string
+    deliverables?: JsonNullableFilter<"Package">
+    is_active?: BoolFilter<"Package"> | boolean
+    created_at?: DateTimeFilter<"Package"> | Date | string
+    updated_at?: DateTimeFilter<"Package"> | Date | string
+  }
+
+  export type OrderUpsertWithWhereUniqueWithoutCreatorInput = {
+    where: OrderWhereUniqueInput
+    update: XOR<OrderUpdateWithoutCreatorInput, OrderUncheckedUpdateWithoutCreatorInput>
+    create: XOR<OrderCreateWithoutCreatorInput, OrderUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type OrderUpdateWithWhereUniqueWithoutCreatorInput = {
+    where: OrderWhereUniqueInput
+    data: XOR<OrderUpdateWithoutCreatorInput, OrderUncheckedUpdateWithoutCreatorInput>
+  }
+
+  export type OrderUpdateManyWithWhereWithoutCreatorInput = {
+    where: OrderScalarWhereInput
+    data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyWithoutCreatorInput>
+  }
+
   export type CreatorProfileCreateWithoutSocial_media_accountsInput = {
     id?: bigint | number
     bio?: string | null
@@ -45616,6 +48114,8 @@ export namespace Prisma {
     invoices?: InvoiceCreateNestedManyWithoutCreatorInput
     kyc?: KYCCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileUncheckedCreateWithoutSocial_media_accountsInput = {
@@ -45646,6 +48146,8 @@ export namespace Prisma {
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
     kyc?: KYCUncheckedCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageUncheckedCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileCreateOrConnectWithoutSocial_media_accountsInput = {
@@ -45692,6 +48194,8 @@ export namespace Prisma {
     invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUpdateManyWithoutCreatorNestedInput
   }
 
   export type CreatorProfileUncheckedUpdateWithoutSocial_media_accountsInput = {
@@ -45722,6 +48226,8 @@ export namespace Prisma {
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUncheckedUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type BrandProfileCreateWithoutCampaignsInput = {
@@ -45749,6 +48255,7 @@ export namespace Prisma {
     collaborations?: CollaborationCreateNestedManyWithoutBrandInput
     invoices?: InvoiceCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateWithoutCampaignsInput = {
@@ -45776,6 +48283,7 @@ export namespace Prisma {
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileCreateOrConnectWithoutCampaignsInput = {
@@ -45862,7 +48370,6 @@ export namespace Prisma {
     channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     payments?: PaymentCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewCreateNestedManyWithoutCollaborationInput
   }
@@ -45882,7 +48389,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
   }
@@ -45933,6 +48439,7 @@ export namespace Prisma {
     collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateWithoutCampaignsInput = {
@@ -45960,6 +48467,7 @@ export namespace Prisma {
     collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type CampaignAnalyticsUpsertWithWhereUniqueWithoutCampaignInput = {
@@ -46109,6 +48617,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountCreateNestedManyWithoutCreatorInput
     kyc?: KYCCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileUncheckedCreateWithoutCampaign_applicationsInput = {
@@ -46139,6 +48649,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
     kyc?: KYCUncheckedCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageUncheckedCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileCreateOrConnectWithoutCampaign_applicationsInput = {
@@ -46161,7 +48673,6 @@ export namespace Prisma {
     channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     payments?: PaymentCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewCreateNestedManyWithoutCollaborationInput
   }
@@ -46181,7 +48692,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
   }
@@ -46295,6 +48805,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUpdateManyWithoutCreatorNestedInput
   }
 
   export type CreatorProfileUncheckedUpdateWithoutCampaign_applicationsInput = {
@@ -46325,6 +48837,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUncheckedUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type CollaborationUpsertWithoutApplicationInput = {
@@ -46353,7 +48867,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
   }
@@ -46373,7 +48886,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
   }
@@ -46436,6 +48948,7 @@ export namespace Prisma {
     campaigns?: CampaignCreateNestedManyWithoutBrandInput
     invoices?: InvoiceCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateWithoutCollaborationsInput = {
@@ -46463,6 +48976,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedCreateNestedManyWithoutBrandInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileCreateOrConnectWithoutCollaborationsInput = {
@@ -46557,6 +49071,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountCreateNestedManyWithoutCreatorInput
     kyc?: KYCCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileUncheckedCreateWithoutCollaborationsInput = {
@@ -46587,6 +49103,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
     kyc?: KYCUncheckedCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageUncheckedCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileCreateOrConnectWithoutCollaborationsInput = {
@@ -46673,11 +49191,13 @@ export namespace Prisma {
     issued_at?: Date | string
     paid_at?: Date | string | null
     brand: BrandProfileCreateNestedOneWithoutInvoicesInput
+    order?: OrderCreateNestedOneWithoutInvoicesInput
     creator: CreatorProfileCreateNestedOneWithoutInvoicesInput
   }
 
   export type InvoiceUncheckedCreateWithoutCollaborationInput = {
     id?: bigint | number
+    order_id?: bigint | number | null
     brand_id: bigint | number
     creator_id: bigint | number
     invoice_number: string
@@ -46701,38 +49221,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type PackageCreateWithoutCollaborationInput = {
-    id?: bigint | number
-    type: $Enums.PackageType
-    title: string
-    description?: string | null
-    price: Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: Date | string
-    admin: UserCreateNestedOneWithoutAdmin_packagesInput
-  }
-
-  export type PackageUncheckedCreateWithoutCollaborationInput = {
-    id?: bigint | number
-    admin_id: bigint | number
-    type: $Enums.PackageType
-    title: string
-    description?: string | null
-    price: Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: Date | string
-  }
-
-  export type PackageCreateOrConnectWithoutCollaborationInput = {
-    where: PackageWhereUniqueInput
-    create: XOR<PackageCreateWithoutCollaborationInput, PackageUncheckedCreateWithoutCollaborationInput>
-  }
-
-  export type PackageCreateManyCollaborationInputEnvelope = {
-    data: PackageCreateManyCollaborationInput | PackageCreateManyCollaborationInput[]
-    skipDuplicates?: boolean
-  }
-
   export type PaymentCreateWithoutCollaborationInput = {
     id?: bigint | number
     amount: Decimal | DecimalJsLike | number | string
@@ -46746,12 +49234,14 @@ export namespace Prisma {
     completed_at?: Date | string | null
     failure_reason?: string | null
     admin: UserCreateNestedOneWithoutAdmin_paymentsInput
+    order?: OrderCreateNestedOneWithoutPaymentsInput
     payee: UserCreateNestedOneWithoutPayments_payeeInput
     payer: UserCreateNestedOneWithoutPayments_payerInput
   }
 
   export type PaymentUncheckedCreateWithoutCollaborationInput = {
     id?: bigint | number
+    order_id?: bigint | number | null
     payer_id: bigint | number
     payee_id: bigint | number
     admin_id: bigint | number
@@ -46884,6 +49374,7 @@ export namespace Prisma {
     campaigns?: CampaignUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateWithoutCollaborationsInput = {
@@ -46911,6 +49402,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type CampaignUpsertWithoutCollaborationsInput = {
@@ -47017,6 +49509,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUpdateManyWithoutCreatorNestedInput
   }
 
   export type CreatorProfileUncheckedUpdateWithoutCollaborationsInput = {
@@ -47047,6 +49541,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUncheckedUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type CollaborationChannelUpsertWithoutCollaborationInput = {
@@ -47104,22 +49600,6 @@ export namespace Prisma {
   export type InvoiceUpdateManyWithWhereWithoutCollaborationInput = {
     where: InvoiceScalarWhereInput
     data: XOR<InvoiceUpdateManyMutationInput, InvoiceUncheckedUpdateManyWithoutCollaborationInput>
-  }
-
-  export type PackageUpsertWithWhereUniqueWithoutCollaborationInput = {
-    where: PackageWhereUniqueInput
-    update: XOR<PackageUpdateWithoutCollaborationInput, PackageUncheckedUpdateWithoutCollaborationInput>
-    create: XOR<PackageCreateWithoutCollaborationInput, PackageUncheckedCreateWithoutCollaborationInput>
-  }
-
-  export type PackageUpdateWithWhereUniqueWithoutCollaborationInput = {
-    where: PackageWhereUniqueInput
-    data: XOR<PackageUpdateWithoutCollaborationInput, PackageUncheckedUpdateWithoutCollaborationInput>
-  }
-
-  export type PackageUpdateManyWithWhereWithoutCollaborationInput = {
-    where: PackageScalarWhereInput
-    data: XOR<PackageUpdateManyMutationInput, PackageUncheckedUpdateManyWithoutCollaborationInput>
   }
 
   export type PaymentUpsertWithWhereUniqueWithoutCollaborationInput = {
@@ -47223,6 +49703,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -47242,7 +49723,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -47261,6 +49741,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -47280,7 +49761,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -47310,7 +49790,6 @@ export namespace Prisma {
     creator: CreatorProfileCreateNestedOneWithoutCollaborationsInput
     channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
     invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     payments?: PaymentCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewCreateNestedManyWithoutCollaborationInput
   }
@@ -47330,7 +49809,6 @@ export namespace Prisma {
     completed_at?: Date | string | null
     channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
   }
@@ -47408,6 +49886,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47427,7 +49906,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -47446,6 +49924,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47465,7 +49944,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -47501,7 +49979,6 @@ export namespace Prisma {
     creator?: CreatorProfileUpdateOneRequiredWithoutCollaborationsNestedInput
     channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
     invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
   }
@@ -47521,7 +49998,6 @@ export namespace Prisma {
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
   }
@@ -47578,6 +50054,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -47597,7 +50074,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -47616,6 +50092,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -47635,7 +50112,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -47719,6 +50195,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47738,7 +50215,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -47757,6 +50233,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47776,7 +50253,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -47795,6 +50271,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -47815,7 +50292,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
     phone_verifications?: PhoneVerificationCreateNestedManyWithoutUserInput
@@ -47833,6 +50309,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -47853,7 +50330,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
     phone_verifications?: PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
@@ -47865,6 +50341,41 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutAdmin_paymentsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutAdmin_paymentsInput, UserUncheckedCreateWithoutAdmin_paymentsInput>
+  }
+
+  export type OrderCreateWithoutPaymentsInput = {
+    id?: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    package: PackageCreateNestedOneWithoutOrdersInput
+    brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
+    creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUncheckedCreateWithoutPaymentsInput = {
+    id?: bigint | number
+    package_id: bigint | number
+    brand_id: bigint | number
+    creator_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderCreateOrConnectWithoutPaymentsInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutPaymentsInput, OrderUncheckedCreateWithoutPaymentsInput>
   }
 
   export type CollaborationCreateWithoutPaymentsInput = {
@@ -47883,7 +50394,6 @@ export namespace Prisma {
     channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewCreateNestedManyWithoutCollaborationInput
   }
 
@@ -47903,7 +50413,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
   }
 
@@ -47921,6 +50430,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -47941,7 +50451,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
     phone_verifications?: PhoneVerificationCreateNestedManyWithoutUserInput
@@ -47959,6 +50468,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -47979,7 +50489,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
     phone_verifications?: PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
@@ -48002,6 +50511,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -48022,7 +50532,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     phone_verifications?: PhoneVerificationCreateNestedManyWithoutUserInput
@@ -48040,6 +50549,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -48060,7 +50570,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     phone_verifications?: PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
@@ -48094,6 +50603,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48114,7 +50624,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
     phone_verifications?: PhoneVerificationUpdateManyWithoutUserNestedInput
@@ -48132,6 +50641,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48152,13 +50662,53 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
     phone_verifications?: PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+  }
+
+  export type OrderUpsertWithoutPaymentsInput = {
+    update: XOR<OrderUpdateWithoutPaymentsInput, OrderUncheckedUpdateWithoutPaymentsInput>
+    create: XOR<OrderCreateWithoutPaymentsInput, OrderUncheckedCreateWithoutPaymentsInput>
+    where?: OrderWhereInput
+  }
+
+  export type OrderUpdateToOneWithWhereWithoutPaymentsInput = {
+    where?: OrderWhereInput
+    data: XOR<OrderUpdateWithoutPaymentsInput, OrderUncheckedUpdateWithoutPaymentsInput>
+  }
+
+  export type OrderUpdateWithoutPaymentsInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
+    brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
+    creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutPaymentsInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    package_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type CollaborationUpsertWithoutPaymentsInput = {
@@ -48188,7 +50738,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
   }
 
@@ -48208,7 +50757,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
   }
 
@@ -48232,6 +50780,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48252,7 +50801,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
     phone_verifications?: PhoneVerificationUpdateManyWithoutUserNestedInput
@@ -48270,6 +50818,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48290,7 +50839,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
     phone_verifications?: PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
@@ -48319,6 +50867,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48339,7 +50888,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     phone_verifications?: PhoneVerificationUpdateManyWithoutUserNestedInput
@@ -48357,6 +50905,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48377,7 +50926,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     phone_verifications?: PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
@@ -48411,6 +50959,7 @@ export namespace Prisma {
     campaigns?: CampaignCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateWithoutInvoicesInput = {
@@ -48438,11 +50987,47 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileCreateOrConnectWithoutInvoicesInput = {
     where: BrandProfileWhereUniqueInput
     create: XOR<BrandProfileCreateWithoutInvoicesInput, BrandProfileUncheckedCreateWithoutInvoicesInput>
+  }
+
+  export type OrderCreateWithoutInvoicesInput = {
+    id?: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    package: PackageCreateNestedOneWithoutOrdersInput
+    brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
+    creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
+    payments?: PaymentCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUncheckedCreateWithoutInvoicesInput = {
+    id?: bigint | number
+    package_id: bigint | number
+    brand_id: bigint | number
+    creator_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderCreateOrConnectWithoutInvoicesInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutInvoicesInput, OrderUncheckedCreateWithoutInvoicesInput>
   }
 
   export type CollaborationCreateWithoutInvoicesInput = {
@@ -48460,7 +51045,6 @@ export namespace Prisma {
     creator: CreatorProfileCreateNestedOneWithoutCollaborationsInput
     channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     payments?: PaymentCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewCreateNestedManyWithoutCollaborationInput
   }
@@ -48480,7 +51064,6 @@ export namespace Prisma {
     completed_at?: Date | string | null
     channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
   }
@@ -48518,6 +51101,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountCreateNestedManyWithoutCreatorInput
     kyc?: KYCCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileUncheckedCreateWithoutInvoicesInput = {
@@ -48548,6 +51133,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
     kyc?: KYCUncheckedCreateNestedOneWithoutCreatorInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageUncheckedCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileCreateOrConnectWithoutInvoicesInput = {
@@ -48591,6 +51178,7 @@ export namespace Prisma {
     campaigns?: CampaignUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateWithoutInvoicesInput = {
@@ -48618,6 +51206,48 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUncheckedUpdateManyWithoutBrandNestedInput
+  }
+
+  export type OrderUpsertWithoutInvoicesInput = {
+    update: XOR<OrderUpdateWithoutInvoicesInput, OrderUncheckedUpdateWithoutInvoicesInput>
+    create: XOR<OrderCreateWithoutInvoicesInput, OrderUncheckedCreateWithoutInvoicesInput>
+    where?: OrderWhereInput
+  }
+
+  export type OrderUpdateToOneWithWhereWithoutInvoicesInput = {
+    where?: OrderWhereInput
+    data: XOR<OrderUpdateWithoutInvoicesInput, OrderUncheckedUpdateWithoutInvoicesInput>
+  }
+
+  export type OrderUpdateWithoutInvoicesInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
+    brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
+    creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
+    payments?: PaymentUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutInvoicesInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    package_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type CollaborationUpsertWithoutInvoicesInput = {
@@ -48646,7 +51276,6 @@ export namespace Prisma {
     creator?: CreatorProfileUpdateOneRequiredWithoutCollaborationsNestedInput
     channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
   }
@@ -48666,7 +51295,6 @@ export namespace Prisma {
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
   }
@@ -48710,6 +51338,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUpdateManyWithoutCreatorNestedInput
   }
 
   export type CreatorProfileUncheckedUpdateWithoutInvoicesInput = {
@@ -48740,6 +51370,8 @@ export namespace Prisma {
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUncheckedUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type CollaborationChannelCreateWithoutMessagesInput = {
@@ -48770,6 +51402,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -48789,7 +51422,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionCreateNestedManyWithoutAdminInput
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -48808,6 +51440,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -48827,7 +51460,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutAdminInput
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -48887,6 +51519,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48906,7 +51539,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionUpdateManyWithoutAdminNestedInput
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -48925,6 +51557,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48944,7 +51577,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutAdminNestedInput
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -48970,7 +51602,6 @@ export namespace Prisma {
     channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     payments?: PaymentCreateNestedManyWithoutCollaborationInput
   }
 
@@ -48990,7 +51621,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
     content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
   }
 
@@ -49008,6 +51638,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -49028,7 +51659,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -49046,6 +51676,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -49066,7 +51697,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -49089,6 +51719,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -49109,7 +51740,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -49127,6 +51757,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -49147,7 +51778,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -49188,7 +51818,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUpdateManyWithoutCollaborationNestedInput
   }
 
@@ -49208,7 +51837,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
   }
 
@@ -49232,6 +51860,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49252,7 +51881,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -49270,6 +51898,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49290,7 +51919,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -49319,6 +51947,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49339,7 +51968,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -49357,6 +51985,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49377,7 +52006,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -49730,6 +52358,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -49749,7 +52378,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionCreateNestedManyWithoutAdminInput
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -49768,6 +52396,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -49787,7 +52416,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutAdminInput
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -49822,6 +52450,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49841,7 +52470,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionUpdateManyWithoutAdminNestedInput
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -49860,6 +52488,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49879,7 +52508,6 @@ export namespace Prisma {
     admin_content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutAdminNestedInput
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -49898,6 +52526,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -49917,7 +52546,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -49936,6 +52564,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -49955,7 +52584,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -49985,7 +52613,6 @@ export namespace Prisma {
     creator: CreatorProfileCreateNestedOneWithoutCollaborationsInput
     content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    packages?: PackageCreateNestedManyWithoutCollaborationInput
     payments?: PaymentCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewCreateNestedManyWithoutCollaborationInput
   }
@@ -50005,7 +52632,6 @@ export namespace Prisma {
     completed_at?: Date | string | null
     content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    packages?: PackageUncheckedCreateNestedManyWithoutCollaborationInput
     payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
   }
@@ -50067,6 +52693,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50086,7 +52713,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -50105,6 +52731,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50124,7 +52751,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -50160,7 +52786,6 @@ export namespace Prisma {
     creator?: CreatorProfileUpdateOneRequiredWithoutCollaborationsNestedInput
     content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
   }
@@ -50180,7 +52805,6 @@ export namespace Prisma {
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
   }
@@ -50201,268 +52825,668 @@ export namespace Prisma {
     data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutChannelInput>
   }
 
-  export type UserCreateWithoutAdmin_packagesInput = {
+  export type CreatorProfileCreateWithoutPackages_createdInput = {
     id?: bigint | number
-    email?: string | null
-    password_hash?: string | null
-    user_type: $Enums.UserType
-    name: string
-    first_name?: string | null
-    last_name?: string | null
-    profile_image_url?: string | null
-    phone?: string | null
-    timezone?: string | null
-    language?: string | null
-    email_verified?: boolean
-    status?: $Enums.UserStatus
+    bio?: string | null
+    location_city?: string | null
+    location_state?: string | null
+    location_pincode?: string | null
+    content_categories?: NullableJsonNullValueInput | InputJsonValue
+    min_rate?: Decimal | DecimalJsLike | number | string | null
+    max_rate?: Decimal | DecimalJsLike | number | string | null
+    rate_currency?: string | null
+    availability_status?: $Enums.AvailabilityStatus | null
+    verified?: boolean
+    featured?: boolean
+    rating?: Decimal | DecimalJsLike | number | string | null
+    total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    last_login_at?: Date | string | null
-    auth_provider?: string | null
-    phone_verified?: boolean
-    onboarding_completed?: boolean
-    onboarding_step?: number | null
-    age?: number | null
-    brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
-    admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
-    content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
-    admin_content_submissions?: ContentSubmissionCreateNestedManyWithoutAdminInput
-    creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
-    sent_messages?: MessageCreateNestedManyWithoutSenderInput
-    notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_payments?: PaymentCreateNestedManyWithoutAdminInput
-    payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
-    payments_payer?: PaymentCreateNestedManyWithoutPayerInput
-    phone_verifications?: PhoneVerificationCreateNestedManyWithoutUserInput
-    reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
-    reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
-    kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    date_of_birth?: Date | string | null
+    gender?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
+    campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
+    collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
+    user: UserCreateNestedOneWithoutCreator_profilesInput
+    invoices?: InvoiceCreateNestedManyWithoutCreatorInput
+    social_media_accounts?: SocialMediaAccountCreateNestedManyWithoutCreatorInput
+    kyc?: KYCCreateNestedOneWithoutCreatorInput
+    portfolio_items?: PortfolioItemCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderCreateNestedManyWithoutCreatorInput
   }
 
-  export type UserUncheckedCreateWithoutAdmin_packagesInput = {
+  export type CreatorProfileUncheckedCreateWithoutPackages_createdInput = {
     id?: bigint | number
-    email?: string | null
-    password_hash?: string | null
-    user_type: $Enums.UserType
-    name: string
-    first_name?: string | null
-    last_name?: string | null
-    profile_image_url?: string | null
-    phone?: string | null
-    timezone?: string | null
-    language?: string | null
-    email_verified?: boolean
-    status?: $Enums.UserStatus
+    user_id: bigint | number
+    bio?: string | null
+    location_city?: string | null
+    location_state?: string | null
+    location_pincode?: string | null
+    content_categories?: NullableJsonNullValueInput | InputJsonValue
+    min_rate?: Decimal | DecimalJsLike | number | string | null
+    max_rate?: Decimal | DecimalJsLike | number | string | null
+    rate_currency?: string | null
+    availability_status?: $Enums.AvailabilityStatus | null
+    verified?: boolean
+    featured?: boolean
+    rating?: Decimal | DecimalJsLike | number | string | null
+    total_collaborations?: number
     created_at?: Date | string
     updated_at?: Date | string
-    last_login_at?: Date | string | null
-    auth_provider?: string | null
-    phone_verified?: boolean
-    onboarding_completed?: boolean
-    onboarding_step?: number | null
-    age?: number | null
-    brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
-    admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
-    content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
-    admin_content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutAdminInput
-    creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
-    sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
-    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
-    payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
-    payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
-    phone_verifications?: PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
-    reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
-    reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
-    kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    date_of_birth?: Date | string | null
+    gender?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
+    campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
+    collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
+    social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
+    kyc?: KYCUncheckedCreateNestedOneWithoutCreatorInput
+    portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderUncheckedCreateNestedManyWithoutCreatorInput
   }
 
-  export type UserCreateOrConnectWithoutAdmin_packagesInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutAdmin_packagesInput, UserUncheckedCreateWithoutAdmin_packagesInput>
+  export type CreatorProfileCreateOrConnectWithoutPackages_createdInput = {
+    where: CreatorProfileWhereUniqueInput
+    create: XOR<CreatorProfileCreateWithoutPackages_createdInput, CreatorProfileUncheckedCreateWithoutPackages_createdInput>
   }
 
-  export type CollaborationCreateWithoutPackagesInput = {
+  export type OrderCreateWithoutPackageInput = {
     id?: bigint | number
-    agreed_rate: Decimal | DecimalJsLike | number | string
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
     currency?: string
-    contract_terms?: string | null
-    deadline?: Date | string | null
-    status?: $Enums.CollaborationStatus
-    started_at?: Date | string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
     completed_at?: Date | string | null
-    application: CampaignApplicationCreateNestedOneWithoutCollaborationInput
-    brand: BrandProfileCreateNestedOneWithoutCollaborationsInput
-    campaign: CampaignCreateNestedOneWithoutCollaborationsInput
-    creator: CreatorProfileCreateNestedOneWithoutCollaborationsInput
-    channels?: CollaborationChannelCreateNestedOneWithoutCollaborationInput
-    content_submissions?: ContentSubmissionCreateNestedManyWithoutCollaborationInput
-    invoices?: InvoiceCreateNestedManyWithoutCollaborationInput
-    payments?: PaymentCreateNestedManyWithoutCollaborationInput
-    reviews?: ReviewCreateNestedManyWithoutCollaborationInput
+    rejection_message?: string | null
+    brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
+    creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
+    payments?: PaymentCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
   }
 
-  export type CollaborationUncheckedCreateWithoutPackagesInput = {
+  export type OrderUncheckedCreateWithoutPackageInput = {
     id?: bigint | number
-    campaign_id: bigint | number
     brand_id: bigint | number
     creator_id: bigint | number
-    application_id: bigint | number
-    agreed_rate: Decimal | DecimalJsLike | number | string
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
     currency?: string
-    contract_terms?: string | null
-    deadline?: Date | string | null
-    status?: $Enums.CollaborationStatus
-    started_at?: Date | string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
     completed_at?: Date | string | null
-    channels?: CollaborationChannelUncheckedCreateNestedOneWithoutCollaborationInput
-    content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutCollaborationInput
-    invoices?: InvoiceUncheckedCreateNestedManyWithoutCollaborationInput
-    payments?: PaymentUncheckedCreateNestedManyWithoutCollaborationInput
-    reviews?: ReviewUncheckedCreateNestedManyWithoutCollaborationInput
+    rejection_message?: string | null
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
 
-  export type CollaborationCreateOrConnectWithoutPackagesInput = {
-    where: CollaborationWhereUniqueInput
-    create: XOR<CollaborationCreateWithoutPackagesInput, CollaborationUncheckedCreateWithoutPackagesInput>
+  export type OrderCreateOrConnectWithoutPackageInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutPackageInput, OrderUncheckedCreateWithoutPackageInput>
   }
 
-  export type UserUpsertWithoutAdmin_packagesInput = {
-    update: XOR<UserUpdateWithoutAdmin_packagesInput, UserUncheckedUpdateWithoutAdmin_packagesInput>
-    create: XOR<UserCreateWithoutAdmin_packagesInput, UserUncheckedCreateWithoutAdmin_packagesInput>
-    where?: UserWhereInput
+  export type OrderCreateManyPackageInputEnvelope = {
+    data: OrderCreateManyPackageInput | OrderCreateManyPackageInput[]
+    skipDuplicates?: boolean
   }
 
-  export type UserUpdateToOneWithWhereWithoutAdmin_packagesInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutAdmin_packagesInput, UserUncheckedUpdateWithoutAdmin_packagesInput>
+  export type CreatorProfileUpsertWithoutPackages_createdInput = {
+    update: XOR<CreatorProfileUpdateWithoutPackages_createdInput, CreatorProfileUncheckedUpdateWithoutPackages_createdInput>
+    create: XOR<CreatorProfileCreateWithoutPackages_createdInput, CreatorProfileUncheckedCreateWithoutPackages_createdInput>
+    where?: CreatorProfileWhereInput
   }
 
-  export type UserUpdateWithoutAdmin_packagesInput = {
+  export type CreatorProfileUpdateToOneWithWhereWithoutPackages_createdInput = {
+    where?: CreatorProfileWhereInput
+    data: XOR<CreatorProfileUpdateWithoutPackages_createdInput, CreatorProfileUncheckedUpdateWithoutPackages_createdInput>
+  }
+
+  export type CreatorProfileUpdateWithoutPackages_createdInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    password_hash?: NullableStringFieldUpdateOperationsInput | string | null
-    user_type?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
-    name?: StringFieldUpdateOperationsInput | string
-    first_name?: NullableStringFieldUpdateOperationsInput | string | null
-    last_name?: NullableStringFieldUpdateOperationsInput | string | null
-    profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    timezone?: NullableStringFieldUpdateOperationsInput | string | null
-    language?: NullableStringFieldUpdateOperationsInput | string | null
-    email_verified?: BoolFieldUpdateOperationsInput | boolean
-    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
+    content_categories?: NullableJsonNullValueInput | InputJsonValue
+    min_rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    max_rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rate_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    availability_status?: NullableEnumAvailabilityStatusFieldUpdateOperationsInput | $Enums.AvailabilityStatus | null
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    last_login_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    auth_provider?: NullableStringFieldUpdateOperationsInput | string | null
-    phone_verified?: BoolFieldUpdateOperationsInput | boolean
-    onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
-    onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
-    age?: NullableIntFieldUpdateOperationsInput | number | null
-    brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
-    admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
-    content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
-    admin_content_submissions?: ContentSubmissionUpdateManyWithoutAdminNestedInput
-    creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
-    sent_messages?: MessageUpdateManyWithoutSenderNestedInput
-    notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
-    payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
-    payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
-    phone_verifications?: PhoneVerificationUpdateManyWithoutUserNestedInput
-    reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
-    reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
-    kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
+    campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
+    collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
+    user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
+    invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
+    social_media_accounts?: SocialMediaAccountUpdateManyWithoutCreatorNestedInput
+    kyc?: KYCUpdateOneWithoutCreatorNestedInput
+    portfolio_items?: PortfolioItemUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUpdateManyWithoutCreatorNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutAdmin_packagesInput = {
+  export type CreatorProfileUncheckedUpdateWithoutPackages_createdInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    password_hash?: NullableStringFieldUpdateOperationsInput | string | null
-    user_type?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
-    name?: StringFieldUpdateOperationsInput | string
-    first_name?: NullableStringFieldUpdateOperationsInput | string | null
-    last_name?: NullableStringFieldUpdateOperationsInput | string | null
-    profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    timezone?: NullableStringFieldUpdateOperationsInput | string | null
-    language?: NullableStringFieldUpdateOperationsInput | string | null
-    email_verified?: BoolFieldUpdateOperationsInput | boolean
-    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    user_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
+    content_categories?: NullableJsonNullValueInput | InputJsonValue
+    min_rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    max_rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rate_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    availability_status?: NullableEnumAvailabilityStatusFieldUpdateOperationsInput | $Enums.AvailabilityStatus | null
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    total_collaborations?: IntFieldUpdateOperationsInput | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    last_login_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    auth_provider?: NullableStringFieldUpdateOperationsInput | string | null
-    phone_verified?: BoolFieldUpdateOperationsInput | boolean
-    onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
-    onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
-    age?: NullableIntFieldUpdateOperationsInput | number | null
-    brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
-    admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
-    content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
-    admin_content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutAdminNestedInput
-    creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
-    sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
-    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
-    payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
-    payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
-    phone_verifications?: PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
-    reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
-    reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
-    kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
+    campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
+    collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
+    social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
+    kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
+    portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
-  export type CollaborationUpsertWithoutPackagesInput = {
-    update: XOR<CollaborationUpdateWithoutPackagesInput, CollaborationUncheckedUpdateWithoutPackagesInput>
-    create: XOR<CollaborationCreateWithoutPackagesInput, CollaborationUncheckedCreateWithoutPackagesInput>
-    where?: CollaborationWhereInput
+  export type OrderUpsertWithWhereUniqueWithoutPackageInput = {
+    where: OrderWhereUniqueInput
+    update: XOR<OrderUpdateWithoutPackageInput, OrderUncheckedUpdateWithoutPackageInput>
+    create: XOR<OrderCreateWithoutPackageInput, OrderUncheckedCreateWithoutPackageInput>
   }
 
-  export type CollaborationUpdateToOneWithWhereWithoutPackagesInput = {
-    where?: CollaborationWhereInput
-    data: XOR<CollaborationUpdateWithoutPackagesInput, CollaborationUncheckedUpdateWithoutPackagesInput>
+  export type OrderUpdateWithWhereUniqueWithoutPackageInput = {
+    where: OrderWhereUniqueInput
+    data: XOR<OrderUpdateWithoutPackageInput, OrderUncheckedUpdateWithoutPackageInput>
   }
 
-  export type CollaborationUpdateWithoutPackagesInput = {
+  export type OrderUpdateManyWithWhereWithoutPackageInput = {
+    where: OrderScalarWhereInput
+    data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyWithoutPackageInput>
+  }
+
+  export type PackageCreateWithoutOrdersInput = {
+    id?: bigint | number
+    type: $Enums.PackageType
+    title: string
+    description?: string | null
+    price: Decimal | DecimalJsLike | number | string
+    currency?: string
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    creator: CreatorProfileCreateNestedOneWithoutPackages_createdInput
+  }
+
+  export type PackageUncheckedCreateWithoutOrdersInput = {
+    id?: bigint | number
+    creator_id: bigint | number
+    type: $Enums.PackageType
+    title: string
+    description?: string | null
+    price: Decimal | DecimalJsLike | number | string
+    currency?: string
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type PackageCreateOrConnectWithoutOrdersInput = {
+    where: PackageWhereUniqueInput
+    create: XOR<PackageCreateWithoutOrdersInput, PackageUncheckedCreateWithoutOrdersInput>
+  }
+
+  export type BrandProfileCreateWithoutOrders_placedInput = {
+    id?: bigint | number
+    company_name: string
+    industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
+    business_type?: string | null
+    website_url?: string | null
+    description?: string | null
+    logo_url?: string | null
+    company_size?: $Enums.CompanySize | null
+    location_country?: string | null
+    location_state?: string | null
+    location_city?: string | null
+    location_pincode?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
+    gender?: string | null
+    verified?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    user: UserCreateNestedOneWithoutBrand_profilesInput
+    campaigns?: CampaignCreateNestedManyWithoutBrandInput
+    collaborations?: CollaborationCreateNestedManyWithoutBrandInput
+    invoices?: InvoiceCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemCreateNestedManyWithoutBrandInput
+  }
+
+  export type BrandProfileUncheckedCreateWithoutOrders_placedInput = {
+    id?: bigint | number
+    user_id: bigint | number
+    company_name: string
+    industry?: string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: string | null
+    business_type?: string | null
+    website_url?: string | null
+    description?: string | null
+    logo_url?: string | null
+    company_size?: $Enums.CompanySize | null
+    location_country?: string | null
+    location_state?: string | null
+    location_city?: string | null
+    location_pincode?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: Date | string | null
+    gender?: string | null
+    verified?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    campaigns?: CampaignUncheckedCreateNestedManyWithoutBrandInput
+    collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
+    portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutBrandInput
+  }
+
+  export type BrandProfileCreateOrConnectWithoutOrders_placedInput = {
+    where: BrandProfileWhereUniqueInput
+    create: XOR<BrandProfileCreateWithoutOrders_placedInput, BrandProfileUncheckedCreateWithoutOrders_placedInput>
+  }
+
+  export type CreatorProfileCreateWithoutOrders_receivedInput = {
+    id?: bigint | number
+    bio?: string | null
+    location_city?: string | null
+    location_state?: string | null
+    location_pincode?: string | null
+    content_categories?: NullableJsonNullValueInput | InputJsonValue
+    min_rate?: Decimal | DecimalJsLike | number | string | null
+    max_rate?: Decimal | DecimalJsLike | number | string | null
+    rate_currency?: string | null
+    availability_status?: $Enums.AvailabilityStatus | null
+    verified?: boolean
+    featured?: boolean
+    rating?: Decimal | DecimalJsLike | number | string | null
+    total_collaborations?: number
+    created_at?: Date | string
+    updated_at?: Date | string
+    date_of_birth?: Date | string | null
+    gender?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
+    campaign_applications?: CampaignApplicationCreateNestedManyWithoutCreatorInput
+    collaborations?: CollaborationCreateNestedManyWithoutCreatorInput
+    user: UserCreateNestedOneWithoutCreator_profilesInput
+    invoices?: InvoiceCreateNestedManyWithoutCreatorInput
+    social_media_accounts?: SocialMediaAccountCreateNestedManyWithoutCreatorInput
+    kyc?: KYCCreateNestedOneWithoutCreatorInput
+    portfolio_items?: PortfolioItemCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageCreateNestedManyWithoutCreatorInput
+  }
+
+  export type CreatorProfileUncheckedCreateWithoutOrders_receivedInput = {
+    id?: bigint | number
+    user_id: bigint | number
+    bio?: string | null
+    location_city?: string | null
+    location_state?: string | null
+    location_pincode?: string | null
+    content_categories?: NullableJsonNullValueInput | InputJsonValue
+    min_rate?: Decimal | DecimalJsLike | number | string | null
+    max_rate?: Decimal | DecimalJsLike | number | string | null
+    rate_currency?: string | null
+    availability_status?: $Enums.AvailabilityStatus | null
+    verified?: boolean
+    featured?: boolean
+    rating?: Decimal | DecimalJsLike | number | string | null
+    total_collaborations?: number
+    created_at?: Date | string
+    updated_at?: Date | string
+    date_of_birth?: Date | string | null
+    gender?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
+    campaign_applications?: CampaignApplicationUncheckedCreateNestedManyWithoutCreatorInput
+    collaborations?: CollaborationUncheckedCreateNestedManyWithoutCreatorInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
+    social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
+    kyc?: KYCUncheckedCreateNestedOneWithoutCreatorInput
+    portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageUncheckedCreateNestedManyWithoutCreatorInput
+  }
+
+  export type CreatorProfileCreateOrConnectWithoutOrders_receivedInput = {
+    where: CreatorProfileWhereUniqueInput
+    create: XOR<CreatorProfileCreateWithoutOrders_receivedInput, CreatorProfileUncheckedCreateWithoutOrders_receivedInput>
+  }
+
+  export type PaymentCreateWithoutOrderInput = {
+    id?: bigint | number
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    platform_fee?: Decimal | DecimalJsLike | number | string
+    net_amount: Decimal | DecimalJsLike | number | string
+    payment_method: $Enums.PaymentMethod
+    transaction_id?: string | null
+    status?: $Enums.PaymentStatus
+    initiated_at?: Date | string
+    completed_at?: Date | string | null
+    failure_reason?: string | null
+    admin: UserCreateNestedOneWithoutAdmin_paymentsInput
+    collaboration?: CollaborationCreateNestedOneWithoutPaymentsInput
+    payee: UserCreateNestedOneWithoutPayments_payeeInput
+    payer: UserCreateNestedOneWithoutPayments_payerInput
+  }
+
+  export type PaymentUncheckedCreateWithoutOrderInput = {
+    id?: bigint | number
+    collaboration_id?: bigint | number | null
+    payer_id: bigint | number
+    payee_id: bigint | number
+    admin_id: bigint | number
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    platform_fee?: Decimal | DecimalJsLike | number | string
+    net_amount: Decimal | DecimalJsLike | number | string
+    payment_method: $Enums.PaymentMethod
+    transaction_id?: string | null
+    status?: $Enums.PaymentStatus
+    initiated_at?: Date | string
+    completed_at?: Date | string | null
+    failure_reason?: string | null
+  }
+
+  export type PaymentCreateOrConnectWithoutOrderInput = {
+    where: PaymentWhereUniqueInput
+    create: XOR<PaymentCreateWithoutOrderInput, PaymentUncheckedCreateWithoutOrderInput>
+  }
+
+  export type PaymentCreateManyOrderInputEnvelope = {
+    data: PaymentCreateManyOrderInput | PaymentCreateManyOrderInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type InvoiceCreateWithoutOrderInput = {
+    id?: bigint | number
+    invoice_number: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    tax_amount?: Decimal | DecimalJsLike | number | string
+    total_amount: Decimal | DecimalJsLike | number | string
+    due_date: Date | string
+    status?: $Enums.InvoiceStatus
+    issued_at?: Date | string
+    paid_at?: Date | string | null
+    brand: BrandProfileCreateNestedOneWithoutInvoicesInput
+    collaboration?: CollaborationCreateNestedOneWithoutInvoicesInput
+    creator: CreatorProfileCreateNestedOneWithoutInvoicesInput
+  }
+
+  export type InvoiceUncheckedCreateWithoutOrderInput = {
+    id?: bigint | number
+    collaboration_id?: bigint | number | null
+    brand_id: bigint | number
+    creator_id: bigint | number
+    invoice_number: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    tax_amount?: Decimal | DecimalJsLike | number | string
+    total_amount: Decimal | DecimalJsLike | number | string
+    due_date: Date | string
+    status?: $Enums.InvoiceStatus
+    issued_at?: Date | string
+    paid_at?: Date | string | null
+  }
+
+  export type InvoiceCreateOrConnectWithoutOrderInput = {
+    where: InvoiceWhereUniqueInput
+    create: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput>
+  }
+
+  export type InvoiceCreateManyOrderInputEnvelope = {
+    data: InvoiceCreateManyOrderInput | InvoiceCreateManyOrderInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PackageUpsertWithoutOrdersInput = {
+    update: XOR<PackageUpdateWithoutOrdersInput, PackageUncheckedUpdateWithoutOrdersInput>
+    create: XOR<PackageCreateWithoutOrdersInput, PackageUncheckedCreateWithoutOrdersInput>
+    where?: PackageWhereInput
+  }
+
+  export type PackageUpdateToOneWithWhereWithoutOrdersInput = {
+    where?: PackageWhereInput
+    data: XOR<PackageUpdateWithoutOrdersInput, PackageUncheckedUpdateWithoutOrdersInput>
+  }
+
+  export type PackageUpdateWithoutOrdersInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    agreed_rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
-    contract_terms?: NullableStringFieldUpdateOperationsInput | string | null
-    deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumCollaborationStatusFieldUpdateOperationsInput | $Enums.CollaborationStatus
-    started_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    application?: CampaignApplicationUpdateOneRequiredWithoutCollaborationNestedInput
-    brand?: BrandProfileUpdateOneRequiredWithoutCollaborationsNestedInput
-    campaign?: CampaignUpdateOneRequiredWithoutCollaborationsNestedInput
-    creator?: CreatorProfileUpdateOneRequiredWithoutCollaborationsNestedInput
-    channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
-    content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
-    invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    payments?: PaymentUpdateManyWithoutCollaborationNestedInput
-    reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: CreatorProfileUpdateOneRequiredWithoutPackages_createdNestedInput
   }
 
-  export type CollaborationUncheckedUpdateWithoutPackagesInput = {
+  export type PackageUncheckedUpdateWithoutOrdersInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    campaign_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
     creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    application_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    agreed_rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currency?: StringFieldUpdateOperationsInput | string
-    contract_terms?: NullableStringFieldUpdateOperationsInput | string | null
-    deadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumCollaborationStatusFieldUpdateOperationsInput | $Enums.CollaborationStatus
-    started_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
-    content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
-    invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
-    reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BrandProfileUpsertWithoutOrders_placedInput = {
+    update: XOR<BrandProfileUpdateWithoutOrders_placedInput, BrandProfileUncheckedUpdateWithoutOrders_placedInput>
+    create: XOR<BrandProfileCreateWithoutOrders_placedInput, BrandProfileUncheckedCreateWithoutOrders_placedInput>
+    where?: BrandProfileWhereInput
+  }
+
+  export type BrandProfileUpdateToOneWithWhereWithoutOrders_placedInput = {
+    where?: BrandProfileWhereInput
+    data: XOR<BrandProfileUpdateWithoutOrders_placedInput, BrandProfileUncheckedUpdateWithoutOrders_placedInput>
+  }
+
+  export type BrandProfileUpdateWithoutOrders_placedInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
+    website_url?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
+    location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
+    location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutBrand_profilesNestedInput
+    campaigns?: CampaignUpdateManyWithoutBrandNestedInput
+    collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
+    invoices?: InvoiceUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
+  }
+
+  export type BrandProfileUncheckedUpdateWithoutOrders_placedInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    user_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    industries?: NullableJsonNullValueInput | InputJsonValue
+    role_in_organization?: NullableStringFieldUpdateOperationsInput | string | null
+    business_type?: NullableStringFieldUpdateOperationsInput | string | null
+    website_url?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
+    location_country?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
+    location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaigns?: CampaignUncheckedUpdateManyWithoutBrandNestedInput
+    collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
+    portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
+  }
+
+  export type CreatorProfileUpsertWithoutOrders_receivedInput = {
+    update: XOR<CreatorProfileUpdateWithoutOrders_receivedInput, CreatorProfileUncheckedUpdateWithoutOrders_receivedInput>
+    create: XOR<CreatorProfileCreateWithoutOrders_receivedInput, CreatorProfileUncheckedCreateWithoutOrders_receivedInput>
+    where?: CreatorProfileWhereInput
+  }
+
+  export type CreatorProfileUpdateToOneWithWhereWithoutOrders_receivedInput = {
+    where?: CreatorProfileWhereInput
+    data: XOR<CreatorProfileUpdateWithoutOrders_receivedInput, CreatorProfileUncheckedUpdateWithoutOrders_receivedInput>
+  }
+
+  export type CreatorProfileUpdateWithoutOrders_receivedInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
+    content_categories?: NullableJsonNullValueInput | InputJsonValue
+    min_rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    max_rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rate_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    availability_status?: NullableEnumAvailabilityStatusFieldUpdateOperationsInput | $Enums.AvailabilityStatus | null
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    total_collaborations?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
+    campaign_applications?: CampaignApplicationUpdateManyWithoutCreatorNestedInput
+    collaborations?: CollaborationUpdateManyWithoutCreatorNestedInput
+    user?: UserUpdateOneRequiredWithoutCreator_profilesNestedInput
+    invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
+    social_media_accounts?: SocialMediaAccountUpdateManyWithoutCreatorNestedInput
+    kyc?: KYCUpdateOneWithoutCreatorNestedInput
+    portfolio_items?: PortfolioItemUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUpdateManyWithoutCreatorNestedInput
+  }
+
+  export type CreatorProfileUncheckedUpdateWithoutOrders_receivedInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    user_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location_city?: NullableStringFieldUpdateOperationsInput | string | null
+    location_state?: NullableStringFieldUpdateOperationsInput | string | null
+    location_pincode?: NullableStringFieldUpdateOperationsInput | string | null
+    content_categories?: NullableJsonNullValueInput | InputJsonValue
+    min_rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    max_rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rate_currency?: NullableStringFieldUpdateOperationsInput | string | null
+    availability_status?: NullableEnumAvailabilityStatusFieldUpdateOperationsInput | $Enums.AvailabilityStatus | null
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    total_collaborations?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    date_of_birth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    platform?: NullableJsonNullValueInput | InputJsonValue
+    packages?: NullableJsonNullValueInput | InputJsonValue
+    campaign_applications?: CampaignApplicationUncheckedUpdateManyWithoutCreatorNestedInput
+    collaborations?: CollaborationUncheckedUpdateManyWithoutCreatorNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
+    social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
+    kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
+    portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUncheckedUpdateManyWithoutCreatorNestedInput
+  }
+
+  export type PaymentUpsertWithWhereUniqueWithoutOrderInput = {
+    where: PaymentWhereUniqueInput
+    update: XOR<PaymentUpdateWithoutOrderInput, PaymentUncheckedUpdateWithoutOrderInput>
+    create: XOR<PaymentCreateWithoutOrderInput, PaymentUncheckedCreateWithoutOrderInput>
+  }
+
+  export type PaymentUpdateWithWhereUniqueWithoutOrderInput = {
+    where: PaymentWhereUniqueInput
+    data: XOR<PaymentUpdateWithoutOrderInput, PaymentUncheckedUpdateWithoutOrderInput>
+  }
+
+  export type PaymentUpdateManyWithWhereWithoutOrderInput = {
+    where: PaymentScalarWhereInput
+    data: XOR<PaymentUpdateManyMutationInput, PaymentUncheckedUpdateManyWithoutOrderInput>
+  }
+
+  export type InvoiceUpsertWithWhereUniqueWithoutOrderInput = {
+    where: InvoiceWhereUniqueInput
+    update: XOR<InvoiceUpdateWithoutOrderInput, InvoiceUncheckedUpdateWithoutOrderInput>
+    create: XOR<InvoiceCreateWithoutOrderInput, InvoiceUncheckedCreateWithoutOrderInput>
+  }
+
+  export type InvoiceUpdateWithWhereUniqueWithoutOrderInput = {
+    where: InvoiceWhereUniqueInput
+    data: XOR<InvoiceUpdateWithoutOrderInput, InvoiceUncheckedUpdateWithoutOrderInput>
+  }
+
+  export type InvoiceUpdateManyWithWhereWithoutOrderInput = {
+    where: InvoiceScalarWhereInput
+    data: XOR<InvoiceUpdateManyMutationInput, InvoiceUncheckedUpdateManyWithoutOrderInput>
   }
 
   export type UserCreateWithoutPhone_verificationsInput = {
@@ -50474,6 +53498,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -50494,7 +53519,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -50512,6 +53536,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -50532,7 +53557,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -50566,6 +53590,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50586,7 +53611,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -50604,6 +53628,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50624,7 +53649,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -50661,6 +53685,8 @@ export namespace Prisma {
     invoices?: InvoiceCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountCreateNestedManyWithoutCreatorInput
     portfolio_items?: PortfolioItemCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileUncheckedCreateWithoutKycInput = {
@@ -50691,6 +53717,8 @@ export namespace Prisma {
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
     portfolio_items?: PortfolioItemUncheckedCreateNestedManyWithoutCreatorInput
+    packages_created?: PackageUncheckedCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileCreateOrConnectWithoutKycInput = {
@@ -50707,6 +53735,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -50727,7 +53756,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
     sent_messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
-    admin_packages?: PackageCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentCreateNestedManyWithoutPayerInput
@@ -50745,6 +53773,7 @@ export namespace Prisma {
     first_name?: string | null
     last_name?: string | null
     profile_image_url?: string | null
+    cover_image_url?: string | null
     phone?: string | null
     timezone?: string | null
     language?: string | null
@@ -50765,7 +53794,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
     sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
-    admin_packages?: PackageUncheckedCreateNestedManyWithoutAdminInput
     admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
     payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
     payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
@@ -50818,6 +53846,8 @@ export namespace Prisma {
     invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUpdateManyWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUpdateManyWithoutCreatorNestedInput
   }
 
   export type CreatorProfileUncheckedUpdateWithoutKycInput = {
@@ -50848,6 +53878,8 @@ export namespace Prisma {
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutCreatorNestedInput
+    packages_created?: PackageUncheckedUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUpsertWithoutKyc_verificationsInput = {
@@ -50870,6 +53902,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50890,7 +53923,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
@@ -50908,6 +53940,7 @@ export namespace Prisma {
     first_name?: NullableStringFieldUpdateOperationsInput | string | null
     last_name?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     timezone?: NullableStringFieldUpdateOperationsInput | string | null
     language?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50928,7 +53961,6 @@ export namespace Prisma {
     creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
     sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
-    admin_packages?: PackageUncheckedUpdateManyWithoutAdminNestedInput
     admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
     payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
     payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
@@ -50965,6 +53997,8 @@ export namespace Prisma {
     invoices?: InvoiceCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountCreateNestedManyWithoutCreatorInput
     kyc?: KYCCreateNestedOneWithoutCreatorInput
+    packages_created?: PackageCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileUncheckedCreateWithoutPortfolio_itemsInput = {
@@ -50995,6 +54029,8 @@ export namespace Prisma {
     invoices?: InvoiceUncheckedCreateNestedManyWithoutCreatorInput
     social_media_accounts?: SocialMediaAccountUncheckedCreateNestedManyWithoutCreatorInput
     kyc?: KYCUncheckedCreateNestedOneWithoutCreatorInput
+    packages_created?: PackageUncheckedCreateNestedManyWithoutCreatorInput
+    orders_received?: OrderUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type CreatorProfileCreateOrConnectWithoutPortfolio_itemsInput = {
@@ -51027,6 +54063,7 @@ export namespace Prisma {
     campaigns?: CampaignCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationCreateNestedManyWithoutBrandInput
     invoices?: InvoiceCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileUncheckedCreateWithoutPortfolio_itemsInput = {
@@ -51054,6 +54091,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedCreateNestedManyWithoutBrandInput
     collaborations?: CollaborationUncheckedCreateNestedManyWithoutBrandInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutBrandInput
+    orders_placed?: OrderUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandProfileCreateOrConnectWithoutPortfolio_itemsInput = {
@@ -51100,6 +54138,8 @@ export namespace Prisma {
     invoices?: InvoiceUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUpdateOneWithoutCreatorNestedInput
+    packages_created?: PackageUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUpdateManyWithoutCreatorNestedInput
   }
 
   export type CreatorProfileUncheckedUpdateWithoutPortfolio_itemsInput = {
@@ -51130,6 +54170,8 @@ export namespace Prisma {
     invoices?: InvoiceUncheckedUpdateManyWithoutCreatorNestedInput
     social_media_accounts?: SocialMediaAccountUncheckedUpdateManyWithoutCreatorNestedInput
     kyc?: KYCUncheckedUpdateOneWithoutCreatorNestedInput
+    packages_created?: PackageUncheckedUpdateManyWithoutCreatorNestedInput
+    orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type BrandProfileUpsertWithoutPortfolio_itemsInput = {
@@ -51168,6 +54210,7 @@ export namespace Prisma {
     campaigns?: CampaignUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateWithoutPortfolio_itemsInput = {
@@ -51195,6 +54238,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedUpdateManyWithoutBrandNestedInput
     collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileCreateManyUserInput = {
@@ -51272,20 +54316,10 @@ export namespace Prisma {
     created_at?: Date | string
   }
 
-  export type PackageCreateManyAdminInput = {
-    id?: bigint | number
-    collaboration_id: bigint | number
-    type: $Enums.PackageType
-    title: string
-    description?: string | null
-    price: Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: Date | string
-  }
-
   export type PaymentCreateManyAdminInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     payer_id: bigint | number
     payee_id: bigint | number
     amount: Decimal | DecimalJsLike | number | string
@@ -51302,7 +54336,8 @@ export namespace Prisma {
 
   export type PaymentCreateManyPayeeInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     payer_id: bigint | number
     admin_id: bigint | number
     amount: Decimal | DecimalJsLike | number | string
@@ -51319,7 +54354,8 @@ export namespace Prisma {
 
   export type PaymentCreateManyPayerInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     payee_id: bigint | number
     admin_id: bigint | number
     amount: Decimal | DecimalJsLike | number | string
@@ -51410,6 +54446,7 @@ export namespace Prisma {
     collaborations?: CollaborationUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateWithoutUserInput = {
@@ -51437,6 +54474,7 @@ export namespace Prisma {
     collaborations?: CollaborationUncheckedUpdateManyWithoutBrandNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutBrandNestedInput
     portfolio_items?: PortfolioItemUncheckedUpdateManyWithoutBrandNestedInput
+    orders_placed?: OrderUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandProfileUncheckedUpdateManyWithoutUserInput = {
@@ -51624,39 +54662,6 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PackageUpdateWithoutAdminInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    collaboration?: CollaborationUpdateOneRequiredWithoutPackagesNestedInput
-  }
-
-  export type PackageUncheckedUpdateWithoutAdminInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PackageUncheckedUpdateManyWithoutAdminInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type PaymentUpdateWithoutAdminInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -51669,14 +54674,16 @@ export namespace Prisma {
     initiated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
-    collaboration?: CollaborationUpdateOneRequiredWithoutPaymentsNestedInput
+    order?: OrderUpdateOneWithoutPaymentsNestedInput
+    collaboration?: CollaborationUpdateOneWithoutPaymentsNestedInput
     payee?: UserUpdateOneRequiredWithoutPayments_payeeNestedInput
     payer?: UserUpdateOneRequiredWithoutPayments_payerNestedInput
   }
 
   export type PaymentUncheckedUpdateWithoutAdminInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
     payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -51693,7 +54700,8 @@ export namespace Prisma {
 
   export type PaymentUncheckedUpdateManyWithoutAdminInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
     payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -51721,13 +54729,15 @@ export namespace Prisma {
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: UserUpdateOneRequiredWithoutAdmin_paymentsNestedInput
-    collaboration?: CollaborationUpdateOneRequiredWithoutPaymentsNestedInput
+    order?: OrderUpdateOneWithoutPaymentsNestedInput
+    collaboration?: CollaborationUpdateOneWithoutPaymentsNestedInput
     payer?: UserUpdateOneRequiredWithoutPayments_payerNestedInput
   }
 
   export type PaymentUncheckedUpdateWithoutPayeeInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -51744,7 +54754,8 @@ export namespace Prisma {
 
   export type PaymentUncheckedUpdateManyWithoutPayeeInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -51772,13 +54783,15 @@ export namespace Prisma {
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: UserUpdateOneRequiredWithoutAdmin_paymentsNestedInput
-    collaboration?: CollaborationUpdateOneRequiredWithoutPaymentsNestedInput
+    order?: OrderUpdateOneWithoutPaymentsNestedInput
+    collaboration?: CollaborationUpdateOneWithoutPaymentsNestedInput
     payee?: UserUpdateOneRequiredWithoutPayments_payeeNestedInput
   }
 
   export type PaymentUncheckedUpdateWithoutPayerInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -51795,7 +54808,8 @@ export namespace Prisma {
 
   export type PaymentUncheckedUpdateManyWithoutPayerInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -52003,7 +55017,8 @@ export namespace Prisma {
 
   export type InvoiceCreateManyBrandInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     creator_id: bigint | number
     invoice_number: string
     amount: Decimal | DecimalJsLike | number | string
@@ -52030,6 +55045,19 @@ export namespace Prisma {
     is_featured?: boolean
     created_at?: Date | string
     updated_at?: Date | string
+  }
+
+  export type OrderCreateManyBrandInput = {
+    id?: bigint | number
+    package_id: bigint | number
+    creator_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
   }
 
   export type CampaignUpdateWithoutBrandInput = {
@@ -52125,7 +55153,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
   }
@@ -52145,7 +55172,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
   }
@@ -52175,13 +55201,15 @@ export namespace Prisma {
     status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
     issued_at?: DateTimeFieldUpdateOperationsInput | Date | string
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    collaboration?: CollaborationUpdateOneRequiredWithoutInvoicesNestedInput
+    order?: OrderUpdateOneWithoutInvoicesNestedInput
+    collaboration?: CollaborationUpdateOneWithoutInvoicesNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutInvoicesNestedInput
   }
 
   export type InvoiceUncheckedUpdateWithoutBrandInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
     invoice_number?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -52196,7 +55224,8 @@ export namespace Prisma {
 
   export type InvoiceUncheckedUpdateManyWithoutBrandInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
     invoice_number?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -52257,6 +55286,49 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type OrderUpdateWithoutBrandInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
+    creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
+    payments?: PaymentUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutBrandInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    package_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateManyWithoutBrandInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    package_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type CampaignApplicationCreateManyCreatorInput = {
     id?: bigint | number
     campaign_id: bigint | number
@@ -52286,7 +55358,8 @@ export namespace Prisma {
 
   export type InvoiceCreateManyCreatorInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
+    order_id?: bigint | number | null
+    collaboration_id?: bigint | number | null
     brand_id: bigint | number
     invoice_number: string
     amount: Decimal | DecimalJsLike | number | string
@@ -52326,6 +55399,32 @@ export namespace Prisma {
     is_featured?: boolean
     created_at?: Date | string
     updated_at?: Date | string
+  }
+
+  export type PackageCreateManyCreatorInput = {
+    id?: bigint | number
+    type: $Enums.PackageType
+    title: string
+    description?: string | null
+    price: Decimal | DecimalJsLike | number | string
+    currency?: string
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type OrderCreateManyCreatorInput = {
+    id?: bigint | number
+    package_id: bigint | number
+    brand_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
   }
 
   export type CampaignApplicationUpdateWithoutCreatorInput = {
@@ -52384,7 +55483,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
   }
@@ -52404,7 +55502,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
   }
@@ -52435,12 +55532,14 @@ export namespace Prisma {
     issued_at?: DateTimeFieldUpdateOperationsInput | Date | string
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     brand?: BrandProfileUpdateOneRequiredWithoutInvoicesNestedInput
-    collaboration?: CollaborationUpdateOneRequiredWithoutInvoicesNestedInput
+    order?: OrderUpdateOneWithoutInvoicesNestedInput
+    collaboration?: CollaborationUpdateOneWithoutInvoicesNestedInput
   }
 
   export type InvoiceUncheckedUpdateWithoutCreatorInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
     invoice_number?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -52455,7 +55554,8 @@ export namespace Prisma {
 
   export type InvoiceUncheckedUpdateManyWithoutCreatorInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
     invoice_number?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -52553,6 +55653,90 @@ export namespace Prisma {
     is_featured?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PackageUpdateWithoutCreatorInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUpdateManyWithoutPackageNestedInput
+  }
+
+  export type PackageUncheckedUpdateWithoutCreatorInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    orders?: OrderUncheckedUpdateManyWithoutPackageNestedInput
+  }
+
+  export type PackageUncheckedUpdateManyWithoutCreatorInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    is_active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderUpdateWithoutCreatorInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
+    brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
+    payments?: PaymentUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutCreatorInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    package_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateManyWithoutCreatorInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    package_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type CampaignAnalyticsCreateManyCampaignInput = {
@@ -52670,7 +55854,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUpdateManyWithoutCollaborationNestedInput
   }
@@ -52690,7 +55873,6 @@ export namespace Prisma {
     channels?: CollaborationChannelUncheckedUpdateOneWithoutCollaborationNestedInput
     content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutCollaborationNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
-    packages?: PackageUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
   }
@@ -52728,6 +55910,7 @@ export namespace Prisma {
 
   export type InvoiceCreateManyCollaborationInput = {
     id?: bigint | number
+    order_id?: bigint | number | null
     brand_id: bigint | number
     creator_id: bigint | number
     invoice_number: string
@@ -52741,19 +55924,9 @@ export namespace Prisma {
     paid_at?: Date | string | null
   }
 
-  export type PackageCreateManyCollaborationInput = {
-    id?: bigint | number
-    admin_id: bigint | number
-    type: $Enums.PackageType
-    title: string
-    description?: string | null
-    price: Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: Date | string
-  }
-
   export type PaymentCreateManyCollaborationInput = {
     id?: bigint | number
+    order_id?: bigint | number | null
     payer_id: bigint | number
     payee_id: bigint | number
     admin_id: bigint | number
@@ -52847,11 +56020,13 @@ export namespace Prisma {
     issued_at?: DateTimeFieldUpdateOperationsInput | Date | string
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     brand?: BrandProfileUpdateOneRequiredWithoutInvoicesNestedInput
+    order?: OrderUpdateOneWithoutInvoicesNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutInvoicesNestedInput
   }
 
   export type InvoiceUncheckedUpdateWithoutCollaborationInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
     creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
     invoice_number?: StringFieldUpdateOperationsInput | string
@@ -52867,6 +56042,7 @@ export namespace Prisma {
 
   export type InvoiceUncheckedUpdateManyWithoutCollaborationInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
     creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
     invoice_number?: StringFieldUpdateOperationsInput | string
@@ -52878,39 +56054,6 @@ export namespace Prisma {
     status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
     issued_at?: DateTimeFieldUpdateOperationsInput | Date | string
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type PackageUpdateWithoutCollaborationInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    admin?: UserUpdateOneRequiredWithoutAdmin_packagesNestedInput
-  }
-
-  export type PackageUncheckedUpdateWithoutCollaborationInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PackageUncheckedUpdateManyWithoutCollaborationInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    deliverables?: NullableJsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PaymentUpdateWithoutCollaborationInput = {
@@ -52926,12 +56069,14 @@ export namespace Prisma {
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
     admin?: UserUpdateOneRequiredWithoutAdmin_paymentsNestedInput
+    order?: OrderUpdateOneWithoutPaymentsNestedInput
     payee?: UserUpdateOneRequiredWithoutPayments_payeeNestedInput
     payer?: UserUpdateOneRequiredWithoutPayments_payerNestedInput
   }
 
   export type PaymentUncheckedUpdateWithoutCollaborationInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
     payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -52949,6 +56094,7 @@ export namespace Prisma {
 
   export type PaymentUncheckedUpdateManyWithoutCollaborationInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
     payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -53160,6 +56306,198 @@ export namespace Prisma {
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderCreateManyPackageInput = {
+    id?: bigint | number
+    brand_id: bigint | number
+    creator_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+  }
+
+  export type OrderUpdateWithoutPackageInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
+    creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
+    payments?: PaymentUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutPackageInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateManyWithoutPackageInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PaymentCreateManyOrderInput = {
+    id?: bigint | number
+    collaboration_id?: bigint | number | null
+    payer_id: bigint | number
+    payee_id: bigint | number
+    admin_id: bigint | number
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    platform_fee?: Decimal | DecimalJsLike | number | string
+    net_amount: Decimal | DecimalJsLike | number | string
+    payment_method: $Enums.PaymentMethod
+    transaction_id?: string | null
+    status?: $Enums.PaymentStatus
+    initiated_at?: Date | string
+    completed_at?: Date | string | null
+    failure_reason?: string | null
+  }
+
+  export type InvoiceCreateManyOrderInput = {
+    id?: bigint | number
+    collaboration_id?: bigint | number | null
+    brand_id: bigint | number
+    creator_id: bigint | number
+    invoice_number: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    tax_amount?: Decimal | DecimalJsLike | number | string
+    total_amount: Decimal | DecimalJsLike | number | string
+    due_date: Date | string
+    status?: $Enums.InvoiceStatus
+    issued_at?: Date | string
+    paid_at?: Date | string | null
+  }
+
+  export type PaymentUpdateWithoutOrderInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    platform_fee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    net_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    payment_method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    transaction_id?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    initiated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
+    admin?: UserUpdateOneRequiredWithoutAdmin_paymentsNestedInput
+    collaboration?: CollaborationUpdateOneWithoutPaymentsNestedInput
+    payee?: UserUpdateOneRequiredWithoutPayments_payeeNestedInput
+    payer?: UserUpdateOneRequiredWithoutPayments_payerNestedInput
+  }
+
+  export type PaymentUncheckedUpdateWithoutOrderInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    platform_fee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    net_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    payment_method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    transaction_id?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    initiated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PaymentUncheckedUpdateManyWithoutOrderInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    payer_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    payee_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    platform_fee?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    net_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    payment_method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    transaction_id?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    initiated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type InvoiceUpdateWithoutOrderInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    invoice_number?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    tax_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    due_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    issued_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    brand?: BrandProfileUpdateOneRequiredWithoutInvoicesNestedInput
+    collaboration?: CollaborationUpdateOneWithoutInvoicesNestedInput
+    creator?: CreatorProfileUpdateOneRequiredWithoutInvoicesNestedInput
+  }
+
+  export type InvoiceUncheckedUpdateWithoutOrderInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    invoice_number?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    tax_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    due_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    issued_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type InvoiceUncheckedUpdateManyWithoutOrderInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    collaboration_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    invoice_number?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    tax_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    due_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+    issued_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
 

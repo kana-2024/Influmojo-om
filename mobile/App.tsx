@@ -2,11 +2,13 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text } from 'react-native';
 import { Provider } from 'react-redux';
-import { store } from './store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './store';
 import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { registerRootComponent } from 'expo';
+import * as NavigationBar from 'expo-navigation-bar';
 import WelcomeScreen from './screens/WelcomeScreen';
 import UserRoleScreen from './screens/UserRoleScreen';
 import SignUpScreen from './screens/SignUpScreen';
@@ -24,7 +26,13 @@ import BrandProfile from './screens/brand/BrandProfile';
 import BrandHome from './screens/brand/BrandHome';
 import ProfileCompleteScreen from './screens/ProfileCompleteScreen';
 import CreatePackageScreen from './screens/creator/CreatePackageScreen';
-import * as NavigationBar from 'expo-navigation-bar';
+import OrdersScreen from './screens/OrdersScreen';
+import OrderDetailsScreen from './screens/OrderDetailsScreen';
+import CreateProjectScreen from './screens/brand/CreateProjectScreen';
+import CreateCampaignScreen from './screens/brand/CreateCampaignScreen';
+import CreateCampaignModal from './screens/brand/CreateCampaignModal';
+import EditPackageScreen from './screens/creator/EditPackageScreen';
+import CreatePortfolioScreen from './screens/creator/CreatePortfolioScreen';
 import SplashScreen from './screens/SplashScreen';
 import { ENV } from './config/env';
 
@@ -99,7 +107,7 @@ export default function App() {
     
     // Only set background color if edge-to-edge is not enabled
     try {
-      NavigationBar.setBackgroundColorAsync('#F8F9FB');
+      NavigationBar.setBackgroundColorAsync('#f8f4e8');
     } catch (error) {
       // Ignore error if edge-to-edge is enabled
       console.log('Background color setting skipped (edge-to-edge enabled)');
@@ -109,34 +117,42 @@ export default function App() {
   return (
     <ErrorBoundary>
       <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator 
-            initialRouteName="SplashScreen"
-            screenOptions={{
-              headerShown: false
-            }}
-            id={undefined}
-          >
-            <Stack.Screen name="SplashScreen" component={SplashScreen} />
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="UserRole" component={UserRoleScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
-            <Stack.Screen name="OtpVerification" component={OtpVerificationScreen} />
-            <Stack.Screen name="MobileVerification" component={MobileVerifiedScreen} />
-            <Stack.Screen name="GoogleVerification" component={GoogleVerifiedScreen} />
-            <Stack.Screen name="CreatorPreferences" component={CreatorPreferencesScreen} />
-            <Stack.Screen name="BrandPreferences" component={BrandPreferencesScreen} />
-            <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
-            <Stack.Screen name="BrandProfileSetup" component={BrandProfileSetupScreen} />
-
-            <Stack.Screen name="CreatorProfile" component={CreatorProfile} />
-            <Stack.Screen name="BrandProfile" component={BrandProfile} />
-            <Stack.Screen name="BrandHome" component={BrandHome} />
-            <Stack.Screen name="ProfileComplete" component={ProfileCompleteScreen} />
-            <Stack.Screen name="CreatePackage" component={CreatePackageScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <PersistGate loading={null} persistor={persistor}>
+          <NavigationContainer>
+            <Stack.Navigator 
+              initialRouteName="SplashScreen"
+              screenOptions={{
+                headerShown: false
+              }}
+              id={undefined}
+            >
+              <Stack.Screen name="SplashScreen" component={SplashScreen} />
+              <Stack.Screen name="Welcome" component={WelcomeScreen} />
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="UserRole" component={UserRoleScreen} />
+              <Stack.Screen name="SignUp" component={SignUpScreen} />
+              <Stack.Screen name="OtpVerification" component={OtpVerificationScreen} />
+              <Stack.Screen name="MobileVerification" component={MobileVerifiedScreen} />
+              <Stack.Screen name="GoogleVerification" component={GoogleVerifiedScreen} />
+              <Stack.Screen name="CreatorPreferences" component={CreatorPreferencesScreen} />
+              <Stack.Screen name="BrandPreferences" component={BrandPreferencesScreen} />
+              <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+              <Stack.Screen name="BrandProfileSetup" component={BrandProfileSetupScreen} />
+              <Stack.Screen name="ProfileComplete" component={ProfileCompleteScreen} />
+              <Stack.Screen name="CreatorProfile" component={CreatorProfile} />
+              <Stack.Screen name="BrandProfile" component={BrandProfile} />
+              <Stack.Screen name="BrandHome" component={BrandHome} />
+              <Stack.Screen name="CreatePackage" component={CreatePackageScreen} />
+              <Stack.Screen name="EditPackage" component={EditPackageScreen} />
+              <Stack.Screen name="CreatePortfolio" component={CreatePortfolioScreen} />
+              <Stack.Screen name="Orders" component={OrdersScreen} />
+              <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+              <Stack.Screen name="CreateProject" component={CreateProjectScreen} />
+              <Stack.Screen name="CreateCampaign" component={CreateCampaignScreen} />
+              <Stack.Screen name="CreateCampaignModal" component={CreateCampaignModal} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </PersistGate>
         <StatusBar style="auto" />
       </Provider>
     </ErrorBoundary>
@@ -146,19 +162,19 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     padding: 20,
   },
   errorText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B2C',
+    color: '#f37135',
     marginBottom: 10,
   },
   errorSubtext: {

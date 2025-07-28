@@ -159,6 +159,14 @@ const RegionModal: React.FC<RegionModalProps> = ({
                     placeholder="Search State"
                     value={stateSearchText}
                     onChangeText={setStateSearchText}
+                    editable={false}
+                    showSoftInputOnFocus={false}
+                    contextMenuHidden={true}
+                    selectTextOnFocus={false}
+                    onPressIn={() => {
+                      // When user taps the search input, we can show a different UI or handle differently
+                      // For now, we'll just allow the search to work without keyboard
+                    }}
                   />
                 </View>
                 
@@ -175,7 +183,7 @@ const RegionModal: React.FC<RegionModalProps> = ({
                         selectedStates.includes(state) && styles.checkboxSelected
                       ]}>
                         {selectedStates.includes(state) && (
-                          <Ionicons name="checkmark" size={16} color="#fff" />
+                          <Ionicons name="checkmark" size={16} color="#f8f4e8" />
                         )}
                       </View>
                     </TouchableOpacity>
@@ -232,7 +240,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -262,7 +270,7 @@ const styles = StyleSheet.create({
   },
   sectionContainer: {
     marginBottom: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
@@ -288,8 +296,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
   },
   searchInput: {
     flex: 1,
@@ -320,7 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -371,7 +381,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   applyButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
     fontSize: 16,
   },

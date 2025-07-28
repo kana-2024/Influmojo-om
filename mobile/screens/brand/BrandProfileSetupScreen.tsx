@@ -8,7 +8,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 import CustomDropdown from '../../components/CustomDropdown';
 import * as apiService from '../../services/apiService';
 import OtpModal from '../../components/modals/OtpModal';
-import DatePickerModal from '../../components/modals/DatePickerModal';
+
 import GoogleVerificationModal from '../../components/modals/GoogleVerificationModal';
 import CityModal from '../../components/modals/CityModal';
 import RoleModal from '../../components/modals/RoleModal';
@@ -20,15 +20,13 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
   const [gender, setGender] = useState('Male');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [dob, setDob] = useState('');
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  // Removed date of birth fields
   const [city, setCity] = useState('');
   const [showCityPicker, setShowCityPicker] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
 
   const [userProfile, setUserProfile] = useState<any>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -89,24 +87,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
     }
   };
 
-  // Date picker functions
-  const handleDateSelected = (date: Date) => {
-    setSelectedDate(date);
-    setDob(date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }));
-    setShowDatePicker(false);
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-  };
+  // Date picker functions removed
 
 
 
@@ -209,7 +190,6 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
     try {
       const requestData: any = {
         gender,
-        dob: selectedDate ? selectedDate.toISOString().split('T')[0] : dob.trim(),
         city: city.trim(),
         business_type: businessType.trim(),
         role: role.trim()
@@ -282,6 +262,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
     
     console.log('Setting verified phone in state:', verifiedPhone);
     setPhone(verifiedPhone);
+    setIsPhoneVerified(true);
     setShowOtpModal(false);
     
     // Don't auto-save - let user fill all fields and click Next manually
@@ -394,43 +375,60 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
             <Text style={styles.sectionTitle}>Email ID</Text>
             <View style={styles.inputRow}>
               <TextInput
-                style={[styles.input, { flex: 1, backgroundColor: '#F3F4F6', color: '#6B7280' }]}
+                style={[styles.input, { flex: 1, backgroundColor: '#F8F9FA', color: '#6B7280' }]}
                 value={email}
                 editable={false}
                 selectTextOnFocus={false}
                 placeholderTextColor="#B0B0B0"
               />
               <View style={{ justifyContent: 'center', alignItems: 'center', marginLeft: 8 }}>
-                <Ionicons name="checkmark-circle" size={22} color="#22C55E" />
+                <Ionicons name="checkmark-circle" size={22} color="#11714f" />
               </View>
             </View>
             <View style={styles.emailWarningBox}>
-              <Ionicons name="information-circle-outline" size={16} color="#22C55E" style={{ marginRight: 6 }} />
-              <Text style={[styles.emailWarningText, { color: '#22C55E' }]}>Your email is verified via Google</Text>
+              <Ionicons name="information-circle-outline" size={16} color="#11714f" style={{ marginRight: 6 }} />
+              <Text style={[styles.emailWarningText, { color: '#11714f' }]}>Your email is verified via Google</Text>
             </View>
             {/* Phone Number for Google users (they need to verify phone) */}
             <Text style={styles.sectionTitle}>Phone Number</Text>
             <View style={styles.inputRow}>
               <TextInput
-                style={[styles.input, { flex: 1 }]} 
+                style={[styles.input, { flex: 1, backgroundColor: isPhoneVerified ? '#F8F9FA' : '#F5F5F5', color: isPhoneVerified ? '#6B7280' : '#1A1D1F', marginBottom: 0 }]} 
                 placeholder="Enter 10-digit mobile number"
                 placeholderTextColor="#B0B0B0"
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
+                editable={!isPhoneVerified}
+                selectTextOnFocus={!isPhoneVerified}
               />
-              <TouchableOpacity 
-                style={styles.verifyButton}
-                onPress={handleSendOtp}
-              >
-                <Text style={styles.verifyButtonText}>Send OTP</Text>
-              </TouchableOpacity>
+              {isPhoneVerified ? (
+                <View style={{ justifyContent: 'center', alignItems: 'center', marginLeft: 8 }}>
+                  <Ionicons name="checkmark-circle" size={22} color="#11714f" />
+                </View>
+              ) : (
+                <TouchableOpacity 
+                  style={styles.verifyButton}
+                  onPress={handleSendOtp}
+                >
+                  <Text style={styles.verifyButtonText}>Send OTP</Text>
+                </TouchableOpacity>
+              )}
             </View>
             <View style={styles.emailWarningBox}>
-              <Ionicons name="warning-outline" size={16} color="#FF9900" style={{ marginRight: 6 }} />
-              <Text style={styles.emailWarningText}>
-                Please verify your phone number
-              </Text>
+              {isPhoneVerified ? (
+                <>
+                  <Ionicons name="checkmark-circle-outline" size={16} color="#11714f" style={{ marginRight: 6 }} />
+                  <Text style={[styles.emailWarningText, { color: '#11714f' }]}>Your phone number is verified</Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons name="warning-outline" size={16} color="#FF9900" style={{ marginRight: 6 }} />
+                  <Text style={styles.emailWarningText}>
+                    Please verify your phone number
+                  </Text>
+                </>
+              )}
             </View>
           </>
         ) : (
@@ -439,7 +437,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
             <Text style={styles.sectionTitle}>Email ID</Text>
             <View style={styles.inputRow}>
               <TextInput
-                style={[styles.input, { flex: 1 }]}
+                style={[styles.input, { flex: 1, marginBottom: 0 }]}
                 placeholder="e.g. azharweb90@gmail.com"
                 placeholderTextColor="#B0B0B0"
                 value={email}
@@ -463,23 +461,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
           </>
         )}
 
-        {/* DOB */}
-        <Text style={styles.sectionTitle}>Date of Birth</Text>
-        <View style={styles.inputRow}>
-          <TextInput
-            style={[styles.input, { flex: 1 }]}
-            placeholder="MM/DD/YYYY"
-            placeholderTextColor="#B0B0B0"
-            value={selectedDate ? formatDate(selectedDate) : ''}
-            editable={false}
-          />
-          <TouchableOpacity 
-            style={styles.calendarIcon}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Ionicons name="calendar-outline" size={22} color="#000" />
-          </TouchableOpacity>
-        </View>
+
 
         {/* City */}
         <Text style={styles.sectionTitle}>City</Text>
@@ -547,15 +529,12 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
           <Text style={styles.nextButtonText}>
             {loading ? 'Saving...' : profileLoading ? 'Loading...' : 'Next 1 / 2'}
           </Text>
-          {!loading && !profileLoading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
+          {!loading && !profileLoading && <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
       </ScrollView>
 
       {/* Overlays for modals */}
       {showOtpModal && (
-        <View style={styles.modalOverlay} />
-      )}
-      {showDatePicker && (
         <View style={styles.modalOverlay} />
       )}
       {googleVerifying && (
@@ -578,14 +557,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
         phone={phone}
       />
 
-      {/* Date Picker Modal */}
-      <DatePickerModal
-        visible={showDatePicker}
-        onClose={() => setShowDatePicker(false)}
-        onDateSelected={handleDateSelected}
-        currentDate={selectedDate || new Date()}
-        title="Select Date of Birth"
-      />
+
 
       {/* Google Verification Modal */}
       <GoogleVerificationModal
@@ -613,7 +585,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F8F9FB' },
+  safeArea: { flex: 1, backgroundColor: '#f8f4e8' },
   scrollContent: { paddingHorizontal: 20, paddingBottom: 32 },
   progressBarContainer: { height: 8, width: '100%', marginTop: 8, marginBottom: 4, position: 'relative' },
   progressBarBg: {
@@ -622,7 +594,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     position: 'absolute', left: 0, top: 0, height: 8, width: '50%',
-    backgroundColor: '#FF6B2C', borderRadius: 4, zIndex: 1,
+    backgroundColor: '#f37135', borderRadius: 4, zIndex: 1,
   },
   progressPercent: { alignSelf: 'flex-end', color: '#6B7280', fontSize: 13, marginBottom: 12 },
   sectionTitle: { fontSize: 15, fontWeight: '600', color: '#1A1D1F', marginTop: 18, marginBottom: 6 },
@@ -630,21 +602,21 @@ const styles = StyleSheet.create({
   businessTypeRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 16 },
   radioBtn: { flexDirection: 'row', alignItems: 'center', marginRight: 16 },
   radioOuter: {
-    width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#2563EB', alignItems: 'center', justifyContent: 'center', marginRight: 6,
+    width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#f37135', alignItems: 'center', justifyContent: 'center', marginRight: 6,
   },
-  radioOuterSelected: { borderColor: '#2563EB', backgroundColor: '#E6F0FF' },
-  radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#2563EB' },
+  radioOuterSelected: { borderColor: '#f37135', backgroundColor: 'rgba(243, 113, 53, 0.1)' },
+  radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#f37135' },
   radioLabel: { fontSize: 15, color: '#1A1D1F', fontWeight: '400' },
   input: {
-    backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
-    paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, marginBottom: 8, minHeight: 48,
+    backgroundColor: '#F5F5F5', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
+    paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, marginBottom: 8, minHeight: 48,
     color: '#1A1D1F',
   },
   inputRow: { flexDirection: 'row', alignItems: 'center', position: 'relative', marginBottom: 8, gap: 8 },
   calendarIcon: { position: 'absolute', right: 12, top: 12 },
   dropdownIcon: { position: 'absolute', right: 16, top: 18 },
   verifyButton: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#20536d',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -653,7 +625,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   verifyButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -662,19 +634,21 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   emailWarningBox: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF4ED',
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8F9FA',
     borderRadius: 8, padding: 8, marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   emailWarningText: { color: '#FF9900', fontSize: 13, flex: 1, flexWrap: 'wrap' },
   errorText: { color: '#FF3B30', fontSize: 13, marginBottom: 8 },
   nextButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#FF6B2C', borderRadius: 8, paddingVertical: 14, marginTop: 16, marginBottom: 8,
+    backgroundColor: '#f37135', borderRadius: 8, paddingVertical: 14, marginTop: 16, marginBottom: 8,
     zIndex: 1,
   },
-  nextButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  nextButtonText: { color: '#f8f4e8', fontWeight: '600', fontSize: 16 },
   dropdownList: {
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
@@ -697,12 +671,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     marginTop: 8,
     marginBottom: 8,
     minHeight: 48,
@@ -736,12 +710,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     marginBottom: 8,
     minHeight: 48,
   },

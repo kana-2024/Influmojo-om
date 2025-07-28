@@ -236,6 +236,16 @@ export const profileAPI = {
     });
   },
 
+  // Update cover image
+  updateCoverImage: async (data: {
+    cover_image_url: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.UPDATE_COVER_IMAGE, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   // Create package
   createPackage: async (data: {
     platform: string;
@@ -426,6 +436,47 @@ export const profileAPI = {
     }
     
     return response;
+  },
+};
+
+// Orders API calls
+export const ordersAPI = {
+  // Get all orders for the authenticated user
+  getOrders: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_ORDERS, {
+      method: 'GET',
+    });
+  },
+
+  // Get specific order details
+  getOrderDetails: async (orderId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDER_DETAILS}/${orderId}`, {
+      method: 'GET',
+    });
+  },
+
+  // Checkout cart items to create orders
+  checkout: async (cartItems: any[]) => {
+    return await apiRequest(API_ENDPOINTS.CHECKOUT_ORDERS, {
+      method: 'POST',
+      body: JSON.stringify({ cartItems }),
+    });
+  },
+
+  // Accept order (creators only)
+  acceptOrder: async (orderId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/accept`, {
+      method: 'PUT',
+    });
+  },
+
+  // Reject order (creators only)
+  rejectOrder: async (orderId: string, rejectionMessage?: string) => {
+    const body = rejectionMessage ? { rejectionMessage } : {};
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/reject`, {
+      method: 'PUT',
+      body: Object.keys(body).length > 0 ? JSON.stringify(body) : undefined,
+    });
   },
 };
 

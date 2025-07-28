@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, SafeAreaView, ActivityIndicator, Modal, Alert, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, SafeAreaView, ActivityIndicator, Modal, Alert, StyleSheet, Image } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomNavBar, CreatorSection, CartModal, FilterModal } from '../../components';
 import { useAppSelector } from '../../store/hooks';
 import BrandProfile from './BrandProfile';
 import { profileAPI } from '../../services/apiService';
+import CartService from '../../services/cartService';
 
 const BrandHome = ({ navigation, route }: any) => {
   const insets = useSafeAreaInsets();
@@ -29,7 +30,6 @@ const BrandHome = ({ navigation, route }: any) => {
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<string>('all');
   const [showCartModal, setShowCartModal] = useState(false);
-  const [cartItems, setCartItems] = useState<any[]>([]);
 
 
   const categories = ['Fashion', 'Trainer', 'Yoga', 'Business', 'Beauty'];
@@ -87,23 +87,7 @@ const BrandHome = ({ navigation, route }: any) => {
     setShowCartModal(true);
   };
 
-  const handleRemoveCartItem = (itemId: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== itemId));
-  };
 
-  const handleUpdateCartQuantity = (itemId: string, quantity: number) => {
-    setCartItems(prev => 
-      prev.map(item => 
-        item.id === itemId ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const handleCheckout = () => {
-    // TODO: Implement checkout functionality
-    Alert.alert('Checkout', 'Checkout functionality will be implemented soon!');
-    setShowCartModal(false);
-  };
 
 
 
@@ -145,7 +129,7 @@ const BrandHome = ({ navigation, route }: any) => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F3F7FF' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f8f4e8' }}>
       {loading && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: insets.top + 16 }}>
           <ActivityIndicator size="large" color="#FD5D27" />
@@ -160,13 +144,19 @@ const BrandHome = ({ navigation, route }: any) => {
             style={{ backgroundColor: '#FD5D27', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}
             onPress={fetchCreators}
           >
-            <Text style={{ color: '#fff', fontWeight: '600' }}>Retry</Text>
+            <Text style={{ color: '#f8f4e8', fontWeight: '600' }}>Retry</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {!loading && !error && (
-        <ScrollView style={{ flex: 1, paddingHorizontal: 16, paddingTop: insets.top + 16 }} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={{ flex: 1, paddingHorizontal: 16, paddingTop: insets.top + 16, backgroundColor: '#f8f4e8' }} 
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled={true}
+          scrollEventThrottle={16}
+          decelerationRate="normal"
+        >
         {/* Header */}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
           <TouchableOpacity style={{ padding: 4, marginRight: 16 }}>
@@ -190,17 +180,19 @@ const BrandHome = ({ navigation, route }: any) => {
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <View style={{ 
             flex: 1, 
-            backgroundColor: '#fff', 
+            backgroundColor: '#F5F5F5', 
             flexDirection: 'row', 
             alignItems: 'center', 
-            paddingHorizontal: 12, 
+            paddingHorizontal: 16, 
             paddingVertical: 8, 
-            borderRadius: 8 
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: '#E5E7EB',
           }}>
             <Feather name="search" size={16} color="#C6C6C6" />
                          <TextInput
                placeholder="Search Creators"
-               placeholderTextColor="#C6C6C6"
+                               placeholderTextColor="#B0B0B0"
                style={{ marginLeft: 8, flex: 1, fontSize: 14, color: '#000' }}
              />
           </View>
@@ -217,27 +209,68 @@ const BrandHome = ({ navigation, route }: any) => {
         </View>
 
         {/* Categories */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#484848' }}>Categories</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#484848' }}>Categories</Text>
           <TouchableOpacity>
-            <Text style={{ fontSize: 9, color: '#000' }}>view all</Text>
+            <Text style={{ fontSize: 12, color: '#000' }}>view all</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
-          {categories.map((cat, index) => (
-            <View key={index} style={{ alignItems: 'center', marginRight: 12 }}>
-              <View style={{ 
-                width: 67, 
-                height: 78, 
-                borderRadius: 8, 
-                borderWidth: 1, 
-                borderColor: '#E9E9E9', 
-                backgroundColor: '#fff',
-                marginBottom: 4 
-              }} />
-              <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#01052D' }}>{cat}</Text>
-            </View>
-          ))}
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          style={{ marginBottom: 16 }}
+          contentContainerStyle={{ paddingRight: 16 }}
+          decelerationRate="fast"
+          snapToInterval={96}
+          snapToAlignment="start"
+          bounces={false}
+          alwaysBounceHorizontal={false}
+        >
+          {categories.map((cat, index) => {
+                         // Map categories to their corresponding images
+             const getCategoryImage = (category: string) => {
+               switch (category.toLowerCase()) {
+                 case 'fashion':
+                   return require('../../assets/fashion.jpg');
+                 case 'yoga':
+                   return require('../../assets/yoga.jpg');
+                 case 'business':
+                   return require('../../assets/business.jpg');
+                 case 'beauty':
+                   return require('../../assets/beauty.jpg');
+                 case 'trainer':
+                   return require('../../assets/trainer.jpg'); // Using the proper trainer image
+                 default:
+                   return require('../../assets/06.jpg'); // Fallback image
+               }
+             };
+
+            return (
+              <View key={index} style={{ alignItems: 'center', marginRight: 16 }}>
+                <View style={{ 
+                  width: 80, 
+                  height: 90, 
+                  borderRadius: 12, 
+                  borderWidth: 1, 
+                  borderColor: '#E9E9E9', 
+                  backgroundColor: '#f8f4e8',
+                  marginBottom: 6,
+                  overflow: 'hidden'
+                }}>
+                  <Image 
+                    source={getCategoryImage(cat)}
+                    style={{ 
+                      width: '100%', 
+                      height: '100%',
+                      borderRadius: 11
+                    }}
+                    resizeMode="cover"
+                  />
+                </View>
+                <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#01052D' }}>{cat}</Text>
+              </View>
+            );
+          })}
         </ScrollView>
 
         {/* Platform Creator Sections */}
@@ -291,10 +324,6 @@ const BrandHome = ({ navigation, route }: any) => {
       <CartModal
         visible={showCartModal}
         onClose={() => setShowCartModal(false)}
-        items={cartItems}
-        onRemoveItem={handleRemoveCartItem}
-        onUpdateQuantity={handleUpdateCartQuantity}
-        onCheckout={handleCheckout}
       />
 
       {/* Overlay for cart modal */}

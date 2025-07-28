@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useAppDispatch } from '../store/hooks';
 import { setUserType } from '../store/slices/authSlice';
+import { FONTS } from '../config/fonts';
 
 interface UserRoleScreenProps {
   navigation: any;
@@ -94,7 +95,7 @@ const UserRoleScreen = ({ navigation, route }: UserRoleScreenProps) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
   },
   imageContainer: {
     width: '100%',
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     padding: 24,
     alignItems: 'center',
     shadowColor: '#000',
@@ -133,6 +134,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
+    fontFamily: FONTS.secondary.italic,
     fontWeight: '600',
     color: '#1A1D1F',
     textAlign: 'center',
@@ -140,6 +142,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 15,
+    fontFamily: FONTS.primary.regular,
     color: '#6B7280',
     textAlign: 'center',
     marginBottom: 24,
@@ -161,29 +164,31 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: '#f37135',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
   },
   radioCircleSelected: {
-    borderColor: '#FF6B2C',
+    borderColor: '#f37135',
+    backgroundColor: 'rgba(243, 113, 53, 0.1)',
   },
   radioDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
   },
   radioLabel: {
     fontSize: 16,
+    fontFamily: FONTS.primary.medium,
     color: '#1A1D1F',
     fontWeight: '500',
   },
   continueButton: {
     width: '100%',
-    backgroundColor: '#FC5213',
+    backgroundColor: '#f37135',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -191,7 +196,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   continueText: {
-    color: '#fff',
+    color: '#f8f4e8',
+    fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     fontSize: 16,
   },
@@ -201,10 +207,12 @@ const styles = StyleSheet.create({
   loginText: {
     color: '#6B7280',
     fontSize: 14,
+    fontFamily: FONTS.primary.regular,
     textAlign: 'center',
   },
   loginLink: {
-    color: '#2563EB',
+    color: '#20536d',
+    fontFamily: FONTS.primary.medium,
     fontWeight: '500',
   },
 });

@@ -3,6 +3,7 @@ import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity, Platform
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useEffect } from 'react';
+import { FONTS } from '../config/fonts';
 
 const WelcomeScreen = ({ navigation }: any) => {
   useEffect(() => {
@@ -52,11 +53,11 @@ const WelcomeScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     padding: 24,
     alignItems: 'center',
     shadowColor: '#000',
@@ -93,6 +94,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
+    fontFamily: FONTS.secondary.italic,
     fontWeight: '600',
     color: '#1A1D1F',
     textAlign: 'center',
@@ -100,6 +102,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 15,
+    fontFamily: FONTS.primary.regular,
     color: '#6B7280',
     textAlign: 'center',
     marginBottom: 24,
@@ -113,11 +116,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#20536d',
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: '#102B38',
+    backgroundColor: '#20536d',
     width: 16,
   },
   buttonRow: {
@@ -127,28 +130,30 @@ const styles = StyleSheet.create({
   },
   signupButton: {
     flex: 1,
-    backgroundColor: '#FC5213',
+    backgroundColor: '#f37135',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     marginRight: 8,
   },
   signupText: {
-    color: '#fff',
+    color: '#f8f4e8',
+    fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     fontSize: 16,
   },
   loginButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#FC5213',
+    borderColor: '#f37135',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     marginLeft: 8,
   },
   loginText: {
-    color: '#FC5213',
+    color: '#f37135',
+    fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     fontSize: 16,
   },

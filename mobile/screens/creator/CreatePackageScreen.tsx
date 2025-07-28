@@ -179,6 +179,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
                   onChangeText={setPrice}
                   keyboardType="numeric"
                   placeholder="50000"
+                  placeholderTextColor="#B0B0B0"
                 />
                 <TouchableOpacity style={styles.arrowBtn}>
                   <Ionicons name="chevron-down" size={20} color="#6B7280" />
@@ -194,6 +195,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
                 value={desc}
                 onChangeText={setDesc}
                 placeholder="Brief description of your package has to be add here."
+                placeholderTextColor="#B0B0B0"
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"
@@ -229,7 +231,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1.2,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -290,9 +292,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 12,
-    backgroundColor: '#fff',
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    backgroundColor: '#F5F5F5',
   },
   input: {
     flex: 1,
@@ -314,14 +316,14 @@ const styles = StyleSheet.create({
   },
   textArea: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 12,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     fontSize: 16,
     color: '#1A1D1F',
     minHeight: 100,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
   },
   btnRow: {
     flexDirection: 'row',
@@ -337,22 +339,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#FFF4F0',
+    backgroundColor: '#f8f4e8',
   },
   cancelBtnText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontWeight: '700',
     fontSize: 16,
   },
   submitBtn: {
     flex: 1,
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
   },
   submitBtnText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '700',
     fontSize: 16,
   },

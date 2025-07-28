@@ -146,6 +146,7 @@ const FollowerRangeModal: React.FC<FollowerRangeModalProps> = ({
                 onChangeText={handleMinInputChange}
                 keyboardType="numeric"
                 placeholder="0"
+                placeholderTextColor="#B0B0B0"
               />
               <Text style={styles.inputSeparator}>-</Text>
               <TextInput
@@ -154,6 +155,7 @@ const FollowerRangeModal: React.FC<FollowerRangeModalProps> = ({
                 onChangeText={handleMaxInputChange}
                 keyboardType="numeric"
                 placeholder="0"
+                placeholderTextColor="#B0B0B0"
               />
             </View>
           </View>
@@ -179,7 +181,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -267,6 +269,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 16,
     textAlign: 'center',
+    backgroundColor: '#F5F5F5',
   },
   inputSeparator: {
     fontSize: 16,
@@ -299,7 +302,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   applyButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
     fontSize: 16,
   },

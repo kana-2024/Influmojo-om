@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     bottom: Platform.OS === 'ios' ? '10%' : 0,
     left: Platform.OS === 'ios' ? '5%' : 0,
     right: Platform.OS === 'ios' ? '5%' : 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderRadius: Platform.OS === 'ios' ? 16 : 0,
     width: Platform.OS === 'ios' ? '90%' : '100%',
     maxWidth: Platform.OS === 'ios' ? 400 : undefined,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   confirmButtonText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontSize: 16,
     fontWeight: '600',
   },

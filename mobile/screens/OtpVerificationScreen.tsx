@@ -130,14 +130,14 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
 
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1, backgroundColor: '#EFF3F5' }}
+              style={{ flex: 1, backgroundColor: '#f8f4e8' }}
       contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start' }}
       enableOnAndroid={true}
       extraScrollHeight={80}
       keyboardShouldPersistTaps="handled"
     >
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#EFF3F5' }}>
-        <StatusBar barStyle="dark-content" backgroundColor="#EFF3F5" />
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#f8f4e8' }}>
+        <StatusBar barStyle="dark-content" backgroundColor="#f8f4e8" />
         <View style={styles.container}>
           {/* Top Bar */}
           <View style={styles.topBar}>
@@ -208,9 +208,9 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
           {/* Verify Button */}
           <TouchableOpacity style={styles.verifyButton} onPress={handleVerify} disabled={loading}>
             <Text style={styles.verifyText}>Verify</Text>
-            <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
+            <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />
           </TouchableOpacity>
-          {loading && <ActivityIndicator size="small" color="#FF6B2C" style={{ marginTop: 8 }} />}
+          {loading && <ActivityIndicator size="small" color="#f37135" style={{ marginTop: 8 }} />}
           {/* Login Link */}
           <TouchableOpacity style={styles.loginRow} onPress={() => navigation.navigate('Login')}>
             <Text style={styles.loginText}>Already have an account ? <Text style={styles.loginLink}>Login here</Text></Text>
@@ -224,7 +224,7 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EFF3F5',
+    backgroundColor: '#f8f4e8',
     paddingHorizontal: 24,
     paddingTop: 48,
   },
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     fontSize: 22,
     textAlign: 'center',
     marginHorizontal: 4,
@@ -320,14 +320,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#20536d',
     borderRadius: 8,
     paddingVertical: 14,
     marginTop: 8,
     marginBottom: 8,
   },
   verifyText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
     fontSize: 16,
   },

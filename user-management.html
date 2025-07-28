@@ -76,14 +76,19 @@
         .search-input {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
             font-size: 16px;
             outline: none;
+            background-color: #f8f4e8;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .search-input:focus {
             border-color: #ff6b2c;
+            box-shadow: 0 4px 8px rgba(255, 107, 44, 0.15);
+            transform: translateY(-1px);
         }
 
         .users-container {

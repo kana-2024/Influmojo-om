@@ -499,7 +499,7 @@ const KycModal: React.FC<KycModalProps> = ({ onClose, onBack }) => {
 
 const styles = StyleSheet.create({
   sheet: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -560,13 +560,13 @@ const styles = StyleSheet.create({
   },
   proofCard: {
     flex: 1,
-    backgroundColor: '#F3F7FF',
+    backgroundColor: '#f8f4e8',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 20,
     marginHorizontal: 12,
     borderWidth: 1.5,
-    borderColor: '#F3F7FF',
+    borderColor: '#f8f4e8',
     position: 'relative',
   },
   proofCardSelected: {
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     top: 8,
     right: 8,
     backgroundColor: '#2DD36F',
-    color: '#fff',
+    color: '#f8f4e8',
     fontSize: 10,
     fontWeight: '600',
     paddingHorizontal: 6,
@@ -610,13 +610,13 @@ const styles = StyleSheet.create({
   },
   uploadCard: {
     flex: 1,
-    backgroundColor: '#F3F7FF',
+    backgroundColor: '#f8f4e8',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 20,
     marginHorizontal: 12,
     borderWidth: 1.5,
-    borderColor: '#F3F7FF',
+    borderColor: '#f8f4e8',
   },
   uploadCardUploaded: {
     borderColor: '#2DD36F',
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   ekycRedirectCard: {
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#f8f4e8',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 16,
@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   ekycUploadCard: {
-    backgroundColor: '#F3F7FF',
+    backgroundColor: '#f8f4e8',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 24,
@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   submitBtnText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   guideContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -842,7 +842,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   guideStartText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
     fontSize: 16,
   },

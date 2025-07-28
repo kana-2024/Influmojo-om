@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   optionsContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f8f4e8',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
@@ -122,13 +122,13 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   doneButton: {
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
   },
   doneButtonText: {
-    color: '#FFFFFF',
+    color: '#f8f4e8',
     fontSize: 16,
     fontWeight: '600',
   },

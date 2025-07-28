@@ -21,7 +21,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   message, 
   confirmText = "Yes", 
   cancelText = "No",
-  confirmColor = "#FF6B2C"
+  confirmColor = "#f37135"
 }) => {
   const handleConfirm = () => {
     onConfirm();
@@ -51,7 +51,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         {/* Content */}
         <View style={styles.content}>
           <View style={styles.iconContainer}>
-            <Ionicons name="warning" size={48} color="#FF6B2C" />
+            <Ionicons name="warning" size={48} color="#f37135" />
           </View>
           
           <Text style={styles.message}>
@@ -68,10 +68,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             </TouchableOpacity>
             
             <TouchableOpacity
-              style={[styles.confirmButton, { backgroundColor: confirmColor === "#FF6B2C" ? "#FFE5D9" : confirmColor }]}
+              style={[styles.confirmButton, { backgroundColor: confirmColor === "#f37135" ? "#FFE5D9" : confirmColor }]}
               onPress={handleConfirm}
             >
-              <Text style={[styles.confirmButtonText, { color: confirmColor === "#FF6B2C" ? "#FF6B2C" : "#fff" }]}>{confirmText}</Text>
+              <Text style={[styles.confirmButtonText, { color: confirmColor === "#f37135" ? "#f37135" : "#f8f4e8" }]}>{confirmText}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     top: '50%',
     left: '50%',
     transform: [{ translateX: -200 }, { translateY: -200 }],
-    backgroundColor: '#fff',
+            backgroundColor: '#f8f4e8',
     borderRadius: 16,
     width: '90%',
     maxWidth: 400,
@@ -134,10 +134,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#FFF4F0',
+            backgroundColor: '#f8f4e8',
   },
   cancelButtonText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontWeight: '700',
     fontSize: 16,
   },
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '700',
     fontSize: 16,
   },

@@ -105,17 +105,19 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({ onClose, onBa
             <Dropdown value={platform} setValue={setPlatform} options={platforms} />
 
             <Text style={styles.label}>Campaign Title*</Text>
-            <TextInput 
-              style={styles.input} 
+                        <TextInput
+              style={styles.input}
               value={title} 
               onChangeText={setTitle}
               placeholder="Enter your campaign title"
+              placeholderTextColor="#B0B0B0"
             />
 
             <Text style={styles.label}>Campaign Description*</Text>
             <TextInput
               style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
               placeholder="Describe your campaign goals and objectives"
+              placeholderTextColor="#B0B0B0"
               value={description}
               onChangeText={setDescription}
               multiline
@@ -134,6 +136,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({ onClose, onBa
             <TextInput
               style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
               placeholder="Describe what you're looking for from creators (content type, style, deliverables, etc.)"
+              placeholderTextColor="#B0B0B0"
               value={requirements}
               onChangeText={setRequirements}
               multiline
@@ -163,7 +166,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({ onClose, onBa
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
   },
   safeArea: {
     flex: 1,
@@ -172,7 +175,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1.2,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -226,12 +229,12 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     fontSize: 15,
     color: '#1A1D1F',
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
   },
   btnRow: {
     flexDirection: 'row',
@@ -245,7 +248,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     alignItems: 'center',
   },
   cancelBtnText: {
@@ -258,13 +261,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 12,
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     alignItems: 'center',
   },
   submitBtnText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: '#f8f4e8',
   },
 });
 

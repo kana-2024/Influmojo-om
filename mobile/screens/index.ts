@@ -21,4 +21,8 @@ export { default as CreatePackageScreen } from './creator/CreatePackageScreen';
 // Brand-specific screens
 export { default as BrandPreferencesScreen } from './brand/BrandPreferencesScreen';
 export { default as CreateCampaignScreen } from './brand/CreateCampaignScreen';
-export { default as CreateProjectScreen } from './brand/CreateProjectScreen'; 
+export { default as CreateProjectScreen } from './brand/CreateProjectScreen';
+
+// Order screens
+export { default as OrdersScreen } from './OrdersScreen';
+export { default as OrderDetailsScreen } from './OrderDetailsScreen'; 

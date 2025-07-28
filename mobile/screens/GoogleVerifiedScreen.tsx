@@ -54,7 +54,7 @@ const GoogleVerifiedScreen = ({ navigation }: any) => {
       />
       {/* Checkmark */}
       <View style={styles.checkCircle}>
-        <Ionicons name="checkmark" size={40} color="#22C55E" />
+        <Ionicons name="checkmark" size={40} color="#11714f" />
       </View>
       {/* Success Message */}
       <Text style={styles.title}>Your Google account has been verified.</Text>
@@ -68,7 +68,7 @@ const GoogleVerifiedScreen = ({ navigation }: any) => {
         disabled={loading}
       >
         <Text style={styles.nextText}>{loading ? 'Loading...' : 'Next'}</Text>
-        {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
+        {!loading && <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />}
       </TouchableOpacity>
     </View>
   );
@@ -77,7 +77,7 @@ const GoogleVerifiedScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
     paddingHorizontal: 24,
     paddingTop: 48,
     alignItems: 'center',
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#E0FCE5',
+    backgroundColor: 'rgba(17, 113, 79, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
@@ -122,14 +122,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 14,
     paddingHorizontal: 32,
     marginBottom: 8,
   },
   nextText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
     fontSize: 16,
   },

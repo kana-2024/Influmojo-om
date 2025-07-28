@@ -74,12 +74,12 @@ const AnimatedButton = ({ onPress, children }: { onPress: () => void; children: 
 const ConfettiCheckmark = () => {
   // Confetti positions (angle, distance, color)
   const confetti = [
-    { angle: 0, distance: 60, color: '#FF6B2C', size: 10, delay: 0 },
+    { angle: 0, distance: 60, color: '#f37135', size: 10, delay: 0 },
     { angle: 30, distance: 60, color: '#FFD600', size: 8, delay: 60 },
     { angle: 60, distance: 60, color: '#2DD36F', size: 9, delay: 120 },
     { angle: 90, distance: 60, color: '#1E90FF', size: 7, delay: 180 },
     { angle: 120, distance: 60, color: '#FF3B30', size: 8, delay: 240 },
-    { angle: 150, distance: 60, color: '#FF6B2C', size: 7, delay: 300 },
+    { angle: 150, distance: 60, color: '#f37135', size: 7, delay: 300 },
     { angle: 180, distance: 60, color: '#FFD600', size: 10, delay: 360 },
     { angle: 210, distance: 60, color: '#2DD36F', size: 8, delay: 420 },
     { angle: 240, distance: 60, color: '#1E90FF', size: 9, delay: 480 },
@@ -136,7 +136,7 @@ const ConfettiCheckmark = () => {
       {/* Double circle checkmark with animated inner circle */}
       <View style={styles.outerCircle}>
         <Animated.View style={[styles.innerCircle, { transform: [{ scale }] }]}> 
-          <Ionicons name="checkmark" size={36} color="#fff" style={{ fontWeight: 'bold' }} />
+          <Ionicons name="checkmark" size={36} color="#f8f4e8" style={{ fontWeight: 'bold' }} />
         </Animated.View>
       </View>
     </View>
@@ -207,7 +207,7 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
         </Text>
         <TouchableOpacity style={styles.button} onPress={handleViewProfile}>
           <Text style={styles.buttonText}>View Profile</Text>
-          <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
+          <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -217,14 +217,14 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
   },
   confettiContainer: {
     marginBottom: 32,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 0,
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 14,
     paddingHorizontal: 24,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
     fontSize: 16,
     letterSpacing: 1,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     top: 0, 
     height: 8, 
     width: '100%',
-    backgroundColor: '#FF6B2C', 
+    backgroundColor: '#f37135', 
     borderRadius: 4, 
     zIndex: 1,
   },

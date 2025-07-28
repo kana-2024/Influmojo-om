@@ -94,7 +94,7 @@ const PlatformModal: React.FC<PlatformModalProps> = ({
             >
               <View style={styles.platformInfo}>
                 <View style={[styles.platformIcon, { backgroundColor: platform.color }]}>
-                  <Ionicons name={platform.icon as any} size={20} color="#fff" />
+                  <Ionicons name={platform.icon as any} size={20} color="#f8f4e8" />
                 </View>
                 <Text style={styles.platformName}>{platform.name}</Text>
               </View>
@@ -103,7 +103,7 @@ const PlatformModal: React.FC<PlatformModalProps> = ({
                 selectedPlatforms.includes(platform.id) && styles.checkboxSelected
               ]}>
                 {selectedPlatforms.includes(platform.id) && (
-                  <Ionicons name="checkmark" size={16} color="#fff" />
+                  <Ionicons name="checkmark" size={16} color="#f8f4e8" />
                 )}
               </View>
             </TouchableOpacity>
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   applyButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
     fontSize: 16,
   },

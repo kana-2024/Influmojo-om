@@ -29,6 +29,9 @@ if (__DEV__) {
   console.log('Platform:', Platform.OS);
   console.log('GOOGLE_CLIENT_ID exists:', !!GOOGLE_CLIENT_ID);
   console.log('GOOGLE_CLIENT_ID length:', GOOGLE_CLIENT_ID?.length || 0);
+  console.log('ENV.GOOGLE_CLIENT_ID:', ENV.GOOGLE_CLIENT_ID);
+  console.log('ENV.GOOGLE_CLIENT_ID_ANDROID:', ENV.GOOGLE_CLIENT_ID_ANDROID);
+  console.log('ENV.GOOGLE_CLIENT_ID_IOS:', ENV.GOOGLE_CLIENT_ID_IOS);
 }
 
 // Validate that credentials are configured
@@ -43,12 +46,27 @@ if (__DEV__) {
 }
 
 // Configure Google Sign-In
-GoogleSignin.configure({
-  webClientId: ENV.GOOGLE_CLIENT_ID, // Keep web client ID for server auth
-  iosClientId: ENV.GOOGLE_CLIENT_ID_IOS, // iOS-specific client ID
-  offlineAccess: true,
-  forceCodeForRefreshToken: true,
-});
+try {
+  if (__DEV__) {
+    console.log('Configuring Google Sign-In...');
+    console.log('webClientId:', ENV.GOOGLE_CLIENT_ID);
+    console.log('iosClientId:', ENV.GOOGLE_CLIENT_ID_IOS);
+  }
+  
+  GoogleSignin.configure({
+    webClientId: ENV.GOOGLE_CLIENT_ID, // Web client ID for server auth
+    iosClientId: ENV.GOOGLE_CLIENT_ID_IOS, // iOS-specific client ID
+    offlineAccess: true,
+    forceCodeForRefreshToken: true,
+  });
+  
+  if (__DEV__) {
+    console.log('Google Sign-In configured successfully');
+  }
+} catch (error) {
+  console.error('Error configuring Google Sign-In:', error);
+  throw error;
+}
 
 export interface GoogleUser {
   id: string;

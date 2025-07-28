@@ -15,8 +15,10 @@ const BottomNavBar = ({ navigation, currentRoute = 'home', onCartPress }: Bottom
   // Different nav items for brand vs creator
   const brandNavItems = [
     { name: 'home', icon: 'home-outline', label: 'Home' },
-    { name: 'cart', icon: 'cart-outline', label: 'Cart' },
     { name: 'insights', icon: 'analytics-outline', label: 'Insights' },
+
+    { name: 'cart', icon: 'cart-outline', label: 'Cart' },
+    { name: 'orders', icon: 'list-outline', label: 'Orders' },
     { name: 'profile', icon: 'person-outline', label: 'Profile' },
   ];
   
@@ -51,8 +53,11 @@ const BottomNavBar = ({ navigation, currentRoute = 'home', onCartPress }: Bottom
       if (userType === 'brand' && onCartPress) {
         onCartPress();
       }
+    } else if (routeName === 'orders') {
+      // Navigate to orders screen
+      navigation.navigate('Orders');
     } else {
-      // For other routes (insights, orders), navigate normally
+      // For other routes (insights), navigate normally
       // Note: These screens might not exist yet, so we'll handle gracefully
       try {
         navigation.navigate(routeName);
@@ -68,29 +73,41 @@ const BottomNavBar = ({ navigation, currentRoute = 'home', onCartPress }: Bottom
     }
   };
 
+  // For creators, if we're on CreatorProfile, show 'profile' as active
+  // For brands, use the currentRoute as passed
+  const getActiveRoute = () => {
+    if (userType === 'creator' && currentRoute === 'home') {
+      return 'profile'; // For creators, home and profile are the same screen, show profile as active
+    }
+    return currentRoute;
+  };
+
   return (
     <View style={styles.container}>
-      {navItems.map((item) => (
-        <TouchableOpacity
-          key={item.name}
-          style={styles.navItem}
-          onPress={() => handleNavigation(item.name)}
-        >
-          <Ionicons
-            name={item.icon as any}
-            size={24}
-            color={currentRoute === item.name ? '#007AFF' : '#8E8E93'}
-          />
-          <Text
-            style={[
-              styles.navLabel,
-              { color: currentRoute === item.name ? '#007AFF' : '#8E8E93' }
-            ]}
+      {navItems.map((item) => {
+        const isActive = getActiveRoute() === item.name;
+        return (
+          <TouchableOpacity
+            key={item.name}
+            style={styles.navItem}
+            onPress={() => handleNavigation(item.name)}
           >
-            {item.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
+            <Ionicons
+              name={item.icon as any}
+              size={24}
+              color={isActive ? '#FD5D27' : '#8E8E93'}
+            />
+                         <Text
+               style={[
+                 styles.navLabel,
+                 { color: isActive ? '#FD5D27' : '#8E8E93' }
+               ]}
+             >
+               {item.label}
+             </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };
@@ -98,12 +115,17 @@ const BottomNavBar = ({ navigation, currentRoute = 'home', onCartPress }: Bottom
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderTopWidth: 0.5,
-    borderTopColor: '#C6C6C8',
+    backgroundColor: '#f8f4e8',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
     paddingVertical: 8,
     paddingHorizontal: 16,
     paddingBottom: 20, // Extra padding for safe area
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 8,
   },
   navItem: {
     flex: 1,

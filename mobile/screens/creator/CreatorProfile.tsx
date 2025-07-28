@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, StatusBar, Platform, Dimensions, Modal, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { updateUser } from '../../store/slices/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { BottomNavBar, KycModal, AccountModal, PackageCard, CartModal } from '../../components';
@@ -12,12 +13,25 @@ import CreatePortfolioScreen from './CreatePortfolioScreen';
 import AnimatedModalOverlay from '../../components/AnimatedModalOverlay';
 import CustomDropdown from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
+import { imageService } from '../../services/imageService';
 import { setShowCreatePortfolio, setShowKycModal, setShowCreatePackage, setShowEditPackage, resetModals } from '../../store/slices/modalSlice';
 
 const categories = ['Technology', 'Science', 'Training'];
 const languages = ['English', 'Hindi', 'Telugu', 'Marathi'];
 
 const SCROLL_THRESHOLD = 40;
+
+import COLORS from '../../config/colors';
+
+// Color constants
+const COLORS_LOCAL = {
+  primary: COLORS.primary,
+  secondary: COLORS.secondary,
+  textDark: COLORS.textDark,
+  textGray: COLORS.textGray,
+  borderLight: COLORS.borderLight,
+  backgroundLight: COLORS.backgroundLight
+};
 
 const tabList = [
   { key: 'Packages', label: 'Packages' },
@@ -57,6 +71,34 @@ const calculateAge = (dateOfBirth: any): number | null => {
   }
 };
 
+// Helper function to get platform data (icon and color)
+const getPlatformData = (platform: string) => {
+  switch (platform.toLowerCase()) {
+    case 'instagram':
+      return { icon: 'logo-instagram', color: '#E4405F' };
+    case 'youtube':
+      return { icon: 'logo-youtube', color: '#FF0000' };
+    case 'facebook':
+      return { icon: 'logo-facebook', color: '#1877F2' };
+    case 'tiktok':
+      return { icon: 'musical-notes', color: '#000000' };
+    case 'twitter':
+      return { icon: 'logo-twitter', color: '#1DA1F2' };
+    case 'linkedin':
+      return { icon: 'logo-linkedin', color: '#0077B5' };
+    case 'snapchat':
+      return { icon: 'logo-snapchat', color: '#FFFC00' };
+    default:
+      return { icon: 'share-social', color: '#6B7280' };
+  }
+};
+
+// Helper function to generate random follower count
+const getRandomFollowerCount = () => {
+  const counts = ['1.2K', '5.8K', '12.4K', '25.7K', '89.3K', '156K', '234K', '567K', '1.2M', '2.8M'];
+  return counts[Math.floor(Math.random() * counts.length)];
+};
+
 const CreatorProfile = () => {
   const user = useAppSelector(state => state.auth.user);
   const insets = useSafeAreaInsets();
@@ -83,7 +125,7 @@ const CreatorProfile = () => {
   const [editingPackage, setEditingPackage] = useState<any>(null);
   const [showDeleteOverlay, setShowDeleteOverlay] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
-  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [coverImageKey, setCoverImageKey] = useState(0); // Cache-busting for cover image
 
   console.log('🔍 CreatorProfile component loaded');
   console.log('🔍 Current user:', user);
@@ -319,75 +361,40 @@ const CreatorProfile = () => {
     setShowPaymentsModal(true);
   };
 
-  // Handle add to cart for readonly mode
-  const handleAddToCart = (packageItem: any) => {
-    console.log('🔍 Adding package to cart:', packageItem);
-    // Add the package to cart items
-    const newCartItem = {
-      id: packageItem.id || `package_${Date.now()}`,
-      name: packageItem.title || `${packageItem.platform} Package`,
-      price: packageItem.price || 0,
-      quantity: 1,
-      creator: creatorProfile?.name || creatorProfile?.user?.name || 'Creator',
-      platform: packageItem.platform || 'Unknown'
-    };
-    
-    setCartItems(prev => {
-      // Check if item already exists in cart
-      const existingItem = prev.find(item => item.id === newCartItem.id);
-      if (existingItem) {
-        // Update quantity if item exists
-        return prev.map(item => 
-          item.id === newCartItem.id 
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        // Add new item if it doesn't exist
-        return [...prev, newCartItem];
+  // Handle cover image upload
+  const handleCoverImageUpload = async () => {
+    try {
+      const result = await imageService.showImageSourceOptions();
+      
+      if (result.success && result.coverImageUrl) {
+        // Update user's cover image in Redux store
+        dispatch(updateUser({ cover_image_url: result.coverImageUrl }));
+        // Increment key to force image reload
+        setCoverImageKey(prev => prev + 1);
+        
+        // Refresh the creator profile to get updated data from API
+        await loadCreatorProfile();
+        
+        Alert.alert('Success', 'Cover image updated successfully!');
+      } else if (result.error && result.error !== 'Cancelled') {
+        Alert.alert('Error', result.error);
       }
-    });
-    
-    Alert.alert(
-      'Added to Cart',
-      `"${packageItem.title || packageItem.platform} Package" has been added to your cart!`,
-      [
-        { text: 'Continue Shopping', style: 'default' },
-        { text: 'View Cart', style: 'default', onPress: () => setShowCartModal(true) }
-      ]
-    );
+    } catch (error) {
+      console.error('Cover image upload error:', error);
+      Alert.alert('Error', 'Failed to upload cover image. Please try again.');
+    }
   };
 
-  const handleCartPress = () => {
-    setShowCartModal(true);
-  };
-
-  const handleRemoveCartItem = (itemId: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== itemId));
-  };
-
-  const handleUpdateCartQuantity = (itemId: string, quantity: number) => {
-    setCartItems(prev => 
-      prev.map(item => 
-        item.id === itemId ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const handleCheckout = () => {
-    // TODO: Implement checkout functionality
-    Alert.alert('Checkout', 'Checkout functionality will be implemented soon!');
-    setShowCartModal(false);
-  };
+  // Cart functionality is now handled by CartService
 
   return (
           <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle='dark-content' backgroundColor='#fff' />
+      <StatusBar barStyle='dark-content' backgroundColor='#f8f4e8' />
       
       {/* Show error message for brand users (only when not in readonly mode) */}
       {user && (user.user_type === 'brand' || (user as any).userType === 'brand') && !readonly && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-          <Ionicons name="alert-circle" size={64} color="#FF6B2C" />
+          <Ionicons name="alert-circle" size={64} color="#f37135" />
           <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
             Wrong Profile Type
           </Text>
@@ -405,15 +412,15 @@ const CreatorProfile = () => {
         <>
           {/* Show loading state while fetching creator profile data */}
           {loading && readonly ? (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
-              <ActivityIndicator size="large" color="#FF6B2C" />
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f4e8' }}>
+              <ActivityIndicator size="large" color="#f37135" />
               <Text style={{ marginTop: 16, fontSize: 16, color: '#6B7280' }}>
                 Loading creator profile...
               </Text>
             </View>
           ) : error && readonly ? (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff', padding: 20 }}>
-              <Ionicons name="alert-circle" size={64} color="#FF6B2C" />
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f4e8', padding: 20 }}>
+              <Ionicons name="alert-circle" size={64} color="#f37135" />
               <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
                 Failed to Load Profile
               </Text>
@@ -421,7 +428,7 @@ const CreatorProfile = () => {
                 {error}
               </Text>
               <TouchableOpacity 
-                style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 12, backgroundColor: '#FF6B2C', borderRadius: 8 }}
+                style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 12, backgroundColor: '#f37135', borderRadius: 8 }}
                 onPress={() => {
                   setError(null);
                   if (creatorId) {
@@ -429,12 +436,12 @@ const CreatorProfile = () => {
                   }
                 }}
               >
-                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
+                <Text style={{ color: '#f8f4e8', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
               </TouchableOpacity>
             </View>
           ) : !creatorProfile && readonly ? (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
-              <ActivityIndicator size="large" color="#FF6B2C" />
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f4e8' }}>
+              <ActivityIndicator size="large" color="#f37135" />
               <Text style={{ marginTop: 16, fontSize: 16, color: '#6B7280' }}>
                 Loading creator profile...
               </Text>
@@ -442,119 +449,172 @@ const CreatorProfile = () => {
           ) : (
             <>
               {/* Header */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12, paddingHorizontal: 16 }}>
+              <View style={[styles.headerContainer, { paddingTop: insets.top + 16 }]}>
                 {readonly ? (
-                  <TouchableOpacity onPress={() => navigation.navigate('BrandHome' as never)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
+                  <TouchableOpacity onPress={() => navigation.navigate('BrandHome' as never)} style={styles.headerButton}>
                     <Ionicons name="arrow-back" size={24} color="#1A1D1F" />
                   </TouchableOpacity>
                 ) : (
-                  <View style={{ width: 32 }} />
+                  <View style={styles.headerButton} />
                 )}
-                <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' }}>
-                  {readonly ? 'Creator Profile' : 'My Profile'}
+                <Text style={styles.headerTitle}>
+                  Creator
                 </Text>
                 {!readonly ? (
-                  <TouchableOpacity onPress={() => setShowAccountModal(true)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
+                  <TouchableOpacity onPress={() => setShowAccountModal(true)} style={styles.headerButton}>
                     <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
                   </TouchableOpacity>
                 ) : (
-                  <View style={{ width: 32 }} />
+                  <View style={styles.headerButton} />
                 )}
               </View>
               <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}>
-                {/* Profile Card */}
-                <View style={styles.profileCard}>
-                  {/* Cover block */}
-                  <View style={styles.coverBlock}>
-                    {!readonly && (
-                      <TouchableOpacity style={styles.coverCameraBtn}>
-                        <Ionicons name="camera" size={18} color="#FF6B2C" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                  {/* Avatar - left aligned and overlapping cover */}
-                  <View style={styles.avatarRow}>
-                    <View style={styles.avatarOuterWrapper}>
-                      <View style={styles.avatarWrapper}>
-                        <Image source={{ uri: creatorProfile?.profile_image_url || creatorProfile?.user?.profile_image_url || 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
-                      </View>
+                {/* Cover Image and Avatar */}
+                <View style={styles.coverContainer}>
+                  <Image 
+                    key={coverImageKey}
+                    source={{ 
+                      uri: creatorProfile?.cover_image_url || 
+                            creatorProfile?.user?.cover_image_url || 
+                            user?.cover_image_url || 
+                            'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80' 
+                    }} 
+                    style={styles.coverImage}
+                  />
+                  {/* Avatar and Info Row */}
+                  <View style={styles.avatarInfoRow}>
+                    <View style={styles.avatarWrapper}>
+                      <Image source={{ uri: creatorProfile?.profile_image_url || creatorProfile?.user?.profile_image_url || 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
                       {!readonly && (
                         <TouchableOpacity style={styles.avatarEditBtn}>
-                          <Ionicons name="pencil" size={12} color="#fff" />
+                          <Ionicons name="pencil" size={12} color="#f8f4e8" />
                         </TouchableOpacity>
                       )}
                     </View>
-                    <View style={styles.avatarSpacer} />
                   </View>
-                  {/* Info Card - left aligned below avatar */}
-                  <View style={styles.infoCard}>
-                    <View style={styles.infoNameRow}>
-                      <Text style={[styles.infoName, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">{creatorProfile?.name || creatorProfile?.user?.name || 'Creator Name'}</Text>
-                      {!readonly && (
-                        <Ionicons name="chevron-forward" size={18} color="#1A1D1F" />
-                      )}
-                    </View>
-                    <View style={styles.infoRow}>
-                      <Ionicons name="male" size={15} color="#B0B0B0" style={styles.infoIcon} />
-                      <Text style={styles.infoText}>{creatorProfile?.gender || 'Not specified'}</Text>
-                    </View>
-                    <View style={styles.infoRow}>
-                      <Ionicons name="calendar-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-                      <Text style={styles.infoText}>
-                        {(() => {
-                          console.log('🔍 Debug: Calculating age for date_of_birth:', creatorProfile?.date_of_birth);
-                          const age = calculateAge(creatorProfile?.date_of_birth);
-                          console.log('🔍 Debug: Calculated age:', age);
-                          return age ? `${age} years old` : 'Age not specified';
-                        })()}
-                      </Text>
-                    </View>
-                    <View style={styles.infoRow}><Ionicons name="location-outline" size={15} color="#B0B0B0" style={styles.infoIcon} /><Text style={styles.infoText}>{creatorProfile?.location_state ? `${creatorProfile.location_state}, ` : ''}{creatorProfile?.location_city || 'City'}{creatorProfile?.location_pincode ? ` ${creatorProfile.location_pincode}` : ''}</Text></View>
-                    <View style={styles.infoRow}>
-                      <Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
-                      <Text style={styles.infoText}>
-                        {(() => {
-                          console.log('🔍 Debug: Languages in render:', creatorProfile?.languages);
-                          console.log('🔍 Debug: Languages type in render:', typeof creatorProfile?.languages);
-                          console.log('🔍 Debug: Languages is array in render:', Array.isArray(creatorProfile?.languages));
-                          console.log('🔍 Debug: Languages length in render:', creatorProfile?.languages?.length);
-                          return creatorProfile?.languages && Array.isArray(creatorProfile.languages) && creatorProfile.languages.length > 0 ? creatorProfile.languages.join(', ') : 'Languages not specified';
-                        })()}
-                      </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                      <Ionicons name="star" size={15} color="#FFD600" style={{ marginRight: 4 }} />
-                      {(!creatorProfile?.rating || isNaN(Number(creatorProfile.rating)) || Number(creatorProfile.rating) === 0) ? (
-                        <Text style={{ color: '#6B7280', fontSize: 14 }}>No ratings yet</Text>
-                      ) : (
-                        <Text style={{ color: '#6B7280', fontSize: 14 }}>{Number(creatorProfile.rating).toFixed(1)}</Text>
-                      )}
-                    </View>
-                  </View>
+                  {/* Cover camera */}
+                  {!readonly && (
+                    <TouchableOpacity 
+                      style={styles.coverEditBtn}
+                      onPress={handleCoverImageUpload}
+                    >
+                      <Ionicons name="camera" size={18} color="#f8f4e8" />
+                    </TouchableOpacity>
+                  )}
                 </View>
-                {/* Divider */}
-                <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
-                {/* Categories */}
-                <View style={{ marginHorizontal: 16 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#1A1D1F' }}>Categories</Text>
-                    {!readonly && (
-                      <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+                <View style={{ height: 8 }} />
+                {/* User Info */}
+                <View style={styles.infoSection}>
+                  <Text style={styles.name}>{creatorProfile?.name || creatorProfile?.user?.name || 'Creator Name'}</Text>
+                  <View style={styles.infoRowIcon}>
+                    <Ionicons name="person-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
+                    <Text style={styles.infoGray}>{creatorProfile?.gender || 'Gender not specified'}</Text>
+                  </View>
+                  <View style={styles.infoRowIcon}>
+                    <Ionicons name="calendar-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
+                    <Text style={styles.infoGray}>
+                      {(() => {
+                        const age = calculateAge(creatorProfile?.date_of_birth);
+                        return age ? `${age} years old` : 'Age not specified';
+                      })()}
+                    </Text>
+                  </View>
+                  <View style={styles.infoRowIcon}>
+                    <Ionicons name="location-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
+                    <Text style={styles.infoGray}>
+                      {creatorProfile?.location_state ? `${creatorProfile.location_state}, ` : ''}
+                      {creatorProfile?.location_city || 'City'}
+                      {creatorProfile?.location_pincode ? ` ${creatorProfile.location_pincode}` : ''}
+                    </Text>
+                  </View>
+                  <View style={styles.infoRowIcon}>
+                    <Ionicons name="language-outline" size={15} color="#B0B0B0" style={styles.infoIcon} />
+                    <Text style={styles.infoGray}>
+                      {creatorProfile?.languages && Array.isArray(creatorProfile.languages) && creatorProfile.languages.length > 0 
+                        ? creatorProfile.languages.join(', ') 
+                        : 'Languages not specified'}
+                    </Text>
+                  </View>
+                  <View style={styles.ratingRow}>
+                    {creatorProfile?.rating && Number(creatorProfile.rating) > 0 ? (
+                      <>
+                        <Text style={styles.ratingValue}>{Number(creatorProfile.rating).toFixed(1)}</Text>
+                        <Ionicons name="star" size={16} color="#FFD600" />
+                        <Ionicons name="star" size={16} color="#FFD600" />
+                        <Ionicons name="star" size={16} color="#FFD600" />
+                        <Ionicons name="star" size={16} color="#FFD600" />
+                        <Ionicons name="star" size={16} color="#FFD600" />
+                      </>
+                    ) : (
+                      <>
+                        <Text style={styles.ratingValue}>No ratings yet</Text>
+                        <Ionicons name="star" size={16} color="#B0B0B0" />
+                      </>
                     )}
                   </View>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 }}>
-                    {creatorProfile?.content_categories?.length
-                      ? creatorProfile.content_categories.map((cat: string, index: number) => (
-                          <View key={cat} style={{ backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, marginRight: 8, marginBottom: 8 }}>
-                            <Text style={{ color: '#000', fontSize: 14, fontWeight: '500' }}>{cat}</Text>
+                </View>
+                <View style={styles.divider} />
+                {/* Categories */}
+                <TouchableOpacity style={styles.sectionRow}>
+                  <Text style={styles.sectionTitle}>CATEGORIES</Text>
+                  {!readonly && (
+                    <Ionicons name="chevron-forward" size={18} color="#6B7280" style={{ marginBottom: 6 }} />
+                  )}
+                </TouchableOpacity>
+                <View style={styles.categoryRow}>
+                  {creatorProfile?.content_categories?.length > 0 ? creatorProfile.content_categories.map((cat: string, index: number) => (
+                    <View 
+                      key={cat} 
+                      style={[
+                        styles.categoryChip,
+                        { backgroundColor: index % 2 === 0 ? COLORS.chipBlue : COLORS.chipYellow }
+                      ]}
+                    >
+                      <Text style={[styles.categoryText, { color: '#000' }]}>{cat}</Text>
+                    </View>
+                  )) : (
+                    <View style={styles.categoryChip}>
+                      <Text style={[styles.categoryText, { color: '#6B7280' }]}>No categories specified</Text>
+                    </View>
+                  )}
+                </View>
+                <View style={styles.divider} />
+                {/* Social Media Platforms */}
+                <TouchableOpacity style={styles.sectionRow}>
+                  <Text style={styles.sectionTitle}>SOCIAL MEDIA</Text>
+                  {!readonly && (
+                    <Ionicons name="chevron-forward" size={18} color="#6B7280" style={{ marginBottom: 6 }} />
+                  )}
+                </TouchableOpacity>
+                <View style={styles.categoryRow}>
+                  {creatorProfile?.platform?.length > 0 ? (
+                    creatorProfile.platform.map((platform: string, index: number) => {
+                      const platformData = getPlatformData(platform);
+                      return (
+                        <View key={platform} style={styles.socialPlatformCard}>
+                          <View style={[styles.platformIconContainer, { backgroundColor: platformData.color + '20' }]}>
+                            <Ionicons name={platformData.icon as any} size={20} color={platformData.color} />
                           </View>
-                        ))
-                      : categories.map((cat, index) => (
-                          <View key={cat} style={{ backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D', paddingHorizontal: 12, paddingVertical: 6, marginRight: 8, marginBottom: 8 }}>
-                            <Text style={{ color: '#000', fontSize: 14, fontWeight: '500' }}>{cat}</Text>
+                          <Text style={styles.platformName}>{platform}</Text>
+                          <Text style={styles.followerCount}>{getRandomFollowerCount()}</Text>
+                        </View>
+                      );
+                    })
+                  ) : (
+                    // Show default platforms if none selected
+                    ['Instagram', 'YouTube', 'Facebook'].map((platform, index) => {
+                      const platformData = getPlatformData(platform);
+                      return (
+                        <View key={platform} style={styles.socialPlatformCard}>
+                          <View style={[styles.platformIconContainer, { backgroundColor: platformData.color + '20' }]}>
+                            <Ionicons name={platformData.icon as any} size={20} color={platformData.color} />
                           </View>
-                        ))}
-                  </View>
+                          <Text style={styles.platformName}>{platform}</Text>
+                          <Text style={styles.followerCount}>{getRandomFollowerCount()}</Text>
+                        </View>
+                      );
+                    })
+                  )}
                 </View>
                 {/* Divider */}
                 <View style={{ height: 1, backgroundColor: '#E5E7EB', marginVertical: 18, marginHorizontal: 16 }} />
@@ -568,6 +628,8 @@ const CreatorProfile = () => {
                   </View>
                   <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 22, marginBottom: 16 }}>{creatorProfile?.bio || 'No bio available yet.'}</Text>
                 </View>
+
+
                 
                 {/* Tabs */}
                 <View style={styles.tabRow}>
@@ -598,7 +660,7 @@ const CreatorProfile = () => {
                         {!readonly && (
                           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24, paddingHorizontal: 16 }}>
                             <TouchableOpacity style={styles.addPortfolioBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
-                              <Ionicons name="add" size={20} color="#FF6B2C" />
+                              <Ionicons name="add" size={20} color="#f37135" />
                               <Text style={styles.addPortfolioBtnText}>Create Package</Text>
                             </TouchableOpacity>
                           </View>
@@ -609,11 +671,13 @@ const CreatorProfile = () => {
                             <PackageCard 
                               key={pkg.id || index} 
                               item={pkg} 
+                              creatorId={creatorProfile.id}
+                              creatorName={creatorProfile.name || creatorProfile.username}
+                              creatorImage={creatorProfile.profile_image}
                               onEdit={handleEditPackage} 
                               onDelete={loadCreatorProfile} 
                               onShowOverlay={setShowDeleteOverlay}
                               readonly={readonly}
-                              onAddToCart={readonly ? handleAddToCart : undefined}
                             />
                           ))}
                         </ScrollView>
@@ -626,7 +690,7 @@ const CreatorProfile = () => {
                         {!readonly && (
                           <TouchableOpacity style={styles.createPackageBtn} onPress={() => dispatch(setShowCreatePackage(true))}>
                             <Text style={styles.createPackageBtnText}>Create Package</Text>
-                            <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
+                            <Ionicons name="arrow-forward" size={16} color="#f37135" />
                           </TouchableOpacity>
                         )}
                       </View>
@@ -639,7 +703,7 @@ const CreatorProfile = () => {
                           <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F' }}>Portfolio Items</Text>
                           {!readonly && (
                             <TouchableOpacity style={styles.addPortfolioBtn} onPress={openCreatePortfolio}>
-                              <Ionicons name="add" size={20} color="#FF6B2C" />
+                              <Ionicons name="add" size={20} color="#f37135" />
                               <Text style={styles.addPortfolioBtnText}>Add Files</Text>
                             </TouchableOpacity>
                           )}
@@ -663,7 +727,7 @@ const CreatorProfile = () => {
                                     resizeMode="cover"
                                   />
                                   <View style={styles.videoOverlay}>
-                                    <Ionicons name="play-circle" size={32} color="#fff" />
+                                    <Ionicons name="play-circle" size={32} color="#f8f4e8" />
                                   </View>
                                 </View>
                               ) : (
@@ -705,7 +769,7 @@ const CreatorProfile = () => {
                         {!readonly && (
                           <TouchableOpacity style={styles.createPackageBtn} onPress={openCreatePortfolio}>
                             <Text style={styles.createPackageBtnText}>Add Files</Text>
-                            <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
+                            <Ionicons name="arrow-forward" size={16} color="#f37135" />
                           </TouchableOpacity>
                         )}
                       </View>
@@ -766,14 +830,14 @@ const CreatorProfile = () => {
 
               <Modal visible={showPaymentsModal} transparent animationType="slide" onRequestClose={() => setShowPaymentsModal(false)}>
                 <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
+                  <View style={{ backgroundColor: '#f8f4e8', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginBottom: 16, textAlign: 'center' }}>Payments</Text>
                     <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 24, textAlign: 'center' }}>Payment management features will be available soon.</Text>
                     <TouchableOpacity 
-                      style={{ backgroundColor: '#FF6B2C', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
+                      style={{ backgroundColor: '#f37135', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
                       onPress={() => setShowPaymentsModal(false)}
                     >
-                      <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Close</Text>
+                      <Text style={{ color: '#f8f4e8', fontSize: 16, fontWeight: '600' }}>Close</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -820,7 +884,7 @@ const CreatorProfile = () => {
                 <BottomNavBar 
                   navigation={navigation} 
                   currentRoute="home"
-                  onCartPress={readonly ? handleCartPress : undefined}
+                  onCartPress={readonly ? () => setShowCartModal(true) : undefined}
                 />
               )}
 
@@ -830,10 +894,6 @@ const CreatorProfile = () => {
                   <CartModal
                     visible={showCartModal}
                     onClose={() => setShowCartModal(false)}
-                    items={cartItems}
-                    onRemoveItem={handleRemoveCartItem}
-                    onUpdateQuantity={handleUpdateCartQuantity}
-                    onCheckout={handleCheckout}
                   />
 
                   {/* Overlay for cart modal */}
@@ -851,7 +911,30 @@ const CreatorProfile = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F8F9FB' },
+  safeArea: { flex: 1, backgroundColor: '#f8f4e8' },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8f4e8',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 16, // Will be added to insets.top in the component
+    paddingBottom: 12,
+    paddingHorizontal: 16,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1A1D1F',
+    textAlign: 'center',
+  },
+  headerButton: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   scrollContent: { paddingHorizontal: 20 },
   headerRow: {
     flexDirection: 'row',
@@ -863,7 +946,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -872,29 +955,19 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  headerTitle: { fontSize: 18, fontWeight: '600', color: '#1A1D1F' },
   // --- Profile Card Styles ---
-  profileCard: { marginTop: 8, backgroundColor: '#fff', borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
-  coverBlock: { height: 90, backgroundColor: '#FF6B2C', borderTopLeftRadius: 16, borderTopRightRadius: 16, justifyContent: 'flex-end', alignItems: 'flex-end', padding: 8 },
-  coverCameraBtn: { backgroundColor: '#fff', borderRadius: 16, padding: 4 },
+  profileCard: { marginTop: 8, backgroundColor: '#f8f4e8', borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  coverBlock: { height: 90, backgroundColor: '#f37135', borderTopLeftRadius: 16, borderTopRightRadius: 16, justifyContent: 'flex-end', alignItems: 'flex-end', padding: 8, position: 'relative' },
+  coverCameraBtn: { backgroundColor: '#f8f4e8', borderRadius: 16, padding: 4, zIndex: 1 },
   avatarRow: { flexDirection: 'row', alignItems: 'flex-end', marginTop: -40, paddingHorizontal: 16 },
   avatarOuterWrapper: { position: 'relative' },
-  avatarWrapper: { borderWidth: 3, borderColor: '#fff', borderRadius: 56, overflow: 'hidden', width: 90, height: 90, backgroundColor: '#eee' },
-  avatarImg: { width: 90, height: 90 },
-  avatarEditBtn: { position: 'absolute', bottom: 1, left: 6, backgroundColor: '#FF6B2C', borderRadius: 12, width: 24, height: 24, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#fff', zIndex: 2 },
   avatarSpacer: { flex: 1 },
   infoCard: { marginTop: -42, alignItems: 'flex-start', paddingHorizontal: 16, marginLeft: 100, marginBottom: 8 },
   infoNameRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
   infoName: { fontSize: 17, fontWeight: '700', color: '#1A1D1F' },
   infoNameArrow: { marginLeft: 4 },
   infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  infoIcon: { marginRight: 8 },
   infoText: { color: '#6B7280', fontSize: 14 },
-  divider: {
-    height: 1,
-    backgroundColor: '#E5E7EB',
-    marginBottom: 24,
-  },
   sectionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -930,12 +1003,12 @@ const styles = StyleSheet.create({
   },
   tabRow: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: COLORS.backgroundLight,
+    borderRadius: 20,
     padding: 4,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#FF6B2C',
+    borderColor: COLORS.borderLight,
   },
   tabBtn: {
     flex: 1,
@@ -947,18 +1020,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
-    borderRadius: 8,
-    backgroundColor: '#FF6B2C',
+    borderRadius: 20,
+    backgroundColor: COLORS.backgroundLight,
+    borderWidth: 1,
+    borderColor: COLORS.secondary,
   },
   tabBtnText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#6B7280',
+    color: COLORS.textGray,
   },
   tabBtnTextActive: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fff',
+    color: COLORS.secondary,
   },
   emptyState: {
     alignItems: 'center',
@@ -987,12 +1062,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     borderWidth: 1,
-    borderColor: '#FF6B2C',
+    borderColor: '#f37135',
     borderRadius: 18,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
   },
   createPackageBtnText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -1014,7 +1089,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   addPortfolioBtnText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,
@@ -1026,7 +1101,7 @@ const styles = StyleSheet.create({
   },
   portfolioItem: {
     width: '48%', // Two items per row
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderRadius: 12,
     marginBottom: 16,
     shadowColor: '#000',
@@ -1108,6 +1183,122 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#B0B0B0',
     marginTop: 8,
+  },
+  socialPlatformCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f4e8',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginRight: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  platformIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  platformName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A1D1F',
+    marginRight: 8,
+  },
+  followerCount: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  coverContainer: {
+    position: 'relative',
+    height: 200,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  coverImage: {
+    width: '100%',
+    height: '100%',
+  },
+  avatarInfoRow: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  avatarWrapper: {
+    position: 'relative',
+    marginRight: 12,
+  },
+  avatarImg: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 3,
+    borderColor: '#f8f4e8',
+  },
+  avatarEditBtn: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#f37135',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#f8f4e8',
+  },
+  coverEditBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoSection: {
+    marginBottom: 16,
+  },
+  name: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1A1D1F',
+    marginBottom: 8,
+  },
+  infoRowIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  infoIcon: { marginRight: 8 },
+  infoGray: { fontSize: 14, color: '#6B7280' },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  ratingValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A1D1F',
+    marginRight: 4,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginBottom: 24,
   },
 });
 

@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
-import { clearToken } from '../../services/storage';
+import { clearToken, clearAllData } from '../../services/storage';
 
 interface AccountModalProps {
   visible: boolean;
@@ -38,10 +38,10 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, onKycPres
           style: 'destructive',
           onPress: async () => {
             try {
-              // Clear stored token
-              await clearToken();
+              // Clear all stored data including user data and cover image
+              await clearAllData();
               
-              // Dispatch logout action
+              // Dispatch logout action to clear Redux state
               dispatch(logout());
               
               // Navigate to login screen
@@ -52,6 +52,8 @@ const AccountModal: React.FC<AccountModalProps> = ({ visible, onClose, onKycPres
               
               // Close the modal
               onClose();
+              
+              console.log('[AccountModal] Logout successful - all data cleared');
             } catch (error) {
               console.error('Logout error:', error);
               Alert.alert('Error', 'Failed to logout. Please try again.');
@@ -211,7 +213,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -261,7 +263,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderRadius: 12,
     padding: 2,
     borderWidth: 1,

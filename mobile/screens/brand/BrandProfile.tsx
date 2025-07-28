@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, StatusBar, Platform, Dimensions, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, StatusBar, Platform, Dimensions, Modal, Alert } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useAppSelector } from '../../store/hooks';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { updateUser } from '../../store/slices/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { BottomNavBar, AccountModal, CartModal } from '../../components';
@@ -12,6 +13,7 @@ import CreatePortfolioScreen from '../creator/CreatePortfolioScreen';
 import AnimatedModalOverlay from '../../components/AnimatedModalOverlay';
 import CustomDropdown from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
+import { imageService } from '../../services/imageService';
 
 // Safe parsing helper
 const safeParse = (value: any): string[] => {
@@ -32,8 +34,21 @@ const tabList = [
   { key: 'Portfolio', label: 'Portfolio' },
 ];
 
+import COLORS from '../../config/colors';
+
+// Color constants
+const COLORS_LOCAL = {
+  primary: COLORS.primary,
+  secondary: COLORS.secondary,
+  textDark: COLORS.textDark,
+  textGray: COLORS.textGray,
+  borderLight: COLORS.borderLight,
+  backgroundLight: COLORS.backgroundLight
+};
+
 const BrandProfile = () => {
   const user = useAppSelector(state => state.auth.user);
+  const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState('Campaigns');
@@ -49,6 +64,7 @@ const BrandProfile = () => {
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
   const [cartItems, setCartItems] = useState<any[]>([]);
+  const [coverImageKey, setCoverImageKey] = useState(0);
 
   useEffect(() => {
     loadBrandProfile();
@@ -71,19 +87,16 @@ const BrandProfile = () => {
   };
 
   const handleCheckout = () => {
-    // TODO: Implement checkout functionality
-    Alert.alert('Checkout', 'Checkout functionality will be implemented soon!');
+    // The checkout functionality is now handled in the CartModal
     setShowCartModal(false);
   };
 
   const loadBrandProfile = async (forceRefresh = false) => {
     try {
       setLoading(true);
-      console.log('🔍 Loading brand profile...', forceRefresh ? '(forced refresh)' : '');
       
       // Check if user is a creator user and prevent API call
       if (user && user.user_type === 'creator') {
-        console.log('🔍 User is a creator, preventing brand profile API call');
         setLoading(false);
         return;
       }
@@ -98,15 +111,6 @@ const BrandProfile = () => {
         const parsedLanguages = safeParse(profile.languages);
         const parsedCampaigns = Array.isArray(profile.campaigns) ? profile.campaigns : [];
         const parsedCollaborations = Array.isArray(profile.collaborations) ? profile.collaborations : [];
-        
-        console.log('🔍 Brand profile loaded successfully:', {
-          industries: parsedIndustries,
-          languages: parsedLanguages,
-          campaigns_count: parsedCampaigns.length,
-          collaborations_count: parsedCollaborations.length,
-          portfolio_items_count: profile.portfolio_items?.length || 0
-        });
-        console.log('🔍 Portfolio items:', profile.portfolio_items);
         
         setBrandProfile({
           ...profile,
@@ -124,7 +128,6 @@ const BrandProfile = () => {
       
       // Check if error is due to user type mismatch
       if (error.message && error.message.includes('User is not a brand')) {
-        console.log('🔍 User type mismatch detected, user should be on CreatorProfile');
         setLoading(false);
         return;
       }
@@ -154,14 +157,39 @@ const BrandProfile = () => {
     setShowPaymentsModal(true);
   };
 
+  // Handle cover image upload
+  const handleCoverImageUpload = async () => {
+    try {
+      const result = await imageService.showImageSourceOptions();
+      
+      if (result.success && result.coverImageUrl) {
+        // Update the user in Redux state with the new cover image URL
+        dispatch(updateUser({ cover_image_url: result.coverImageUrl }));
+        
+        // Update the cover image key to force re-render
+        setCoverImageKey(prev => prev + 1);
+        
+        // Refresh the profile to get updated data
+        await loadBrandProfile(true);
+        
+        Alert.alert('Success', 'Cover image updated successfully!');
+      } else if (result.error && result.error !== 'Cancelled') {
+        Alert.alert('Error', result.error);
+      }
+    } catch (error) {
+      console.error('🔍 Cover image upload error:', error);
+      Alert.alert('Error', 'Failed to upload cover image. Please try again.');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle='light-content' backgroundColor='#000' />
+      <StatusBar barStyle='dark-content' backgroundColor='#f8f4e8' />
       
       {/* Show error message for creator users */}
       {user && user.user_type === 'creator' && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-          <Ionicons name="alert-circle" size={64} color="#FF6B2C" />
+          <Ionicons name="alert-circle" size={64} color="#f37135" />
           <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
             Wrong Profile Type
           </Text>
@@ -174,45 +202,59 @@ const BrandProfile = () => {
         </View>
       )}
       
-      {/* Regular brand profile content */}
-      {(!user || user.user_type == 'brand') && (
-        <>
-          <ScrollView
-            ref={scrollViewRef}
-            contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}
-            onScroll={event => {
-              const y = event.nativeEvent.contentOffset.y;
-              setScrolled(y > 10);
-            }}
-            scrollEventThrottle={16}
-          >
-        {/* Header */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: insets.top + 16, paddingBottom: 12, paddingHorizontal: 16 }}>
-          <View style={{ width: 32 }} />
-          <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' }}>Brand Profile</Text>
-          <TouchableOpacity onPress={() => setShowAccountModal(true)} style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
-          </TouchableOpacity>
-        </View>
+             {/* Regular brand profile content */}
+       {(!user || user.user_type == 'brand') && (
+         <>
+           {/* Header - Fixed */}
+           <View style={[styles.headerContainer, { paddingTop: insets.top + 16 }]}>
+             <View style={styles.headerButton} />
+             <Text style={styles.headerTitle}>
+               Brand
+             </Text>
+             <TouchableOpacity onPress={() => setShowAccountModal(true)} style={styles.headerButton}>
+               <Ionicons name="ellipsis-vertical" size={24} color="#1A1D1F" />
+             </TouchableOpacity>
+           </View>
+           
+           <ScrollView
+             ref={scrollViewRef}
+             contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}
+             onScroll={event => {
+               const y = event.nativeEvent.contentOffset.y;
+               setScrolled(y > 10);
+             }}
+             scrollEventThrottle={16}
+           >
         {/* Cover Image and Avatar */}
         <View style={styles.coverContainer}>
-          <Image source={{ uri: (user && (user as any).coverUrl) ? (user as any).coverUrl : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80' }} style={styles.coverImage} />
+          <Image 
+            key={coverImageKey}
+            source={{ 
+              uri: user?.cover_image_url || 
+                    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80' 
+            }} 
+            style={styles.coverImage} 
+          />
           {/* Avatar and Info Row */}
           <View style={styles.avatarInfoRow}>
             <View style={styles.avatarWrapper}>
               <Image source={{ uri: (user && (user as any).avatarUrl) ? (user as any).avatarUrl : 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
               <TouchableOpacity style={styles.avatarEditBtn}>
-                <Ionicons name="pencil" size={12} color="#fff" />
+                <Ionicons name="pencil" size={12} color="#f8f4e8" />
               </TouchableOpacity>
             </View>
             
           </View>
           {/* Cover camera */}
-          <TouchableOpacity style={styles.coverEditBtn}>
-            <Ionicons name="camera" size={18} color="#fff" />
+          <TouchableOpacity 
+            style={styles.coverEditBtn}
+            onPress={handleCoverImageUpload}
+          >
+            <Ionicons name="camera" size={18} color="#f8f4e8" />
           </TouchableOpacity>
+          
         </View>
-        <View style={{ height: 24 }} />
+        <View style={{ height: 8 }} />
         {/* User Info */}
         <View style={styles.infoSection}>
           <Text style={styles.name}>{brandProfile?.company_name || user?.name || 'Brand Name'}</Text>
@@ -247,7 +289,6 @@ const BrandProfile = () => {
             <View style={styles.verifiedTag}>
               <Text style={styles.verifiedText}>{brandProfile?.verified ? 'Verified Brand' : 'Unverified Brand'}</Text>
             </View>
-            <Text style={[styles.infoGray, { alignSelf: 'center' }]}> • {brandProfile?.company_size || 'Company size not specified'}</Text>
           </View>
           <View style={styles.ratingRow}>
             {brandProfile?.rating && Number(brandProfile.rating) > 0 ? (
@@ -279,7 +320,7 @@ const BrandProfile = () => {
               key={industry} 
               style={[
                 styles.categoryChip,
-                { backgroundColor: index % 2 === 0 ? '#B1E5FC' : '#FFD88D' }
+                { backgroundColor: index % 2 === 0 ? COLORS.chipBlue : COLORS.chipYellow }
               ]}
             >
               <Text style={[styles.categoryText, { color: '#000' }]}>{industry}</Text>
@@ -324,25 +365,22 @@ const BrandProfile = () => {
             <View style={styles.emptyState}>
               <Ionicons name="hourglass-outline" size={48} color="#B0B0B0" style={{ marginBottom: 8 }} />
               <Text style={styles.emptyTitle}>There are no Campaigns created yet!</Text>
-              <Text style={styles.emptyDesc}>To connect with creators and promote your brand, you need to create campaigns for your marketing needs.</Text>
+              <Text style={styles.emptyDesc}>To connect with creators and promote your brand, you need to create campaigns.</Text>
               <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowCreateCampaign(true)}>
                 <Text style={styles.createPackageBtnText}>Create Campaign</Text>
-                <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
+                <Ionicons name="arrow-forward" size={16} color="#f37135" />
               </TouchableOpacity>
             </View>
           )}
           {activeTab === 'Portfolio' && (
             (() => {
-              console.log('🔍 Portfolio tab - brandProfile:', !!brandProfile);
-              console.log('🔍 Portfolio tab - portfolio_items:', brandProfile?.portfolio_items);
-              console.log('🔍 Portfolio tab - length:', brandProfile?.portfolio_items?.length);
               return brandProfile?.portfolio_items?.length > 0;
             })() ? (
               <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F' }}>Portfolio Items</Text>
                   <TouchableOpacity style={styles.addPortfolioBtn} onPress={() => setShowCreatePortfolio(true)}>
-                    <Ionicons name="add" size={20} color="#FF6B2C" />
+                    <Ionicons name="add" size={20} color="#f37135" />
                     <Text style={styles.addPortfolioBtnText}>Add Files</Text>
                   </TouchableOpacity>
                 </View>
@@ -365,7 +403,7 @@ const BrandProfile = () => {
                             resizeMode="cover"
                           />
                           <View style={styles.videoOverlay}>
-                            <Ionicons name="play-circle" size={32} color="#fff" />
+                            <Ionicons name="play-circle" size={32} color="#f8f4e8" />
                           </View>
                         </View>
                       ) : (
@@ -387,7 +425,7 @@ const BrandProfile = () => {
                 <Text style={styles.emptyDesc}>To showcase your brand work, you need to add your portfolio files and collaborations.</Text>
                 <TouchableOpacity style={styles.createPackageBtn} onPress={() => setShowCreatePortfolio(true)}>
                   <Text style={styles.createPackageBtnText}>Add Files</Text>
-                  <Ionicons name="arrow-forward" size={16} color="#FF6B2C" />
+                  <Ionicons name="arrow-forward" size={16} color="#f37135" />
                 </TouchableOpacity>
               </View>
             )
@@ -441,14 +479,14 @@ const BrandProfile = () => {
 
       <Modal visible={showPaymentsModal} transparent animationType="slide" onRequestClose={() => setShowPaymentsModal(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
+          <View style={{ backgroundColor: '#f8f4e8', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginBottom: 16, textAlign: 'center' }}>Payments</Text>
             <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 24, textAlign: 'center' }}>Payment management features will be available soon.</Text>
             <TouchableOpacity 
-              style={{ backgroundColor: '#FF6B2C', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
+              style={{ backgroundColor: '#f37135', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
               onPress={() => setShowPaymentsModal(false)}
             >
-              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Close</Text>
+              <Text style={{ color: '#f8f4e8', fontSize: 16, fontWeight: '600' }}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -490,7 +528,25 @@ const BrandProfile = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F8F9FB' },
+  safeArea: { flex: 1, backgroundColor: '#f8f4e8' },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8f4e8',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 16, // Will be added to insets.top in the component
+    paddingBottom: 12,
+    paddingHorizontal: 16,
+  },
+
+  headerButton: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   scrollContent: { paddingHorizontal: 20 },
   headerRow: {
     flexDirection: 'row',
@@ -502,7 +558,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -511,13 +567,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  headerTitle: { fontSize: 18, fontWeight: '600', color: '#1A1D1F' },
+  headerTitle: { fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' },
   coverContainer: {
     position: 'relative',
     height: 200,
     borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   coverImage: {
     width: '100%',
@@ -539,7 +595,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     borderWidth: 3,
-    borderColor: '#fff',
+    borderColor: '#f8f4e8',
   },
   avatarEditBtn: {
     position: 'absolute',
@@ -548,11 +604,11 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: '#f8f4e8',
   },
   coverEditBtn: {
     position: 'absolute',
@@ -566,7 +622,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   infoSection: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   name: {
     fontSize: 24,
@@ -590,7 +646,7 @@ const styles = StyleSheet.create({
   },
   verifiedText: {
     fontSize: 12,
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
   },
   ratingRow: {
@@ -644,12 +700,12 @@ const styles = StyleSheet.create({
   },
   tabRow: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: COLORS.backgroundLight,
+    borderRadius: 20,
     padding: 4,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#FF6B2C',
+    borderColor: COLORS.borderLight,
   },
   tabBtn: {
     flex: 1,
@@ -661,18 +717,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
-    borderRadius: 8,
-    backgroundColor: '#FF6B2C',
+    borderRadius: 20,
+    backgroundColor: COLORS.backgroundLight,
+    borderWidth: 1,
+    borderColor: COLORS.secondary,
   },
   tabBtnText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#6B7280',
+    color: COLORS.textGray,
   },
   tabBtnTextActive: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fff',
+    color: COLORS.secondary,
   },
   emptyState: {
     alignItems: 'center',
@@ -692,21 +750,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     paddingHorizontal: 20,
   },
-  createPackageBtn: {
-    flexDirection: 'row',
-    height: 36,
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#FF6B2C',
-    borderRadius: 18,
-    backgroundColor: '#F8F9FB',
-  },
+     createPackageBtn: {
+     flexDirection: 'row',
+     height: 36,
+     paddingHorizontal: 20,
+     paddingVertical: 8,
+     justifyContent: 'center',
+     alignItems: 'center',
+     gap: 8,
+     borderWidth: 1,
+     borderColor: '#f37135',
+     borderRadius: 18,
+     backgroundColor: '#f8f4e8',
+   },
   createPackageBtnText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -719,7 +777,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   addPortfolioBtnText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,
@@ -731,11 +789,11 @@ const styles = StyleSheet.create({
   },
   portfolioItem: {
     width: '48%', // Two items per row
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderRadius: 12,
     marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 1,

@@ -94,6 +94,7 @@ const EditPackageScreen: React.FC<EditPackageScreenProps> = ({ package: pkg, onC
             onChangeText={setRevisions}
             keyboardType="numeric"
             placeholder="Enter revisions"
+            placeholderTextColor="#B0B0B0"
           />
         </View>
 
@@ -129,6 +130,7 @@ const EditPackageScreen: React.FC<EditPackageScreenProps> = ({ package: pkg, onC
             onChangeText={setPrice}
             keyboardType="numeric"
             placeholder="Enter price"
+            placeholderTextColor="#B0B0B0"
           />
         </View>
 
@@ -140,6 +142,7 @@ const EditPackageScreen: React.FC<EditPackageScreenProps> = ({ package: pkg, onC
             value={description}
             onChangeText={setDescription}
             placeholder="Enter description"
+            placeholderTextColor="#B0B0B0"
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -163,7 +166,7 @@ const EditPackageScreen: React.FC<EditPackageScreenProps> = ({ package: pkg, onC
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
   },
   header: {
     flexDirection: 'row',
@@ -171,7 +174,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
   },
@@ -202,23 +205,33 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   textInput: {
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: '#D1D5DB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   textArea: {
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: '#D1D5DB',
     minHeight: 100,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   durationRow: {
     flexDirection: 'row',
@@ -232,33 +245,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     gap: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopWidth: 1,
     borderTopColor: '#E5E5E5',
   },
   cancelButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#FF6B2C',
+    borderColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
   },
   cancelButtonText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontSize: 16,
     fontWeight: '600',
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
   },
   saveButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontSize: 16,
     fontWeight: '600',
   },

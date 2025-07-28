@@ -5,7 +5,7 @@ export const ENV = {
   // API Configuration
   
   API_BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3002',
-  GOOGLE_CLIENT_ID: extra.googleClientId || '',
+  GOOGLE_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '',
   GOOGLE_CLIENT_ID_ANDROID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '',
   GOOGLE_CLIENT_ID_IOS: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || '',
   // Google OAuth
@@ -30,6 +30,7 @@ export const API_ENDPOINTS = {
   // Profile endpoints
   UPDATE_BASIC_INFO: `${ENV.API_BASE_URL}/api/profile/update-basic-info`,
   UPDATE_PREFERENCES: `${ENV.API_BASE_URL}/api/profile/update-preferences`,
+  UPDATE_COVER_IMAGE: `${ENV.API_BASE_URL}/api/profile/update-cover-image`,
   GET_INDUSTRIES: `${ENV.API_BASE_URL}/api/profile/industries`,
   CREATE_PACKAGE: `${ENV.API_BASE_URL}/api/profile/create-package`,
   UPDATE_PACKAGE: `${ENV.API_BASE_URL}/api/profile/update-package`,
@@ -45,6 +46,11 @@ export const API_ENDPOINTS = {
   GET_CREATORS: `${ENV.API_BASE_URL}/api/profile/creators`,
   GET_CREATOR_BY_PLATFORM: `${ENV.API_BASE_URL}/api/profile/creators`,
   GET_CREATOR_PROFILE_BY_ID: `${ENV.API_BASE_URL}/api/profile/creators`,
+  
+  // Orders endpoints
+  GET_ORDERS: `${ENV.API_BASE_URL}/api/orders`,
+  GET_ORDER_DETAILS: `${ENV.API_BASE_URL}/api/orders`,
+  CHECKOUT_ORDERS: `${ENV.API_BASE_URL}/api/orders/checkout`,
   
   // Health check
   HEALTH: `${ENV.API_BASE_URL}/api/health`,

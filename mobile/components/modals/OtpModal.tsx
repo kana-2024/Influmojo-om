@@ -133,7 +133,7 @@ const OtpModal: React.FC<OtpModalProps> = ({ visible, onClose, onSuccess, phone 
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color="#f8f4e8" />
               ) : (
                 <Text style={styles.verifyButtonText}>Verify</Text>
               )}
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     top: '50%',
     left: '50%',
     transform: [{ translateX: -200 }, { translateY: -200 }],
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderRadius: 16,
     width: '90%',
     maxWidth: 400,
@@ -188,12 +188,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   otpInput: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     fontSize: 16,
     marginBottom: 16,
     textAlign: 'center',
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   },
   resendButton: {
     fontSize: 14,
-    color: '#FF6B2C',
+    color: '#f37135',
     fontWeight: '600',
   },
   timerText: {
@@ -219,13 +219,13 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
   verifyButton: {
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#FD5D27',
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
   },
   verifyButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontSize: 16,
     fontWeight: '600',
   },

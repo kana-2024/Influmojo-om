@@ -26,17 +26,27 @@ const CreatorSection: React.FC<CreatorSectionProps> = ({
   return (
     <View style={{ marginBottom: 24 }}>
       {/* Section Header */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#222222' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#222222' }}>
           {formatPlatformName(platform)} Creators
         </Text>
         <TouchableOpacity onPress={onViewAllPress}>
-          <Text style={{ fontSize: 12, color: '#000' }}>view all</Text>
+          <Text style={{ fontSize: 14, color: '#000' }}>view all</Text>
         </TouchableOpacity>
       </View>
 
       {/* Creators ScrollView */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingRight: 16 }}
+        decelerationRate="fast"
+        snapToInterval={200}
+        snapToAlignment="start"
+        bounces={false}
+        alwaysBounceHorizontal={false}
+        nestedScrollEnabled={true}
+      >
         {creators.map((creator: any, index: number) => (
           <CreatorCard
             key={`${creator.id}-${index}`}

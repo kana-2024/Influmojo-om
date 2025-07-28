@@ -14,6 +14,28 @@ export default {
     assetBundlePatterns: [
       "**/*"
     ],
+    fonts: [
+      {
+        asset: "./assets/fonts/Poppins-Regular.ttf",
+        family: "Poppins-Regular"
+      },
+      {
+        asset: "./assets/fonts/Poppins-Medium.ttf",
+        family: "Poppins-Medium"
+      },
+      {
+        asset: "./assets/fonts/Poppins-SemiBold.ttf",
+        family: "Poppins-SemiBold"
+      },
+      {
+        asset: "./assets/fonts/Poppins-Bold.ttf",
+        family: "Poppins-Bold"
+      },
+      {
+        asset: "./assets/fonts/Alice-Italic.ttf",
+        family: "Alice-Italic"
+      }
+    ],
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.influmojo.mobile",
@@ -40,7 +62,7 @@ export default {
     ],
     extra: {
       eas: {
-        projectId: "18ad0b63-061b-4159-ac61-9eedeada6db4"
+        projectId: "80855753-b803-446e-899a-7c9c53714b64"
       },
       apiBaseUrl: process.env.EXPO_PUBLIC_API_URL,
       googleClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID

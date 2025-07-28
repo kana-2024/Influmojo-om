@@ -20,14 +20,14 @@ const GoogleVerificationModal: React.FC<GoogleVerificationModalProps> = ({
     >
       <View style={styles.modal}>
           <View style={styles.iconContainer}>
-            <Ionicons name="mail" size={48} color="#FF6B2C" />
+            <Ionicons name="mail" size={48} color="#f37135" />
           </View>
           <Text style={styles.title}>Verifying Email</Text>
           <Text style={styles.subtitle}>
             Please wait while we verify your email address with Google...
           </Text>
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#FF6B2C" />
+            <ActivityIndicator size="large" color="#f37135" />
             <Text style={styles.loadingText}>Verifying...</Text>
           </View>
         </View>
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     top: '50%',
     left: '50%',
     transform: [{ translateX: -150 }, { translateY: -100 }],
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: '#FF6B2C',
+    color: '#f37135',
     fontWeight: '600',
     marginTop: 12,
   },

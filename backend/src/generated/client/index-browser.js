@@ -129,6 +129,7 @@ exports.Prisma.UserScalarFieldEnum = {
   first_name: 'first_name',
   last_name: 'last_name',
   profile_image_url: 'profile_image_url',
+  cover_image_url: 'cover_image_url',
   phone: 'phone',
   timezone: 'timezone',
   language: 'language',
@@ -290,6 +291,7 @@ exports.Prisma.ContentReviewScalarFieldEnum = {
 
 exports.Prisma.PaymentScalarFieldEnum = {
   id: 'id',
+  order_id: 'order_id',
   collaboration_id: 'collaboration_id',
   payer_id: 'payer_id',
   payee_id: 'payee_id',
@@ -308,6 +310,7 @@ exports.Prisma.PaymentScalarFieldEnum = {
 
 exports.Prisma.InvoiceScalarFieldEnum = {
   id: 'id',
+  order_id: 'order_id',
   collaboration_id: 'collaboration_id',
   brand_id: 'brand_id',
   creator_id: 'creator_id',
@@ -408,14 +411,30 @@ exports.Prisma.CollaborationChannelScalarFieldEnum = {
 
 exports.Prisma.PackageScalarFieldEnum = {
   id: 'id',
-  collaboration_id: 'collaboration_id',
-  admin_id: 'admin_id',
+  creator_id: 'creator_id',
   type: 'type',
   title: 'title',
   description: 'description',
   price: 'price',
+  currency: 'currency',
   deliverables: 'deliverables',
-  created_at: 'created_at'
+  is_active: 'is_active',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.OrderScalarFieldEnum = {
+  id: 'id',
+  package_id: 'package_id',
+  brand_id: 'brand_id',
+  creator_id: 'creator_id',
+  quantity: 'quantity',
+  total_amount: 'total_amount',
+  currency: 'currency',
+  status: 'status',
+  order_date: 'order_date',
+  completed_at: 'completed_at',
+  rejection_message: 'rejection_message'
 };
 
 exports.Prisma.PhoneVerificationScalarFieldEnum = {
@@ -627,6 +646,15 @@ exports.PackageType = exports.$Enums.PackageType = {
   custom: 'custom'
 };
 
+exports.OrderStatus = exports.$Enums.OrderStatus = {
+  pending: 'pending',
+  confirmed: 'confirmed',
+  in_progress: 'in_progress',
+  completed: 'completed',
+  cancelled: 'cancelled',
+  refunded: 'refunded'
+};
+
 exports.KYCStatus = exports.$Enums.KYCStatus = {
   pending: 'pending',
   verified: 'verified',
@@ -660,6 +688,7 @@ exports.Prisma.ModelName = {
   PlatformSetting: 'PlatformSetting',
   CollaborationChannel: 'CollaborationChannel',
   Package: 'Package',
+  Order: 'Order',
   PhoneVerification: 'PhoneVerification',
   KYC: 'KYC',
   PortfolioItem: 'PortfolioItem'

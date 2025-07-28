@@ -9,6 +9,7 @@ interface User {
   firstName?: string;
   lastName?: string;
   profileImage?: string;
+  cover_image_url?: string;
   isVerified?: boolean;
   user_type?: string;
   auth_provider?: string;
@@ -49,10 +50,6 @@ const initialState: AuthState = {
   user: null,
   userType: null,
 };
-
-
-
-
 
 const authSlice = createSlice({
   name: 'auth',
@@ -99,8 +96,19 @@ const authSlice = createSlice({
       state.userType = null;
       state.error = null;
     },
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        // Merge the updated user data, ensuring cover_image_url is preserved
+        state.user = { 
+          ...state.user, 
+          ...action.payload,
+          // Ensure cover_image_url is properly updated if provided
+          ...(action.payload.cover_image_url && { cover_image_url: action.payload.cover_image_url })
+        };
+        console.log('[authSlice] User updated with cover image:', action.payload.cover_image_url);
+      }
+    },
   },
-  
 });
 
 export const {
@@ -113,6 +121,7 @@ export const {
   loginSuccess,
   signupFailure,
   logout,
+  updateUser,
 } = authSlice.actions;
 
 export default authSlice.reducer; 

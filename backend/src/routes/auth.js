@@ -9,6 +9,37 @@ const asyncHandler = require('../utils/asyncHandler');
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// Middleware to verify JWT token and attach user info
+const authenticateToken = (req, res, next) => {
+  // Allow bypass for testing in development
+  if (req.headers['x-bypass-auth'] === 'true' && process.env.NODE_ENV !== 'production') {
+    req.user = {
+      id: BigInt(1), // Use a default user ID for testing
+      user_type: 'brand' // Default to brand for testing
+    };
+    req.userId = '1'; // Also set userId for compatibility
+    return next();
+  }
+  
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    req.user = {
+      id: BigInt(decoded.userId),
+      user_type: decoded.user_type || 'creator' // Default to creator if not specified
+    };
+    req.userId = decoded.userId; // Also set userId for compatibility
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+};
+
 // Google OAuth client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -28,9 +59,9 @@ const validateRequest = (req, res, next) => {
 };
 
 // Generate JWT token
-const generateToken = (userId) => {
+const generateToken = (userId, userType = 'creator') => {
   return jwt.sign(
-    { userId: userId.toString(), iat: Date.now() },
+    { userId: userId.toString(), user_type: userType, iat: Date.now() },
     process.env.JWT_SECRET || 'your-secret-key',
     { expiresIn: '7d' }
   );
@@ -175,7 +206,7 @@ router.post('/google-mobile', [
     }
 
     // Generate JWT token
-    const token = generateToken(user.id);
+    const token = generateToken(user.id, user.user_type);
 
     res.json({
       success: true,
@@ -187,6 +218,7 @@ router.post('/google-mobile', [
         email: user.email,
         name: user.name,
         profileImage: user.profile_image_url,
+        cover_image_url: user.cover_image_url,
         isVerified: user.email_verified,
         user_type: user.user_type
       },
@@ -608,7 +640,7 @@ router.post('/verify-phone-code', [
     }
 
     // Generate JWT token
-    const token = generateToken(user.id);
+    const token = generateToken(user.id, user.user_type);
 
     res.json({
       success: true,
@@ -617,6 +649,8 @@ router.post('/verify-phone-code', [
         id: user.id.toString(),
         phone: user.phone,
         name: user.name,
+        profileImage: user.profile_image_url,
+        cover_image_url: user.cover_image_url,
         isVerified: user.phone_verified,
         user_type: user.user_type // Add user_type to response
       },
@@ -658,7 +692,9 @@ router.post('/update-name', [
         id: user.id.toString(),
         name: user.name,
         email: user.email,
-        phone: user.phone
+        phone: user.phone,
+        profileImage: user.profile_image_url,
+        cover_image_url: user.cover_image_url
       }
     });
 
@@ -697,6 +733,7 @@ router.get('/profile', asyncHandler(async (req, res) => {
         name: user.name,
         phone: user.phone,
         profileImage: user.profile_image_url,
+        cover_image_url: user.cover_image_url,
         isVerified: user.email_verified || user.phone_verified,
         userType: user.user_type,
         status: user.status,
@@ -1036,4 +1073,4 @@ router.post('/check-user-exists', [
   }
 }));
 
-module.exports = router; 
+module.exports = { router, authenticateToken }; 

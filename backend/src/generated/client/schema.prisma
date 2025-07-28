@@ -37,7 +37,6 @@ model User {
   creator_profiles          CreatorProfile?
   sent_messages             Message[]              @relation("MessageSender")
   notifications             Notification[]
-  admin_packages            Package[]              @relation("AdminPackages")
   admin_payments            Payment[]              @relation("AdminPayments")
   payments_payee            Payment[]              @relation("PaymentPayee")
   payments_payer            Payment[]              @relation("PaymentPayer")
@@ -74,6 +73,7 @@ model BrandProfile {
   collaborations       Collaboration[]
   invoices             Invoice[]
   portfolio_items      PortfolioItem[]
+  orders_placed        Order[] // Orders placed by this brand
 }
 
 model CreatorProfile {
@@ -106,6 +106,8 @@ model CreatorProfile {
   social_media_accounts SocialMediaAccount[]
   kyc                   KYC?
   portfolio_items       PortfolioItem[]
+  packages_created      Package[] // Packages created by this creator
+  orders_received       Order[] // Orders received by this creator
 }
 
 model SocialMediaAccount {
@@ -193,7 +195,6 @@ model Collaboration {
   channels            CollaborationChannel?
   content_submissions ContentSubmission[]
   invoices            Invoice[]
-  packages            Package[]
   payments            Payment[]
   reviews             Review[]
 }
@@ -232,30 +233,33 @@ model ContentReview {
 }
 
 model Payment {
-  id               BigInt        @id @default(autoincrement())
-  collaboration_id BigInt
+  id               BigInt         @id @default(autoincrement())
+  order_id         BigInt? // For package orders
+  collaboration_id BigInt? // For campaign collaborations
   payer_id         BigInt
   payee_id         BigInt
   admin_id         BigInt
   amount           Decimal
-  currency         String        @default("USD")
-  platform_fee     Decimal       @default(0.00)
+  currency         String         @default("USD")
+  platform_fee     Decimal        @default(0.00)
   net_amount       Decimal
   payment_method   PaymentMethod
   transaction_id   String?
-  status           PaymentStatus @default(pending)
-  initiated_at     DateTime      @default(now())
+  status           PaymentStatus  @default(pending)
+  initiated_at     DateTime       @default(now())
   completed_at     DateTime?
   failure_reason   String?
-  admin            User          @relation("AdminPayments", fields: [admin_id], references: [id], onDelete: Cascade)
-  collaboration    Collaboration @relation(fields: [collaboration_id], references: [id])
-  payee            User          @relation("PaymentPayee", fields: [payee_id], references: [id], onDelete: Cascade)
-  payer            User          @relation("PaymentPayer", fields: [payer_id], references: [id], onDelete: Cascade)
+  admin            User           @relation("AdminPayments", fields: [admin_id], references: [id], onDelete: Cascade)
+  order            Order?         @relation(fields: [order_id], references: [id])
+  collaboration    Collaboration? @relation(fields: [collaboration_id], references: [id])
+  payee            User           @relation("PaymentPayee", fields: [payee_id], references: [id], onDelete: Cascade)
+  payer            User           @relation("PaymentPayer", fields: [payer_id], references: [id], onDelete: Cascade)
 }
 
 model Invoice {
   id               BigInt         @id @default(autoincrement())
-  collaboration_id BigInt
+  order_id         BigInt? // For package orders
+  collaboration_id BigInt? // For campaign collaborations
   brand_id         BigInt
   creator_id       BigInt
   invoice_number   String         @unique
@@ -268,7 +272,8 @@ model Invoice {
   issued_at        DateTime       @default(now())
   paid_at          DateTime?
   brand            BrandProfile   @relation(fields: [brand_id], references: [id], onDelete: Cascade)
-  collaboration    Collaboration  @relation(fields: [collaboration_id], references: [id])
+  order            Order?         @relation(fields: [order_id], references: [id])
+  collaboration    Collaboration? @relation(fields: [collaboration_id], references: [id])
   creator          CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
 }
 
@@ -374,17 +379,37 @@ model CollaborationChannel {
 }
 
 model Package {
-  id               BigInt        @id @default(autoincrement())
-  collaboration_id BigInt
-  admin_id         BigInt
-  type             PackageType
-  title            String
-  description      String?
-  price            Decimal
-  deliverables     Json?
-  created_at       DateTime      @default(now())
-  admin            User          @relation("AdminPackages", fields: [admin_id], references: [id], onDelete: Cascade)
-  collaboration    Collaboration @relation(fields: [collaboration_id], references: [id])
+  id           BigInt         @id @default(autoincrement())
+  creator_id   BigInt // Creator who created this package
+  type         PackageType
+  title        String
+  description  String?
+  price        Decimal
+  currency     String         @default("USD")
+  deliverables Json?
+  is_active    Boolean        @default(true)
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+  creator      CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  orders       Order[] // Orders for this package
+}
+
+model Order {
+  id           BigInt         @id @default(autoincrement())
+  package_id   BigInt
+  brand_id     BigInt
+  creator_id   BigInt
+  quantity     Int            @default(1)
+  total_amount Decimal
+  currency     String         @default("USD")
+  status       OrderStatus    @default(pending)
+  order_date   DateTime       @default(now())
+  completed_at DateTime?
+  package      Package        @relation(fields: [package_id], references: [id])
+  brand        BrandProfile   @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  creator      CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  payments     Payment[]
+  invoices     Invoice[]
 }
 
 model PhoneVerification {
@@ -595,4 +620,13 @@ enum PortfolioMediaType {
   image
   video
   text
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  in_progress
+  completed
+  cancelled
+  refunded
 }

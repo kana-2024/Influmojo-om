@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   genderButtonTextSelected: {
-    color: '#fff',
+    color: '#f8f4e8',
   },
   ageSection: {
     marginBottom: 16,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
   },
   ageOptionText: {
     fontSize: 14,
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   applyButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '600',
     fontSize: 16,
   },

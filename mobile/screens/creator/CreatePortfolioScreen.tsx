@@ -155,7 +155,7 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
               <View style={styles.filePreviewHeader}>
                 <Text style={styles.filePreviewTitle}>Selected File</Text>
                 <TouchableOpacity onPress={removeFile} style={styles.removeBtn}>
-                  <Ionicons name="close-circle" size={20} color="#FF6B2C" />
+                  <Ionicons name="close-circle" size={20} color="#f37135" />
                 </TouchableOpacity>
               </View>
               
@@ -169,7 +169,7 @@ const CreatePortfolioScreen: React.FC<CreatePortfolioScreenProps> = ({ onClose, 
                   />
                 ) : uploadedFile && uploadedFile.resource_type === 'video' ? (
                   <View style={styles.filePreviewImage}>
-                    <Ionicons name="play-circle" size={32} color="#fff" style={styles.videoPlayIcon} />
+                    <Ionicons name="play-circle" size={32} color="#f8f4e8" style={styles.videoPlayIcon} />
                     <Image 
                       source={{ uri: uploadedFile.secure_url.replace('/upload/', '/upload/w_100,h_100,c_fill/') }} 
                       style={styles.filePreviewImage}
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1.2,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     color: '#B0B0B0',
   },
   filePreviewContainer: {
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
     borderRadius: 12,
     marginHorizontal: 24,
     marginBottom: 18,
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#F3F7FF',
+    backgroundColor: '#f8f4e8',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: '#F3F7FF',
+    backgroundColor: '#f8f4e8',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   uploadProgressBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F3F7FF',
+    backgroundColor: '#f8f4e8',
     borderRadius: 10,
     padding: 12,
     marginHorizontal: 24,
@@ -478,22 +478,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#FFF4F0',
+    backgroundColor: '#f8f4e8',
   },
   cancelBtnText: {
-    color: '#FF6B2C',
+    color: '#f37135',
     fontWeight: '700',
     fontSize: 16,
   },
   submitBtn: {
     flex: 1,
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
   },
   submitBtnText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontWeight: '700',
     fontSize: 16,
   },

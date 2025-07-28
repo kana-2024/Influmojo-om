@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { profileAPI } from '../../services/apiService';
 import { CheckboxItem, SelectionModal } from '../../components';
+import COLORS from '../../config/colors';
 
 export default function BrandPreferencesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -267,7 +268,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
           <Text style={styles.nextButtonText}>
             {loading ? 'Saving...' : 'Next 2 / 2'}
           </Text>
-          {!loading && <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />}
+          {!loading && <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />}
         </TouchableOpacity>
       </ScrollView>
 
@@ -294,7 +295,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F8F9FB' },
+  safeArea: { flex: 1, backgroundColor: '#f8f4e8' },
   scrollContent: { paddingHorizontal: 20, paddingBottom: 32 },
   topBar: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: '15%', marginTop: 16,
@@ -309,13 +310,13 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     position: 'absolute', left: 0, top: 0, height: 8, width: '90%',
-    backgroundColor: '#FF6B2C', borderRadius: 4, zIndex: 1,
+    backgroundColor: '#f37135', borderRadius: 4, zIndex: 1,
   },
   progressPercent: { alignSelf: 'flex-end', color: '#6B7280', fontSize: 13, marginBottom: 12 },
   sectionTitle: { fontSize: 15, fontWeight: '600', color: '#1A1D1F', marginTop: 12, marginBottom: 2 },
   sectionSubtitle: { fontSize: 13, color: '#6B7280', marginBottom: 8 },
   industriesBox: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12,
+    backgroundColor: '#f8f4e8', borderRadius: 12, padding: 12, marginBottom: 12,
     borderWidth: 1, borderColor: '#E5E7EB',
   },
   industriesRow: {
@@ -323,18 +324,18 @@ const styles = StyleSheet.create({
   },
   categoryChip: {
     backgroundColor: '#F3F4F6', borderRadius: 16, paddingHorizontal: 14, paddingVertical: 6,
-    margin: 4, borderWidth: 0,
+    margin: 4, borderWidth: 1, borderColor: '#E5E7EB',
   },
   categoryChipSelected: {
-    backgroundColor: '#FF6B2C22', borderColor: '#FF6B2C', borderWidth: 1,
+    backgroundColor: '#FFF3E0', borderColor: '#FD5D27', borderWidth: 1,
   },
 
   categoryText: { color: '#1A1D1F', fontSize: 14 },
-  categoryTextSelected: { color: '#FF6B2C', fontWeight: '600' },
+  categoryTextSelected: { color: '#f37135', fontWeight: '600' },
 
   aboutInput: {
-    backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
-    paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, marginBottom: 8, marginTop: 12, minHeight: 48,
+    backgroundColor: '#F5F5F5', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
+    paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, marginBottom: 8, marginTop: 12, minHeight: 48,
   },
   dateInputRow: {
     flexDirection: 'row',
@@ -343,19 +344,19 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   dateInput: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 15,
     minHeight: 48,
   },
   calendarButton: {
     width: 48,
     height: 48,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
@@ -365,7 +366,7 @@ const styles = StyleSheet.create({
   },
 
   languageBox: { 
-    backgroundColor: '#FFFFFF', 
+    backgroundColor: '#f8f4e8', 
     flexDirection: 'row', 
     alignItems: 'center', 
     marginBottom: 12, 
@@ -380,12 +381,13 @@ const styles = StyleSheet.create({
   languageChip: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: '#F3F4F6',
     borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4, marginRight: 6, marginBottom: 4,
+    borderWidth: 1, borderColor: '#E5E7EB',
   },
   languageText: { color: '#1A1D1F', fontSize: 14, marginRight: 2 },
   languageDropdown: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff', 
+    backgroundColor: '#F5F5F5', 
     borderRadius: 8, 
     borderWidth: 1, 
     borderColor: '#E5E7EB',
@@ -395,7 +397,7 @@ const styles = StyleSheet.create({
   },
   dropdownText: { color: '#6B7280', fontSize: 14, marginRight: 8 },
   languageOptionsBox: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f8f4e8',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
@@ -406,9 +408,9 @@ const styles = StyleSheet.create({
 
   nextButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#FF6B2C', borderRadius: 8, paddingVertical: 14, marginBottom: 8,
+    backgroundColor: '#f37135', borderRadius: 8, paddingVertical: 14, marginBottom: 8,
   },
-  nextButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  nextButtonText: { color: '#f8f4e8', fontWeight: '600', fontSize: 16 },
   bottomRow: { alignItems: 'center', marginTop: 8 },
   bottomText: { color: '#6B7280', fontSize: 14, textAlign: 'center' },
   loginLink: { color: '#2563EB', fontWeight: '500' },

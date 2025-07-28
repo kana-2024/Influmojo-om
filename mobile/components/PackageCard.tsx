@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert, Image } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 import ConfirmationModal from './modals/ConfirmationModal';
 import { profileAPI } from '../services/apiService';
+import CartService from '../services/cartService';
 
 interface PackageCardProps {
   item: {
@@ -16,6 +17,9 @@ interface PackageCardProps {
     revisions?: number;
     price?: number;
   };
+  creatorId?: string;
+  creatorName?: string;
+  creatorImage?: string;
   onEdit?: (item: any) => void;
   onDelete?: () => void;
   onShowOverlay?: (show: boolean) => void;
@@ -23,7 +27,17 @@ interface PackageCardProps {
   onAddToCart?: (item: any) => void;
 }
 
-const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onShowOverlay, readonly = false, onAddToCart }) => {
+const PackageCard: React.FC<PackageCardProps> = ({ 
+  item, 
+  creatorId, 
+  creatorName, 
+  creatorImage, 
+  onEdit, 
+  onDelete, 
+  onShowOverlay, 
+  readonly = false, 
+  onAddToCart 
+}) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -39,8 +53,32 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onSho
         return 'https://img.icons8.com/color/96/facebook-new.png';
       case 'youtube':
         return 'https://img.icons8.com/color/96/youtube-play.png';
+      case 'tiktok':
+        return 'https://img.icons8.com/color/96/tiktok.png';
+      case 'twitter':
+        return 'https://img.icons8.com/color/96/twitter.png';
+      case 'linkedin':
+        return 'https://img.icons8.com/color/96/linkedin.png';
+      case 'pinterest':
+        return 'https://img.icons8.com/color/96/pinterest.png';
       case 'snapchat':
         return 'https://img.icons8.com/color/96/snapchat.png';
+      case 'telegram':
+        return 'https://img.icons8.com/color/96/telegram-app.png';
+      case 'whatsapp':
+        return 'https://img.icons8.com/color/96/whatsapp.png';
+      case 'discord':
+        return 'https://img.icons8.com/color/96/discord-new-logo.png';
+      case 'reddit':
+        return 'https://img.icons8.com/color/96/reddit.png';
+      case 'twitch':
+        return 'https://img.icons8.com/color/96/twitch.png';
+      case 'spotify':
+        return 'https://img.icons8.com/color/96/spotify.png';
+      case 'apple':
+        return 'https://img.icons8.com/color/96/apple-logo.png';
+      case 'google':
+        return 'https://img.icons8.com/color/96/google-logo.png';
       default:
         return 'https://img.icons8.com/color/96/social-network.png';
     }
@@ -55,8 +93,32 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onSho
         return { name: 'logo-facebook', color: '#1877F2' };
       case 'youtube':
         return { name: 'logo-youtube', color: '#FF0000' };
+      case 'tiktok':
+        return { name: 'musical-notes', color: '#000000' };
+      case 'twitter':
+        return { name: 'logo-twitter', color: '#1DA1F2' };
+      case 'linkedin':
+        return { name: 'logo-linkedin', color: '#0077B5' };
+      case 'pinterest':
+        return { name: 'logo-pinterest', color: '#E60023' };
       case 'snapchat':
         return { name: 'logo-snapchat', color: '#FFFC00' };
+      case 'telegram':
+        return { name: 'paper-plane', color: '#0088CC' };
+      case 'whatsapp':
+        return { name: 'logo-whatsapp', color: '#25D366' };
+      case 'discord':
+        return { name: 'game-controller', color: '#5865F2' };
+      case 'reddit':
+        return { name: 'logo-reddit', color: '#FF4500' };
+      case 'twitch':
+        return { name: 'game-controller', color: '#9146FF' };
+      case 'spotify':
+        return { name: 'musical-notes', color: '#1DB954' };
+      case 'apple':
+        return { name: 'logo-apple', color: '#000000' };
+      case 'google':
+        return { name: 'logo-google', color: '#4285F4' };
       default:
         return { name: 'share-social', color: '#6B7280' };
     }
@@ -83,6 +145,32 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onSho
 
   const handleImageError = () => {
     setImageError(true);
+  };
+
+  const handleAddToCart = () => {
+    if (!creatorId || !creatorName) {
+      Alert.alert('Error', 'Creator information is missing');
+      return;
+    }
+
+    try {
+      CartService.addToCart({
+        creatorId,
+        creatorName,
+        creatorImage: creatorImage || '',
+        packageId: item.id,
+        packageName: item.title || `${item.platform?.toUpperCase()} ${item.content_type?.toUpperCase()}`,
+        packageDescription: item.description || `I craft eye-catching, scroll-stopping ${item.platform} ${item.content_type} designed to grab attention instantly, boost engagement, and turn viewers into loyal followers and customers.`,
+        packagePrice: parseInt(item.price?.toString() || '0'),
+        packageDuration: item.duration1 || '1-2 days',
+        platform: item.platform || 'Unknown',
+      });
+
+      Alert.alert('Success', 'Package added to cart!');
+    } catch (error) {
+      console.error('Add to cart error:', error);
+      Alert.alert('Error', 'Failed to add package to cart. Please try again.');
+    }
   };
   
   return (
@@ -122,7 +210,7 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onSho
                     <Ionicons name="pencil" size={14} color="#B0B0B0" />
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.actionButton} onPress={() => handleShowDeleteModal(true)}>
-                    <Ionicons name="trash" size={14} color="#FF6B2C" />
+                    <Ionicons name="trash" size={14} color="#f37135" />
                   </TouchableOpacity>
                 </View>
               )}
@@ -155,10 +243,10 @@ const PackageCard: React.FC<PackageCardProps> = ({ item, onEdit, onDelete, onSho
         </View>
 
         {/* Add to Cart Button - Only show in readonly mode */}
-        {readonly && onAddToCart && (
+        {readonly && (
           <TouchableOpacity 
             style={styles.addToCartButton} 
-            onPress={() => onAddToCart(item)}
+            onPress={handleAddToCart}
           >
             <Text style={styles.addToCartText}>Add to Cart</Text>
           </TouchableOpacity>
@@ -198,7 +286,7 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 64,
     height: 64,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
@@ -294,7 +382,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   addToCartButton: {
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -305,7 +393,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   addToCartText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontSize: 14,
     fontWeight: '600',
   },

@@ -17,6 +17,7 @@ import googleAuthService from '../services/googleAuth';
 import OtpModal from '../components/modals/OtpModal';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loginSuccess, setUserType } from '../store/slices/authSlice';
+import { FONTS } from '../config/fonts';
 
 export default function LoginScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -123,7 +124,7 @@ export default function LoginScreen({ navigation }: any) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle='dark-content' backgroundColor='#fff' />
+      <StatusBar barStyle='dark-content' backgroundColor='#f8f4e8' />
       
       {/* Header with back button */}
       <View style={styles.header}>
@@ -138,27 +139,31 @@ export default function LoginScreen({ navigation }: any) {
         <View style={styles.illustrations}>
           <View style={styles.illustrationRow}>
             <View style={[styles.illustration, styles.illustrationHighlighted]}>
-              <Ionicons name="people" size={24} color="#FF6B2C" />
+              <Ionicons name="people" size={24} color="#1A1D1F" />
             </View>
-            <View style={styles.illustration}>
+            <View style={[styles.illustration, styles.illustrationHighlighted]}>
               <Ionicons name="heart" size={24} color="#1A1D1F" />
             </View>
           </View>
           <View style={styles.illustrationRow}>
-            <View style={styles.illustration}>
+            <View style={[styles.illustration, styles.illustrationHighlighted]}>
               <Ionicons name="shield-checkmark" size={24} color="#1A1D1F" />
             </View>
-            <View style={styles.illustration}>
+            <View style={[styles.illustration, styles.illustrationHighlighted]}>
               <Ionicons name="people-circle" size={24} color="#1A1D1F" />
             </View>
             <View style={[styles.illustration, styles.illustrationHighlighted]}>
-              <Ionicons name="analytics" size={24} color="#FF6B2C" />
+              <Ionicons name="analytics" size={24} color="#1A1D1F" />
             </View>
           </View>
         </View>
 
         {/* Title */}
-        <Text style={styles.title}>Log in to continue your influencer journey</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Continue your{'\n'}</Text>
+          <Text style={styles.titleOrange}>Influ Mojo</Text>
+          <Text style={styles.title}> journey</Text>
+        </View>
 
         {/* Phone Number Input */}
         <View style={styles.inputContainer}>
@@ -189,11 +194,11 @@ export default function LoginScreen({ navigation }: any) {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" size="small" />
+            <ActivityIndicator color="#f8f4e8" size="small" />
           ) : (
             <>
               <Text style={styles.loginButtonText}>Log In</Text>
-              <Ionicons name="arrow-forward" size={20} color="#fff" />
+              <Ionicons name="arrow-forward" size={20} color="#f8f4e8" />
             </>
           )}
         </TouchableOpacity>
@@ -256,7 +261,7 @@ export default function LoginScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
   },
   header: {
     paddingHorizontal: 20,
@@ -287,16 +292,31 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   illustrationHighlighted: {
-    backgroundColor: '#FFF4ED',
+    backgroundColor: '#f8f4e8',
     borderWidth: 2,
-    borderColor: '#FF6B2C',
+    borderColor: '#f37135',
   },
   title: {
     fontSize: 24,
+    fontFamily: FONTS.secondary.italic,
     fontWeight: '700',
     color: '#1A1D1F',
     textAlign: 'center',
+    lineHeight: 32,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 40,
+  },
+  titleOrange: {
+    fontSize: 24,
+    fontFamily: FONTS.secondary.italic,
+    fontWeight: '700',
+    color: '#f37135',
+    textAlign: 'center',
     lineHeight: 32,
   },
   inputContainer: {
@@ -304,6 +324,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
+    fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     color: '#1A1D1F',
     marginBottom: 8,
@@ -311,16 +332,17 @@ const styles = StyleSheet.create({
   phoneInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     marginBottom: 8,
   },
   countryCode: {
     fontSize: 16,
+    fontFamily: FONTS.primary.medium,
     color: '#1A1D1F',
     marginRight: 8,
     fontWeight: '500',
@@ -328,6 +350,7 @@ const styles = StyleSheet.create({
   phoneInputField: {
     flex: 1,
     fontSize: 16,
+    fontFamily: FONTS.primary.regular,
     color: '#1A1D1F',
   },
   infoRow: {
@@ -337,17 +360,19 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
+    fontFamily: FONTS.primary.regular,
     color: '#6B7280',
     marginLeft: 6,
     flex: 1,
   },
   errorText: {
     fontSize: 14,
+    fontFamily: FONTS.primary.regular,
     color: '#FF3B30',
     marginTop: 4,
   },
   loginButton: {
-    backgroundColor: '#FF6B2C',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 16,
     flexDirection: 'row',
@@ -356,8 +381,9 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
     fontSize: 16,
+    fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     marginRight: 8,
   },
@@ -373,6 +399,7 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     fontSize: 14,
+    fontFamily: FONTS.primary.regular,
     color: '#6B7280',
     marginHorizontal: 16,
   },
@@ -386,7 +413,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
@@ -395,6 +422,7 @@ const styles = StyleSheet.create({
   },
   socialButtonText: {
     fontSize: 16,
+    fontFamily: FONTS.primary.medium,
     color: '#1A1D1F',
     marginLeft: 8,
     fontWeight: '500',
@@ -408,11 +436,13 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontSize: 16,
+    fontFamily: FONTS.primary.regular,
     color: '#6B7280',
   },
   signupLink: {
     fontSize: 16,
-    color: '#2563EB',
+    fontFamily: FONTS.primary.medium,
+    color: '#20536d',
     textDecorationLine: 'underline',
     fontWeight: '500',
   },

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, SafeAreaView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ENV, API_ENDPOINTS } from '../config/env';
+import { FONTS } from '../config/fonts';
 
 // Test backend connectivity
 const testBackendConnection = async () => {
@@ -31,7 +32,7 @@ if (__DEV__) {
 
 const SignUpScreen = ({ navigation, route }: any) => {
   useEffect(() => {
-    // NavigationBar.setBackgroundColorAsync('#F8F9FB'); // Removed as per edit hint
+    // NavigationBar.setBackgroundColorAsync('#f8f4e8'); // Removed as per edit hint
     // NavigationBar.setButtonStyleAsync('dark'); // Removed as per edit hint
   }, []);
 
@@ -194,7 +195,7 @@ const SignUpScreen = ({ navigation, route }: any) => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle='light-content' backgroundColor='#000' />
       <KeyboardAwareScrollView
-        style={{ flex: 1, backgroundColor: '#F8F9FB' }}
+        style={{ flex: 1, backgroundColor: '#f8f4e8' }}
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start' }}
         enableOnAndroid={true}
         extraScrollHeight={80}
@@ -215,7 +216,7 @@ const SignUpScreen = ({ navigation, route }: any) => {
             <View style={{ width: 24 }} />
           </View>
           {/* Title */}
-          <Text style={styles.title}>Create your Influ Mojo account</Text>
+          <Text style={styles.title}>Create your <Text style={styles.brandLink}>Influ Mojo</Text> account</Text>
           <Text style={styles.subtitle}>
             Choose your preferred sign-up method below
           </Text>
@@ -253,6 +254,7 @@ const SignUpScreen = ({ navigation, route }: any) => {
           <TextInput
             style={styles.input}
             placeholder="e.g. mohammed Azhar Uddin"
+            placeholderTextColor="#B0B0B0"
             value={fullName}
             onChangeText={setFullName}
           />
@@ -264,8 +266,9 @@ const SignUpScreen = ({ navigation, route }: any) => {
               <Text style={styles.countryCode}>+91</Text>
             </View>
             <TextInput
-              style={[styles.input, { flex: 1, marginLeft: 8 }]}
+              style={[styles.input, { flex: 1, marginLeft: 8, marginBottom: 0 }]}
               placeholder="e.g. 9948425492"
+              placeholderTextColor="#B0B0B0"
               keyboardType="phone-pad"
               value={mobile}
               onChangeText={setMobile}
@@ -276,24 +279,24 @@ const SignUpScreen = ({ navigation, route }: any) => {
           {/* Button and checkbox at the end */}
           <TouchableOpacity style={styles.createButton} onPress={handleCreateAccount}>
             <Text style={styles.createButtonText}>Create account</Text>
-            <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
+            <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />
           </TouchableOpacity>
           <View style={styles.checkboxRow}>
             <TouchableOpacity 
               style={[styles.customCheckbox, agreed && styles.customCheckboxChecked]} 
               onPress={() => setAgreed(!agreed)}
             >
-              {agreed && <Ionicons name="checkmark" size={16} color="#fff" />}
+              {agreed && <Ionicons name="checkmark" size={16} color="#f8f4e8" />}
             </TouchableOpacity>
             <Text style={styles.checkboxText}>
-              By creating an account, you agree to Influmojo's{' '}
+              By creating an account, you agree to <Text style={styles.brandLink}>Influmojo</Text>'s{' '}
               <Text style={styles.link}>Terms</Text> and <Text style={styles.link}>Privacy Policy</Text>.
             </Text>
           </View>
           <TouchableOpacity style={[styles.loginRow, { marginTop: 16 }]} onPress={() => navigation.navigate('Login')}>
             <Text style={styles.loginText}>Already have an account ? <Text style={styles.loginLink}>Login here</Text></Text>
           </TouchableOpacity>
-          {loading && <ActivityIndicator size="small" color="#FF6B2C" style={{ marginTop: 8 }} />}
+          {loading && <ActivityIndicator size="small" color="#f37135" style={{ marginTop: 8 }} />}
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>
@@ -303,11 +306,11 @@ const SignUpScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#f8f4e8',
   },
   container: {
     flex: 1,
-    backgroundColor: '#EFF3F5',
+    backgroundColor: '#f8f4e8',
     paddingHorizontal: 24,
     paddingTop: 48,
     gap: 5,                                                           
@@ -321,11 +324,13 @@ const styles = StyleSheet.create({
   },
   topBarTitle: {
     fontSize: 18,
+    fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     color: '#1A1D1F',
   },
   title: {
     fontSize: 20,
+    fontFamily: FONTS.secondary.italic,
     fontWeight: '700',
     color: '#1A1D1F',
     textAlign: 'center',
@@ -333,6 +338,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: FONTS.primary.regular,
     color: '#6B7280',
     textAlign: 'center',
     marginBottom: 24,
@@ -340,16 +346,13 @@ const styles = StyleSheet.create({
   socialButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 2,
-    elevation: 2,
     justifyContent: 'center',
   },
   socialIcon: {
@@ -358,6 +361,7 @@ const styles = StyleSheet.create({
   },
   socialText: {
     fontSize: 16,
+    fontFamily: FONTS.primary.medium,
     color: '#1A1D1F',
     fontWeight: '500',
   },
@@ -377,44 +381,52 @@ const styles = StyleSheet.create({
   dividerText: {
     color: '#6B7280',
     fontSize: 14,
+    fontFamily: FONTS.primary.regular,
     marginHorizontal: 16,
   },
   inputLabel: {
     fontSize: 15,
+    fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     color: '#1A1D1F',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 15,
+    fontFamily: FONTS.primary.regular,
     marginBottom: 8,
     minHeight: 48,
   },
   mobileRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 8,
   },
   countryCodeBox: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingVertical: 14,
     minHeight: 48,
     justifyContent: 'center',
   },
   countryCode: {
     fontSize: 15,
+    fontFamily: FONTS.primary.medium,
     color: '#1A1D1F',
     fontWeight: '500',
   },
   infoText: {
     fontSize: 13,
+    fontFamily: FONTS.primary.regular,
     color: '#6B7280',
     marginBottom: 16,
   },
@@ -422,14 +434,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FC5213',
+    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 14,
     marginTop: 8,
     marginBottom: 16,
   },
   createButtonText: {
-    color: '#fff',
+    color: '#f8f4e8',
+    fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     fontSize: 16,
   },
@@ -450,17 +463,24 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   customCheckboxChecked: {
-    backgroundColor: '#FC5213',
-    borderColor: '#FC5213',
+    backgroundColor: '#f37135',
+    borderColor: '#f37135',
   },
   checkboxText: {
     fontSize: 13,
+    fontFamily: FONTS.primary.regular,
     color: '#6B7280',
     flex: 1,
     lineHeight: 18,
   },
   link: {
-    color: '#FC5213',
+    color: '#20536d',
+    fontFamily: FONTS.primary.medium,
+    fontWeight: '500',
+  },
+  brandLink: {
+    color: '#f37135',
+    fontFamily: FONTS.primary.medium,
     fontWeight: '500',
   },
   loginRow: {
@@ -468,16 +488,19 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 14,
+    fontFamily: FONTS.primary.regular,
     color: '#6B7280',
     textAlign: 'center',
   },
   loginLink: {
-    color: '#2563EB',
+    color: '#20536d',
+    fontFamily: FONTS.primary.medium,
     fontWeight: '500',
   },
   errorText: {
     color: '#FF3B30',
     fontSize: 13,
+    fontFamily: FONTS.primary.regular,
     marginBottom: 8,
   },
 });

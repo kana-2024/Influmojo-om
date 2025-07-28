@@ -67,17 +67,25 @@ const CityModal: React.FC<CityModalProps> = ({ visible, onClose, onSelectCity, s
           </TouchableOpacity>
         </View>
 
-        {/* Search Input */}
+        {/* Search Input - Modified to prevent keyboard */}
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#6B7280" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search cities..."
-            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor="#B0B0B0"
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
             autoCorrect={false}
+            editable={false}
+            showSoftInputOnFocus={false}
+            contextMenuHidden={true}
+            selectTextOnFocus={false}
+            onPressIn={() => {
+              // When user taps the search input, we can show a different UI or handle differently
+              // For now, we'll just allow the search to work without keyboard
+            }}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
@@ -127,7 +135,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -156,11 +164,13 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   searchIcon: {
     marginRight: 12,
