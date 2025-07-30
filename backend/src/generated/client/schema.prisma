@@ -17,6 +17,7 @@ model User {
   first_name                String?
   last_name                 String?
   profile_image_url         String?
+  cover_image_url           String?
   phone                     String?                @unique
   timezone                  String?
   language                  String?                @default("en")
@@ -57,7 +58,6 @@ model BrandProfile {
   website_url          String?
   description          String?
   logo_url             String?
-  company_size         CompanySize?
   location_country     String?
   location_state       String? // Added for unified profile
   location_city        String?
@@ -395,21 +395,29 @@ model Package {
 }
 
 model Order {
-  id           BigInt         @id @default(autoincrement())
-  package_id   BigInt
-  brand_id     BigInt
-  creator_id   BigInt
-  quantity     Int            @default(1)
-  total_amount Decimal
-  currency     String         @default("USD")
-  status       OrderStatus    @default(pending)
-  order_date   DateTime       @default(now())
-  completed_at DateTime?
-  package      Package        @relation(fields: [package_id], references: [id])
-  brand        BrandProfile   @relation(fields: [brand_id], references: [id], onDelete: Cascade)
-  creator      CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
-  payments     Payment[]
-  invoices     Invoice[]
+  id                BigInt         @id @default(autoincrement())
+  package_id        BigInt
+  brand_id          BigInt
+  creator_id        BigInt
+  quantity          Int            @default(1)
+  total_amount      Decimal
+  currency          String         @default("USD")
+  status            OrderStatus    @default(pending)
+  order_date        DateTime       @default(now())
+  completed_at      DateTime?
+  rejection_message String? // Appealing message when order is rejected
+  // Chat integration fields
+  zoho_visitor_id   String? // Zoho chat visitor ID for this order
+  chat_session_id   String? // Zoho chat session ID
+  chat_enabled      Boolean        @default(false) // Whether chat is enabled for this order
+  chat_started_at   DateTime? // When chat was first initiated
+  package           Package        @relation(fields: [package_id], references: [id])
+  brand             BrandProfile   @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  creator           CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  payments          Payment[]
+  invoices          Invoice[]
+
+  @@index([package_id, brand_id, creator_id, status, order_date])
 }
 
 model PhoneVerification {
@@ -484,14 +492,6 @@ enum UserStatus {
   active
   suspended
   pending
-}
-
-enum CompanySize {
-  ONE_TO_TEN                  @map("1-10")
-  ELEVEN_TO_FIFTY             @map("11-50")
-  FIFTY_ONE_TO_TWO_HUNDRED    @map("51-200")
-  TWO_HUNDRED_ONE_TO_THOUSAND @map("201-1000")
-  THOUSAND_PLUS               @map("1000+")
 }
 
 enum AvailabilityStatus {

@@ -12,6 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppSelector } from '../store/hooks';
 import { ENV } from '../config/env';
 import { getToken } from '../services/storage';
+import { ordersAPI } from '../services/apiService';
+import { ZohoChatWidget } from '../components';
 
 interface OrderDetails {
   id: string;
@@ -55,6 +57,9 @@ interface OrderDetails {
 const OrderDetailsScreen = ({ route, navigation }: any) => {
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showChat, setShowChat] = useState(false);
+  const [currentOrderChat, setCurrentOrderChat] = useState<any>(null);
+  const [chatLoading, setChatLoading] = useState(false);
   const userType = useAppSelector(state => state.auth.userType);
   const { orderId } = route.params;
 
@@ -122,6 +127,59 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
     return `${currency === 'USD' ? '$' : currency}${price.toFixed(2)}`;
   };
 
+  // Chat handling functions
+  const handleChatPress = async () => {
+    if (userType !== 'brand') {
+      Alert.alert('Info', 'Chat is only available for brand users');
+      return;
+    }
+
+    setChatLoading(true);
+    try {
+      // Check if chat is already enabled for this order
+      const chatResponse = await ordersAPI.getOrderChat(orderId);
+      
+      if (chatResponse.success && chatResponse.chat.enabled) {
+        // Chat is already enabled, show chat widget
+        setCurrentOrderChat({
+          orderId: orderId,
+          visitorId: chatResponse.chat.visitor_id,
+          sessionId: chatResponse.chat.session_id
+        });
+        setShowChat(true);
+      } else {
+        // Chat is not enabled, enable it first
+        const enableResponse = await ordersAPI.enableOrderChat(orderId);
+        
+        if (enableResponse.success) {
+          setCurrentOrderChat({
+            orderId: orderId,
+            visitorId: enableResponse.chat.visitor_id,
+            sessionId: enableResponse.chat.session_id
+          });
+          setShowChat(true);
+        } else {
+          Alert.alert('Error', 'Failed to enable chat for this order');
+        }
+      }
+    } catch (error) {
+      console.error('Error handling chat:', error);
+      Alert.alert('Error', 'Failed to open chat. Please try again.');
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleChatClose = () => {
+    setShowChat(false);
+    setCurrentOrderChat(null);
+  };
+
+  const handleChatMessageSent = (message: any) => {
+    console.log('Chat message sent:', message);
+    // You can add additional logic here if needed
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -162,7 +220,23 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Order Details</Text>
-        <View style={styles.headerSpacer} />
+        {userType === 'brand' && (
+          <TouchableOpacity
+            style={[
+              styles.chatButton,
+              chatLoading && styles.chatButtonDisabled
+            ]}
+            onPress={handleChatPress}
+            disabled={chatLoading}
+          >
+            <Ionicons 
+              name="chatbubble-ellipses-outline" 
+              size={24} 
+              color={chatLoading ? "#999" : "#20536d"} 
+            />
+          </TouchableOpacity>
+        )}
+        {userType !== 'brand' && <View style={styles.headerSpacer} />}
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -326,6 +400,13 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
           </View>
         )}
       </ScrollView>
+
+      {/* Zoho Chat Widget */}
+      <ZohoChatWidget
+        visible={showChat}
+        onClose={handleChatClose}
+        onMessageSent={handleChatMessageSent}
+      />
     </View>
   );
 };
@@ -587,6 +668,12 @@ const styles = StyleSheet.create({
     color: '#666',
     marginLeft: 8,
     flex: 1,
+  },
+  chatButton: {
+    padding: 8,
+  },
+  chatButtonDisabled: {
+    opacity: 0.7,
   },
 });
 

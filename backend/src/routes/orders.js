@@ -41,6 +41,11 @@ router.post('/checkout', authenticateToken, asyncHandler(async (req, res) => {
       });
     }
 
+    // Get user details for Zoho chat initialization
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
     // Process each cart item
     for (const cartItem of cartItems) {
       const { packageId, quantity = 1 } = cartItem;
@@ -94,7 +99,34 @@ router.post('/checkout', authenticateToken, asyncHandler(async (req, res) => {
       // Calculate total amount
       const totalAmount = package.price * quantity;
 
-      // Create order
+      // Initialize Zoho chat for this order
+      let zohoVisitorId = null;
+      let chatSessionId = null;
+      
+      try {
+        const zohoService = require('../services/zohoService');
+        
+        // Initialize chat widget for the brand user
+        const chatResult = await zohoService.initializeChatWidget({
+          id: user.id.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          user_type: user.user_type,
+          auth_provider: user.auth_provider
+        });
+
+        if (chatResult && chatResult.visitor_id) {
+          zohoVisitorId = chatResult.visitor_id;
+          chatSessionId = chatResult.session_id || `session_${Date.now()}`;
+          console.log('✅ Zoho chat initialized for order:', chatResult.visitor_id);
+        }
+      } catch (chatError) {
+        console.error('⚠️ Failed to initialize Zoho chat for order:', chatError.message);
+        // Continue with order creation even if chat fails
+      }
+
+      // Create order with chat enabled
       const order = await prisma.order.create({
         data: {
           package_id: package.id,
@@ -103,7 +135,12 @@ router.post('/checkout', authenticateToken, asyncHandler(async (req, res) => {
           quantity: quantity,
           total_amount: totalAmount,
           currency: package.currency,
-          status: 'pending'
+          status: 'pending',
+          // Chat integration fields
+          chat_enabled: true,
+          zoho_visitor_id: zohoVisitorId,
+          chat_session_id: chatSessionId,
+          chat_started_at: zohoVisitorId ? new Date() : null
         },
         include: {
           package: true,
@@ -144,7 +181,11 @@ router.post('/checkout', authenticateToken, asyncHandler(async (req, res) => {
         currency: order.currency,
         status: order.status,
         order_date: order.order_date,
-        created_at: order.order_date
+        created_at: order.order_date,
+        // Chat integration data
+        chat_enabled: order.chat_enabled,
+        zoho_visitor_id: order.zoho_visitor_id,
+        chat_session_id: order.chat_session_id
       });
     }
 
@@ -600,6 +641,206 @@ router.put('/:orderId/reject', authenticateToken, asyncHandler(async (req, res) 
     res.status(500).json({
       success: false,
       message: 'Failed to reject order',
+      error: error.message
+    });
+  }
+}));
+
+// Get chat information for a specific order
+router.get('/:orderId/chat', authenticateToken, asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const userType = req.user.user_type;
+  const orderId = req.params.orderId;
+
+  try {
+    let order = null;
+
+    if (userType === 'creator') {
+      // For creators, get order details for their packages
+      const creatorProfile = await prisma.creatorProfile.findFirst({
+        where: { user_id: userId }
+      });
+
+      if (!creatorProfile) {
+        return res.status(404).json({
+          success: false,
+          message: 'Creator profile not found'
+        });
+      }
+
+      order = await prisma.order.findFirst({
+        where: {
+          id: BigInt(orderId),
+          creator_id: creatorProfile.id
+        }
+      });
+
+    } else if (userType === 'brand') {
+      // For brands, get order details they've placed
+      const brandProfile = await prisma.brandProfile.findFirst({
+        where: { user_id: userId }
+      });
+
+      if (!brandProfile) {
+        return res.status(404).json({
+          success: false,
+          message: 'Brand profile not found'
+        });
+      }
+
+      order = await prisma.order.findFirst({
+        where: {
+          id: BigInt(orderId),
+          brand_id: brandProfile.id
+        }
+      });
+    }
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // Return chat information
+    res.json({
+      success: true,
+      chat: {
+        enabled: order.chat_enabled,
+        visitor_id: order.zoho_visitor_id,
+        session_id: order.chat_session_id,
+        started_at: order.chat_started_at
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching order chat info:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch order chat information',
+      error: error.message
+    });
+  }
+}));
+
+// Enable chat for an existing order (for orders created before chat integration)
+router.post('/:orderId/enable-chat', authenticateToken, asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const userType = req.user.user_type;
+  const orderId = req.params.orderId;
+
+  if (userType !== 'brand') {
+    return res.status(403).json({
+      success: false,
+      message: 'Only brands can enable chat for orders'
+    });
+  }
+
+  try {
+    // Get brand profile
+    const brandProfile = await prisma.brandProfile.findFirst({
+      where: { user_id: userId }
+    });
+
+    if (!brandProfile) {
+      return res.status(404).json({
+        success: false,
+        message: 'Brand profile not found'
+      });
+    }
+
+    // Get order
+    const order = await prisma.order.findFirst({
+      where: {
+        id: BigInt(orderId),
+        brand_id: brandProfile.id
+      }
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // Check if chat is already enabled
+    if (order.chat_enabled && order.zoho_visitor_id) {
+      return res.json({
+        success: true,
+        message: 'Chat is already enabled for this order',
+        chat: {
+          enabled: order.chat_enabled,
+          visitor_id: order.zoho_visitor_id,
+          session_id: order.chat_session_id,
+          started_at: order.chat_started_at
+        }
+      });
+    }
+
+    // Get user details for Zoho chat initialization
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    // Initialize Zoho chat
+    let zohoVisitorId = null;
+    let chatSessionId = null;
+    
+    try {
+      const zohoService = require('../services/zohoService');
+      
+      const chatResult = await zohoService.initializeChatWidget({
+        id: user.id.toString(),
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        user_type: user.user_type,
+        auth_provider: user.auth_provider
+      });
+
+      if (chatResult && chatResult.visitor_id) {
+        zohoVisitorId = chatResult.visitor_id;
+        chatSessionId = chatResult.session_id || `session_${Date.now()}`;
+        console.log('✅ Zoho chat enabled for existing order:', chatResult.visitor_id);
+      }
+    } catch (chatError) {
+      console.error('⚠️ Failed to initialize Zoho chat for order:', chatError.message);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to initialize chat for this order',
+        error: chatError.message
+      });
+    }
+
+    // Update order with chat information
+    const updatedOrder = await prisma.order.update({
+      where: { id: BigInt(orderId) },
+      data: {
+        chat_enabled: true,
+        zoho_visitor_id: zohoVisitorId,
+        chat_session_id: chatSessionId,
+        chat_started_at: new Date()
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Chat enabled successfully for this order',
+      chat: {
+        enabled: updatedOrder.chat_enabled,
+        visitor_id: updatedOrder.zoho_visitor_id,
+        session_id: updatedOrder.chat_session_id,
+        started_at: updatedOrder.chat_started_at
+      }
+    });
+
+  } catch (error) {
+    console.error('Error enabling chat for order:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to enable chat for order',
       error: error.message
     });
   }

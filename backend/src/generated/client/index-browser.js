@@ -156,7 +156,6 @@ exports.Prisma.BrandProfileScalarFieldEnum = {
   website_url: 'website_url',
   description: 'description',
   logo_url: 'logo_url',
-  company_size: 'company_size',
   location_country: 'location_country',
   location_state: 'location_state',
   location_city: 'location_city',
@@ -434,7 +433,11 @@ exports.Prisma.OrderScalarFieldEnum = {
   status: 'status',
   order_date: 'order_date',
   completed_at: 'completed_at',
-  rejection_message: 'rejection_message'
+  rejection_message: 'rejection_message',
+  zoho_visitor_id: 'zoho_visitor_id',
+  chat_session_id: 'chat_session_id',
+  chat_enabled: 'chat_enabled',
+  chat_started_at: 'chat_started_at'
 };
 
 exports.Prisma.PhoneVerificationScalarFieldEnum = {
@@ -520,14 +523,6 @@ exports.UserStatus = exports.$Enums.UserStatus = {
   active: 'active',
   suspended: 'suspended',
   pending: 'pending'
-};
-
-exports.CompanySize = exports.$Enums.CompanySize = {
-  ONE_TO_TEN: 'ONE_TO_TEN',
-  ELEVEN_TO_FIFTY: 'ELEVEN_TO_FIFTY',
-  FIFTY_ONE_TO_TWO_HUNDRED: 'FIFTY_ONE_TO_TWO_HUNDRED',
-  TWO_HUNDRED_ONE_TO_THOUSAND: 'TWO_HUNDRED_ONE_TO_THOUSAND',
-  THOUSAND_PLUS: 'THOUSAND_PLUS'
 };
 
 exports.AvailabilityStatus = exports.$Enums.AvailabilityStatus = {

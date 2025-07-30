@@ -196,6 +196,70 @@ export const authAPI = {
   },
 };
 
+// Zoho API calls
+export const zohoAPI = {
+  // Initialize chat widget
+  initializeChat: async (userData: any) => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CHAT_INITIALIZE, {
+      method: 'POST',
+      body: JSON.stringify({ userData }),
+    });
+  },
+
+  // Send chat message
+  sendChatMessage: async (visitorId: string, message: string, messageType: string = 'text') => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CHAT_SEND_MESSAGE, {
+      method: 'POST',
+      body: JSON.stringify({ visitorId, message, messageType }),
+    });
+  },
+
+  // Get chat history
+  getChatHistory: async (visitorId: string, limit: number = 50) => {
+    return await apiRequest(`${API_ENDPOINTS.ZOHO_CHAT_HISTORY}/${visitorId}?limit=${limit}`, {
+      method: 'GET',
+    });
+  },
+
+  // Sync contact to Zoho CRM
+  syncContact: async (userData: any) => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_SYNC_CONTACT, {
+      method: 'POST',
+      body: JSON.stringify({ userData }),
+    });
+  },
+
+  // Create deal in Zoho CRM
+  createDeal: async (collaborationData: any) => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CREATE_DEAL, {
+      method: 'POST',
+      body: JSON.stringify({ collaborationData }),
+    });
+  },
+
+  // Create task in Zoho CRM
+  createTask: async (taskData: any) => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CREATE_TASK, {
+      method: 'POST',
+      body: JSON.stringify({ taskData }),
+    });
+  },
+
+  // Test Zoho connection
+  testConnection: async () => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_TEST_CONNECTION, {
+      method: 'POST',
+    });
+  },
+
+  // Get Zoho config status
+  getConfigStatus: async () => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CONFIG_STATUS, {
+      method: 'GET',
+    });
+  },
+};
+
 // Profile API calls
 export const profileAPI = {
   // Get available industries
@@ -441,7 +505,7 @@ export const profileAPI = {
 
 // Orders API calls
 export const ordersAPI = {
-  // Get all orders for the authenticated user
+  // Get all orders
   getOrders: async () => {
     return await apiRequest(API_ENDPOINTS.GET_ORDERS, {
       method: 'GET',
@@ -455,8 +519,8 @@ export const ordersAPI = {
     });
   },
 
-  // Checkout cart items to create orders
-  checkout: async (cartItems: any[]) => {
+  // Checkout orders from cart
+  checkoutOrders: async (cartItems: any[]) => {
     return await apiRequest(API_ENDPOINTS.CHECKOUT_ORDERS, {
       method: 'POST',
       body: JSON.stringify({ cartItems }),
@@ -472,10 +536,23 @@ export const ordersAPI = {
 
   // Reject order (creators only)
   rejectOrder: async (orderId: string, rejectionMessage?: string) => {
-    const body = rejectionMessage ? { rejectionMessage } : {};
     return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/reject`, {
       method: 'PUT',
-      body: Object.keys(body).length > 0 ? JSON.stringify(body) : undefined,
+      body: JSON.stringify({ rejectionMessage }),
+    });
+  },
+
+  // Get chat information for an order
+  getOrderChat: async (orderId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/chat`, {
+      method: 'GET',
+    });
+  },
+
+  // Enable chat for an existing order
+  enableOrderChat: async (orderId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/enable-chat`, {
+      method: 'POST',
     });
   },
 };

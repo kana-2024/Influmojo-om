@@ -406,6 +406,11 @@ model Order {
   order_date       DateTime      @default(now())
   completed_at     DateTime?
   rejection_message String?      // Appealing message when order is rejected
+  // Chat integration fields
+  zoho_visitor_id  String?       // Zoho chat visitor ID for this order
+  chat_session_id  String?       // Zoho chat session ID
+  chat_enabled     Boolean       @default(false) // Whether chat is enabled for this order
+  chat_started_at  DateTime?     // When chat was first initiated
   package          Package       @relation(fields: [package_id], references: [id])
   brand            BrandProfile  @relation(fields: [brand_id], references: [id], onDelete: Cascade)
   creator          CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)

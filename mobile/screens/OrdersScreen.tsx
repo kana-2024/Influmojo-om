@@ -13,7 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAppSelector } from '../store/hooks';
 import { ordersAPI } from '../services/apiService';
-import { BottomNavBar } from '../components';
+import { BottomNavBar, ZohoChatWidget } from '../components';
 
 interface Order {
   id: string;
@@ -40,6 +40,10 @@ interface Order {
   total_amount: number;
   quantity: number;
   rejection_message?: string;
+  // Chat integration fields
+  chat_enabled?: boolean;
+  zoho_visitor_id?: string;
+  chat_session_id?: string;
 }
 
 // Color constants
@@ -64,6 +68,9 @@ const OrdersScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('New');
+  const [showChat, setShowChat] = useState(false);
+  const [currentOrderChat, setCurrentOrderChat] = useState<any>(null);
+  const [chatLoading, setChatLoading] = useState(false);
   const userType = useAppSelector(state => state.auth.userType);
   const user = useAppSelector(state => state.auth.user);
 
@@ -208,6 +215,61 @@ const OrdersScreen = ({ navigation }: any) => {
     );
   };
 
+  // Chat handling functions
+  const handleChatPress = async (order: Order) => {
+    if (userType !== 'brand') {
+      Alert.alert('Info', 'Chat is only available for brand users');
+      return;
+    }
+
+    setChatLoading(true);
+    try {
+      // Check if chat is already enabled for this order
+      const chatResponse = await ordersAPI.getOrderChat(order.id);
+      
+      if (chatResponse.success && chatResponse.chat.enabled) {
+        // Chat is already enabled, show chat widget
+        setCurrentOrderChat({
+          orderId: order.id,
+          visitorId: chatResponse.chat.visitor_id,
+          sessionId: chatResponse.chat.session_id
+        });
+        setShowChat(true);
+      } else {
+        // Chat is not enabled, enable it first
+        const enableResponse = await ordersAPI.enableOrderChat(order.id);
+        
+        if (enableResponse.success) {
+          setCurrentOrderChat({
+            orderId: order.id,
+            visitorId: enableResponse.chat.visitor_id,
+            sessionId: enableResponse.chat.session_id
+          });
+          setShowChat(true);
+          // Refresh orders to update chat status
+          fetchOrders();
+        } else {
+          Alert.alert('Error', 'Failed to enable chat for this order');
+        }
+      }
+    } catch (error) {
+      console.error('Error handling chat:', error);
+      Alert.alert('Error', 'Failed to open chat. Please try again.');
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleChatClose = () => {
+    setShowChat(false);
+    setCurrentOrderChat(null);
+  };
+
+  const handleChatMessageSent = (message: any) => {
+    console.log('Chat message sent:', message);
+    // You can add additional logic here if needed
+  };
+
   const renderOrderCard = (order: Order) => {
     const isCreator = userType === 'creator';
     const otherParty = isCreator ? order.brand : order.creator;
@@ -313,6 +375,33 @@ const OrdersScreen = ({ navigation }: any) => {
             >
               <Ionicons name="checkmark" size={20} color="#f8f4e8" />
               <Text style={styles.acceptButtonText}>Accept</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Show chat button for brand users */}
+        {!isCreator && (
+          <View style={styles.brandActionsContainer}>
+            {/* Chat button */}
+            <TouchableOpacity 
+              style={[
+                styles.chatButton,
+                chatLoading && styles.chatButtonDisabled
+              ]}
+              onPress={() => handleChatPress(order)}
+              disabled={chatLoading}
+            >
+              <Ionicons 
+                name="chatbubble-ellipses-outline" 
+                size={20} 
+                color={chatLoading ? "#999" : "#20536d"} 
+              />
+              <Text style={[
+                styles.chatButtonText,
+                chatLoading && styles.chatButtonTextDisabled
+              ]}>
+                {chatLoading ? 'Loading...' : 'Chat with Support'}
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -429,6 +518,13 @@ const OrdersScreen = ({ navigation }: any) => {
       <BottomNavBar 
         navigation={navigation} 
         currentRoute="orders"
+      />
+
+      {/* Zoho Chat Widget */}
+      <ZohoChatWidget
+        visible={showChat}
+        onClose={handleChatClose}
+        onMessageSent={handleChatMessageSent}
       />
     </SafeAreaView>
   );
@@ -764,6 +860,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
     fontWeight: '500',
+  },
+  // New styles for chat button
+  brandActionsContainer: {
+    marginTop: 12,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E1E5E9',
+  },
+  chatButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#E0E0E0', // Default background
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#B0B0B0', // Default border
+  },
+  chatButtonDisabled: {
+    backgroundColor: '#E0E0E0',
+    borderColor: '#B0B0B0',
+    opacity: 0.7,
+  },
+  chatButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#20536d', // Default text color
+    marginLeft: 8,
+  },
+  chatButtonTextDisabled: {
+    color: '#999',
   },
 });
 

@@ -17,6 +17,7 @@ const { router: authRoutes } = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const ordersRoutes = require('./routes/orders');
 const packagesRoutes = require('./routes/packages');
+const zohoRoutes = require('./routes/zoho');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -103,6 +104,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/packages', packagesRoutes);
+app.use('/api/zoho', zohoRoutes);
 
 // Catch-all 404 handler for unknown routes
 app.use((req, res, next) => {

@@ -4,7 +4,7 @@ const extra = Constants.expoConfig?.extra || {};
 export const ENV = {
   // API Configuration
   
-  API_BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3002',
+  API_BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'https://fair-legal-gar.ngrok-free.app',
   GOOGLE_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '',
   GOOGLE_CLIENT_ID_ANDROID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '',
   GOOGLE_CLIENT_ID_IOS: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || '',
@@ -51,6 +51,16 @@ export const API_ENDPOINTS = {
   GET_ORDERS: `${ENV.API_BASE_URL}/api/orders`,
   GET_ORDER_DETAILS: `${ENV.API_BASE_URL}/api/orders`,
   CHECKOUT_ORDERS: `${ENV.API_BASE_URL}/api/orders/checkout`,
+  
+  // Zoho CRM & Chat endpoints
+  ZOHO_SYNC_CONTACT: `${ENV.API_BASE_URL}/api/zoho/sync-contact`,
+  ZOHO_CREATE_DEAL: `${ENV.API_BASE_URL}/api/zoho/create-deal`,
+  ZOHO_CREATE_TASK: `${ENV.API_BASE_URL}/api/zoho/create-task`,
+  ZOHO_CHAT_INITIALIZE: `${ENV.API_BASE_URL}/api/zoho/chat/initialize`,
+  ZOHO_CHAT_SEND_MESSAGE: `${ENV.API_BASE_URL}/api/zoho/chat/send-message`,
+  ZOHO_CHAT_HISTORY: `${ENV.API_BASE_URL}/api/zoho/chat/history`,
+  ZOHO_TEST_CONNECTION: `${ENV.API_BASE_URL}/api/zoho/test-connection`,
+  ZOHO_CONFIG_STATUS: `${ENV.API_BASE_URL}/api/zoho/config/status`,
   
   // Health check
   HEALTH: `${ENV.API_BASE_URL}/api/health`,

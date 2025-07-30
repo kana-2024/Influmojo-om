@@ -28,4 +28,8 @@ export { default as PackageCard } from './PackageCard';
 export { default as CheckboxItem } from './CheckboxItem';
 export { default as SelectionModal } from './SelectionModal';
 export { default as CreatorCard } from './CreatorCard';
-export { default as CreatorSection } from './CreatorSection'; 
+export { default as CreatorSection } from './CreatorSection';
+
+// Zoho Integration Components
+export { default as ZohoChatWidget } from './ZohoChatWidget';
+export { default as ChatButton } from './ChatButton'; 

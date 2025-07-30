@@ -156,17 +156,6 @@ export const UserStatus: {
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
 
 
-export const CompanySize: {
-  ONE_TO_TEN: 'ONE_TO_TEN',
-  ELEVEN_TO_FIFTY: 'ELEVEN_TO_FIFTY',
-  FIFTY_ONE_TO_TWO_HUNDRED: 'FIFTY_ONE_TO_TWO_HUNDRED',
-  TWO_HUNDRED_ONE_TO_THOUSAND: 'TWO_HUNDRED_ONE_TO_THOUSAND',
-  THOUSAND_PLUS: 'THOUSAND_PLUS'
-};
-
-export type CompanySize = (typeof CompanySize)[keyof typeof CompanySize]
-
-
 export const AvailabilityStatus: {
   available: 'available',
   busy: 'busy',
@@ -369,10 +358,6 @@ export const UserType: typeof $Enums.UserType
 export type UserStatus = $Enums.UserStatus
 
 export const UserStatus: typeof $Enums.UserStatus
-
-export type CompanySize = $Enums.CompanySize
-
-export const CompanySize: typeof $Enums.CompanySize
 
 export type AvailabilityStatus = $Enums.AvailabilityStatus
 
@@ -5572,7 +5557,6 @@ export namespace Prisma {
     website_url: string | null
     description: string | null
     logo_url: string | null
-    company_size: $Enums.CompanySize | null
     location_country: string | null
     location_state: string | null
     location_city: string | null
@@ -5594,7 +5578,6 @@ export namespace Prisma {
     website_url: string | null
     description: string | null
     logo_url: string | null
-    company_size: $Enums.CompanySize | null
     location_country: string | null
     location_state: string | null
     location_city: string | null
@@ -5617,7 +5600,6 @@ export namespace Prisma {
     website_url: number
     description: number
     logo_url: number
-    company_size: number
     location_country: number
     location_state: number
     location_city: number
@@ -5652,7 +5634,6 @@ export namespace Prisma {
     website_url?: true
     description?: true
     logo_url?: true
-    company_size?: true
     location_country?: true
     location_state?: true
     location_city?: true
@@ -5674,7 +5655,6 @@ export namespace Prisma {
     website_url?: true
     description?: true
     logo_url?: true
-    company_size?: true
     location_country?: true
     location_state?: true
     location_city?: true
@@ -5697,7 +5677,6 @@ export namespace Prisma {
     website_url?: true
     description?: true
     logo_url?: true
-    company_size?: true
     location_country?: true
     location_state?: true
     location_city?: true
@@ -5808,7 +5787,6 @@ export namespace Prisma {
     website_url: string | null
     description: string | null
     logo_url: string | null
-    company_size: $Enums.CompanySize | null
     location_country: string | null
     location_state: string | null
     location_city: string | null
@@ -5851,7 +5829,6 @@ export namespace Prisma {
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
-    company_size?: boolean
     location_country?: boolean
     location_state?: boolean
     location_city?: boolean
@@ -5882,7 +5859,6 @@ export namespace Prisma {
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
-    company_size?: boolean
     location_country?: boolean
     location_state?: boolean
     location_city?: boolean
@@ -5907,7 +5883,6 @@ export namespace Prisma {
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
-    company_size?: boolean
     location_country?: boolean
     location_state?: boolean
     location_city?: boolean
@@ -5932,7 +5907,6 @@ export namespace Prisma {
     website_url?: boolean
     description?: boolean
     logo_url?: boolean
-    company_size?: boolean
     location_country?: boolean
     location_state?: boolean
     location_city?: boolean
@@ -5945,7 +5919,7 @@ export namespace Prisma {
     updated_at?: boolean
   }
 
-  export type BrandProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "company_name" | "industry" | "industries" | "role_in_organization" | "business_type" | "website_url" | "description" | "logo_url" | "company_size" | "location_country" | "location_state" | "location_city" | "location_pincode" | "languages" | "date_of_birth" | "gender" | "verified" | "created_at" | "updated_at", ExtArgs["result"]["brandProfile"]>
+  export type BrandProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "company_name" | "industry" | "industries" | "role_in_organization" | "business_type" | "website_url" | "description" | "logo_url" | "location_country" | "location_state" | "location_city" | "location_pincode" | "languages" | "date_of_birth" | "gender" | "verified" | "created_at" | "updated_at", ExtArgs["result"]["brandProfile"]>
   export type BrandProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     campaigns?: boolean | BrandProfile$campaignsArgs<ExtArgs>
@@ -5983,7 +5957,6 @@ export namespace Prisma {
       website_url: string | null
       description: string | null
       logo_url: string | null
-      company_size: $Enums.CompanySize | null
       location_country: string | null
       location_state: string | null
       location_city: string | null
@@ -6433,7 +6406,6 @@ export namespace Prisma {
     readonly website_url: FieldRef<"BrandProfile", 'String'>
     readonly description: FieldRef<"BrandProfile", 'String'>
     readonly logo_url: FieldRef<"BrandProfile", 'String'>
-    readonly company_size: FieldRef<"BrandProfile", 'CompanySize'>
     readonly location_country: FieldRef<"BrandProfile", 'String'>
     readonly location_state: FieldRef<"BrandProfile", 'String'>
     readonly location_city: FieldRef<"BrandProfile", 'String'>
@@ -29093,6 +29065,10 @@ export namespace Prisma {
     order_date: Date | null
     completed_at: Date | null
     rejection_message: string | null
+    zoho_visitor_id: string | null
+    chat_session_id: string | null
+    chat_enabled: boolean | null
+    chat_started_at: Date | null
   }
 
   export type OrderMaxAggregateOutputType = {
@@ -29107,6 +29083,10 @@ export namespace Prisma {
     order_date: Date | null
     completed_at: Date | null
     rejection_message: string | null
+    zoho_visitor_id: string | null
+    chat_session_id: string | null
+    chat_enabled: boolean | null
+    chat_started_at: Date | null
   }
 
   export type OrderCountAggregateOutputType = {
@@ -29121,6 +29101,10 @@ export namespace Prisma {
     order_date: number
     completed_at: number
     rejection_message: number
+    zoho_visitor_id: number
+    chat_session_id: number
+    chat_enabled: number
+    chat_started_at: number
     _all: number
   }
 
@@ -29155,6 +29139,10 @@ export namespace Prisma {
     order_date?: true
     completed_at?: true
     rejection_message?: true
+    zoho_visitor_id?: true
+    chat_session_id?: true
+    chat_enabled?: true
+    chat_started_at?: true
   }
 
   export type OrderMaxAggregateInputType = {
@@ -29169,6 +29157,10 @@ export namespace Prisma {
     order_date?: true
     completed_at?: true
     rejection_message?: true
+    zoho_visitor_id?: true
+    chat_session_id?: true
+    chat_enabled?: true
+    chat_started_at?: true
   }
 
   export type OrderCountAggregateInputType = {
@@ -29183,6 +29175,10 @@ export namespace Prisma {
     order_date?: true
     completed_at?: true
     rejection_message?: true
+    zoho_visitor_id?: true
+    chat_session_id?: true
+    chat_enabled?: true
+    chat_started_at?: true
     _all?: true
   }
 
@@ -29284,6 +29280,10 @@ export namespace Prisma {
     order_date: Date
     completed_at: Date | null
     rejection_message: string | null
+    zoho_visitor_id: string | null
+    chat_session_id: string | null
+    chat_enabled: boolean
+    chat_started_at: Date | null
     _count: OrderCountAggregateOutputType | null
     _avg: OrderAvgAggregateOutputType | null
     _sum: OrderSumAggregateOutputType | null
@@ -29317,6 +29317,10 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
+    zoho_visitor_id?: boolean
+    chat_session_id?: boolean
+    chat_enabled?: boolean
+    chat_started_at?: boolean
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
@@ -29337,6 +29341,10 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
+    zoho_visitor_id?: boolean
+    chat_session_id?: boolean
+    chat_enabled?: boolean
+    chat_started_at?: boolean
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
@@ -29354,6 +29362,10 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
+    zoho_visitor_id?: boolean
+    chat_session_id?: boolean
+    chat_enabled?: boolean
+    chat_started_at?: boolean
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
@@ -29371,9 +29383,13 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
+    zoho_visitor_id?: boolean
+    chat_session_id?: boolean
+    chat_enabled?: boolean
+    chat_started_at?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "package_id" | "brand_id" | "creator_id" | "quantity" | "total_amount" | "currency" | "status" | "order_date" | "completed_at" | "rejection_message", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "package_id" | "brand_id" | "creator_id" | "quantity" | "total_amount" | "currency" | "status" | "order_date" | "completed_at" | "rejection_message" | "zoho_visitor_id" | "chat_session_id" | "chat_enabled" | "chat_started_at", ExtArgs["result"]["order"]>
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
@@ -29414,6 +29430,10 @@ export namespace Prisma {
       order_date: Date
       completed_at: Date | null
       rejection_message: string | null
+      zoho_visitor_id: string | null
+      chat_session_id: string | null
+      chat_enabled: boolean
+      chat_started_at: Date | null
     }, ExtArgs["result"]["order"]>
     composites: {}
   }
@@ -29853,6 +29873,10 @@ export namespace Prisma {
     readonly order_date: FieldRef<"Order", 'DateTime'>
     readonly completed_at: FieldRef<"Order", 'DateTime'>
     readonly rejection_message: FieldRef<"Order", 'String'>
+    readonly zoho_visitor_id: FieldRef<"Order", 'String'>
+    readonly chat_session_id: FieldRef<"Order", 'String'>
+    readonly chat_enabled: FieldRef<"Order", 'Boolean'>
+    readonly chat_started_at: FieldRef<"Order", 'DateTime'>
   }
     
 
@@ -34068,7 +34092,6 @@ export namespace Prisma {
     website_url: 'website_url',
     description: 'description',
     logo_url: 'logo_url',
-    company_size: 'company_size',
     location_country: 'location_country',
     location_state: 'location_state',
     location_city: 'location_city',
@@ -34403,7 +34426,11 @@ export namespace Prisma {
     status: 'status',
     order_date: 'order_date',
     completed_at: 'completed_at',
-    rejection_message: 'rejection_message'
+    rejection_message: 'rejection_message',
+    zoho_visitor_id: 'zoho_visitor_id',
+    chat_session_id: 'chat_session_id',
+    chat_enabled: 'chat_enabled',
+    chat_started_at: 'chat_started_at'
   };
 
   export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -34614,20 +34641,6 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-  /**
-   * Reference to a field of type 'CompanySize'
-   */
-  export type EnumCompanySizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanySize'>
-    
-
-
-  /**
-   * Reference to a field of type 'CompanySize[]'
-   */
-  export type ListEnumCompanySizeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanySize[]'>
     
 
 
@@ -35123,7 +35136,6 @@ export namespace Prisma {
     website_url?: StringNullableFilter<"BrandProfile"> | string | null
     description?: StringNullableFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
-    company_size?: EnumCompanySizeNullableFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableFilter<"BrandProfile"> | string | null
     location_state?: StringNullableFilter<"BrandProfile"> | string | null
     location_city?: StringNullableFilter<"BrandProfile"> | string | null
@@ -35153,7 +35165,6 @@ export namespace Prisma {
     website_url?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     logo_url?: SortOrderInput | SortOrder
-    company_size?: SortOrderInput | SortOrder
     location_country?: SortOrderInput | SortOrder
     location_state?: SortOrderInput | SortOrder
     location_city?: SortOrderInput | SortOrder
@@ -35186,7 +35197,6 @@ export namespace Prisma {
     website_url?: StringNullableFilter<"BrandProfile"> | string | null
     description?: StringNullableFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
-    company_size?: EnumCompanySizeNullableFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableFilter<"BrandProfile"> | string | null
     location_state?: StringNullableFilter<"BrandProfile"> | string | null
     location_city?: StringNullableFilter<"BrandProfile"> | string | null
@@ -35216,7 +35226,6 @@ export namespace Prisma {
     website_url?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     logo_url?: SortOrderInput | SortOrder
-    company_size?: SortOrderInput | SortOrder
     location_country?: SortOrderInput | SortOrder
     location_state?: SortOrderInput | SortOrder
     location_city?: SortOrderInput | SortOrder
@@ -35248,7 +35257,6 @@ export namespace Prisma {
     website_url?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     description?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
-    company_size?: EnumCompanySizeNullableWithAggregatesFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     location_state?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
     location_city?: StringNullableWithAggregatesFilter<"BrandProfile"> | string | null
@@ -36970,6 +36978,10 @@ export namespace Prisma {
     order_date?: DateTimeFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableFilter<"Order"> | string | null
+    zoho_visitor_id?: StringNullableFilter<"Order"> | string | null
+    chat_session_id?: StringNullableFilter<"Order"> | string | null
+    chat_enabled?: BoolFilter<"Order"> | boolean
+    chat_started_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
     brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
     creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
@@ -36989,6 +37001,10 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrderInput | SortOrder
     rejection_message?: SortOrderInput | SortOrder
+    zoho_visitor_id?: SortOrderInput | SortOrder
+    chat_session_id?: SortOrderInput | SortOrder
+    chat_enabled?: SortOrder
+    chat_started_at?: SortOrderInput | SortOrder
     package?: PackageOrderByWithRelationInput
     brand?: BrandProfileOrderByWithRelationInput
     creator?: CreatorProfileOrderByWithRelationInput
@@ -37011,6 +37027,10 @@ export namespace Prisma {
     order_date?: DateTimeFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableFilter<"Order"> | string | null
+    zoho_visitor_id?: StringNullableFilter<"Order"> | string | null
+    chat_session_id?: StringNullableFilter<"Order"> | string | null
+    chat_enabled?: BoolFilter<"Order"> | boolean
+    chat_started_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
     brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
     creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
@@ -37030,6 +37050,10 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrderInput | SortOrder
     rejection_message?: SortOrderInput | SortOrder
+    zoho_visitor_id?: SortOrderInput | SortOrder
+    chat_session_id?: SortOrderInput | SortOrder
+    chat_enabled?: SortOrder
+    chat_started_at?: SortOrderInput | SortOrder
     _count?: OrderCountOrderByAggregateInput
     _avg?: OrderAvgOrderByAggregateInput
     _max?: OrderMaxOrderByAggregateInput
@@ -37052,6 +37076,10 @@ export namespace Prisma {
     order_date?: DateTimeWithAggregatesFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    zoho_visitor_id?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    chat_session_id?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    chat_enabled?: BoolWithAggregatesFilter<"Order"> | boolean
+    chat_started_at?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
   }
 
   export type PhoneVerificationWhereInput = {
@@ -37592,7 +37620,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -37622,7 +37649,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -37650,7 +37676,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37680,7 +37705,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37709,7 +37733,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -37732,7 +37755,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37756,7 +37778,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39604,6 +39625,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
@@ -39623,6 +39648,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
@@ -39636,6 +39665,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
@@ -39655,6 +39688,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
@@ -39671,6 +39708,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
   }
 
   export type OrderUpdateManyMutationInput = {
@@ -39682,6 +39723,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type OrderUncheckedUpdateManyInput = {
@@ -39696,6 +39741,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PhoneVerificationCreateInput = {
@@ -40466,13 +40515,6 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type EnumCompanySizeNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.CompanySize | EnumCompanySizeFieldRefInput<$PrismaModel> | null
-    in?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumCompanySizeNullableFilter<$PrismaModel> | $Enums.CompanySize | null
-  }
-
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -40539,7 +40581,6 @@ export namespace Prisma {
     website_url?: SortOrder
     description?: SortOrder
     logo_url?: SortOrder
-    company_size?: SortOrder
     location_country?: SortOrder
     location_state?: SortOrder
     location_city?: SortOrder
@@ -40567,7 +40608,6 @@ export namespace Prisma {
     website_url?: SortOrder
     description?: SortOrder
     logo_url?: SortOrder
-    company_size?: SortOrder
     location_country?: SortOrder
     location_state?: SortOrder
     location_city?: SortOrder
@@ -40589,7 +40629,6 @@ export namespace Prisma {
     website_url?: SortOrder
     description?: SortOrder
     logo_url?: SortOrder
-    company_size?: SortOrder
     location_country?: SortOrder
     location_state?: SortOrder
     location_city?: SortOrder
@@ -40630,16 +40669,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
-  }
-
-  export type EnumCompanySizeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.CompanySize | EnumCompanySizeFieldRefInput<$PrismaModel> | null
-    in?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumCompanySizeNullableWithAggregatesFilter<$PrismaModel> | $Enums.CompanySize | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedEnumCompanySizeNullableFilter<$PrismaModel>
-    _max?: NestedEnumCompanySizeNullableFilter<$PrismaModel>
   }
 
   export type DecimalNullableFilter<$PrismaModel = never> = {
@@ -42195,6 +42224,10 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrder
     rejection_message?: SortOrder
+    zoho_visitor_id?: SortOrder
+    chat_session_id?: SortOrder
+    chat_enabled?: SortOrder
+    chat_started_at?: SortOrder
   }
 
   export type OrderAvgOrderByAggregateInput = {
@@ -42218,6 +42251,10 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrder
     rejection_message?: SortOrder
+    zoho_visitor_id?: SortOrder
+    chat_session_id?: SortOrder
+    chat_enabled?: SortOrder
+    chat_started_at?: SortOrder
   }
 
   export type OrderMinOrderByAggregateInput = {
@@ -42232,6 +42269,10 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrder
     rejection_message?: SortOrder
+    zoho_visitor_id?: SortOrder
+    chat_session_id?: SortOrder
+    chat_enabled?: SortOrder
+    chat_started_at?: SortOrder
   }
 
   export type OrderSumOrderByAggregateInput = {
@@ -43188,10 +43229,6 @@ export namespace Prisma {
     connectOrCreate?: OrderCreateOrConnectWithoutBrandInput | OrderCreateOrConnectWithoutBrandInput[]
     createMany?: OrderCreateManyBrandInputEnvelope
     connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
-  }
-
-  export type NullableEnumCompanySizeFieldUpdateOperationsInput = {
-    set?: $Enums.CompanySize | null
   }
 
   export type UserUpdateOneRequiredWithoutBrand_profilesNestedInput = {
@@ -45283,13 +45320,6 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
-
-  export type NestedEnumCompanySizeNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.CompanySize | EnumCompanySizeFieldRefInput<$PrismaModel> | null
-    in?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumCompanySizeNullableFilter<$PrismaModel> | $Enums.CompanySize | null
-  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -45312,16 +45342,6 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type NestedEnumCompanySizeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.CompanySize | EnumCompanySizeFieldRefInput<$PrismaModel> | null
-    in?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.CompanySize[] | ListEnumCompanySizeFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumCompanySizeNullableWithAggregatesFilter<$PrismaModel> | $Enums.CompanySize | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedEnumCompanySizeNullableFilter<$PrismaModel>
-    _max?: NestedEnumCompanySizeNullableFilter<$PrismaModel>
   }
 
   export type NestedDecimalNullableFilter<$PrismaModel = never> = {
@@ -45771,7 +45791,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -45799,7 +45818,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -46366,7 +46384,6 @@ export namespace Prisma {
     website_url?: StringNullableFilter<"BrandProfile"> | string | null
     description?: StringNullableFilter<"BrandProfile"> | string | null
     logo_url?: StringNullableFilter<"BrandProfile"> | string | null
-    company_size?: EnumCompanySizeNullableFilter<"BrandProfile"> | $Enums.CompanySize | null
     location_country?: StringNullableFilter<"BrandProfile"> | string | null
     location_state?: StringNullableFilter<"BrandProfile"> | string | null
     location_city?: StringNullableFilter<"BrandProfile"> | string | null
@@ -47078,6 +47095,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
@@ -47095,6 +47116,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
@@ -47377,6 +47402,10 @@ export namespace Prisma {
     order_date?: DateTimeFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableFilter<"Order"> | string | null
+    zoho_visitor_id?: StringNullableFilter<"Order"> | string | null
+    chat_session_id?: StringNullableFilter<"Order"> | string | null
+    chat_enabled?: BoolFilter<"Order"> | boolean
+    chat_started_at?: DateTimeNullableFilter<"Order"> | Date | string | null
   }
 
   export type CampaignApplicationCreateWithoutCreatorInput = {
@@ -47756,6 +47785,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
@@ -47773,6 +47806,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
@@ -48240,7 +48277,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -48269,7 +48305,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -48424,7 +48459,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48453,7 +48487,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48933,7 +48966,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -48962,7 +48994,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -49359,7 +49390,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49388,7 +49418,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50352,6 +50381,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
@@ -50370,6 +50403,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
 
@@ -50690,6 +50727,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
@@ -50708,6 +50749,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
 
@@ -50944,7 +50989,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -50973,7 +51017,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -51004,6 +51047,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
@@ -51022,6 +51069,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
   }
 
@@ -51163,7 +51214,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51192,7 +51242,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51229,6 +51278,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
@@ -51247,6 +51300,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
   }
 
@@ -52903,6 +52960,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
@@ -52920,6 +52981,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
@@ -53068,7 +53133,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -53097,7 +53161,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -53336,7 +53399,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53365,7 +53427,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54048,7 +54109,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -54077,7 +54137,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -54195,7 +54254,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54224,7 +54282,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54251,7 +54308,6 @@ export namespace Prisma {
     website_url?: string | null
     description?: string | null
     logo_url?: string | null
-    company_size?: $Enums.CompanySize | null
     location_country?: string | null
     location_state?: string | null
     location_city?: string | null
@@ -54431,7 +54487,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54459,7 +54514,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54487,7 +54541,6 @@ export namespace Prisma {
     website_url?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    company_size?: NullableEnumCompanySizeFieldUpdateOperationsInput | $Enums.CompanySize | null
     location_country?: NullableStringFieldUpdateOperationsInput | string | null
     location_state?: NullableStringFieldUpdateOperationsInput | string | null
     location_city?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55058,6 +55111,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
   }
 
   export type CampaignUpdateWithoutBrandInput = {
@@ -55295,6 +55352,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
@@ -55312,6 +55373,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
@@ -55327,6 +55392,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type CampaignApplicationCreateManyCreatorInput = {
@@ -55425,6 +55494,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
   }
 
   export type CampaignApplicationUpdateWithoutCreatorInput = {
@@ -55705,6 +55778,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
@@ -55722,6 +55799,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
@@ -55737,6 +55818,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type CampaignAnalyticsCreateManyCampaignInput = {
@@ -56319,6 +56404,10 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    zoho_visitor_id?: string | null
+    chat_session_id?: string | null
+    chat_enabled?: boolean
+    chat_started_at?: Date | string | null
   }
 
   export type OrderUpdateWithoutPackageInput = {
@@ -56330,6 +56419,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
@@ -56347,6 +56440,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
@@ -56362,6 +56459,10 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
+    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
+    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PaymentCreateManyOrderInput = {
