@@ -220,6 +220,41 @@ router.post('/webhook', asyncHandler(async (req, res) => {
 }));
 
 /**
+ * Zoho Chat Webhook Handler (Specific for chat events)
+ * Following Zoho Chat Webhook documentation
+ */
+router.post('/chat-webhook', asyncHandler(async (req, res) => {
+  try {
+    const webhookData = req.body;
+    
+    console.log('💬 Zoho chat webhook received:', {
+      type: webhookData.type,
+      operation: webhookData.operation,
+      visitor_id: webhookData.visitor_id,
+      session_id: webhookData.session_id
+    });
+    
+    // Handle chat-specific webhooks
+    const result = await zohoService.handleWebhook({
+      ...webhookData,
+      module: webhookData.type === 'message' ? 'Messages' : 'Chat'
+    });
+    
+    res.json({
+      success: true,
+      message: 'Chat webhook processed successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('❌ Error processing Zoho chat webhook:', error);
+    res.status(500).json({
+      error: 'Failed to process chat webhook',
+      message: error.message
+    });
+  }
+}));
+
+/**
  * Zoho Configuration Routes
  */
 

@@ -7,11 +7,22 @@ import { ordersAPI } from '../../services/apiService';
 interface CartModalProps {
   visible: boolean;
   onClose: () => void;
+  onNavigateToProfile?: () => void;
+  // Legacy props for backward compatibility
+  items?: any[];
+  onRemoveItem?: (itemId: string) => void;
+  onUpdateQuantity?: (itemId: string, quantity: number) => void;
+  onCheckout?: () => void;
 }
 
 const CartModal: React.FC<CartModalProps> = ({
   visible,
   onClose,
+  onNavigateToProfile,
+  items,
+  onRemoveItem,
+  onUpdateQuantity,
+  onCheckout,
 }) => {
   const [cartSummary, setCartSummary] = useState<CartSummary>({
     totalItems: 0,
@@ -22,16 +33,39 @@ const CartModal: React.FC<CartModalProps> = ({
   const [lastCheckoutTime, setLastCheckoutTime] = useState(0);
 
   useEffect(() => {
-    // Subscribe to cart changes
-    const unsubscribe = CartService.subscribe((summary) => {
-      setCartSummary(summary);
-    });
+    // If using legacy items prop, use that instead of CartService
+    if (items && items.length > 0) {
+      const legacySummary: CartSummary = {
+        totalItems: items.reduce((sum, item) => sum + (item.quantity || 1), 0),
+        totalPrice: items.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0),
+        items: items.map(item => ({
+          id: item.id,
+          creatorId: item.creatorId || '',
+          creatorName: item.creatorName || '',
+          creatorImage: item.creatorImage,
+          packageId: item.packageId || '',
+          packageName: item.packageName || '',
+          packageDescription: item.packageDescription || '',
+          packagePrice: item.price || 0,
+          packageDuration: item.duration || '',
+          platform: item.platform || '',
+          quantity: item.quantity || 1,
+          addedAt: new Date()
+        }))
+      };
+      setCartSummary(legacySummary);
+    } else {
+      // Subscribe to cart changes
+      const unsubscribe = CartService.subscribe((summary) => {
+        setCartSummary(summary);
+      });
 
-    // Get initial cart state
-    setCartSummary(CartService.getCartSummary());
+      // Get initial cart state
+      setCartSummary(CartService.getCartSummary());
 
-    return unsubscribe;
-  }, []);
+      return unsubscribe;
+    }
+  }, [items]);
 
   const handleRemoveItem = (itemId: string) => {
     Alert.alert(
@@ -42,14 +76,24 @@ const CartModal: React.FC<CartModalProps> = ({
         { 
           text: 'Remove', 
           style: 'destructive',
-          onPress: () => CartService.removeFromCart(itemId)
+          onPress: () => {
+            if (onRemoveItem) {
+              onRemoveItem(itemId);
+            } else {
+              CartService.removeFromCart(itemId);
+            }
+          }
         },
       ]
     );
   };
 
   const handleUpdateQuantity = (itemId: string, quantity: number) => {
-    CartService.updateQuantity(itemId, quantity);
+    if (onUpdateQuantity) {
+      onUpdateQuantity(itemId, quantity);
+    } else {
+      CartService.updateQuantity(itemId, quantity);
+    }
   };
 
   const handleClearCart = () => {
@@ -68,6 +112,11 @@ const CartModal: React.FC<CartModalProps> = ({
   };
 
   const handleCheckout = async () => {
+    // If using legacy checkout callback, use that instead
+    if (onCheckout) {
+      onCheckout();
+      return;
+    }
     // Prevent multiple rapid clicks
     const now = Date.now();
     if (checkoutLoading || (now - lastCheckoutTime < 2000)) {
@@ -78,6 +127,44 @@ const CartModal: React.FC<CartModalProps> = ({
     if (cartSummary.items.length === 0) {
       Alert.alert('Empty Cart', 'Please add items to your cart before checkout.');
       return;
+    }
+
+    // Check if user has completed profile setup (for brand users)
+    try {
+      const { authAPI } = await import('../../services/apiService');
+      const profile = await authAPI.getUserProfile();
+      const userType = profile.user?.user_type || 'creator';
+      
+      if (userType === 'brand') {
+        // For brand users, check if they have a brand profile
+        const { profileAPI } = await import('../../services/apiService');
+        try {
+          await profileAPI.getBrandProfile();
+        } catch (profileError) {
+          if (profileError.message?.includes('not found') || profileError.message?.includes('404')) {
+            Alert.alert(
+              'Profile Setup Required',
+              'Please complete your brand profile setup before checkout. You need to provide your company information and preferences.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { 
+                  text: 'Complete Profile', 
+                  onPress: () => {
+                    onClose();
+                    if (onNavigateToProfile) {
+                      onNavigateToProfile();
+                    }
+                  }
+                }
+              ]
+            );
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Profile check error:', error);
+      // Continue with checkout if profile check fails
     }
 
     setLastCheckoutTime(now);
@@ -99,8 +186,14 @@ const CartModal: React.FC<CartModalProps> = ({
                 quantity: item.quantity
               }));
 
+              console.log('🔄 Starting checkout process...');
+              console.log('📦 Cart items:', cartItems);
+              console.log('💰 Total amount:', cartSummary.totalPrice);
+
               // Call checkout API
-              const response = await ordersAPI.checkout(cartItems);
+              const response = await ordersAPI.checkoutOrders(cartItems);
+              
+              console.log('✅ Checkout response:', response);
 
               if (response.success) {
                 Alert.alert(
@@ -138,7 +231,26 @@ const CartModal: React.FC<CartModalProps> = ({
               }
             } catch (error) {
               console.error('Checkout error:', error);
-              Alert.alert('Checkout Error', 'An error occurred during checkout. Please try again.');
+              let errorMessage = 'An error occurred during checkout. Please try again.';
+              
+              // Provide more specific error messages
+              if (error.message?.includes('401')) {
+                errorMessage = 'Authentication failed. Please log in again.';
+              } else if (error.message?.includes('403')) {
+                errorMessage = 'Only brands can checkout orders.';
+              } else if (error.message?.includes('404')) {
+                errorMessage = 'Package not found or inactive.';
+              } else if (error.message?.includes('409')) {
+                errorMessage = 'An order for this package already exists.';
+              } else if (error.message?.includes('500')) {
+                errorMessage = 'Server error. Please try again later.';
+              } else if (error.message?.includes('Network')) {
+                errorMessage = 'Network error. Please check your connection.';
+              } else if (error.message?.includes('Brand profile not found')) {
+                errorMessage = 'Please complete your brand profile setup before checkout.';
+              }
+              
+              Alert.alert('Checkout Error', errorMessage);
             } finally {
               setCheckoutLoading(false);
             }

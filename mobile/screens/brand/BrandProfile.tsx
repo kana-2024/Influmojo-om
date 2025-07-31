@@ -63,7 +63,6 @@ const BrandProfile = () => {
   const [loading, setLoading] = useState(true);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
-  const [cartItems, setCartItems] = useState<any[]>([]);
   const [coverImageKey, setCoverImageKey] = useState(0);
 
   useEffect(() => {
@@ -74,22 +73,7 @@ const BrandProfile = () => {
     setShowCartModal(true);
   };
 
-  const handleRemoveCartItem = (itemId: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== itemId));
-  };
 
-  const handleUpdateCartQuantity = (itemId: string, quantity: number) => {
-    setCartItems(prev => 
-      prev.map(item => 
-        item.id === itemId ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const handleCheckout = () => {
-    // The checkout functionality is now handled in the CartModal
-    setShowCartModal(false);
-  };
 
   const loadBrandProfile = async (forceRefresh = false) => {
     try {
@@ -444,10 +428,10 @@ const BrandProfile = () => {
       <CartModal
         visible={showCartModal}
         onClose={() => setShowCartModal(false)}
-        items={cartItems}
-        onRemoveItem={handleRemoveCartItem}
-        onUpdateQuantity={handleUpdateCartQuantity}
-        onCheckout={handleCheckout}
+        onNavigateToProfile={() => {
+          setShowCartModal(false);
+          navigation.navigate('BrandProfileSetup');
+        }}
       />
 
       {/* Overlay for cart modal */}
