@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Platform, Image, Dimensions, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Platform, Image, Dimensions, Alert, ScrollView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
@@ -12,12 +12,30 @@ interface CreateCampaignScreenProps {
   CustomDropdown?: React.FC<any>;
 }
 
-const CreateCampaignScreen: React.FC<CreateCampaignScreenProps> = ({ onClose, onBack }) => {
+const CreateCampaignScreen: React.FC<CreateCampaignScreenProps> = ({ onClose, onBack, CustomDropdown }) => {
   const insets = useSafeAreaInsets();
   const [file, setFile] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [saving, setSaving] = useState(false);
+
+  // Form state
+  const [campaignTitle, setCampaignTitle] = useState('');
+  const [platform, setPlatform] = useState('');
+  const [contentType, setContentType] = useState('');
+  const [budget, setBudget] = useState('');
+  const [duration, setDuration] = useState('');
+  const [targetAudience, setTargetAudience] = useState('');
+  const [requirements, setRequirements] = useState('');
+
+  const Dropdown = CustomDropdown || CustomDropdownDefault;
+
+  // Dropdown options
+  const platforms = ['Instagram', 'Facebook', 'Youtube', 'TikTok', 'Snapchat', 'Twitter'];
+  const contentTypes = ['Reel', 'Story', 'Feed post', 'Carousel Post', 'Video', 'Live Stream'];
+  const budgetRanges = ['₹5,000 - ₹10,000', '₹10,000 - ₹25,000', '₹25,000 - ₹50,000', '₹50,000 - ₹1,00,000', '₹1,00,000+'];
+  const durations = ['1 Week', '2 Weeks', '1 Month', '2 Months', '3 Months', '6 Months'];
+  const audienceTypes = ['Teenagers (13-19)', 'Young Adults (20-29)', 'Adults (30-39)', 'Middle-aged (40-49)', 'Seniors (50+)', 'All Ages'];
 
   const pickFile = async () => {
     const result = await DocumentPicker.getDocumentAsync({
@@ -69,6 +87,31 @@ const CreateCampaignScreen: React.FC<CreateCampaignScreenProps> = ({ onClose, on
 
   // Save campaign to database
   const handleSubmitCampaign = async () => {
+    if (!campaignTitle.trim()) {
+      Alert.alert('Error', 'Please enter a campaign title');
+      return;
+    }
+
+    if (!platform.trim()) {
+      Alert.alert('Error', 'Please select a platform');
+      return;
+    }
+
+    if (!contentType.trim()) {
+      Alert.alert('Error', 'Please select a content type');
+      return;
+    }
+
+    if (!budget.trim()) {
+      Alert.alert('Error', 'Please select a budget range');
+      return;
+    }
+
+    if (!duration.trim()) {
+      Alert.alert('Error', 'Please select a duration');
+      return;
+    }
+
     if (!file) {
       Alert.alert('Error', 'Please select a file first');
       return;
@@ -81,20 +124,22 @@ const CreateCampaignScreen: React.FC<CreateCampaignScreenProps> = ({ onClose, on
       const mediaUrl = `https://example.com/uploads/${file.name}`;
       
       await profileAPI.createCampaign({
-        title: 'Campaign Title', // This should come from form fields
-        description: 'Campaign Description', // This should come from form fields
-        budget: '1000', // This should come from form fields
-        duration: '30 days', // This should come from form fields
-        requirements: 'Requirements', // This should come from form fields
-        targetAudience: 'Target Audience' // This should come from form fields
+        title: campaignTitle.trim(),
+        description: requirements.trim(),
+        budget: budget.trim(),
+        duration: duration.trim(),
+        requirements: requirements.trim(),
+        targetAudience: targetAudience.trim(),
+        platform: platform.trim(),
+        contentType: contentType.trim()
       });
 
       Alert.alert('Success', 'Campaign created successfully!', [
         { text: 'OK', onPress: () => onClose() }
       ]);
     } catch (error) {
-      console.error('Create portfolio error:', error);
-      Alert.alert('Error', 'Failed to create portfolio item. Please try again.');
+      console.error('Create campaign error:', error);
+      Alert.alert('Error', 'Failed to create campaign. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -116,85 +161,168 @@ const CreateCampaignScreen: React.FC<CreateCampaignScreenProps> = ({ onClose, on
             </TouchableOpacity>
           </View>
 
-          {/* Add files */}
-          <Text style={styles.addFilesTitle}>Add files</Text>
-          <TouchableOpacity style={styles.uploadBox} onPress={pickFile} activeOpacity={0.8}>
-            <Ionicons name="cloud-upload-outline" size={32} color="#1A1D1F" style={{ marginBottom: 8 }} />
-            <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 4 }}>
-              <Text style={styles.uploadText}>Drag & Drop or </Text>
-              <TouchableOpacity onPress={pickFile} activeOpacity={0.7}>
-                <Text style={{ color: '#2D5BFF', textDecorationLine: 'underline', fontSize: 15 }}>choose</Text>
-              </TouchableOpacity>
-              <Text style={styles.uploadText}> file to upload</Text>
+          <ScrollView 
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Campaign Title */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Campaign Title<Text style={styles.required}>*</Text></Text>
+              <TextInput
+                style={styles.input}
+                value={campaignTitle}
+                onChangeText={setCampaignTitle}
+                placeholder="Enter campaign title"
+                placeholderTextColor="#B0B0B0"
+              />
             </View>
-            <Text style={styles.uploadSubText}>Select zip, image, video</Text>
-          </TouchableOpacity>
 
-          {/* File Preview */}
-          {file && (
-            <View style={styles.filePreviewContainer}>
-              <View style={styles.filePreviewHeader}>
-                <Text style={styles.filePreviewTitle}>Selected File</Text>
-                <TouchableOpacity onPress={removeFile} style={styles.removeBtn}>
-                  <Ionicons name="close-circle" size={20} color="#f37135" />
+            {/* Platform */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Platform<Text style={styles.required}>*</Text></Text>
+              <Dropdown
+                value={platform}
+                setValue={setPlatform}
+                options={platforms}
+              />
+            </View>
+
+            {/* Content Type */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Content Type<Text style={styles.required}>*</Text></Text>
+              <Dropdown
+                value={contentType}
+                setValue={setContentType}
+                options={contentTypes}
+              />
+            </View>
+
+            {/* Budget */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Budget Range<Text style={styles.required}>*</Text></Text>
+              <Dropdown
+                value={budget}
+                setValue={setBudget}
+                options={budgetRanges}
+              />
+            </View>
+
+            {/* Duration */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Campaign Duration<Text style={styles.required}>*</Text></Text>
+              <Dropdown
+                value={duration}
+                setValue={setDuration}
+                options={durations}
+              />
+            </View>
+
+            {/* Target Audience */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Target Audience</Text>
+              <Dropdown
+                value={targetAudience}
+                setValue={setTargetAudience}
+                options={audienceTypes}
+              />
+            </View>
+
+            {/* Requirements */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Requirements</Text>
+              <TextInput
+                style={styles.textArea}
+                value={requirements}
+                onChangeText={setRequirements}
+                placeholder="Describe your campaign requirements..."
+                placeholderTextColor="#B0B0B0"
+                multiline
+                numberOfLines={4}
+              />
+            </View>
+
+            {/* Add files */}
+            <Text style={styles.addFilesTitle}>Add files</Text>
+            <TouchableOpacity style={styles.uploadBox} onPress={pickFile} activeOpacity={0.8}>
+              <Ionicons name="cloud-upload-outline" size={32} color="#1A1D1F" style={{ marginBottom: 8 }} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 4 }}>
+                <Text style={styles.uploadText}>Drag & Drop or </Text>
+                <TouchableOpacity onPress={pickFile} activeOpacity={0.7}>
+                  <Text style={{ color: '#2D5BFF', textDecorationLine: 'underline', fontSize: 15 }}>choose</Text>
                 </TouchableOpacity>
+                <Text style={styles.uploadText}> file to upload</Text>
               </View>
-              
-              <View style={styles.filePreviewContent}>
-                {/* File Type Icon */}
-                <View style={styles.fileTypeIcon}>
-                  {getFileType(file.mimeType || '') === 'image' ? (
-                    <Ionicons name="image" size={24} color="#2D5BFF" />
-                  ) : getFileType(file.mimeType || '') === 'video' ? (
-                    <Ionicons name="videocam" size={24} color="#2D5BFF" />
-                  ) : getFileType(file.mimeType || '') === 'archive' ? (
-                    <Ionicons name="archive" size={24} color="#2D5BFF" />
-                  ) : (
-                    <Ionicons name="document" size={24} color="#2D5BFF" />
-                  )}
+              <Text style={styles.uploadSubText}>Select zip, image, video</Text>
+            </TouchableOpacity>
+
+            {/* File Preview */}
+            {file && (
+              <View style={styles.filePreviewContainer}>
+                <View style={styles.filePreviewHeader}>
+                  <Text style={styles.filePreviewTitle}>Selected File</Text>
+                  <TouchableOpacity onPress={removeFile} style={styles.removeBtn}>
+                    <Ionicons name="close-circle" size={20} color="#f37135" />
+                  </TouchableOpacity>
                 </View>
                 
-                {/* File Details */}
-                <View style={styles.fileDetails}>
-                  <Text style={styles.fileName} numberOfLines={1} ellipsizeMode="middle">
-                    {file.name}
-                  </Text>
-                  <Text style={styles.fileMeta}>
-                    {formatFileSize(file.size || 0)} • {getFileType(file.mimeType || '').toUpperCase()}
-                  </Text>
-                  {file.mimeType && (
-                    <Text style={styles.fileMimeType}>{file.mimeType}</Text>
-                  )}
+                <View style={styles.filePreviewContent}>
+                  {/* File Type Icon */}
+                  <View style={styles.fileTypeIcon}>
+                    {getFileType(file.mimeType || '') === 'image' ? (
+                      <Ionicons name="image" size={24} color="#2D5BFF" />
+                    ) : getFileType(file.mimeType || '') === 'video' ? (
+                      <Ionicons name="videocam" size={24} color="#2D5BFF" />
+                    ) : getFileType(file.mimeType || '') === 'archive' ? (
+                      <Ionicons name="archive" size={24} color="#2D5BFF" />
+                    ) : (
+                      <Ionicons name="document" size={24} color="#2D5BFF" />
+                    )}
+                  </View>
+                  
+                  {/* File Details */}
+                  <View style={styles.fileDetails}>
+                    <Text style={styles.fileName} numberOfLines={1} ellipsizeMode="middle">
+                      {file.name}
+                    </Text>
+                    <Text style={styles.fileMeta}>
+                      {formatFileSize(file.size || 0)} • {getFileType(file.mimeType || '').toUpperCase()}
+                    </Text>
+                    {file.mimeType && (
+                      <Text style={styles.fileMimeType}>{file.mimeType}</Text>
+                    )}
+                  </View>
                 </View>
+                
+                {/* Upload Progress */}
+                {uploading && (
+                  <View style={styles.uploadProgressSection}>
+                    <View style={styles.progressInfo}>
+                      <Text style={styles.progressText}>Uploading...</Text>
+                      <Text style={styles.progressPercent}>{Math.round(progress * 100)}%</Text>
+                    </View>
+                    <View style={styles.progressBarBg}>
+                      <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
+                    </View>
+                  </View>
+                )}
+                
+                {!uploading && progress >= 1 && (
+                  <View style={styles.uploadCompleteSection}>
+                    <Ionicons name="checkmark-circle" size={20} color="#2DD36F" />
+                    <Text style={styles.uploadCompleteText}>Upload Complete</Text>
+                  </View>
+                )}
               </View>
-              
-              {/* Upload Progress */}
-              {uploading && (
-                <View style={styles.uploadProgressSection}>
-                  <View style={styles.progressInfo}>
-                    <Text style={styles.progressText}>Uploading...</Text>
-                    <Text style={styles.progressPercent}>{Math.round(progress * 100)}%</Text>
-                  </View>
-                  <View style={styles.progressBarBg}>
-                    <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
-                  </View>
-                </View>
-              )}
-              
-              {!uploading && progress >= 1 && (
-                <View style={styles.uploadCompleteSection}>
-                  <Ionicons name="checkmark-circle" size={20} color="#2DD36F" />
-                  <Text style={styles.uploadCompleteText}>Upload Complete</Text>
-                </View>
-              )}
-            </View>
-          )}
+            )}
 
-          {/* Help section */}
-          <View style={styles.helpRow}>
-            <Ionicons name="help-circle-outline" size={18} color="#6B7280" style={{ marginRight: 6 }} />
-            <Text style={styles.helpText}>Still need help?</Text>
-          </View>
+            {/* Help section */}
+            <View style={styles.helpRow}>
+              <Ionicons name="help-circle-outline" size={18} color="#6B7280" style={{ marginRight: 6 }} />
+              <Text style={styles.helpText}>Still need help?</Text>
+            </View>
+          </ScrollView>
 
           {/* Action buttons */}
           <View style={styles.btnRow}>
@@ -262,12 +390,53 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 2,
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  formGroup: {
+    marginBottom: 18,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A1D1F',
+    marginBottom: 8,
+  },
+  required: {
+    color: '#f37135',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 15,
+    color: '#1A1D1F',
+    backgroundColor: '#FAFAFA',
+  },
+  textArea: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 15,
+    color: '#1A1D1F',
+    backgroundColor: '#FAFAFA',
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
   addFilesTitle: {
     fontSize: 17,
     fontWeight: '700',
     color: '#1A1D1F',
     textAlign: 'center',
-    marginTop: 18,
+    marginTop: 24,
     marginBottom: 12,
   },
   uploadBox: {
