@@ -1,128 +1,159 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal, Pressable, Platform, StatusBar, Dimensions, LayoutRectangle, findNodeHandle, UIManager, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../config/colors';
 
 interface CustomDropdownProps {
   value: string;
   setValue: (value: string) => void;
   options: string[];
+  placeholder?: string;
 }
 
-const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, setValue, options }) => {
+const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, setValue, options, placeholder = 'Select' }) => {
   const [open, setOpen] = useState(false);
-  const [dropdownLayout, setDropdownLayout] = useState<LayoutRectangle | null>(null);
-  const buttonRef = useRef<View>(null);
 
   const openDropdown = () => {
-    if (buttonRef.current) {
-      const handle = findNodeHandle(buttonRef.current);
-      if (handle) {
-        UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
-          setDropdownLayout({ x: pageX, y: pageY, width, height });
-          setOpen(true);
-        });
-      } else {
-        setOpen(true);
-      }
-    } else {
-      setOpen(true);
-    }
+    console.log('Opening dropdown with options:', options, 'length:', options?.length);
+    setOpen(true);
   };
 
-  const closeDropdown = () => setOpen(false);
+  const closeDropdown = () => {
+    setOpen(false);
+  };
+
+  const handleOptionSelect = (option: string) => {
+    console.log('Selected option:', option);
+    setValue(option);
+    closeDropdown();
+  };
+
+  // Ensure options is always an array
+  const safeOptions = Array.isArray(options) ? options : [];
+  console.log('Safe options:', safeOptions, 'length:', safeOptions.length);
 
   return (
-    <>
-      <View ref={buttonRef} style={{ marginBottom: 24 }}>
-        <TouchableOpacity style={styles.dropdown} onPress={openDropdown} activeOpacity={0.8}>
-          <Text style={{ color: value ? '#1A1D1F' : '#B0B0B0', fontSize: 15 }}>{value || 'Select'}</Text>
-          <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color="#B0B0B0" />
-        </TouchableOpacity>
-      </View>
-      {open && dropdownLayout && (
-        <Modal
-          visible={open}
-          transparent
-          animationType="fade"
-          onRequestClose={closeDropdown}
-        >
-          <Pressable style={styles.modalOverlay} onPress={closeDropdown}>
-            <View
-              style={[
-                styles.dropdownListModal,
-                {
-                  position: 'absolute',
-                  top:
-                    (dropdownLayout.y + dropdownLayout.height) -
-                    (Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0),
-                  left: dropdownLayout.x,
-                  width: dropdownLayout.width,
-                  maxHeight: 200, // Fixed height for scrolling
-                },
-              ]}
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.dropdown} onPress={openDropdown} activeOpacity={0.8}>
+        <Text style={{ color: value ? COLORS.textDark : '#B0B0B0', fontSize: 15 }}>{value || placeholder}</Text>
+        <Ionicons name="chevron-down" size={18} color="#B0B0B0" />
+      </TouchableOpacity>
+      
+      {open && (
+        <View style={styles.dropdownContainer}>
+          <View style={styles.dropdownList}>
+            <ScrollView 
+              style={styles.scrollView}
+              showsVerticalScrollIndicator={true}
+              nestedScrollEnabled={true}
+              keyboardShouldPersistTaps="handled"
             >
-              <ScrollView 
-                showsVerticalScrollIndicator={true}
-                nestedScrollEnabled={true}
-                style={styles.scrollView}
-              >
-                {options.map((opt: string) => (
-                  <TouchableOpacity key={opt} style={styles.dropdownItem} onPress={() => { setValue(opt); closeDropdown(); }}>
-                    <Text style={{ color: '#1A1D1F', fontSize: 15 }}>{opt}</Text>
+              {safeOptions.length > 0 ? (
+                safeOptions.map((option, index) => (
+                  <TouchableOpacity
+                    key={`${option}-${index}`}
+                    style={styles.optionItem}
+                    onPress={() => handleOptionSelect(option)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[
+                      styles.optionText,
+                      value === option && styles.selectedOptionText
+                    ]}>
+                      {option}
+                    </Text>
+                    {value === option && (
+                      <Ionicons name="checkmark" size={20} color={COLORS.secondary} />
+                    )}
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </Pressable>
-        </Modal>
+                ))
+              ) : (
+                <View style={styles.noOptionsContainer}>
+                  <Text style={styles.noOptionsText}>No options available</Text>
+                  <Text style={styles.noOptionsText}>Options passed: {JSON.stringify(options)}</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </View>
       )}
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    marginBottom: 24,
+    position: 'relative',
+    zIndex: 1000,
+  },
   dropdown: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: COLORS.borderLight,
     borderRadius: 12,
     padding: 16,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: COLORS.primary,
     marginBottom: 0,
-    position: 'relative',
-    zIndex: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.08)',
+  dropdownContainer: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    zIndex: 10000,
+    marginTop: 4,
   },
-  dropdownListModal: {
-    backgroundColor: '#f8f4e8',
+  dropdownList: {
+    backgroundColor: COLORS.primary,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: COLORS.borderLight,
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 8,
-    overflow: 'hidden',
-    zIndex: 10000,
+    maxHeight: 200,
   },
   scrollView: {
     maxHeight: 200,
   },
-  dropdownItem: {
-    padding: 12,
+  optionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
+  },
+  optionText: {
+    fontSize: 16,
+    color: COLORS.textDark,
+    fontWeight: '400',
+  },
+  selectedOptionText: {
+    color: COLORS.secondary,
+    fontWeight: '600',
+  },
+  noOptionsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  noOptionsText: {
+    fontSize: 16,
+    color: '#B0B0B0',
+    textAlign: 'center',
   },
 });
 
