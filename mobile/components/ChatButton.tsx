@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   TouchableOpacity,
   StyleSheet,
   View,
   Text,
-  Alert,
   Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ZohoChatWidget from './ZohoChatWidget';
+import { ZohoSalesIQ } from 'react-native-zohosalesiq-mobilisten';
 import COLORS from '../config/colors';
 
 interface ChatButtonProps {
@@ -17,22 +16,64 @@ interface ChatButtonProps {
   showBadge?: boolean;
   badgeCount?: number;
   onPress?: () => void;
+  orderInfo?: {
+    orderId: string;
+    orderNumber?: string;
+    orderStatus?: string;
+    amount?: number;
+    customerName?: string;
+  };
 }
 
 const ChatButton: React.FC<ChatButtonProps> = ({
   position = 'bottom-right',
   showBadge = false,
   badgeCount = 0,
-  onPress
+  onPress,
+  orderInfo
 }) => {
-  const [showChat, setShowChat] = useState(false);
   const insets = useSafeAreaInsets();
 
   const handlePress = () => {
     if (onPress) {
       onPress();
     } else {
-      setShowChat(true);
+      openZohoChat();
+    }
+  };
+
+  const openZohoChat = () => {
+    try {
+      console.log('🎯 Opening Zoho SalesIQ chat...');
+      
+      // Set order context if available
+      if (orderInfo) {
+        console.log('📦 Setting order context:', orderInfo);
+        
+        // Set custom fields for order context
+        try {
+          ZohoSalesIQ.setCustomField('order_id', orderInfo.orderId);
+          if (orderInfo.orderNumber) {
+            ZohoSalesIQ.setCustomField('order_number', orderInfo.orderNumber);
+          }
+          if (orderInfo.orderStatus) {
+            ZohoSalesIQ.setCustomField('order_status', orderInfo.orderStatus);
+          }
+          if (orderInfo.amount) {
+            ZohoSalesIQ.setCustomField('order_amount', orderInfo.amount.toString());
+          }
+          console.log('✅ Order context set in Zoho SalesIQ');
+        } catch (error) {
+          console.error('❌ Error setting order context:', error);
+        }
+      }
+      
+      // Show the chat using the simplified method
+      ZohoSalesIQ.showChat();
+      console.log('✅ Zoho SalesIQ chat opened');
+      
+    } catch (error) {
+      console.error('❌ Error opening Zoho SalesIQ chat:', error);
     }
   };
 
@@ -97,13 +138,7 @@ const ChatButton: React.FC<ChatButtonProps> = ({
         )}
       </TouchableOpacity>
 
-      <ZohoChatWidget
-        visible={showChat}
-        onClose={() => setShowChat(false)}
-        onMessageSent={(message) => {
-          console.log('Message sent:', message);
-        }}
-      />
+
     </>
   );
 };

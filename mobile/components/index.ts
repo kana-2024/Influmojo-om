@@ -32,4 +32,6 @@ export { default as CreatorSection } from './CreatorSection';
 
 // Zoho Integration Components
 export { default as ZohoChatWidget } from './ZohoChatWidget';
-export { default as ChatButton } from './ChatButton'; 
+export { default as ChatButton } from './ChatButton';
+export { default as OrderChatTest } from './OrderChatTest';
+export { default as ZohoDebugTest } from './ZohoDebugTest'; 

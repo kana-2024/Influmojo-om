@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAppSelector } from '../store/hooks';
 import { ordersAPI } from '../services/apiService';
+import { orderChatService } from '../services/orderChatService';
 import { BottomNavBar, ZohoChatWidget } from '../components';
 
 interface Order {
@@ -79,6 +80,7 @@ const OrdersScreen = ({ navigation }: any) => {
   
   const userType = useAppSelector(state => state.auth.userType);
   const user = useAppSelector(state => state.auth.user);
+  const userId = useAppSelector(state => state.auth.user?.id);
 
   const fetchOrders = async () => {
     try {
@@ -393,39 +395,45 @@ const OrdersScreen = ({ navigation }: any) => {
       return;
     }
 
+    if (!userId) {
+      Alert.alert('Error', 'User ID not found. Please log in again.');
+      return;
+    }
+
     setChatLoading(true);
     try {
-      // Check if chat is already enabled for this order
-      const chatResponse = await ordersAPI.getOrderChat(order.id);
-      
-      if (chatResponse.success && chatResponse.chat.enabled) {
-        // Chat is already enabled, show chat widget
-        setCurrentOrderChat({
-          orderId: order.id,
-          visitorId: chatResponse.chat.visitor_id,
-          sessionId: chatResponse.chat.session_id
-        });
-        setShowChat(true);
-      } else {
-        // Chat is not enabled, enable it first
-        const enableResponse = await ordersAPI.enableOrderChat(order.id);
-        
-        if (enableResponse.success) {
-          setCurrentOrderChat({
-            orderId: order.id,
-            visitorId: enableResponse.chat.visitor_id,
-            sessionId: enableResponse.chat.session_id
-          });
-          setShowChat(true);
-          // Refresh orders to update chat status
-          fetchOrders();
-        } else {
-          Alert.alert('Error', 'Failed to enable chat for this order');
-        }
-      }
+      // Get user data for chat session
+      const userData = {
+        id: userId,
+        name: user?.name || 'Brand User',
+        email: user?.email || '',
+        phone: user?.phone || '',
+        user_type: userType
+      };
+
+      // Get or create order-specific chat session
+      const session = await orderChatService.getOrCreateSession(
+        order.id,
+        userId,
+        'brand'
+      );
+
+      console.log('✅ Order-specific chat session created/retrieved:', session.id);
+
+      // Initialize Zoho chat with order context
+      await orderChatService.initializeOrderChat(session, userData);
+
+      // Update local state to show chat
+      setCurrentOrderChat({
+        orderId: order.id,
+        visitorId: session.zoho_ticket_id,
+        sessionId: session.id
+      });
+      setShowChat(true);
+
     } catch (error) {
-      console.error('Error handling chat:', error);
-      Alert.alert('Error', 'Failed to open chat. Please try again.');
+      console.error('Error handling order-specific chat:', error);
+      Alert.alert('Error', 'Failed to open order chat. Please try again.');
     } finally {
       setChatLoading(false);
     }
@@ -454,43 +462,48 @@ const OrdersScreen = ({ navigation }: any) => {
       return;
     }
 
+    if (!userId) {
+      Alert.alert('Error', 'User ID not found. Please log in again.');
+      return;
+    }
+
     setChatLoading(true);
     try {
-      // Check if chat is already enabled for this order
-      const chatResponse = await ordersAPI.getOrderChat(order.id);
+      // Get user data for chat session
+      const userData = {
+        id: userId,
+        name: user?.name || 'Brand User',
+        email: user?.email || '',
+        phone: user?.phone || '',
+        user_type: userType
+      };
+
+      // Get or create order-specific chat session
+      const session = await orderChatService.getOrCreateSession(
+        order.id,
+        userId,
+        'brand'
+      );
+
+      console.log('✅ Order-specific chat session created/retrieved:', session.id);
+
+      // Initialize Zoho chat with order context
+      await orderChatService.initializeOrderChat(session, userData);
+
+      // Update local state to show chat
+      setCurrentOrderChat({
+        orderId: order.id,
+        visitorId: session.zoho_ticket_id,
+        sessionId: session.id
+      });
+      setShowChat(true);
       
-      if (chatResponse.success && chatResponse.chat.enabled) {
-        // Chat is already enabled, show chat widget
-        setCurrentOrderChat({
-          orderId: order.id,
-          visitorId: chatResponse.chat.visitor_id,
-          sessionId: chatResponse.chat.session_id
-        });
-        setShowChat(true);
-        // Close the order details modal when opening chat
-        setShowOrderDetails(false);
-      } else {
-        // Chat is not enabled, enable it first
-        const enableResponse = await ordersAPI.enableOrderChat(order.id);
-        
-        if (enableResponse.success) {
-          setCurrentOrderChat({
-            orderId: order.id,
-            visitorId: enableResponse.chat.visitor_id,
-            sessionId: enableResponse.chat.session_id
-          });
-          setShowChat(true);
-          // Close the order details modal when opening chat
-          setShowOrderDetails(false);
-          // Refresh orders to update chat status
-          fetchOrders();
-        } else {
-          Alert.alert('Error', 'Failed to enable chat for this order');
-        }
-      }
+      // Close the order details modal when opening chat
+      setShowOrderDetails(false);
+
     } catch (error) {
-      console.error('Error handling chat:', error);
-      Alert.alert('Error', 'Failed to open chat. Please try again.');
+      console.error('Error handling order-specific chat:', error);
+      Alert.alert('Error', 'Failed to open order chat. Please try again.');
     } finally {
       setChatLoading(false);
     }
