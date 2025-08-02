@@ -13,6 +13,7 @@ import GoogleVerificationModal from '../../components/modals/GoogleVerificationM
 import CityModal from '../../components/modals/CityModal';
 import RoleModal from '../../components/modals/RoleModal';
 import googleAuthService from '../../services/googleAuth';
+import COLORS from '../../config/colors';
 
 export default function BrandProfileSetupScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -379,7 +380,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
                 value={email}
                 editable={false}
                 selectTextOnFocus={false}
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
               />
               <View style={{ justifyContent: 'center', alignItems: 'center', marginLeft: 8 }}>
                 <Ionicons name="checkmark-circle" size={22} color="#11714f" />
@@ -395,7 +396,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
               <TextInput
                 style={[styles.input, { flex: 1, backgroundColor: isPhoneVerified ? '#F8F9FA' : '#F5F5F5', color: isPhoneVerified ? '#6B7280' : '#1A1D1F', marginBottom: 0 }]} 
                 placeholder="Enter 10-digit mobile number"
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
@@ -439,7 +440,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
               <TextInput
                 style={[styles.input, { flex: 1, marginBottom: 0 }]}
                 placeholder="e.g. azharweb90@gmail.com"
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -498,7 +499,7 @@ export default function BrandProfileSetupScreen({ navigation }: any) {
         <TextInput
           style={styles.input}
           placeholder="e.g. www.yourcompany.com"
-          placeholderTextColor="#B0B0B0"
+          placeholderTextColor={COLORS.placeholder}
           value={websiteUrl}
           onChangeText={setWebsiteUrl}
           keyboardType="default"

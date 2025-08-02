@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomDropdownDefault from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
+import COLORS from '../../config/colors';
 
 const platforms = ['Instagram', 'Facebook', 'Youtube', 'Snapchat'];
 const contentTypes = ['Reel', 'Story', 'Feed post', 'Carousel Post'];
@@ -109,7 +110,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
             keyboardShouldPersistTaps="handled"
           >
             {/* Choose platform */}
-            <View style={styles.formGroup}>
+            <View style={[styles.formGroup, { zIndex: 5000 }]}>
               <Text style={styles.label}>Choose platform<Text style={styles.required}>*</Text></Text>
               <Dropdown
                 value={platform}
@@ -119,7 +120,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
             </View>
 
             {/* Select Content type */}
-            <View style={styles.formGroup}>
+            <View style={[styles.formGroup, { zIndex: 4000 }]}>
               <Text style={styles.label}>Select Content type<Text style={styles.required}>*</Text></Text>
               <Dropdown
                 value={contentType}
@@ -129,7 +130,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
             </View>
 
             {/* Quantity */}
-            <View style={styles.formGroup}>
+            <View style={[styles.formGroup, { zIndex: 3000 }]}>
               <Text style={styles.label}>Quantity<Text style={styles.required}>*</Text></Text>
               <Dropdown
                 value={quantity}
@@ -139,7 +140,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
             </View>
 
             {/* Revisions */}
-            <View style={styles.formGroup}>
+            <View style={[styles.formGroup, { zIndex: 2000 }]}>
               <Text style={styles.label}>Revisions</Text>
               <Dropdown
                 value={revisions}
@@ -149,7 +150,7 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
             </View>
 
             {/* Duration */}
-            <View style={styles.formGroup}>
+            <View style={[styles.formGroup, { zIndex: 1000 }]}>
               <Text style={styles.label}>Duration<Text style={styles.required}>*</Text></Text>
               <View style={styles.durationRow}>
                 <View style={styles.durationDropdown}>
@@ -170,32 +171,27 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
             </View>
 
             {/* Price */}
-            <View style={styles.formGroup}>
+            <View style={[styles.formGroup, { zIndex: 500 }]}>
               <Text style={styles.label}>Price (INR)<Text style={styles.required}>*</Text></Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  value={price}
-                  onChangeText={setPrice}
-                  keyboardType="numeric"
-                  placeholder="50000"
-                  placeholderTextColor="#B0B0B0"
-                />
-                <TouchableOpacity style={styles.arrowBtn}>
-                  <Ionicons name="chevron-down" size={20} color="#6B7280" />
-                </TouchableOpacity>
-              </View>
+              <TextInput
+                style={styles.input}
+                value={price}
+                onChangeText={setPrice}
+                keyboardType="numeric"
+                placeholder="50000"
+                placeholderTextColor={COLORS.placeholder}
+              />
             </View>
 
             {/* Brief Description */}
-            <View style={styles.formGroup}>
+            <View style={[styles.formGroup, { zIndex: 100 }]}>
               <Text style={styles.label}>Brief Description</Text>
               <TextInput
                 style={styles.textArea}
                 value={desc}
                 onChangeText={setDesc}
                 placeholder="Brief description of your package has to be add here."
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"
@@ -257,7 +253,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 2,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     textAlign: 'center',
     color: '#1A1D1F',
@@ -273,39 +269,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   form: {
-    padding: 24,
+    paddingHorizontal: 18,
     paddingBottom: 20,
   },
   formGroup: {
     marginBottom: 24,
+    position: 'relative',
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#1A1D1F',
     marginBottom: 8,
+    marginTop: 16,
   },
   required: {
     color: '#EF4444',
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  input: {
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 8,
-    backgroundColor: '#F5F5F5',
-  },
-  input: {
-    flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
+    paddingVertical: 14,
+    fontSize: 15,
     color: '#1A1D1F',
-  },
-  arrowBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: '#F5F5F5',
   },
   durationRow: {
     flexDirection: 'row',
@@ -320,42 +309,45 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    fontSize: 16,
+    fontSize: 15,
     color: '#1A1D1F',
     minHeight: 100,
     backgroundColor: '#F5F5F5',
+    textAlignVertical: 'top',
   },
   btnRow: {
     flexDirection: 'row',
     gap: 12,
-    marginHorizontal: 24,
+    marginHorizontal: 18,
     marginTop: 12,
     marginBottom: 24,
   },
   cancelBtn: {
     flex: 1,
-    borderWidth: 1.5,
-    borderColor: '#ffcba9',
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     backgroundColor: '#f8f4e8',
+    alignItems: 'center',
   },
   cancelBtnText: {
-    color: '#f37135',
-    fontWeight: '700',
     fontSize: 16,
+    fontWeight: '600',
+    color: '#6B7280',
   },
   submitBtn: {
     flex: 1,
     backgroundColor: '#f37135',
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
     alignItems: 'center',
   },
   submitBtnText: {
     color: '#f8f4e8',
-    fontWeight: '700',
+    fontWeight: '600',
     fontSize: 16,
   },
 });

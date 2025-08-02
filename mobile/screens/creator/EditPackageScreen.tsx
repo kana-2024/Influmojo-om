@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, TextInput, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CustomDropdown from '../../components/CustomDropdown';
+import COLORS from '../../config/colors';
 
 interface EditPackageScreenProps {
   package: any;
@@ -94,7 +95,7 @@ const EditPackageScreen: React.FC<EditPackageScreenProps> = ({ package: pkg, onC
             onChangeText={setRevisions}
             keyboardType="numeric"
             placeholder="Enter revisions"
-            placeholderTextColor="#B0B0B0"
+            placeholderTextColor={COLORS.placeholder}
           />
         </View>
 
@@ -130,7 +131,7 @@ const EditPackageScreen: React.FC<EditPackageScreenProps> = ({ package: pkg, onC
             onChangeText={setPrice}
             keyboardType="numeric"
             placeholder="Enter price"
-            placeholderTextColor="#B0B0B0"
+            placeholderTextColor={COLORS.placeholder}
           />
         </View>
 
@@ -142,7 +143,7 @@ const EditPackageScreen: React.FC<EditPackageScreenProps> = ({ package: pkg, onC
             value={description}
             onChangeText={setDescription}
             placeholder="Enter description"
-            placeholderTextColor="#B0B0B0"
+            placeholderTextColor={COLORS.placeholder}
             multiline
             numberOfLines={4}
             textAlignVertical="top"

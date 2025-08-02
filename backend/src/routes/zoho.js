@@ -115,22 +115,57 @@ router.post('/create-task', [
  * Following Zoho Chat API documentation
  */
 
-// Initialize chat widget for user
+// Get chat configuration for mobile app
+router.get('/chat/config', asyncHandler(async (req, res) => {
+  console.log('🔧 Getting chat configuration...');
+  
+  const result = await zohoService.getChatConfiguration();
+  
+  res.json({
+    success: result.success,
+    message: result.success ? 'Chat configuration retrieved successfully' : 'Failed to get chat configuration',
+    data: result.data || result.error
+  });
+}));
+
+// Initialize chat widget with order context
 router.post('/chat/initialize', [
   body('userData').isObject().withMessage('User data is required'),
   body('userData.name').isString().withMessage('User name is required'),
-  body('userData.id').optional().isString().withMessage('User ID must be a string if provided')
+  body('userData.id').optional().isString().withMessage('User ID must be a string if provided'),
+  body('orderContext').optional().isObject().withMessage('Order context must be an object if provided')
 ], validateRequest, asyncHandler(async (req, res) => {
   try {
-    const { userData } = req.body;
+    const { userData, orderContext } = req.body;
     
     console.log('💬 Initializing chat widget for user:', userData.id);
+    if (orderContext) {
+      console.log('📦 Order context provided:', orderContext);
+    }
     
-    const result = await zohoService.initializeChatWidget(userData);
+    const result = await zohoService.initializeChatWidget(userData, orderContext);
+    
+    // Extract visitor_id from the result
+    const visitorId = result.visitor_id || result.data?.visitor_id;
+    const sessionId = result.session_id || result.data?.session_id;
+    
+    // If order context is provided, create a support ticket
+    let ticketResult = null;
+    if (orderContext && visitorId && sessionId) {
+      try {
+        ticketResult = await zohoService.createOrderSupportTicket(orderContext, visitorId, sessionId);
+        console.log('🎫 Support ticket created:', ticketResult);
+      } catch (ticketError) {
+        console.error('❌ Error creating support ticket:', ticketError);
+      }
+    }
     
     res.json({
       success: true,
       message: 'Chat widget initialized successfully',
+      visitor_id: visitorId,
+      session_id: sessionId,
+      ticket_id: ticketResult?.ticket_id || null,
       data: result
     });
   } catch (error) {
@@ -142,18 +177,22 @@ router.post('/chat/initialize', [
   }
 }));
 
-// Send chat message
+// Send chat message with order context
 router.post('/chat/send-message', [
   body('visitorId').isString().withMessage('Visitor ID is required'),
   body('message').isString().withMessage('Message is required'),
-  body('messageType').optional().isIn(['text', 'file', 'image']).withMessage('Valid message type is required')
+  body('messageType').optional().isIn(['text', 'file', 'image']).withMessage('Valid message type is required'),
+  body('orderContext').optional().isObject().withMessage('Order context must be an object if provided')
 ], validateRequest, asyncHandler(async (req, res) => {
   try {
-    const { visitorId, message, messageType = 'text' } = req.body;
+    const { visitorId, message, messageType = 'text', orderContext } = req.body;
     
     console.log('💬 Sending chat message for visitor:', visitorId);
+    if (orderContext) {
+      console.log('📦 Order context for message:', orderContext);
+    }
     
-    const result = await zohoService.sendChatMessage(visitorId, message, messageType);
+    const result = await zohoService.sendChatMessage(visitorId, message, messageType, orderContext);
     
     res.json({
       success: true,
@@ -169,25 +208,51 @@ router.post('/chat/send-message', [
   }
 }));
 
-// Get chat history
-router.get('/chat/history/:visitorId', asyncHandler(async (req, res) => {
+// Get chat session history
+router.get('/chat/history', asyncHandler(async (req, res) => {
   try {
-    const { visitorId } = req.params;
+    const { visitorId, sessionId } = req.query;
     const { limit = 50 } = req.query;
     
-    console.log('📜 Getting chat history for visitor:', visitorId);
+    console.log('📜 Getting chat session history for visitor:', visitorId);
+    if (sessionId) {
+      console.log('📋 Session ID:', sessionId);
+    }
     
-    const result = await zohoService.getChatHistory(visitorId, parseInt(limit));
+    const result = await zohoService.getChatSessionHistory(visitorId, sessionId, parseInt(limit));
     
     res.json({
       success: true,
-      message: 'Chat history retrieved successfully',
+      message: 'Chat session history retrieved successfully',
       data: result
     });
   } catch (error) {
-    console.error('❌ Error getting chat history:', error);
+    console.error('❌ Error getting chat session history:', error);
     res.status(500).json({
-      error: 'Failed to get chat history',
+      error: 'Failed to get chat session history',
+      message: error.message
+    });
+  }
+}));
+
+// Get active chat sessions
+router.get('/chat/sessions', asyncHandler(async (req, res) => {
+  try {
+    const { visitorId } = req.query;
+    
+    console.log('📋 Getting active chat sessions for visitor:', visitorId);
+    
+    const result = await zohoService.getActiveChatSessions(visitorId);
+    
+    res.json({
+      success: true,
+      message: 'Active chat sessions retrieved successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('❌ Error getting active chat sessions:', error);
+    res.status(500).json({
+      error: 'Failed to get active chat sessions',
       message: error.message
     });
   }
@@ -266,7 +331,7 @@ router.get('/config/status', asyncHandler(async (req, res) => {
       clientSecret: !!process.env.ZOHO_CLIENT_SECRET,
       refreshToken: !!process.env.ZOHO_REFRESH_TOKEN,
       baseUrl: process.env.ZOHO_BASE_URL || 'https://www.zohoapis.com',
-      chatBaseUrl: process.env.ZOHO_CHAT_BASE_URL || 'https://livechat.zoho.com',
+      chatBaseUrl: process.env.ZOHO_CHAT_BASE_URL || 'https://salesiq.zoho.in',
       webhookSecret: !!process.env.ZOHO_WEBHOOK_SECRET
     };
     

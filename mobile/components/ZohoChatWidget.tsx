@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,26 +7,12 @@ import {
   Modal,
   Alert,
   ActivityIndicator,
-  Platform,
-  TextInput,
-  ScrollView,
-  KeyboardAvoidingView,
-  FlatList
+  Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ZohoSalesIQ } from 'react-native-zohosalesiq-mobilisten';
 import { useAppSelector } from '../store/hooks';
-import { zohoAPI } from '../services/apiService';
 import COLORS from '../config/colors';
-
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-  agentName?: string;
-  messageType?: string;
-}
 
 interface ZohoChatWidgetProps {
   visible: boolean;
@@ -34,6 +20,10 @@ interface ZohoChatWidgetProps {
   onMessageSent?: (message: any) => void;
   orderInfo?: {
     orderId: string;
+    orderNumber?: string;
+    orderStatus?: string;
+    amount?: number;
+    customerName?: string;
     visitorId?: string;
     sessionId?: string;
   };
@@ -47,218 +37,118 @@ const ZohoChatWidget: React.FC<ZohoChatWidgetProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const flatListRef = useRef<FlatList>(null);
   const user = useAppSelector(state => state.auth.user);
 
-  // Zoho SalesIQ Configuration
-  const zohoConfig = {
-    ios: {
-      appKey: process.env.EXPO_PUBLIC_ZOHO_IOS_APP_KEY || 'your_ios_app_key',
-      accessKey: process.env.EXPO_PUBLIC_ZOHO_IOS_ACCESS_KEY || 'your_ios_access_key'
-    },
-    android: {
-      appKey: process.env.EXPO_PUBLIC_ZOHO_ANDROID_APP_KEY || 'your_android_app_key',
-      accessKey: process.env.EXPO_PUBLIC_ZOHO_ANDROID_ACCESS_KEY || 'your_android_access_key'
-    }
-  };
-
-  // Initialize Zoho SalesIQ when component mounts
+  // Check if Zoho SalesIQ is initialized
   useEffect(() => {
-    if (visible && user && !isInitialized) {
-      initializeZohoChat();
+    if (visible) {
+      checkZohoInitialization();
     }
-  }, [visible, user, isInitialized]);
+  }, [visible]);
 
-  // Connect to chat when initialized
-  useEffect(() => {
-    if (isInitialized && visible && !isConnected) {
-      connectToChat();
-    }
-  }, [isInitialized, visible, isConnected]);
-
-  const initializeZohoChat = async () => {
-    if (!user) {
-      Alert.alert('Error', 'User not found. Please login again.');
-      return;
-    }
-
-    setIsLoading(true);
+  const checkZohoInitialization = () => {
     try {
-      console.log('💬 Initializing Zoho SalesIQ for user:', user.id);
-
-      const appKey = Platform.OS === 'ios' ? zohoConfig.ios.appKey : zohoConfig.android.appKey;
-      const accessKey = Platform.OS === 'ios' ? zohoConfig.ios.accessKey : zohoConfig.android.accessKey;
-
-      ZohoSalesIQ.initWithCallback(appKey, accessKey, (success) => {
-        if (success) {
-          console.log('✅ Zoho SalesIQ initialized successfully');
-          setIsInitialized(true);
-          
-          // Hide the launcher completely
-          ZohoSalesIQ.Launcher.show(ZohoSalesIQ.Launcher.VisibilityMode.NEVER);
-          
-        } else {
-          console.error('❌ Failed to initialize Zoho SalesIQ');
-          Alert.alert('Error', 'Failed to initialize chat. Please try again.');
-        }
-        setIsLoading(false);
-      });
-
-    } catch (error) {
-      console.error('❌ Error initializing Zoho SalesIQ:', error);
-      Alert.alert('Error', 'Failed to initialize chat. Please try again.');
-      setIsLoading(false);
-    }
-  };
-
-  const loadChatHistory = async () => {
-    if (!orderInfo?.visitorId) {
-      console.log('⚠️ No visitor ID available for chat history');
-      return;
-    }
-
-    setIsLoadingHistory(true);
-    try {
-      console.log('📜 Loading chat history for visitor:', orderInfo.visitorId);
-      
-      const response = await zohoAPI.getChatHistory(orderInfo.visitorId, 50);
-      
-      if (response.success && response.data) {
-        console.log('✅ Chat history loaded:', response.data);
-        
-        // Convert Zoho messages to our Message format
-        const historyMessages: Message[] = response.data.messages?.map((msg: any) => ({
-          id: msg.message_id || `msg_${Date.now()}_${Math.random()}`,
-          text: msg.message || msg.content || '',
-          isUser: msg.sender_type === 'visitor' || msg.sender_type === 'user',
-          timestamp: new Date(msg.timestamp || msg.created_time || Date.now()),
-          agentName: msg.agent_name || msg.sender_name,
-          messageType: msg.message_type || 'text'
-        })) || [];
-
-        // Sort messages by timestamp
-        historyMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-        
-        setMessages(historyMessages);
-        console.log(`📜 Loaded ${historyMessages.length} messages from history`);
+      // Check if ZohoSalesIQ is available and initialized
+      if (ZohoSalesIQ && typeof ZohoSalesIQ.initWithCallback === 'function') {
+        console.log('✅ Zoho SalesIQ SDK is available');
+        setIsInitialized(true);
       } else {
-        console.log('📜 No chat history found or empty response');
-        // Add welcome message if no history
-        addWelcomeMessage();
+        console.error('❌ Zoho SalesIQ SDK not available');
+        setIsInitialized(false);
       }
     } catch (error) {
-      console.error('❌ Error loading chat history:', error);
-      // Add welcome message on error
-      addWelcomeMessage();
-    } finally {
-      setIsLoadingHistory(false);
+      console.error('❌ Error checking Zoho initialization:', error);
+      setIsInitialized(false);
     }
   };
 
-  const addWelcomeMessage = () => {
-    const welcomeMessage: Message = {
-      id: 'welcome',
-      text: orderInfo 
-        ? `Welcome! You're chatting with support about Order #${orderInfo.orderId.slice(-6)}. How can we help you today?`
-        : 'Welcome! How can we help you today?',
-      isUser: false,
-      timestamp: new Date()
-    };
-    
-    setMessages([welcomeMessage]);
-  };
-
-  const connectToChat = async () => {
+  const openZohoNativeChat = async () => {
     try {
-      console.log('💬 Connecting to chat for order:', orderInfo?.orderId);
+      console.log('🎯 Opening Zoho SalesIQ native chat interface');
       
-      // Load chat history first
-      await loadChatHistory();
+      if (!isInitialized) {
+        Alert.alert('Error', 'Zoho SalesIQ is not initialized. Please try again.');
+        return;
+      }
+
+      setIsLoading(true);
       
-      setIsConnected(true);
-      console.log('✅ Connected to chat');
-      
-    } catch (error) {
-      console.error('❌ Error connecting to chat:', error);
-      Alert.alert('Error', 'Failed to connect to chat. Please try again.');
-    }
-  };
-
-  const sendMessage = async () => {
-    if (!inputText.trim() || !isConnected) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputText.trim(),
-      isUser: true,
-      timestamp: new Date()
-    };
-
-    // Add user message to chat
-    setMessages(prev => [...prev, userMessage]);
-    setInputText('');
-    setIsTyping(true);
-
-    try {
-      // Send message to Zoho SalesIQ
-      if (orderInfo?.visitorId) {
-        console.log('📤 Sending message to Zoho:', userMessage.text);
-        
-        const response = await zohoAPI.sendChatMessage(
-          orderInfo.visitorId, 
-          userMessage.text, 
-          'text'
-        );
-        
-        if (response.success) {
-          console.log('✅ Message sent successfully to Zoho');
-        } else {
-          console.error('❌ Failed to send message to Zoho:', response.message);
+      // Set visitor information before showing chat
+      if (user) {
+        try {
+          ZohoSalesIQ.setVisitorAddInfo(
+            user.name || 'User',
+            user.email || ''
+          );
+          console.log('✅ Visitor information set for Zoho chat');
+        } catch (error) {
+          console.error('❌ Error setting visitor info:', error);
         }
       }
+
+      // Generate session and visitor IDs for tracking
+      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const visitorId = `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      if (orderInfo) {
+        console.log('📦 Chat context - Order ID:', orderInfo.orderId, 'Session ID:', sessionId, 'Visitor ID:', visitorId);
+      }
       
-      // Simulate agent response (you can replace this with real-time message listening)
-      setTimeout(() => {
-        const agentMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: `Thank you for your message about Order #${orderInfo?.orderId.slice(-6) || 'your order'}. Our support team will respond shortly.`,
-          isUser: false,
-          timestamp: new Date(),
-          agentName: 'Support Team'
+      // Show the Zoho SalesIQ chat interface according to official documentation
+      if (ZohoSalesIQ && ZohoSalesIQ.Launcher) {
+        console.log('🎯 Showing Zoho SalesIQ launcher');
+        
+        // Show the Zoho chat interface
+        ZohoSalesIQ.Launcher.show(ZohoSalesIQ.Launcher.VisibilityMode.ALWAYS);
+        
+        // Update orderInfo with session and visitor IDs
+        const updatedOrderInfo = {
+          ...orderInfo,
+          sessionId,
+          visitorId
         };
         
-        setMessages(prev => [...prev, agentMessage]);
-        setIsTyping(false);
-        
-        // Call onMessageSent callback
+        // Call onMessageSent callback if provided
         if (onMessageSent) {
-          onMessageSent(userMessage);
+          onMessageSent({
+            type: 'chat_opened',
+            timestamp: new Date(),
+            orderInfo: updatedOrderInfo
+          });
         }
-      }, 1000);
-
+        
+        console.log('✅ Chat opened with session ID:', sessionId, 'visitor ID:', visitorId);
+        
+        // Keep the modal open so user can see the chat status
+        // User can manually close it when done
+        setIsLoading(false);
+        
+        // Show success message
+        Alert.alert(
+          'Chat Opened', 
+          'Zoho SalesIQ chat has been opened. You can now chat with support.',
+          [{ text: 'OK' }]
+        );
+        
+      } else {
+        console.error('❌ Zoho SalesIQ Launcher not available');
+        Alert.alert('Error', 'Zoho chat interface not available. Please try again.');
+        setIsLoading(false);
+      }
+      
     } catch (error) {
-      console.error('❌ Error sending message:', error);
-      setIsTyping(false);
-      Alert.alert('Error', 'Failed to send message. Please try again.');
+      console.error('❌ Error opening Zoho native chat interface:', error);
+      Alert.alert('Error', 'Failed to open Zoho chat interface. Please try again.');
+      setIsLoading(false);
     }
   };
 
   const closeChat = () => {
     try {
       // Hide the launcher completely
-      ZohoSalesIQ.Launcher.show(ZohoSalesIQ.Launcher.VisibilityMode.NEVER);
-      
-      // Reset state
-      setIsConnected(false);
-      setMessages([]);
-      setInputText('');
-      setIsTyping(false);
-      setIsLoadingHistory(false);
+      if (ZohoSalesIQ && ZohoSalesIQ.Launcher) {
+        ZohoSalesIQ.Launcher.show(ZohoSalesIQ.Launcher.VisibilityMode.NEVER);
+      }
       
       console.log('✅ Chat closed');
       onClose();
@@ -267,31 +157,6 @@ const ZohoChatWidget: React.FC<ZohoChatWidgetProps> = ({
       onClose();
     }
   };
-
-  const renderMessage = ({ item }: { item: Message }) => (
-    <View style={[
-      styles.messageContainer,
-      item.isUser ? styles.userMessage : styles.agentMessage
-    ]}>
-      <View style={[
-        styles.messageBubble,
-        item.isUser ? styles.userBubble : styles.agentBubble
-      ]}>
-        {!item.isUser && item.agentName && (
-          <Text style={styles.agentName}>{item.agentName}</Text>
-        )}
-        <Text style={[
-          styles.messageText,
-          item.isUser ? styles.userMessageText : styles.agentMessageText
-        ]}>
-          {item.text}
-        </Text>
-        <Text style={styles.messageTime}>
-          {item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </Text>
-      </View>
-    </View>
-  );
 
   if (!visible) return null;
 
@@ -302,10 +167,7 @@ const ZohoChatWidget: React.FC<ZohoChatWidgetProps> = ({
       presentationStyle="pageSheet"
       onRequestClose={closeChat}
     >
-      <KeyboardAvoidingView 
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+      <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerContent}>
@@ -314,11 +176,11 @@ const ZohoChatWidget: React.FC<ZohoChatWidgetProps> = ({
                 <Ionicons name="chatbubble-ellipses" size={24} color={COLORS.primary} />
               </View>
               <View style={styles.agentDetails}>
-                <Text style={styles.agentName}>
+                <Text style={styles.headerAgentName}>
                   {orderInfo ? `Order #${orderInfo.orderId.slice(-6)} Support` : 'Influ Mojo Support'}
                 </Text>
                 <Text style={styles.agentStatus}>
-                  {isLoading ? 'Connecting...' : isConnected ? 'Online' : 'Connecting...'}
+                  {isInitialized ? 'Ready' : 'Initializing...'}
                 </Text>
               </View>
             </View>
@@ -328,67 +190,56 @@ const ZohoChatWidget: React.FC<ZohoChatWidgetProps> = ({
           </View>
         </View>
 
-        {/* Chat Messages */}
-        <View style={styles.chatContainer}>
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={COLORS.primary} />
-              <Text style={styles.loadingText}>Connecting to support...</Text>
+        {/* Content */}
+        <View style={styles.content}>
+          <View style={styles.chatContainer}>
+            <View style={styles.welcomeSection}>
+              <Ionicons name="chatbubbles" size={64} color={COLORS.primary} />
+              <Text style={styles.welcomeTitle}>
+                {orderInfo ? `Support for Order #${orderInfo.orderId.slice(-6)}` : 'Customer Support'}
+              </Text>
+              <Text style={styles.welcomeDescription}>
+                Get instant help from our support team. Click the button below to start chatting with Zoho SalesIQ.
+              </Text>
             </View>
-          ) : isLoadingHistory ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={COLORS.primary} />
-              <Text style={styles.loadingText}>Loading conversation history...</Text>
-            </View>
-          ) : (
-            <FlatList
-              ref={flatListRef}
-              data={messages}
-              renderItem={renderMessage}
-              keyExtractor={(item) => item.id}
-              style={styles.messagesList}
-              contentContainerStyle={styles.messagesContent}
-              onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-              showsVerticalScrollIndicator={false}
-            />
-          )}
-          
-          {isTyping && (
-            <View style={styles.typingContainer}>
-              <Text style={styles.typingText}>Support is typing...</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Input Area */}
-        {isConnected && !isLoadingHistory && (
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              value={inputText}
-              onChangeText={setInputText}
-              placeholder="Type your message..."
-              placeholderTextColor="#999"
-              multiline
-              maxLength={500}
-            />
+            
             <TouchableOpacity 
-              style={[
-                styles.sendButton,
-                !inputText.trim() && styles.sendButtonDisabled
-              ]}
-              onPress={sendMessage}
-              disabled={!inputText.trim()}
+              style={styles.zohoChatButton}
+              onPress={openZohoNativeChat}
+              disabled={!isInitialized || isLoading}
             >
-              <Ionicons 
-                name="send" 
-                size={20} 
-                color={inputText.trim() ? '#fff' : '#999'} 
-              />
+              <Ionicons name="chatbubbles" size={20} color="#fff" />
+              <Text style={styles.zohoChatButtonText}>
+                {isLoading ? 'Opening Chat...' : isInitialized ? 'Open Zoho Chat' : 'Initializing...'}
+              </Text>
             </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.closeChatButton}
+              onPress={closeChat}
+            >
+              <Ionicons name="close-circle" size={20} color={COLORS.textGray} />
+              <Text style={styles.closeChatButtonText}>Close</Text>
+            </TouchableOpacity>
+            
+            {orderInfo && (
+              <View style={styles.orderInfo}>
+                <Text style={styles.orderInfoTitle}>Order Details:</Text>
+                <Text style={styles.orderInfoText}>Order ID: {orderInfo.orderId}</Text>
+                {orderInfo.orderNumber && (
+                  <Text style={styles.orderInfoText}>Order #: {orderInfo.orderNumber}</Text>
+                )}
+                {orderInfo.orderStatus && (
+                  <Text style={styles.orderInfoText}>Status: {orderInfo.orderStatus}</Text>
+                )}
+                {orderInfo.amount && (
+                  <Text style={styles.orderInfoText}>Amount: ₹{orderInfo.amount}</Text>
+                )}
+              </View>
+            )}
+          </View>
+        </View>
       </View>
-        )}
-      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -426,7 +277,7 @@ const styles = StyleSheet.create({
   agentDetails: {
     flex: 1,
   },
-  agentName: {
+  headerAgentName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#ffffff',
@@ -439,119 +290,88 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 8,
   },
-  chatContainer: {
+  content: {
     flex: 1,
     backgroundColor: '#f8f9fa',
-    paddingHorizontal: 20,
-    paddingBottom: 10,
   },
-  messagesList: {
-    flex: 1,
-  },
-  messagesContent: {
-    paddingBottom: 10, // Add some padding at the bottom for the input area
-  },
-  messageContainer: {
-    marginBottom: 10,
-    alignSelf: 'flex-start', // Align user messages to the left
-  },
-  userMessage: {
-    alignSelf: 'flex-end', // Align user messages to the right
-  },
-  agentMessage: {
-    alignSelf: 'flex-start', // Align agent messages to the left
-  },
-  messageBubble: {
-    maxWidth: '80%',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 15,
-  },
-  userBubble: {
-    backgroundColor: COLORS.primary,
-    borderBottomRightRadius: 5,
-  },
-  agentBubble: {
-    backgroundColor: '#e0e0e0',
-    borderBottomLeftRadius: 5,
-  },
-  messageText: {
-    fontSize: 16,
-    color: '#ffffff',
-  },
-  agentName: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-    fontWeight: '500',
-  },
-  userMessageText: {
-    color: '#ffffff',
-  },
-  agentMessageText: {
-    color: COLORS.textDark,
-  },
-  messageTime: {
-    fontSize: 10,
-    color: '#999',
-    marginTop: 5,
-    alignSelf: 'flex-end',
-  },
-  typingContainer: {
-    alignSelf: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  typingText: {
-    fontSize: 14,
-    color: '#555',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    backgroundColor: '#f0f0f0',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-  },
-  textInput: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    fontSize: 16,
-    color: COLORS.textDark,
-    minHeight: 40,
-    maxHeight: 100,
-    textAlignVertical: 'top',
-  },
-  sendButton: {
-    padding: 10,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary,
-    marginLeft: 10,
-  },
-  sendButtonDisabled: {
-    backgroundColor: '#ccc',
-  },
-  loadingContainer: {
+  chatContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 40,
+    paddingHorizontal: 20,
   },
-  loadingText: {
-    marginTop: 12,
+  welcomeSection: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  welcomeTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: COLORS.textDark,
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  welcomeDescription: {
     fontSize: 16,
     color: COLORS.textGray,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  zohoChatButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#20536d',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    marginBottom: 30,
+    minWidth: 200,
+  },
+  zohoChatButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  orderInfo: {
+    backgroundColor: '#ffffff',
+    padding: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    width: '100%',
+    maxWidth: 300,
+  },
+  orderInfoTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textDark,
+    marginBottom: 10,
+  },
+  orderInfoText: {
+    fontSize: 14,
+    color: COLORS.textGray,
+    marginBottom: 5,
+  },
+  closeChatButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.textGray,
+    backgroundColor: 'transparent',
+    marginTop: 10,
+  },
+  closeChatButtonText: {
+    color: COLORS.textGray,
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: 8,
   },
 });
 

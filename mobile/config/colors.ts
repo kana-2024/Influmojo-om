@@ -16,6 +16,9 @@ export const COLORS = {
   chipBlue: '#aad6f3',   // 5th color - Light blue
   chipYellow: '#ffd365', // 6th color - Light yellow
   
+  // Placeholder text color
+  placeholder: '#9CA3AF',
+  
   // Legacy colors (keeping for reference)
   legacyChipBlue: '#B1E5FC',
   legacyChipYellow: '#FFD88D',

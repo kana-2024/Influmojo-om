@@ -12,6 +12,7 @@ import OtpModal from '../components/modals/OtpModal';
 import DatePickerModal from '../components/modals/DatePickerModal';
 import GoogleVerificationModal from '../components/modals/GoogleVerificationModal';
 import googleAuthService from '../services/googleAuth';
+import COLORS from '../config/colors';
 
 export default function ProfileSetupScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -358,7 +359,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
                 value={email}
                 editable={false}
                 selectTextOnFocus={false}
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
               />
               <View style={{ justifyContent: 'center', alignItems: 'center', marginLeft: 8 }}>
                 <Ionicons name="checkmark-circle" size={22} color="#11714f" />
@@ -374,7 +375,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
               <TextInput
                 style={[styles.input, { flex: 1, backgroundColor: isPhoneVerified ? '#F8F9FA' : '#F5F5F5', color: isPhoneVerified ? '#6B7280' : '#1A1D1F', marginBottom: 0 }]} 
                 placeholder="Enter 10-digit mobile number"
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
@@ -418,7 +419,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
               <TextInput
                 style={[styles.input, { flex: 1, marginBottom: 0 }]}
                 placeholder="e.g. xxxxxstill sayin@gmail.com"
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -446,7 +447,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
           <TextInput
             style={[styles.input, { flex: 1, marginBottom: 0 }]}
             placeholder="MM/DD/YYYY"
-            placeholderTextColor="#B0B0B0"
+            placeholderTextColor={COLORS.placeholder}
             value={selectedDate ? formatDate(selectedDate) : ''}
             editable={false}
           />

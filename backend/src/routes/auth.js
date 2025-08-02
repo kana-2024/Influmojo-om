@@ -234,6 +234,150 @@ router.post('/google-mobile', [
   }
 }));
 
+// Google OAuth endpoint (alias for google-mobile)
+router.post('/google', [
+  body('idToken').notEmpty().withMessage('ID token is required'),
+  body('isSignup').optional().isBoolean().withMessage('isSignup must be a boolean'),
+  body('userType').optional().isIn(['creator', 'brand']).withMessage('userType must be creator or brand')
+], validateRequest, asyncHandler(async (req, res) => {
+  try {
+    const { idToken, isSignup = false, userType = 'creator' } = req.body;
+
+    // Verify Google token
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub: googleId } = payload;
+
+    // Check if user exists with Google auth provider
+    let user = await prisma.user.findFirst({
+      where: {
+        email: email,
+        auth_provider: 'google'
+      }
+    });
+
+    // Also check if user exists with different auth provider
+    let existingUserWithDifferentProvider = null;
+    if (!user) {
+      existingUserWithDifferentProvider = await prisma.user.findFirst({
+        where: {
+          email: email,
+          auth_provider: { not: 'google' }
+        }
+      });
+    }
+
+    let isNewUser = false;
+
+    if (!user) {
+      if (existingUserWithDifferentProvider) {
+        // User exists with different auth provider (e.g., phone)
+        if (isSignup) {
+          // Update the existing user to use Google auth provider
+          user = await prisma.user.update({
+            where: { id: existingUserWithDifferentProvider.id },
+            data: {
+              auth_provider: 'google',
+              profile_image_url: picture,
+              email_verified: true,
+              last_login_at: new Date()
+            }
+          });
+          isNewUser = false;
+        } else {
+          // Login - update the existing user
+          user = await prisma.user.update({
+            where: { id: existingUserWithDifferentProvider.id },
+            data: {
+              auth_provider: 'google',
+              profile_image_url: picture,
+              email_verified: true,
+              last_login_at: new Date()
+            }
+          });
+          isNewUser = false;
+        }
+      } else {
+        // No user exists at all
+        if (isSignup) {
+          // Create new user for signup
+          user = await prisma.user.create({
+            data: {
+              email,
+              name,
+              profile_image_url: picture,
+              auth_provider: 'google',
+              email_verified: true,
+              user_type: userType, // Use the userType from request
+              status: 'active'
+            }
+          });
+          isNewUser = true;
+        } else {
+          // User doesn't exist but this is a login attempt
+          return res.status(404).json({
+            success: false,
+            error: 'No account found with this Google account. Please sign up first.',
+            userExists: false
+          });
+        }
+      }
+    } else {
+      // User exists with Google auth provider
+      if (isSignup) {
+        // User exists but this is a signup attempt
+        return res.status(409).json({
+          success: false,
+          error: 'Account already exists with this Google account. Please log in.',
+          userExists: true
+        });
+      } else {
+        // Login - update last login
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            last_login_at: new Date(),
+            profile_image_url: picture,
+            email_verified: true
+          }
+        });
+        isNewUser = false;
+      }
+    }
+
+    // Generate JWT token
+    const token = generateToken(user.id, user.user_type);
+
+    res.json({
+      success: true,
+      message: 'Google authentication successful',
+      userExists: !isNewUser, // true if user existed before, false if newly created
+      isNewUser: isNewUser,
+      user: {
+        id: user.id.toString(),
+        email: user.email,
+        name: user.name,
+        profileImage: user.profile_image_url,
+        cover_image_url: user.cover_image_url,
+        isVerified: user.email_verified,
+        user_type: user.user_type
+      },
+      token
+    });
+
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(500).json({ 
+      error: 'Google authentication failed',
+      message: error.message 
+    });
+  }
+}));
+
 // Development endpoint to disable rate limiting (only in development)
 if (process.env.NODE_ENV !== 'production') {
   router.post('/disable-rate-limit', async (req, res) => {

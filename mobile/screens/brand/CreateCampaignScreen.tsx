@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import CustomDropdownDefault from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
+import COLORS from '../../config/colors';
 
 interface CreateCampaignScreenProps {
   onClose: () => void;
@@ -175,7 +176,7 @@ const CreateCampaignScreen: React.FC<CreateCampaignScreenProps> = ({ onClose, on
                 value={campaignTitle}
                 onChangeText={setCampaignTitle}
                 placeholder="Enter campaign title"
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
               />
             </View>
 
@@ -237,7 +238,7 @@ const CreateCampaignScreen: React.FC<CreateCampaignScreenProps> = ({ onClose, on
                 value={requirements}
                 onChangeText={setRequirements}
                 placeholder="Describe your campaign requirements..."
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
                 multiline
                 numberOfLines={4}
               />
@@ -357,11 +358,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     marginTop: 0,
     marginHorizontal: 0,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: -2 },
-    elevation: 8,
     overflow: 'hidden',
     paddingHorizontal: 0,
   },

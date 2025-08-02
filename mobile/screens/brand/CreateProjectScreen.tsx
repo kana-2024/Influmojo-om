@@ -5,6 +5,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomDropdownDefault from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
+import COLORS from '../../config/colors';
 
 const platforms = ['Instagram', 'Facebook', 'Youtube', 'Snapchat'];
 const contentTypes = ['Reel', 'Story', 'Feed post', 'Carousel Post'];
@@ -132,7 +133,7 @@ const CreateProjectScreen: React.FC<CreateProjectScreenProps> = ({ navigation, o
             <TextInput
               style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
               placeholder="Brief description of your project has to be add here."
-              placeholderTextColor="#B0B0B0"
+              placeholderTextColor={COLORS.placeholder}
               value={desc}
               onChangeText={setDesc}
               multiline

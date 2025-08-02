@@ -198,6 +198,13 @@ export const authAPI = {
 
 // Zoho API calls
 export const zohoAPI = {
+  // Get chat configuration from backend
+  getChatConfig: async () => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CHAT_CONFIG, {
+      method: 'GET',
+    });
+  },
+
   // Initialize chat widget
   initializeChat: async (userData: any) => {
     return await apiRequest(API_ENDPOINTS.ZOHO_CHAT_INITIALIZE, {
@@ -206,18 +213,50 @@ export const zohoAPI = {
     });
   },
 
+  // Initialize chat widget with order context
+  initializeChatWithOrderContext: async (userData: any, orderContext: any) => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CHAT_INITIALIZE, {
+      method: 'POST',
+      body: JSON.stringify({ userData, orderContext }),
+    });
+  },
+
   // Send chat message
-  sendChatMessage: async (visitorId: string, message: string, messageType: string = 'text') => {
+  sendChatMessage: async (visitorId: string, message: string, messageType: string = 'text', orderContext?: any) => {
     return await apiRequest(API_ENDPOINTS.ZOHO_CHAT_SEND_MESSAGE, {
       method: 'POST',
-      body: JSON.stringify({ visitorId, message, messageType }),
+      body: JSON.stringify({ visitorId, message, messageType, orderContext }),
     });
   },
 
   // Get chat history
   getChatHistory: async (visitorId: string, limit: number = 50) => {
-    return await apiRequest(`${API_ENDPOINTS.ZOHO_CHAT_HISTORY}/${visitorId}?limit=${limit}`, {
+    return await apiRequest(`${API_ENDPOINTS.ZOHO_CHAT_HISTORY}?visitorId=${visitorId}&limit=${limit}`, {
       method: 'GET',
+    });
+  },
+
+  // Create contact in Zoho CRM
+  createContact: async (contactData: any) => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CREATE_CONTACT, {
+      method: 'POST',
+      body: JSON.stringify(contactData),
+    });
+  },
+
+  // Create deal in Zoho CRM
+  createDeal: async (dealData: any) => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CREATE_DEAL, {
+      method: 'POST',
+      body: JSON.stringify(dealData),
+    });
+  },
+
+  // Create task in Zoho CRM
+  createTask: async (taskData: any) => {
+    return await apiRequest(API_ENDPOINTS.ZOHO_CREATE_TASK, {
+      method: 'POST',
+      body: JSON.stringify(taskData),
     });
   },
 
@@ -226,22 +265,6 @@ export const zohoAPI = {
     return await apiRequest(API_ENDPOINTS.ZOHO_SYNC_CONTACT, {
       method: 'POST',
       body: JSON.stringify({ userData }),
-    });
-  },
-
-  // Create deal in Zoho CRM
-  createDeal: async (collaborationData: any) => {
-    return await apiRequest(API_ENDPOINTS.ZOHO_CREATE_DEAL, {
-      method: 'POST',
-      body: JSON.stringify({ collaborationData }),
-    });
-  },
-
-  // Create task in Zoho CRM
-  createTask: async (taskData: any) => {
-    return await apiRequest(API_ENDPOINTS.ZOHO_CREATE_TASK, {
-      method: 'POST',
-      body: JSON.stringify({ taskData }),
     });
   },
 

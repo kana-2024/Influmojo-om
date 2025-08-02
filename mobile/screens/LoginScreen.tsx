@@ -18,6 +18,7 @@ import OtpModal from '../components/modals/OtpModal';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loginSuccess, setUserType } from '../store/slices/authSlice';
 import { FONTS } from '../config/fonts';
+import COLORS from '../config/colors';
 
 export default function LoginScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -173,7 +174,7 @@ export default function LoginScreen({ navigation }: any) {
             <TextInput
               style={styles.phoneInputField}
               placeholder="e.g. 9948425492"
-              placeholderTextColor="#B0B0B0"
+              placeholderTextColor={COLORS.placeholder}
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"

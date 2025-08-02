@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import COLORS from '../../config/colors';
 
 interface RoleModalProps {
   visible: boolean;
@@ -50,7 +51,7 @@ const RoleModal: React.FC<RoleModalProps> = ({ visible, onClose, onSelectRole, s
           <TextInput
             style={styles.searchInput}
             placeholder="Search roles..."
-                            placeholderTextColor="#B0B0B0"
+                            placeholderTextColor={COLORS.placeholder}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Platform } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store';
@@ -9,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { registerRootComponent } from 'expo';
 import * as NavigationBar from 'expo-navigation-bar';
+import { ZohoSalesIQ } from 'react-native-zohosalesiq-mobilisten';
 import WelcomeScreen from './screens/WelcomeScreen';
 import UserRoleScreen from './screens/UserRoleScreen';
 import SignUpScreen from './screens/SignUpScreen';
@@ -112,7 +113,61 @@ export default function App() {
       // Ignore error if edge-to-edge is enabled
       console.log('Background color setting skipped (edge-to-edge enabled)');
     }
+
+    // Initialize Zoho SalesIQ Mobilisten
+    initializeZohoSalesIQ();
   }, []);
+
+  const initializeZohoSalesIQ = async () => {
+    try {
+      console.log('🔧 Initializing Zoho SalesIQ Mobilisten...');
+      
+      // Get configuration from backend
+      const response = await fetch(`${ENV.API_BASE_URL}/api/zoho/chat/config`);
+      const configData = await response.json();
+      
+      if (configData.success && configData.data) {
+        const config = configData.data;
+        
+        // Get platform-specific keys according to official documentation
+        let appKey, accessKey;
+        
+        if (Platform.OS === 'ios') {
+          appKey = config.ios.appKey;
+          accessKey = config.ios.accessKey;
+        } else {
+          appKey = config.android.appKey;
+          accessKey = config.android.accessKey;
+        }
+
+        console.log('🔑 Platform:', Platform.OS);
+        console.log('🔑 App Key:', appKey ? 'Set' : 'Not set');
+        console.log('🔑 Access Key:', accessKey ? 'Set' : 'Not set');
+
+        if (appKey && accessKey) {
+          // Initialize Zoho SalesIQ according to official documentation
+          ZohoSalesIQ.initWithCallback(appKey, accessKey, (success) => {
+            if (success) {
+              console.log('✅ Zoho SalesIQ initialized successfully');
+              
+              // Hide the floating launcher as per your requirements
+              ZohoSalesIQ.Launcher.show(ZohoSalesIQ.Launcher.VisibilityMode.NEVER);
+              
+              console.log('✅ Zoho floating launcher hidden');
+            } else {
+              console.error('❌ Zoho SalesIQ initialization failed');
+            }
+          });
+        } else {
+          console.error('❌ Missing Zoho SalesIQ keys for platform:', Platform.OS);
+        }
+      } else {
+        console.error('❌ Failed to get Zoho configuration from backend');
+      }
+    } catch (error) {
+      console.error('❌ Error initializing Zoho SalesIQ:', error);
+    }
+  };
   
   return (
     <ErrorBoundary>

@@ -20,6 +20,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { StatusBar } from 'react-native';
 import googleAuthService from '../services/googleAuth';
 import * as apiService from '../services/apiService';
+import COLORS from '../config/colors';
 
 // Debug import (only in development)
 if (__DEV__) {
@@ -254,7 +255,7 @@ const SignUpScreen = ({ navigation, route }: any) => {
           <TextInput
             style={styles.input}
             placeholder="e.g. mohammed Azhar Uddin"
-            placeholderTextColor="#B0B0B0"
+            placeholderTextColor={COLORS.placeholder}
             value={fullName}
             onChangeText={setFullName}
           />
@@ -268,7 +269,7 @@ const SignUpScreen = ({ navigation, route }: any) => {
             <TextInput
               style={[styles.input, { flex: 1, marginLeft: 8, marginBottom: 0 }]}
               placeholder="e.g. 9948425492"
-              placeholderTextColor="#B0B0B0"
+              placeholderTextColor={COLORS.placeholder}
               keyboardType="phone-pad"
               value={mobile}
               onChangeText={setMobile}

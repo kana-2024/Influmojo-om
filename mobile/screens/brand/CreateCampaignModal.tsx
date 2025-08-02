@@ -5,6 +5,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomDropdownDefault from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
+import COLORS from '../../config/colors';
 
 const campaignTypes = ['Brand Awareness', 'Product Launch', 'Lead Generation', 'Sales Promotion', 'Event Promotion'];
 const platforms = ['Instagram', 'Facebook', 'Youtube', 'TikTok', 'LinkedIn', 'Twitter'];
@@ -110,14 +111,14 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({ onClose, onBa
               value={title} 
               onChangeText={setTitle}
               placeholder="Enter your campaign title"
-              placeholderTextColor="#B0B0B0"
+              placeholderTextColor={COLORS.placeholder}
             />
 
             <Text style={styles.label}>Campaign Description*</Text>
             <TextInput
               style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
               placeholder="Describe your campaign goals and objectives"
-              placeholderTextColor="#B0B0B0"
+              placeholderTextColor={COLORS.placeholder}
               value={description}
               onChangeText={setDescription}
               multiline
@@ -136,7 +137,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({ onClose, onBa
             <TextInput
               style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
               placeholder="Describe what you're looking for from creators (content type, style, deliverables, etc.)"
-              placeholderTextColor="#B0B0B0"
+              placeholderTextColor={COLORS.placeholder}
               value={requirements}
               onChangeText={setRequirements}
               multiline
@@ -180,11 +181,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     marginTop: 0,
     marginHorizontal: 0,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: -2 },
-    elevation: 8,
     overflow: 'hidden',
   },
   scrollView: {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as apiService from '../../services/apiService';
+import COLORS from '../../config/colors';
 
 interface OtpModalProps {
   visible: boolean;
@@ -105,7 +106,7 @@ const OtpModal: React.FC<OtpModalProps> = ({ visible, onClose, onSuccess, phone 
             <TextInput
               style={styles.otpInput}
               placeholder="Enter 6-digit code"
-              placeholderTextColor="#B0B0B0"
+              placeholderTextColor={COLORS.placeholder}
               value={otp}
               onChangeText={setOtp}
               keyboardType="number-pad"

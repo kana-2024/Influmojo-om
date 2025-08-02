@@ -7,6 +7,7 @@ import { useAppSelector } from '../../store/hooks';
 import BrandProfile from './BrandProfile';
 import { profileAPI } from '../../services/apiService';
 import CartService from '../../services/cartService';
+import COLORS from '../../config/colors';
 
 const BrandHome = ({ navigation, route }: any) => {
   const insets = useSafeAreaInsets();
@@ -192,7 +193,7 @@ const BrandHome = ({ navigation, route }: any) => {
             <Feather name="search" size={16} color="#C6C6C6" />
                          <TextInput
                placeholder="Search Creators"
-                               placeholderTextColor="#B0B0B0"
+                               placeholderTextColor={COLORS.placeholder}
                style={{ marginLeft: 8, flex: 1, fontSize: 14, color: '#000' }}
              />
           </View>

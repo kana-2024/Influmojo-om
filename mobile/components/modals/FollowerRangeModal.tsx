@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
+import COLORS from '../../config/colors';
 
 interface FollowerRangeModalProps {
   visible: boolean;
@@ -146,7 +147,7 @@ const FollowerRangeModal: React.FC<FollowerRangeModalProps> = ({
                 onChangeText={handleMinInputChange}
                 keyboardType="numeric"
                 placeholder="0"
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
               />
               <Text style={styles.inputSeparator}>-</Text>
               <TextInput
@@ -155,7 +156,7 @@ const FollowerRangeModal: React.FC<FollowerRangeModalProps> = ({
                 onChangeText={handleMaxInputChange}
                 keyboardType="numeric"
                 placeholder="0"
-                placeholderTextColor="#B0B0B0"
+                placeholderTextColor={COLORS.placeholder}
               />
             </View>
           </View>

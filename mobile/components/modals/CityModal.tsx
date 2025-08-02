@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import COLORS from '../../config/colors';
 
 interface CityModalProps {
   visible: boolean;
@@ -73,7 +74,7 @@ const CityModal: React.FC<CityModalProps> = ({ visible, onClose, onSelectCity, s
           <TextInput
             style={styles.searchInput}
             placeholder="Search cities..."
-                            placeholderTextColor="#B0B0B0"
+                            placeholderTextColor={COLORS.placeholder}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"

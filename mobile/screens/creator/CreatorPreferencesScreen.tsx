@@ -178,7 +178,7 @@ export default function CreatorPreferencesScreen({ navigation }: any) {
         <TextInput
           style={styles.aboutInput}
           placeholder="Brief about your work so that it will help brands to connect you easily."
-          placeholderTextColor="#B0B0B0"
+          placeholderTextColor={COLORS.placeholder}
           value={about}
           onChangeText={setAbout}
           multiline
