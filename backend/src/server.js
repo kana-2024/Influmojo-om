@@ -17,7 +17,8 @@ const { router: authRoutes } = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const ordersRoutes = require('./routes/orders');
 const packagesRoutes = require('./routes/packages');
-const chatRoutes = require('./routes/chat');
+const crmRoutes = require('./routes/crm');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -70,13 +71,15 @@ app.use(cors({
     'http://192.168.31.75:3000', 
     'http://192.168.31.57:3000',
     'http://192.168.31.57:3002',
+    'http://localhost:3002',
     'exp://192.168.31.75:8081',
     'exp://192.168.31.57:8081',
     'http://localhost:8081',
     'exp://localhost:8081',
     'https://fair-legal-gar.ngrok-free.app',
     'exp://fair-legal-gar.ngrok-free.app',
-    'file://'  // Allow file:// protocol for local HTML files
+    'file://',  // Allow file:// protocol for local HTML files
+    'null'      // Allow null origin for local file access
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -104,7 +107,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/packages', packagesRoutes);
-app.use('/api/chat', chatRoutes);
+app.use('/api/crm', crmRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Catch-all 404 handler for unknown routes
 app.use((req, res, next) => {

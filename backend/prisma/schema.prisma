@@ -45,6 +45,7 @@ model User {
   reviews_reviewed          Review[]               @relation("ReviewReviewed")
   reviews_reviewer          Review[]               @relation("ReviewReviewer")
   kyc_verifications         KYC[]                  @relation("KYCVerifier")
+  assigned_tickets          Ticket[]               @relation("TicketAgent")
 }
 
 model BrandProfile {
@@ -278,17 +279,18 @@ model Invoice {
 }
 
 model Message {
-  id           BigInt               @id @default(autoincrement())
-  channel_id   BigInt
+  id           BigInt       @id @default(autoincrement())
+  ticket_id    BigInt
   sender_id    BigInt
   message_text String
-  message_type MessageType          @default(text)
+  message_type MessageType @default(text)
   file_url     String?
   file_name    String?
   read_at      DateTime?
-  created_at   DateTime             @default(now())
-  channel      CollaborationChannel @relation(fields: [channel_id], references: [id])
-  sender       User                 @relation("MessageSender", fields: [sender_id], references: [id], onDelete: Cascade)
+  created_at   DateTime     @default(now())
+
+  ticket       Ticket       @relation(fields: [ticket_id], references: [id])
+  sender       User         @relation("MessageSender", fields: [sender_id], references: [id], onDelete: Cascade)
 }
 
 model Review {
@@ -375,7 +377,6 @@ model CollaborationChannel {
   created_at       DateTime      @default(now())
   admin            User          @relation("AdminChannels", fields: [admin_id], references: [id], onDelete: Cascade)
   collaboration    Collaboration @relation(fields: [collaboration_id], references: [id])
-  messages         Message[]
 }
 
 model Package {
@@ -406,16 +407,13 @@ model Order {
   order_date       DateTime      @default(now())
   completed_at     DateTime?
   rejection_message String?      // Appealing message when order is rejected
-  // Chat integration fields
-  zoho_visitor_id  String?       // Zoho chat visitor ID for this order
-  chat_session_id  String?       // Zoho chat session ID
-  chat_enabled     Boolean       @default(false) // Whether chat is enabled for this order
-  chat_started_at  DateTime?     // When chat was first initiated
+
   package          Package       @relation(fields: [package_id], references: [id])
   brand            BrandProfile  @relation(fields: [brand_id], references: [id], onDelete: Cascade)
   creator          CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
   payments         Payment[]
   invoices         Invoice[]
+  ticket           Ticket?       // Optional if not always created
 
   @@index([package_id, brand_id, creator_id, status, order_date])
 }
@@ -486,6 +484,7 @@ enum UserType {
   brand
   creator
   admin
+  super_admin
 }
 
 enum UserStatus {
@@ -633,27 +632,25 @@ enum OrderStatus {
   refunded
 }
 
-model OrderChatSession {
-  id             String   @id @default(uuid())
-  order_id       String
-  user_id        String
-  role           UserRole
-  zoho_ticket_id String   // Same ticket ID for both brand and creator sessions
-  zoho_visitor_id String? // Unique visitor ID for each chat session
-  status         ChatStatus @default(open)
-  created_at     DateTime   @default(now())
+model Ticket {
+  id               BigInt     @id @default(autoincrement())
+  order_id         BigInt     @unique
+  agent_id         BigInt
+  stream_channel_id String
+  status           TicketStatus @default(open)
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
 
-  @@unique([order_id, user_id, role]) // Allow separate sessions for brand and creator
-  @@index([order_id, zoho_ticket_id]) // Index for ticket-based queries
+  order            Order      @relation(fields: [order_id], references: [id])
+  agent            User       @relation("TicketAgent", fields: [agent_id], references: [id])
+  messages         Message[]
 }
 
-enum ChatStatus {
+
+
+enum TicketStatus {
   open
-  pending
+  in_progress
+  resolved
   closed
-}
-
-enum UserRole {
-  brand
-  influencer
 }

@@ -326,7 +326,7 @@ exports.Prisma.InvoiceScalarFieldEnum = {
 
 exports.Prisma.MessageScalarFieldEnum = {
   id: 'id',
-  channel_id: 'channel_id',
+  ticket_id: 'ticket_id',
   sender_id: 'sender_id',
   message_text: 'message_text',
   message_type: 'message_type',
@@ -433,11 +433,7 @@ exports.Prisma.OrderScalarFieldEnum = {
   status: 'status',
   order_date: 'order_date',
   completed_at: 'completed_at',
-  rejection_message: 'rejection_message',
-  zoho_visitor_id: 'zoho_visitor_id',
-  chat_session_id: 'chat_session_id',
-  chat_enabled: 'chat_enabled',
-  chat_started_at: 'chat_started_at'
+  rejection_message: 'rejection_message'
 };
 
 exports.Prisma.PhoneVerificationScalarFieldEnum = {
@@ -488,15 +484,14 @@ exports.Prisma.PortfolioItemScalarFieldEnum = {
   updated_at: 'updated_at'
 };
 
-exports.Prisma.OrderChatSessionScalarFieldEnum = {
+exports.Prisma.TicketScalarFieldEnum = {
   id: 'id',
   order_id: 'order_id',
-  user_id: 'user_id',
-  role: 'role',
-  zoho_ticket_id: 'zoho_ticket_id',
-  zoho_visitor_id: 'zoho_visitor_id',
+  agent_id: 'agent_id',
+  stream_channel_id: 'stream_channel_id',
   status: 'status',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.SortOrder = {
@@ -527,7 +522,8 @@ exports.Prisma.JsonNullValueFilter = {
 exports.UserType = exports.$Enums.UserType = {
   brand: 'brand',
   creator: 'creator',
-  admin: 'admin'
+  admin: 'admin',
+  super_admin: 'super_admin'
 };
 
 exports.UserStatus = exports.$Enums.UserStatus = {
@@ -673,14 +669,10 @@ exports.PortfolioMediaType = exports.$Enums.PortfolioMediaType = {
   text: 'text'
 };
 
-exports.UserRole = exports.$Enums.UserRole = {
-  brand: 'brand',
-  influencer: 'influencer'
-};
-
-exports.ChatStatus = exports.$Enums.ChatStatus = {
+exports.TicketStatus = exports.$Enums.TicketStatus = {
   open: 'open',
-  pending: 'pending',
+  in_progress: 'in_progress',
+  resolved: 'resolved',
   closed: 'closed'
 };
 
@@ -709,7 +701,7 @@ exports.Prisma.ModelName = {
   PhoneVerification: 'PhoneVerification',
   KYC: 'KYC',
   PortfolioItem: 'PortfolioItem',
-  OrderChatSession: 'OrderChatSession'
+  Ticket: 'Ticket'
 };
 
 /**

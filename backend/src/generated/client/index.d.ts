@@ -134,10 +134,10 @@ export type KYC = $Result.DefaultSelection<Prisma.$KYCPayload>
  */
 export type PortfolioItem = $Result.DefaultSelection<Prisma.$PortfolioItemPayload>
 /**
- * Model OrderChatSession
+ * Model Ticket
  * 
  */
-export type OrderChatSession = $Result.DefaultSelection<Prisma.$OrderChatSessionPayload>
+export type Ticket = $Result.DefaultSelection<Prisma.$TicketPayload>
 
 /**
  * Enums
@@ -146,7 +146,8 @@ export namespace $Enums {
   export const UserType: {
   brand: 'brand',
   creator: 'creator',
-  admin: 'admin'
+  admin: 'admin',
+  super_admin: 'super_admin'
 };
 
 export type UserType = (typeof UserType)[keyof typeof UserType]
@@ -355,21 +356,14 @@ export const OrderStatus: {
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
 
-export const ChatStatus: {
+export const TicketStatus: {
   open: 'open',
-  pending: 'pending',
+  in_progress: 'in_progress',
+  resolved: 'resolved',
   closed: 'closed'
 };
 
-export type ChatStatus = (typeof ChatStatus)[keyof typeof ChatStatus]
-
-
-export const UserRole: {
-  brand: 'brand',
-  influencer: 'influencer'
-};
-
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+export type TicketStatus = (typeof TicketStatus)[keyof typeof TicketStatus]
 
 }
 
@@ -457,13 +451,9 @@ export type OrderStatus = $Enums.OrderStatus
 
 export const OrderStatus: typeof $Enums.OrderStatus
 
-export type ChatStatus = $Enums.ChatStatus
+export type TicketStatus = $Enums.TicketStatus
 
-export const ChatStatus: typeof $Enums.ChatStatus
-
-export type UserRole = $Enums.UserRole
-
-export const UserRole: typeof $Enums.UserRole
+export const TicketStatus: typeof $Enums.TicketStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -831,14 +821,14 @@ export class PrismaClient<
   get portfolioItem(): Prisma.PortfolioItemDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.orderChatSession`: Exposes CRUD operations for the **OrderChatSession** model.
+   * `prisma.ticket`: Exposes CRUD operations for the **Ticket** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more OrderChatSessions
-    * const orderChatSessions = await prisma.orderChatSession.findMany()
+    * // Fetch zero or more Tickets
+    * const tickets = await prisma.ticket.findMany()
     * ```
     */
-  get orderChatSession(): Prisma.OrderChatSessionDelegate<ExtArgs, ClientOptions>;
+  get ticket(): Prisma.TicketDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1303,7 +1293,7 @@ export namespace Prisma {
     PhoneVerification: 'PhoneVerification',
     KYC: 'KYC',
     PortfolioItem: 'PortfolioItem',
-    OrderChatSession: 'OrderChatSession'
+    Ticket: 'Ticket'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1322,7 +1312,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "brandProfile" | "creatorProfile" | "socialMediaAccount" | "campaign" | "campaignApplication" | "collaboration" | "contentSubmission" | "contentReview" | "payment" | "invoice" | "message" | "review" | "campaignAnalytics" | "contentPerformance" | "category" | "notification" | "platformSetting" | "collaborationChannel" | "package" | "order" | "phoneVerification" | "kYC" | "portfolioItem" | "orderChatSession"
+      modelProps: "user" | "brandProfile" | "creatorProfile" | "socialMediaAccount" | "campaign" | "campaignApplication" | "collaboration" | "contentSubmission" | "contentReview" | "payment" | "invoice" | "message" | "review" | "campaignAnalytics" | "contentPerformance" | "category" | "notification" | "platformSetting" | "collaborationChannel" | "package" | "order" | "phoneVerification" | "kYC" | "portfolioItem" | "ticket"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3102,77 +3092,77 @@ export namespace Prisma {
           }
         }
       }
-      OrderChatSession: {
-        payload: Prisma.$OrderChatSessionPayload<ExtArgs>
-        fields: Prisma.OrderChatSessionFieldRefs
+      Ticket: {
+        payload: Prisma.$TicketPayload<ExtArgs>
+        fields: Prisma.TicketFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.OrderChatSessionFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload> | null
+            args: Prisma.TicketFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.OrderChatSessionFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+            args: Prisma.TicketFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
           }
           findFirst: {
-            args: Prisma.OrderChatSessionFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload> | null
+            args: Prisma.TicketFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.OrderChatSessionFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+            args: Prisma.TicketFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
           }
           findMany: {
-            args: Prisma.OrderChatSessionFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>[]
+            args: Prisma.TicketFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>[]
           }
           create: {
-            args: Prisma.OrderChatSessionCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+            args: Prisma.TicketCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
           }
           createMany: {
-            args: Prisma.OrderChatSessionCreateManyArgs<ExtArgs>
+            args: Prisma.TicketCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.OrderChatSessionCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>[]
+            args: Prisma.TicketCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>[]
           }
           delete: {
-            args: Prisma.OrderChatSessionDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+            args: Prisma.TicketDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
           }
           update: {
-            args: Prisma.OrderChatSessionUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+            args: Prisma.TicketUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
           }
           deleteMany: {
-            args: Prisma.OrderChatSessionDeleteManyArgs<ExtArgs>
+            args: Prisma.TicketDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.OrderChatSessionUpdateManyArgs<ExtArgs>
+            args: Prisma.TicketUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.OrderChatSessionUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>[]
+            args: Prisma.TicketUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>[]
           }
           upsert: {
-            args: Prisma.OrderChatSessionUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+            args: Prisma.TicketUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
           }
           aggregate: {
-            args: Prisma.OrderChatSessionAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateOrderChatSession>
+            args: Prisma.TicketAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTicket>
           }
           groupBy: {
-            args: Prisma.OrderChatSessionGroupByArgs<ExtArgs>
-            result: $Utils.Optional<OrderChatSessionGroupByOutputType>[]
+            args: Prisma.TicketGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TicketGroupByOutputType>[]
           }
           count: {
-            args: Prisma.OrderChatSessionCountArgs<ExtArgs>
-            result: $Utils.Optional<OrderChatSessionCountAggregateOutputType> | number
+            args: Prisma.TicketCountArgs<ExtArgs>
+            result: $Utils.Optional<TicketCountAggregateOutputType> | number
           }
         }
       }
@@ -3284,7 +3274,7 @@ export namespace Prisma {
     phoneVerification?: PhoneVerificationOmit
     kYC?: KYCOmit
     portfolioItem?: PortfolioItemOmit
-    orderChatSession?: OrderChatSessionOmit
+    ticket?: TicketOmit
   }
 
   /* Types for Logging */
@@ -3392,6 +3382,7 @@ export namespace Prisma {
     reviews_reviewed: number
     reviews_reviewer: number
     kyc_verifications: number
+    assigned_tickets: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3408,6 +3399,7 @@ export namespace Prisma {
     reviews_reviewed?: boolean | UserCountOutputTypeCountReviews_reviewedArgs
     reviews_reviewer?: boolean | UserCountOutputTypeCountReviews_reviewerArgs
     kyc_verifications?: boolean | UserCountOutputTypeCountKyc_verificationsArgs
+    assigned_tickets?: boolean | UserCountOutputTypeCountAssigned_ticketsArgs
   }
 
   // Custom InputTypes
@@ -3510,6 +3502,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountKyc_verificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: KYCWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountAssigned_ticketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TicketWhereInput
   }
 
 
@@ -3844,37 +3843,6 @@ export namespace Prisma {
 
 
   /**
-   * Count Type CollaborationChannelCountOutputType
-   */
-
-  export type CollaborationChannelCountOutputType = {
-    messages: number
-  }
-
-  export type CollaborationChannelCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    messages?: boolean | CollaborationChannelCountOutputTypeCountMessagesArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * CollaborationChannelCountOutputType without action
-   */
-  export type CollaborationChannelCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the CollaborationChannelCountOutputType
-     */
-    select?: CollaborationChannelCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * CollaborationChannelCountOutputType without action
-   */
-  export type CollaborationChannelCountOutputTypeCountMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: MessageWhereInput
-  }
-
-
-  /**
    * Count Type PackageCountOutputType
    */
 
@@ -3942,6 +3910,37 @@ export namespace Prisma {
    */
   export type OrderCountOutputTypeCountInvoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InvoiceWhereInput
+  }
+
+
+  /**
+   * Count Type TicketCountOutputType
+   */
+
+  export type TicketCountOutputType = {
+    messages: number
+  }
+
+  export type TicketCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    messages?: boolean | TicketCountOutputTypeCountMessagesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * TicketCountOutputType without action
+   */
+  export type TicketCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TicketCountOutputType
+     */
+    select?: TicketCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * TicketCountOutputType without action
+   */
+  export type TicketCountOutputTypeCountMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MessageWhereInput
   }
 
 
@@ -4305,6 +4304,7 @@ export namespace Prisma {
     reviews_reviewed?: boolean | User$reviews_reviewedArgs<ExtArgs>
     reviews_reviewer?: boolean | User$reviews_reviewerArgs<ExtArgs>
     kyc_verifications?: boolean | User$kyc_verificationsArgs<ExtArgs>
+    assigned_tickets?: boolean | User$assigned_ticketsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4399,6 +4399,7 @@ export namespace Prisma {
     reviews_reviewed?: boolean | User$reviews_reviewedArgs<ExtArgs>
     reviews_reviewer?: boolean | User$reviews_reviewerArgs<ExtArgs>
     kyc_verifications?: boolean | User$kyc_verificationsArgs<ExtArgs>
+    assigned_tickets?: boolean | User$assigned_ticketsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4421,6 +4422,7 @@ export namespace Prisma {
       reviews_reviewed: Prisma.$ReviewPayload<ExtArgs>[]
       reviews_reviewer: Prisma.$ReviewPayload<ExtArgs>[]
       kyc_verifications: Prisma.$KYCPayload<ExtArgs>[]
+      assigned_tickets: Prisma.$TicketPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
@@ -4853,6 +4855,7 @@ export namespace Prisma {
     reviews_reviewed<T extends User$reviews_reviewedArgs<ExtArgs> = {}>(args?: Subset<T, User$reviews_reviewedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     reviews_reviewer<T extends User$reviews_reviewerArgs<ExtArgs> = {}>(args?: Subset<T, User$reviews_reviewerArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kyc_verifications<T extends User$kyc_verificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$kyc_verificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KYCPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    assigned_tickets<T extends User$assigned_ticketsArgs<ExtArgs> = {}>(args?: Subset<T, User$assigned_ticketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5620,6 +5623,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: KYCScalarFieldEnum | KYCScalarFieldEnum[]
+  }
+
+  /**
+   * User.assigned_tickets
+   */
+  export type User$assigned_ticketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    where?: TicketWhereInput
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    cursor?: TicketWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
   }
 
   /**
@@ -18829,19 +18856,19 @@ export namespace Prisma {
 
   export type MessageAvgAggregateOutputType = {
     id: number | null
-    channel_id: number | null
+    ticket_id: number | null
     sender_id: number | null
   }
 
   export type MessageSumAggregateOutputType = {
     id: bigint | null
-    channel_id: bigint | null
+    ticket_id: bigint | null
     sender_id: bigint | null
   }
 
   export type MessageMinAggregateOutputType = {
     id: bigint | null
-    channel_id: bigint | null
+    ticket_id: bigint | null
     sender_id: bigint | null
     message_text: string | null
     message_type: $Enums.MessageType | null
@@ -18853,7 +18880,7 @@ export namespace Prisma {
 
   export type MessageMaxAggregateOutputType = {
     id: bigint | null
-    channel_id: bigint | null
+    ticket_id: bigint | null
     sender_id: bigint | null
     message_text: string | null
     message_type: $Enums.MessageType | null
@@ -18865,7 +18892,7 @@ export namespace Prisma {
 
   export type MessageCountAggregateOutputType = {
     id: number
-    channel_id: number
+    ticket_id: number
     sender_id: number
     message_text: number
     message_type: number
@@ -18879,19 +18906,19 @@ export namespace Prisma {
 
   export type MessageAvgAggregateInputType = {
     id?: true
-    channel_id?: true
+    ticket_id?: true
     sender_id?: true
   }
 
   export type MessageSumAggregateInputType = {
     id?: true
-    channel_id?: true
+    ticket_id?: true
     sender_id?: true
   }
 
   export type MessageMinAggregateInputType = {
     id?: true
-    channel_id?: true
+    ticket_id?: true
     sender_id?: true
     message_text?: true
     message_type?: true
@@ -18903,7 +18930,7 @@ export namespace Prisma {
 
   export type MessageMaxAggregateInputType = {
     id?: true
-    channel_id?: true
+    ticket_id?: true
     sender_id?: true
     message_text?: true
     message_type?: true
@@ -18915,7 +18942,7 @@ export namespace Prisma {
 
   export type MessageCountAggregateInputType = {
     id?: true
-    channel_id?: true
+    ticket_id?: true
     sender_id?: true
     message_text?: true
     message_type?: true
@@ -19014,7 +19041,7 @@ export namespace Prisma {
 
   export type MessageGroupByOutputType = {
     id: bigint
-    channel_id: bigint
+    ticket_id: bigint
     sender_id: bigint
     message_text: string
     message_type: $Enums.MessageType
@@ -19045,7 +19072,7 @@ export namespace Prisma {
 
   export type MessageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    channel_id?: boolean
+    ticket_id?: boolean
     sender_id?: boolean
     message_text?: boolean
     message_type?: boolean
@@ -19053,13 +19080,13 @@ export namespace Prisma {
     file_name?: boolean
     read_at?: boolean
     created_at?: boolean
-    channel?: boolean | CollaborationChannelDefaultArgs<ExtArgs>
+    ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["message"]>
 
   export type MessageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    channel_id?: boolean
+    ticket_id?: boolean
     sender_id?: boolean
     message_text?: boolean
     message_type?: boolean
@@ -19067,13 +19094,13 @@ export namespace Prisma {
     file_name?: boolean
     read_at?: boolean
     created_at?: boolean
-    channel?: boolean | CollaborationChannelDefaultArgs<ExtArgs>
+    ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["message"]>
 
   export type MessageSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    channel_id?: boolean
+    ticket_id?: boolean
     sender_id?: boolean
     message_text?: boolean
     message_type?: boolean
@@ -19081,13 +19108,13 @@ export namespace Prisma {
     file_name?: boolean
     read_at?: boolean
     created_at?: boolean
-    channel?: boolean | CollaborationChannelDefaultArgs<ExtArgs>
+    ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["message"]>
 
   export type MessageSelectScalar = {
     id?: boolean
-    channel_id?: boolean
+    ticket_id?: boolean
     sender_id?: boolean
     message_text?: boolean
     message_type?: boolean
@@ -19097,29 +19124,29 @@ export namespace Prisma {
     created_at?: boolean
   }
 
-  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "channel_id" | "sender_id" | "message_text" | "message_type" | "file_url" | "file_name" | "read_at" | "created_at", ExtArgs["result"]["message"]>
+  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticket_id" | "sender_id" | "message_text" | "message_type" | "file_url" | "file_name" | "read_at" | "created_at", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    channel?: boolean | CollaborationChannelDefaultArgs<ExtArgs>
+    ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type MessageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    channel?: boolean | CollaborationChannelDefaultArgs<ExtArgs>
+    ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type MessageIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    channel?: boolean | CollaborationChannelDefaultArgs<ExtArgs>
+    ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
   }
 
   export type $MessagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Message"
     objects: {
-      channel: Prisma.$CollaborationChannelPayload<ExtArgs>
+      ticket: Prisma.$TicketPayload<ExtArgs>
       sender: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
-      channel_id: bigint
+      ticket_id: bigint
       sender_id: bigint
       message_text: string
       message_type: $Enums.MessageType
@@ -19521,7 +19548,7 @@ export namespace Prisma {
    */
   export interface Prisma__MessageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    channel<T extends CollaborationChannelDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CollaborationChannelDefaultArgs<ExtArgs>>): Prisma__CollaborationChannelClient<$Result.GetResult<Prisma.$CollaborationChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    ticket<T extends TicketDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TicketDefaultArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     sender<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -19553,7 +19580,7 @@ export namespace Prisma {
    */
   interface MessageFieldRefs {
     readonly id: FieldRef<"Message", 'BigInt'>
-    readonly channel_id: FieldRef<"Message", 'BigInt'>
+    readonly ticket_id: FieldRef<"Message", 'BigInt'>
     readonly sender_id: FieldRef<"Message", 'BigInt'>
     readonly message_text: FieldRef<"Message", 'String'>
     readonly message_type: FieldRef<"Message", 'MessageType'>
@@ -27010,8 +27037,6 @@ export namespace Prisma {
     created_at?: boolean
     admin?: boolean | UserDefaultArgs<ExtArgs>
     collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
-    messages?: boolean | CollaborationChannel$messagesArgs<ExtArgs>
-    _count?: boolean | CollaborationChannelCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["collaborationChannel"]>
 
   export type CollaborationChannelSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -27043,8 +27068,6 @@ export namespace Prisma {
   export type CollaborationChannelInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     admin?: boolean | UserDefaultArgs<ExtArgs>
     collaboration?: boolean | CollaborationDefaultArgs<ExtArgs>
-    messages?: boolean | CollaborationChannel$messagesArgs<ExtArgs>
-    _count?: boolean | CollaborationChannelCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CollaborationChannelIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     admin?: boolean | UserDefaultArgs<ExtArgs>
@@ -27060,7 +27083,6 @@ export namespace Prisma {
     objects: {
       admin: Prisma.$UserPayload<ExtArgs>
       collaboration: Prisma.$CollaborationPayload<ExtArgs>
-      messages: Prisma.$MessagePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
@@ -27463,7 +27485,6 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     admin<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     collaboration<T extends CollaborationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CollaborationDefaultArgs<ExtArgs>>): Prisma__CollaborationClient<$Result.GetResult<Prisma.$CollaborationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    messages<T extends CollaborationChannel$messagesArgs<ExtArgs> = {}>(args?: Subset<T, CollaborationChannel$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -27890,30 +27911,6 @@ export namespace Prisma {
      * Limit how many CollaborationChannels to delete.
      */
     limit?: number
-  }
-
-  /**
-   * CollaborationChannel.messages
-   */
-  export type CollaborationChannel$messagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Message
-     */
-    select?: MessageSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Message
-     */
-    omit?: MessageOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MessageInclude<ExtArgs> | null
-    where?: MessageWhereInput
-    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
-    cursor?: MessageWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
   }
 
   /**
@@ -29181,10 +29178,6 @@ export namespace Prisma {
     order_date: Date | null
     completed_at: Date | null
     rejection_message: string | null
-    zoho_visitor_id: string | null
-    chat_session_id: string | null
-    chat_enabled: boolean | null
-    chat_started_at: Date | null
   }
 
   export type OrderMaxAggregateOutputType = {
@@ -29199,10 +29192,6 @@ export namespace Prisma {
     order_date: Date | null
     completed_at: Date | null
     rejection_message: string | null
-    zoho_visitor_id: string | null
-    chat_session_id: string | null
-    chat_enabled: boolean | null
-    chat_started_at: Date | null
   }
 
   export type OrderCountAggregateOutputType = {
@@ -29217,10 +29206,6 @@ export namespace Prisma {
     order_date: number
     completed_at: number
     rejection_message: number
-    zoho_visitor_id: number
-    chat_session_id: number
-    chat_enabled: number
-    chat_started_at: number
     _all: number
   }
 
@@ -29255,10 +29240,6 @@ export namespace Prisma {
     order_date?: true
     completed_at?: true
     rejection_message?: true
-    zoho_visitor_id?: true
-    chat_session_id?: true
-    chat_enabled?: true
-    chat_started_at?: true
   }
 
   export type OrderMaxAggregateInputType = {
@@ -29273,10 +29254,6 @@ export namespace Prisma {
     order_date?: true
     completed_at?: true
     rejection_message?: true
-    zoho_visitor_id?: true
-    chat_session_id?: true
-    chat_enabled?: true
-    chat_started_at?: true
   }
 
   export type OrderCountAggregateInputType = {
@@ -29291,10 +29268,6 @@ export namespace Prisma {
     order_date?: true
     completed_at?: true
     rejection_message?: true
-    zoho_visitor_id?: true
-    chat_session_id?: true
-    chat_enabled?: true
-    chat_started_at?: true
     _all?: true
   }
 
@@ -29396,10 +29369,6 @@ export namespace Prisma {
     order_date: Date
     completed_at: Date | null
     rejection_message: string | null
-    zoho_visitor_id: string | null
-    chat_session_id: string | null
-    chat_enabled: boolean
-    chat_started_at: Date | null
     _count: OrderCountAggregateOutputType | null
     _avg: OrderAvgAggregateOutputType | null
     _sum: OrderSumAggregateOutputType | null
@@ -29433,15 +29402,12 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
-    zoho_visitor_id?: boolean
-    chat_session_id?: boolean
-    chat_enabled?: boolean
-    chat_started_at?: boolean
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
     payments?: boolean | Order$paymentsArgs<ExtArgs>
     invoices?: boolean | Order$invoicesArgs<ExtArgs>
+    ticket?: boolean | Order$ticketArgs<ExtArgs>
     _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
@@ -29457,10 +29423,6 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
-    zoho_visitor_id?: boolean
-    chat_session_id?: boolean
-    chat_enabled?: boolean
-    chat_started_at?: boolean
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
@@ -29478,10 +29440,6 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
-    zoho_visitor_id?: boolean
-    chat_session_id?: boolean
-    chat_enabled?: boolean
-    chat_started_at?: boolean
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
@@ -29499,19 +29457,16 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
-    zoho_visitor_id?: boolean
-    chat_session_id?: boolean
-    chat_enabled?: boolean
-    chat_started_at?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "package_id" | "brand_id" | "creator_id" | "quantity" | "total_amount" | "currency" | "status" | "order_date" | "completed_at" | "rejection_message" | "zoho_visitor_id" | "chat_session_id" | "chat_enabled" | "chat_started_at", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "package_id" | "brand_id" | "creator_id" | "quantity" | "total_amount" | "currency" | "status" | "order_date" | "completed_at" | "rejection_message", ExtArgs["result"]["order"]>
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
     payments?: boolean | Order$paymentsArgs<ExtArgs>
     invoices?: boolean | Order$invoicesArgs<ExtArgs>
+    ticket?: boolean | Order$ticketArgs<ExtArgs>
     _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type OrderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -29533,6 +29488,7 @@ export namespace Prisma {
       creator: Prisma.$CreatorProfilePayload<ExtArgs>
       payments: Prisma.$PaymentPayload<ExtArgs>[]
       invoices: Prisma.$InvoicePayload<ExtArgs>[]
+      ticket: Prisma.$TicketPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
@@ -29546,10 +29502,6 @@ export namespace Prisma {
       order_date: Date
       completed_at: Date | null
       rejection_message: string | null
-      zoho_visitor_id: string | null
-      chat_session_id: string | null
-      chat_enabled: boolean
-      chat_started_at: Date | null
     }, ExtArgs["result"]["order"]>
     composites: {}
   }
@@ -29949,6 +29901,7 @@ export namespace Prisma {
     creator<T extends CreatorProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CreatorProfileDefaultArgs<ExtArgs>>): Prisma__CreatorProfileClient<$Result.GetResult<Prisma.$CreatorProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     payments<T extends Order$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Order$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invoices<T extends Order$invoicesArgs<ExtArgs> = {}>(args?: Subset<T, Order$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    ticket<T extends Order$ticketArgs<ExtArgs> = {}>(args?: Subset<T, Order$ticketArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -29989,10 +29942,6 @@ export namespace Prisma {
     readonly order_date: FieldRef<"Order", 'DateTime'>
     readonly completed_at: FieldRef<"Order", 'DateTime'>
     readonly rejection_message: FieldRef<"Order", 'String'>
-    readonly zoho_visitor_id: FieldRef<"Order", 'String'>
-    readonly chat_session_id: FieldRef<"Order", 'String'>
-    readonly chat_enabled: FieldRef<"Order", 'Boolean'>
-    readonly chat_started_at: FieldRef<"Order", 'DateTime'>
   }
     
 
@@ -30434,6 +30383,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * Order.ticket
+   */
+  export type Order$ticketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    where?: TicketWhereInput
   }
 
   /**
@@ -34156,372 +34124,428 @@ export namespace Prisma {
 
 
   /**
-   * Model OrderChatSession
+   * Model Ticket
    */
 
-  export type AggregateOrderChatSession = {
-    _count: OrderChatSessionCountAggregateOutputType | null
-    _min: OrderChatSessionMinAggregateOutputType | null
-    _max: OrderChatSessionMaxAggregateOutputType | null
+  export type AggregateTicket = {
+    _count: TicketCountAggregateOutputType | null
+    _avg: TicketAvgAggregateOutputType | null
+    _sum: TicketSumAggregateOutputType | null
+    _min: TicketMinAggregateOutputType | null
+    _max: TicketMaxAggregateOutputType | null
   }
 
-  export type OrderChatSessionMinAggregateOutputType = {
-    id: string | null
-    order_id: string | null
-    user_id: string | null
-    role: $Enums.UserRole | null
-    zoho_ticket_id: string | null
-    zoho_visitor_id: string | null
-    status: $Enums.ChatStatus | null
+  export type TicketAvgAggregateOutputType = {
+    id: number | null
+    order_id: number | null
+    agent_id: number | null
+  }
+
+  export type TicketSumAggregateOutputType = {
+    id: bigint | null
+    order_id: bigint | null
+    agent_id: bigint | null
+  }
+
+  export type TicketMinAggregateOutputType = {
+    id: bigint | null
+    order_id: bigint | null
+    agent_id: bigint | null
+    stream_channel_id: string | null
+    status: $Enums.TicketStatus | null
     created_at: Date | null
+    updated_at: Date | null
   }
 
-  export type OrderChatSessionMaxAggregateOutputType = {
-    id: string | null
-    order_id: string | null
-    user_id: string | null
-    role: $Enums.UserRole | null
-    zoho_ticket_id: string | null
-    zoho_visitor_id: string | null
-    status: $Enums.ChatStatus | null
+  export type TicketMaxAggregateOutputType = {
+    id: bigint | null
+    order_id: bigint | null
+    agent_id: bigint | null
+    stream_channel_id: string | null
+    status: $Enums.TicketStatus | null
     created_at: Date | null
+    updated_at: Date | null
   }
 
-  export type OrderChatSessionCountAggregateOutputType = {
+  export type TicketCountAggregateOutputType = {
     id: number
     order_id: number
-    user_id: number
-    role: number
-    zoho_ticket_id: number
-    zoho_visitor_id: number
+    agent_id: number
+    stream_channel_id: number
     status: number
     created_at: number
+    updated_at: number
     _all: number
   }
 
 
-  export type OrderChatSessionMinAggregateInputType = {
+  export type TicketAvgAggregateInputType = {
     id?: true
     order_id?: true
-    user_id?: true
-    role?: true
-    zoho_ticket_id?: true
-    zoho_visitor_id?: true
-    status?: true
-    created_at?: true
+    agent_id?: true
   }
 
-  export type OrderChatSessionMaxAggregateInputType = {
+  export type TicketSumAggregateInputType = {
     id?: true
     order_id?: true
-    user_id?: true
-    role?: true
-    zoho_ticket_id?: true
-    zoho_visitor_id?: true
-    status?: true
-    created_at?: true
+    agent_id?: true
   }
 
-  export type OrderChatSessionCountAggregateInputType = {
+  export type TicketMinAggregateInputType = {
     id?: true
     order_id?: true
-    user_id?: true
-    role?: true
-    zoho_ticket_id?: true
-    zoho_visitor_id?: true
+    agent_id?: true
+    stream_channel_id?: true
     status?: true
     created_at?: true
+    updated_at?: true
+  }
+
+  export type TicketMaxAggregateInputType = {
+    id?: true
+    order_id?: true
+    agent_id?: true
+    stream_channel_id?: true
+    status?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type TicketCountAggregateInputType = {
+    id?: true
+    order_id?: true
+    agent_id?: true
+    stream_channel_id?: true
+    status?: true
+    created_at?: true
+    updated_at?: true
     _all?: true
   }
 
-  export type OrderChatSessionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which OrderChatSession to aggregate.
+     * Filter which Ticket to aggregate.
      */
-    where?: OrderChatSessionWhereInput
+    where?: TicketWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of OrderChatSessions to fetch.
+     * Determine the order of Tickets to fetch.
      */
-    orderBy?: OrderChatSessionOrderByWithRelationInput | OrderChatSessionOrderByWithRelationInput[]
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: OrderChatSessionWhereUniqueInput
+    cursor?: TicketWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` OrderChatSessions from the position of the cursor.
+     * Take `±n` Tickets from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` OrderChatSessions.
+     * Skip the first `n` Tickets.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned OrderChatSessions
+     * Count returned Tickets
     **/
-    _count?: true | OrderChatSessionCountAggregateInputType
+    _count?: true | TicketCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TicketAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TicketSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: OrderChatSessionMinAggregateInputType
+    _min?: TicketMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: OrderChatSessionMaxAggregateInputType
+    _max?: TicketMaxAggregateInputType
   }
 
-  export type GetOrderChatSessionAggregateType<T extends OrderChatSessionAggregateArgs> = {
-        [P in keyof T & keyof AggregateOrderChatSession]: P extends '_count' | 'count'
+  export type GetTicketAggregateType<T extends TicketAggregateArgs> = {
+        [P in keyof T & keyof AggregateTicket]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateOrderChatSession[P]>
-      : GetScalarType<T[P], AggregateOrderChatSession[P]>
+        : GetScalarType<T[P], AggregateTicket[P]>
+      : GetScalarType<T[P], AggregateTicket[P]>
   }
 
 
 
 
-  export type OrderChatSessionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: OrderChatSessionWhereInput
-    orderBy?: OrderChatSessionOrderByWithAggregationInput | OrderChatSessionOrderByWithAggregationInput[]
-    by: OrderChatSessionScalarFieldEnum[] | OrderChatSessionScalarFieldEnum
-    having?: OrderChatSessionScalarWhereWithAggregatesInput
+  export type TicketGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TicketWhereInput
+    orderBy?: TicketOrderByWithAggregationInput | TicketOrderByWithAggregationInput[]
+    by: TicketScalarFieldEnum[] | TicketScalarFieldEnum
+    having?: TicketScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: OrderChatSessionCountAggregateInputType | true
-    _min?: OrderChatSessionMinAggregateInputType
-    _max?: OrderChatSessionMaxAggregateInputType
+    _count?: TicketCountAggregateInputType | true
+    _avg?: TicketAvgAggregateInputType
+    _sum?: TicketSumAggregateInputType
+    _min?: TicketMinAggregateInputType
+    _max?: TicketMaxAggregateInputType
   }
 
-  export type OrderChatSessionGroupByOutputType = {
-    id: string
-    order_id: string
-    user_id: string
-    role: $Enums.UserRole
-    zoho_ticket_id: string
-    zoho_visitor_id: string | null
-    status: $Enums.ChatStatus
+  export type TicketGroupByOutputType = {
+    id: bigint
+    order_id: bigint
+    agent_id: bigint
+    stream_channel_id: string
+    status: $Enums.TicketStatus
     created_at: Date
-    _count: OrderChatSessionCountAggregateOutputType | null
-    _min: OrderChatSessionMinAggregateOutputType | null
-    _max: OrderChatSessionMaxAggregateOutputType | null
+    updated_at: Date
+    _count: TicketCountAggregateOutputType | null
+    _avg: TicketAvgAggregateOutputType | null
+    _sum: TicketSumAggregateOutputType | null
+    _min: TicketMinAggregateOutputType | null
+    _max: TicketMaxAggregateOutputType | null
   }
 
-  type GetOrderChatSessionGroupByPayload<T extends OrderChatSessionGroupByArgs> = Prisma.PrismaPromise<
+  type GetTicketGroupByPayload<T extends TicketGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<OrderChatSessionGroupByOutputType, T['by']> &
+      PickEnumerable<TicketGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof OrderChatSessionGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof TicketGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], OrderChatSessionGroupByOutputType[P]>
-            : GetScalarType<T[P], OrderChatSessionGroupByOutputType[P]>
+              : GetScalarType<T[P], TicketGroupByOutputType[P]>
+            : GetScalarType<T[P], TicketGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type OrderChatSessionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type TicketSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     order_id?: boolean
-    user_id?: boolean
-    role?: boolean
-    zoho_ticket_id?: boolean
-    zoho_visitor_id?: boolean
+    agent_id?: boolean
+    stream_channel_id?: boolean
     status?: boolean
     created_at?: boolean
-  }, ExtArgs["result"]["orderChatSession"]>
+    updated_at?: boolean
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    agent?: boolean | UserDefaultArgs<ExtArgs>
+    messages?: boolean | Ticket$messagesArgs<ExtArgs>
+    _count?: boolean | TicketCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["ticket"]>
 
-  export type OrderChatSessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type TicketSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     order_id?: boolean
-    user_id?: boolean
-    role?: boolean
-    zoho_ticket_id?: boolean
-    zoho_visitor_id?: boolean
+    agent_id?: boolean
+    stream_channel_id?: boolean
     status?: boolean
     created_at?: boolean
-  }, ExtArgs["result"]["orderChatSession"]>
+    updated_at?: boolean
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    agent?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["ticket"]>
 
-  export type OrderChatSessionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type TicketSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     order_id?: boolean
-    user_id?: boolean
-    role?: boolean
-    zoho_ticket_id?: boolean
-    zoho_visitor_id?: boolean
+    agent_id?: boolean
+    stream_channel_id?: boolean
     status?: boolean
     created_at?: boolean
-  }, ExtArgs["result"]["orderChatSession"]>
+    updated_at?: boolean
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    agent?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["ticket"]>
 
-  export type OrderChatSessionSelectScalar = {
+  export type TicketSelectScalar = {
     id?: boolean
     order_id?: boolean
-    user_id?: boolean
-    role?: boolean
-    zoho_ticket_id?: boolean
-    zoho_visitor_id?: boolean
+    agent_id?: boolean
+    stream_channel_id?: boolean
     status?: boolean
     created_at?: boolean
+    updated_at?: boolean
   }
 
-  export type OrderChatSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "order_id" | "user_id" | "role" | "zoho_ticket_id" | "zoho_visitor_id" | "status" | "created_at", ExtArgs["result"]["orderChatSession"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "order_id" | "agent_id" | "stream_channel_id" | "status" | "created_at" | "updated_at", ExtArgs["result"]["ticket"]>
+  export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    agent?: boolean | UserDefaultArgs<ExtArgs>
+    messages?: boolean | Ticket$messagesArgs<ExtArgs>
+    _count?: boolean | TicketCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type TicketIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    agent?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TicketIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    agent?: boolean | UserDefaultArgs<ExtArgs>
+  }
 
-  export type $OrderChatSessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "OrderChatSession"
-    objects: {}
+  export type $TicketPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Ticket"
+    objects: {
+      order: Prisma.$OrderPayload<ExtArgs>
+      agent: Prisma.$UserPayload<ExtArgs>
+      messages: Prisma.$MessagePayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
-      id: string
-      order_id: string
-      user_id: string
-      role: $Enums.UserRole
-      zoho_ticket_id: string
-      zoho_visitor_id: string | null
-      status: $Enums.ChatStatus
+      id: bigint
+      order_id: bigint
+      agent_id: bigint
+      stream_channel_id: string
+      status: $Enums.TicketStatus
       created_at: Date
-    }, ExtArgs["result"]["orderChatSession"]>
+      updated_at: Date
+    }, ExtArgs["result"]["ticket"]>
     composites: {}
   }
 
-  type OrderChatSessionGetPayload<S extends boolean | null | undefined | OrderChatSessionDefaultArgs> = $Result.GetResult<Prisma.$OrderChatSessionPayload, S>
+  type TicketGetPayload<S extends boolean | null | undefined | TicketDefaultArgs> = $Result.GetResult<Prisma.$TicketPayload, S>
 
-  type OrderChatSessionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<OrderChatSessionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: OrderChatSessionCountAggregateInputType | true
+  type TicketCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TicketFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TicketCountAggregateInputType | true
     }
 
-  export interface OrderChatSessionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['OrderChatSession'], meta: { name: 'OrderChatSession' } }
+  export interface TicketDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Ticket'], meta: { name: 'Ticket' } }
     /**
-     * Find zero or one OrderChatSession that matches the filter.
-     * @param {OrderChatSessionFindUniqueArgs} args - Arguments to find a OrderChatSession
+     * Find zero or one Ticket that matches the filter.
+     * @param {TicketFindUniqueArgs} args - Arguments to find a Ticket
      * @example
-     * // Get one OrderChatSession
-     * const orderChatSession = await prisma.orderChatSession.findUnique({
+     * // Get one Ticket
+     * const ticket = await prisma.ticket.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends OrderChatSessionFindUniqueArgs>(args: SelectSubset<T, OrderChatSessionFindUniqueArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findUnique<T extends TicketFindUniqueArgs>(args: SelectSubset<T, TicketFindUniqueArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one OrderChatSession that matches the filter or throw an error with `error.code='P2025'`
+     * Find one Ticket that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {OrderChatSessionFindUniqueOrThrowArgs} args - Arguments to find a OrderChatSession
+     * @param {TicketFindUniqueOrThrowArgs} args - Arguments to find a Ticket
      * @example
-     * // Get one OrderChatSession
-     * const orderChatSession = await prisma.orderChatSession.findUniqueOrThrow({
+     * // Get one Ticket
+     * const ticket = await prisma.ticket.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends OrderChatSessionFindUniqueOrThrowArgs>(args: SelectSubset<T, OrderChatSessionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findUniqueOrThrow<T extends TicketFindUniqueOrThrowArgs>(args: SelectSubset<T, TicketFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first OrderChatSession that matches the filter.
+     * Find the first Ticket that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {OrderChatSessionFindFirstArgs} args - Arguments to find a OrderChatSession
+     * @param {TicketFindFirstArgs} args - Arguments to find a Ticket
      * @example
-     * // Get one OrderChatSession
-     * const orderChatSession = await prisma.orderChatSession.findFirst({
+     * // Get one Ticket
+     * const ticket = await prisma.ticket.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends OrderChatSessionFindFirstArgs>(args?: SelectSubset<T, OrderChatSessionFindFirstArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findFirst<T extends TicketFindFirstArgs>(args?: SelectSubset<T, TicketFindFirstArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first OrderChatSession that matches the filter or
+     * Find the first Ticket that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {OrderChatSessionFindFirstOrThrowArgs} args - Arguments to find a OrderChatSession
+     * @param {TicketFindFirstOrThrowArgs} args - Arguments to find a Ticket
      * @example
-     * // Get one OrderChatSession
-     * const orderChatSession = await prisma.orderChatSession.findFirstOrThrow({
+     * // Get one Ticket
+     * const ticket = await prisma.ticket.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends OrderChatSessionFindFirstOrThrowArgs>(args?: SelectSubset<T, OrderChatSessionFindFirstOrThrowArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findFirstOrThrow<T extends TicketFindFirstOrThrowArgs>(args?: SelectSubset<T, TicketFindFirstOrThrowArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find zero or more OrderChatSessions that matches the filter.
+     * Find zero or more Tickets that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {OrderChatSessionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {TicketFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all OrderChatSessions
-     * const orderChatSessions = await prisma.orderChatSession.findMany()
+     * // Get all Tickets
+     * const tickets = await prisma.ticket.findMany()
      * 
-     * // Get first 10 OrderChatSessions
-     * const orderChatSessions = await prisma.orderChatSession.findMany({ take: 10 })
+     * // Get first 10 Tickets
+     * const tickets = await prisma.ticket.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const orderChatSessionWithIdOnly = await prisma.orderChatSession.findMany({ select: { id: true } })
+     * const ticketWithIdOnly = await prisma.ticket.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends OrderChatSessionFindManyArgs>(args?: SelectSubset<T, OrderChatSessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    findMany<T extends TicketFindManyArgs>(args?: SelectSubset<T, TicketFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
-     * Create a OrderChatSession.
-     * @param {OrderChatSessionCreateArgs} args - Arguments to create a OrderChatSession.
+     * Create a Ticket.
+     * @param {TicketCreateArgs} args - Arguments to create a Ticket.
      * @example
-     * // Create one OrderChatSession
-     * const OrderChatSession = await prisma.orderChatSession.create({
+     * // Create one Ticket
+     * const Ticket = await prisma.ticket.create({
      *   data: {
-     *     // ... data to create a OrderChatSession
+     *     // ... data to create a Ticket
      *   }
      * })
      * 
      */
-    create<T extends OrderChatSessionCreateArgs>(args: SelectSubset<T, OrderChatSessionCreateArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    create<T extends TicketCreateArgs>(args: SelectSubset<T, TicketCreateArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Create many OrderChatSessions.
-     * @param {OrderChatSessionCreateManyArgs} args - Arguments to create many OrderChatSessions.
+     * Create many Tickets.
+     * @param {TicketCreateManyArgs} args - Arguments to create many Tickets.
      * @example
-     * // Create many OrderChatSessions
-     * const orderChatSession = await prisma.orderChatSession.createMany({
+     * // Create many Tickets
+     * const ticket = await prisma.ticket.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends OrderChatSessionCreateManyArgs>(args?: SelectSubset<T, OrderChatSessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends TicketCreateManyArgs>(args?: SelectSubset<T, TicketCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many OrderChatSessions and returns the data saved in the database.
-     * @param {OrderChatSessionCreateManyAndReturnArgs} args - Arguments to create many OrderChatSessions.
+     * Create many Tickets and returns the data saved in the database.
+     * @param {TicketCreateManyAndReturnArgs} args - Arguments to create many Tickets.
      * @example
-     * // Create many OrderChatSessions
-     * const orderChatSession = await prisma.orderChatSession.createManyAndReturn({
+     * // Create many Tickets
+     * const ticket = await prisma.ticket.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many OrderChatSessions and only return the `id`
-     * const orderChatSessionWithIdOnly = await prisma.orderChatSession.createManyAndReturn({
+     * // Create many Tickets and only return the `id`
+     * const ticketWithIdOnly = await prisma.ticket.createManyAndReturn({
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -34531,28 +34555,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends OrderChatSessionCreateManyAndReturnArgs>(args?: SelectSubset<T, OrderChatSessionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+    createManyAndReturn<T extends TicketCreateManyAndReturnArgs>(args?: SelectSubset<T, TicketCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Delete a OrderChatSession.
-     * @param {OrderChatSessionDeleteArgs} args - Arguments to delete one OrderChatSession.
+     * Delete a Ticket.
+     * @param {TicketDeleteArgs} args - Arguments to delete one Ticket.
      * @example
-     * // Delete one OrderChatSession
-     * const OrderChatSession = await prisma.orderChatSession.delete({
+     * // Delete one Ticket
+     * const Ticket = await prisma.ticket.delete({
      *   where: {
-     *     // ... filter to delete one OrderChatSession
+     *     // ... filter to delete one Ticket
      *   }
      * })
      * 
      */
-    delete<T extends OrderChatSessionDeleteArgs>(args: SelectSubset<T, OrderChatSessionDeleteArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    delete<T extends TicketDeleteArgs>(args: SelectSubset<T, TicketDeleteArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Update one OrderChatSession.
-     * @param {OrderChatSessionUpdateArgs} args - Arguments to update one OrderChatSession.
+     * Update one Ticket.
+     * @param {TicketUpdateArgs} args - Arguments to update one Ticket.
      * @example
-     * // Update one OrderChatSession
-     * const orderChatSession = await prisma.orderChatSession.update({
+     * // Update one Ticket
+     * const ticket = await prisma.ticket.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -34562,30 +34586,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends OrderChatSessionUpdateArgs>(args: SelectSubset<T, OrderChatSessionUpdateArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    update<T extends TicketUpdateArgs>(args: SelectSubset<T, TicketUpdateArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Delete zero or more OrderChatSessions.
-     * @param {OrderChatSessionDeleteManyArgs} args - Arguments to filter OrderChatSessions to delete.
+     * Delete zero or more Tickets.
+     * @param {TicketDeleteManyArgs} args - Arguments to filter Tickets to delete.
      * @example
-     * // Delete a few OrderChatSessions
-     * const { count } = await prisma.orderChatSession.deleteMany({
+     * // Delete a few Tickets
+     * const { count } = await prisma.ticket.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends OrderChatSessionDeleteManyArgs>(args?: SelectSubset<T, OrderChatSessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends TicketDeleteManyArgs>(args?: SelectSubset<T, TicketDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more OrderChatSessions.
+     * Update zero or more Tickets.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {OrderChatSessionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {TicketUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many OrderChatSessions
-     * const orderChatSession = await prisma.orderChatSession.updateMany({
+     * // Update many Tickets
+     * const ticket = await prisma.ticket.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -34595,14 +34619,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends OrderChatSessionUpdateManyArgs>(args: SelectSubset<T, OrderChatSessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends TicketUpdateManyArgs>(args: SelectSubset<T, TicketUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more OrderChatSessions and returns the data updated in the database.
-     * @param {OrderChatSessionUpdateManyAndReturnArgs} args - Arguments to update many OrderChatSessions.
+     * Update zero or more Tickets and returns the data updated in the database.
+     * @param {TicketUpdateManyAndReturnArgs} args - Arguments to update many Tickets.
      * @example
-     * // Update many OrderChatSessions
-     * const orderChatSession = await prisma.orderChatSession.updateManyAndReturn({
+     * // Update many Tickets
+     * const ticket = await prisma.ticket.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -34611,8 +34635,8 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more OrderChatSessions and only return the `id`
-     * const orderChatSessionWithIdOnly = await prisma.orderChatSession.updateManyAndReturn({
+     * // Update zero or more Tickets and only return the `id`
+     * const ticketWithIdOnly = await prisma.ticket.updateManyAndReturn({
      *   select: { id: true },
      *   where: {
      *     // ... provide filter here
@@ -34625,56 +34649,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends OrderChatSessionUpdateManyAndReturnArgs>(args: SelectSubset<T, OrderChatSessionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+    updateManyAndReturn<T extends TicketUpdateManyAndReturnArgs>(args: SelectSubset<T, TicketUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Create or update one OrderChatSession.
-     * @param {OrderChatSessionUpsertArgs} args - Arguments to update or create a OrderChatSession.
+     * Create or update one Ticket.
+     * @param {TicketUpsertArgs} args - Arguments to update or create a Ticket.
      * @example
-     * // Update or create a OrderChatSession
-     * const orderChatSession = await prisma.orderChatSession.upsert({
+     * // Update or create a Ticket
+     * const ticket = await prisma.ticket.upsert({
      *   create: {
-     *     // ... data to create a OrderChatSession
+     *     // ... data to create a Ticket
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the OrderChatSession we want to update
+     *     // ... the filter for the Ticket we want to update
      *   }
      * })
      */
-    upsert<T extends OrderChatSessionUpsertArgs>(args: SelectSubset<T, OrderChatSessionUpsertArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    upsert<T extends TicketUpsertArgs>(args: SelectSubset<T, TicketUpsertArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
-     * Count the number of OrderChatSessions.
+     * Count the number of Tickets.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {OrderChatSessionCountArgs} args - Arguments to filter OrderChatSessions to count.
+     * @param {TicketCountArgs} args - Arguments to filter Tickets to count.
      * @example
-     * // Count the number of OrderChatSessions
-     * const count = await prisma.orderChatSession.count({
+     * // Count the number of Tickets
+     * const count = await prisma.ticket.count({
      *   where: {
-     *     // ... the filter for the OrderChatSessions we want to count
+     *     // ... the filter for the Tickets we want to count
      *   }
      * })
     **/
-    count<T extends OrderChatSessionCountArgs>(
-      args?: Subset<T, OrderChatSessionCountArgs>,
+    count<T extends TicketCountArgs>(
+      args?: Subset<T, TicketCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], OrderChatSessionCountAggregateOutputType>
+          : GetScalarType<T['select'], TicketCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a OrderChatSession.
+     * Allows you to perform aggregations operations on a Ticket.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {OrderChatSessionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {TicketAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -34694,13 +34718,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends OrderChatSessionAggregateArgs>(args: Subset<T, OrderChatSessionAggregateArgs>): Prisma.PrismaPromise<GetOrderChatSessionAggregateType<T>>
+    aggregate<T extends TicketAggregateArgs>(args: Subset<T, TicketAggregateArgs>): Prisma.PrismaPromise<GetTicketAggregateType<T>>
 
     /**
-     * Group by OrderChatSession.
+     * Group by Ticket.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {OrderChatSessionGroupByArgs} args - Group by arguments.
+     * @param {TicketGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -34715,14 +34739,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends OrderChatSessionGroupByArgs,
+      T extends TicketGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: OrderChatSessionGroupByArgs['orderBy'] }
-        : { orderBy?: OrderChatSessionGroupByArgs['orderBy'] },
+        ? { orderBy: TicketGroupByArgs['orderBy'] }
+        : { orderBy?: TicketGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -34771,21 +34795,24 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, OrderChatSessionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOrderChatSessionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, TicketGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTicketGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the OrderChatSession model
+   * Fields of the Ticket model
    */
-  readonly fields: OrderChatSessionFieldRefs;
+  readonly fields: TicketFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for OrderChatSession.
+   * The delegate class that acts as a "Promise-like" for Ticket.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__OrderChatSessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__TicketClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    order<T extends OrderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrderDefaultArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    agent<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    messages<T extends Ticket$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -34812,380 +34839,451 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the OrderChatSession model
+   * Fields of the Ticket model
    */
-  interface OrderChatSessionFieldRefs {
-    readonly id: FieldRef<"OrderChatSession", 'String'>
-    readonly order_id: FieldRef<"OrderChatSession", 'String'>
-    readonly user_id: FieldRef<"OrderChatSession", 'String'>
-    readonly role: FieldRef<"OrderChatSession", 'UserRole'>
-    readonly zoho_ticket_id: FieldRef<"OrderChatSession", 'String'>
-    readonly zoho_visitor_id: FieldRef<"OrderChatSession", 'String'>
-    readonly status: FieldRef<"OrderChatSession", 'ChatStatus'>
-    readonly created_at: FieldRef<"OrderChatSession", 'DateTime'>
+  interface TicketFieldRefs {
+    readonly id: FieldRef<"Ticket", 'BigInt'>
+    readonly order_id: FieldRef<"Ticket", 'BigInt'>
+    readonly agent_id: FieldRef<"Ticket", 'BigInt'>
+    readonly stream_channel_id: FieldRef<"Ticket", 'String'>
+    readonly status: FieldRef<"Ticket", 'TicketStatus'>
+    readonly created_at: FieldRef<"Ticket", 'DateTime'>
+    readonly updated_at: FieldRef<"Ticket", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * OrderChatSession findUnique
+   * Ticket findUnique
    */
-  export type OrderChatSessionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelect<ExtArgs> | null
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * Filter, which OrderChatSession to fetch.
+     * Choose, which related nodes to fetch as well
      */
-    where: OrderChatSessionWhereUniqueInput
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * Filter, which Ticket to fetch.
+     */
+    where: TicketWhereUniqueInput
   }
 
   /**
-   * OrderChatSession findUniqueOrThrow
+   * Ticket findUniqueOrThrow
    */
-  export type OrderChatSessionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelect<ExtArgs> | null
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * Filter, which OrderChatSession to fetch.
+     * Choose, which related nodes to fetch as well
      */
-    where: OrderChatSessionWhereUniqueInput
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * Filter, which Ticket to fetch.
+     */
+    where: TicketWhereUniqueInput
   }
 
   /**
-   * OrderChatSession findFirst
+   * Ticket findFirst
    */
-  export type OrderChatSessionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelect<ExtArgs> | null
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * Filter, which OrderChatSession to fetch.
+     * Choose, which related nodes to fetch as well
      */
-    where?: OrderChatSessionWhereInput
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * Filter, which Ticket to fetch.
+     */
+    where?: TicketWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of OrderChatSessions to fetch.
+     * Determine the order of Tickets to fetch.
      */
-    orderBy?: OrderChatSessionOrderByWithRelationInput | OrderChatSessionOrderByWithRelationInput[]
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for OrderChatSessions.
+     * Sets the position for searching for Tickets.
      */
-    cursor?: OrderChatSessionWhereUniqueInput
+    cursor?: TicketWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` OrderChatSessions from the position of the cursor.
+     * Take `±n` Tickets from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` OrderChatSessions.
+     * Skip the first `n` Tickets.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of OrderChatSessions.
+     * Filter by unique combinations of Tickets.
      */
-    distinct?: OrderChatSessionScalarFieldEnum | OrderChatSessionScalarFieldEnum[]
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
   }
 
   /**
-   * OrderChatSession findFirstOrThrow
+   * Ticket findFirstOrThrow
    */
-  export type OrderChatSessionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelect<ExtArgs> | null
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * Filter, which OrderChatSession to fetch.
+     * Choose, which related nodes to fetch as well
      */
-    where?: OrderChatSessionWhereInput
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * Filter, which Ticket to fetch.
+     */
+    where?: TicketWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of OrderChatSessions to fetch.
+     * Determine the order of Tickets to fetch.
      */
-    orderBy?: OrderChatSessionOrderByWithRelationInput | OrderChatSessionOrderByWithRelationInput[]
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for OrderChatSessions.
+     * Sets the position for searching for Tickets.
      */
-    cursor?: OrderChatSessionWhereUniqueInput
+    cursor?: TicketWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` OrderChatSessions from the position of the cursor.
+     * Take `±n` Tickets from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` OrderChatSessions.
+     * Skip the first `n` Tickets.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of OrderChatSessions.
+     * Filter by unique combinations of Tickets.
      */
-    distinct?: OrderChatSessionScalarFieldEnum | OrderChatSessionScalarFieldEnum[]
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
   }
 
   /**
-   * OrderChatSession findMany
+   * Ticket findMany
    */
-  export type OrderChatSessionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelect<ExtArgs> | null
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * Filter, which OrderChatSessions to fetch.
+     * Choose, which related nodes to fetch as well
      */
-    where?: OrderChatSessionWhereInput
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * Filter, which Tickets to fetch.
+     */
+    where?: TicketWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of OrderChatSessions to fetch.
+     * Determine the order of Tickets to fetch.
      */
-    orderBy?: OrderChatSessionOrderByWithRelationInput | OrderChatSessionOrderByWithRelationInput[]
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing OrderChatSessions.
+     * Sets the position for listing Tickets.
      */
-    cursor?: OrderChatSessionWhereUniqueInput
+    cursor?: TicketWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` OrderChatSessions from the position of the cursor.
+     * Take `±n` Tickets from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` OrderChatSessions.
+     * Skip the first `n` Tickets.
      */
     skip?: number
-    distinct?: OrderChatSessionScalarFieldEnum | OrderChatSessionScalarFieldEnum[]
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
   }
 
   /**
-   * OrderChatSession create
+   * Ticket create
    */
-  export type OrderChatSessionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelect<ExtArgs> | null
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * The data needed to create a OrderChatSession.
+     * Choose, which related nodes to fetch as well
      */
-    data: XOR<OrderChatSessionCreateInput, OrderChatSessionUncheckedCreateInput>
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Ticket.
+     */
+    data: XOR<TicketCreateInput, TicketUncheckedCreateInput>
   }
 
   /**
-   * OrderChatSession createMany
+   * Ticket createMany
    */
-  export type OrderChatSessionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many OrderChatSessions.
+     * The data used to create many Tickets.
      */
-    data: OrderChatSessionCreateManyInput | OrderChatSessionCreateManyInput[]
+    data: TicketCreateManyInput | TicketCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * OrderChatSession createManyAndReturn
+   * Ticket createManyAndReturn
    */
-  export type OrderChatSessionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelectCreateManyAndReturn<ExtArgs> | null
+    select?: TicketSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * The data used to create many OrderChatSessions.
+     * The data used to create many Tickets.
      */
-    data: OrderChatSessionCreateManyInput | OrderChatSessionCreateManyInput[]
+    data: TicketCreateManyInput | TicketCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * OrderChatSession update
+   * Ticket update
    */
-  export type OrderChatSessionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelect<ExtArgs> | null
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * The data needed to update a OrderChatSession.
+     * Choose, which related nodes to fetch as well
      */
-    data: XOR<OrderChatSessionUpdateInput, OrderChatSessionUncheckedUpdateInput>
+    include?: TicketInclude<ExtArgs> | null
     /**
-     * Choose, which OrderChatSession to update.
+     * The data needed to update a Ticket.
      */
-    where: OrderChatSessionWhereUniqueInput
+    data: XOR<TicketUpdateInput, TicketUncheckedUpdateInput>
+    /**
+     * Choose, which Ticket to update.
+     */
+    where: TicketWhereUniqueInput
   }
 
   /**
-   * OrderChatSession updateMany
+   * Ticket updateMany
    */
-  export type OrderChatSessionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update OrderChatSessions.
+     * The data used to update Tickets.
      */
-    data: XOR<OrderChatSessionUpdateManyMutationInput, OrderChatSessionUncheckedUpdateManyInput>
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyInput>
     /**
-     * Filter which OrderChatSessions to update
+     * Filter which Tickets to update
      */
-    where?: OrderChatSessionWhereInput
+    where?: TicketWhereInput
     /**
-     * Limit how many OrderChatSessions to update.
+     * Limit how many Tickets to update.
      */
     limit?: number
   }
 
   /**
-   * OrderChatSession updateManyAndReturn
+   * Ticket updateManyAndReturn
    */
-  export type OrderChatSessionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: TicketSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * The data used to update OrderChatSessions.
+     * The data used to update Tickets.
      */
-    data: XOR<OrderChatSessionUpdateManyMutationInput, OrderChatSessionUncheckedUpdateManyInput>
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyInput>
     /**
-     * Filter which OrderChatSessions to update
+     * Filter which Tickets to update
      */
-    where?: OrderChatSessionWhereInput
+    where?: TicketWhereInput
     /**
-     * Limit how many OrderChatSessions to update.
+     * Limit how many Tickets to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Ticket upsert
+   */
+  export type TicketUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Ticket to update in case it exists.
+     */
+    where: TicketWhereUniqueInput
+    /**
+     * In case the Ticket found by the `where` argument doesn't exist, create a new Ticket with this data.
+     */
+    create: XOR<TicketCreateInput, TicketUncheckedCreateInput>
+    /**
+     * In case the Ticket was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TicketUpdateInput, TicketUncheckedUpdateInput>
+  }
+
+  /**
+   * Ticket delete
+   */
+  export type TicketDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * Filter which Ticket to delete.
+     */
+    where: TicketWhereUniqueInput
+  }
+
+  /**
+   * Ticket deleteMany
+   */
+  export type TicketDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Tickets to delete
+     */
+    where?: TicketWhereInput
+    /**
+     * Limit how many Tickets to delete.
      */
     limit?: number
   }
 
   /**
-   * OrderChatSession upsert
+   * Ticket.messages
    */
-  export type OrderChatSessionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Ticket$messagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Message
      */
-    select?: OrderChatSessionSelect<ExtArgs> | null
+    select?: MessageSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Message
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: MessageOmit<ExtArgs> | null
     /**
-     * The filter to search for the OrderChatSession to update in case it exists.
+     * Choose, which related nodes to fetch as well
      */
-    where: OrderChatSessionWhereUniqueInput
-    /**
-     * In case the OrderChatSession found by the `where` argument doesn't exist, create a new OrderChatSession with this data.
-     */
-    create: XOR<OrderChatSessionCreateInput, OrderChatSessionUncheckedCreateInput>
-    /**
-     * In case the OrderChatSession was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<OrderChatSessionUpdateInput, OrderChatSessionUncheckedUpdateInput>
+    include?: MessageInclude<ExtArgs> | null
+    where?: MessageWhereInput
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    cursor?: MessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
   }
 
   /**
-   * OrderChatSession delete
+   * Ticket without action
    */
-  export type OrderChatSessionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TicketDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the OrderChatSession
+     * Select specific fields to fetch from the Ticket
      */
-    select?: OrderChatSessionSelect<ExtArgs> | null
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the OrderChatSession
+     * Omit specific fields from the Ticket
      */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * Filter which OrderChatSession to delete.
+     * Choose, which related nodes to fetch as well
      */
-    where: OrderChatSessionWhereUniqueInput
-  }
-
-  /**
-   * OrderChatSession deleteMany
-   */
-  export type OrderChatSessionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which OrderChatSessions to delete
-     */
-    where?: OrderChatSessionWhereInput
-    /**
-     * Limit how many OrderChatSessions to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * OrderChatSession without action
-   */
-  export type OrderChatSessionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the OrderChatSession
-     */
-    select?: OrderChatSessionSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the OrderChatSession
-     */
-    omit?: OrderChatSessionOmit<ExtArgs> | null
+    include?: TicketInclude<ExtArgs> | null
   }
 
 
@@ -35442,7 +35540,7 @@ export namespace Prisma {
 
   export const MessageScalarFieldEnum: {
     id: 'id',
-    channel_id: 'channel_id',
+    ticket_id: 'ticket_id',
     sender_id: 'sender_id',
     message_text: 'message_text',
     message_type: 'message_type',
@@ -35576,11 +35674,7 @@ export namespace Prisma {
     status: 'status',
     order_date: 'order_date',
     completed_at: 'completed_at',
-    rejection_message: 'rejection_message',
-    zoho_visitor_id: 'zoho_visitor_id',
-    chat_session_id: 'chat_session_id',
-    chat_enabled: 'chat_enabled',
-    chat_started_at: 'chat_started_at'
+    rejection_message: 'rejection_message'
   };
 
   export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -35643,18 +35737,17 @@ export namespace Prisma {
   export type PortfolioItemScalarFieldEnum = (typeof PortfolioItemScalarFieldEnum)[keyof typeof PortfolioItemScalarFieldEnum]
 
 
-  export const OrderChatSessionScalarFieldEnum: {
+  export const TicketScalarFieldEnum: {
     id: 'id',
     order_id: 'order_id',
-    user_id: 'user_id',
-    role: 'role',
-    zoho_ticket_id: 'zoho_ticket_id',
-    zoho_visitor_id: 'zoho_visitor_id',
+    agent_id: 'agent_id',
+    stream_channel_id: 'stream_channel_id',
     status: 'status',
-    created_at: 'created_at'
+    created_at: 'created_at',
+    updated_at: 'updated_at'
   };
 
-  export type OrderChatSessionScalarFieldEnum = (typeof OrderChatSessionScalarFieldEnum)[keyof typeof OrderChatSessionScalarFieldEnum]
+  export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -36089,30 +36182,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'UserRole'
+   * Reference to a field of type 'TicketStatus'
    */
-  export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+  export type EnumTicketStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketStatus'>
     
 
 
   /**
-   * Reference to a field of type 'UserRole[]'
+   * Reference to a field of type 'TicketStatus[]'
    */
-  export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'ChatStatus'
-   */
-  export type EnumChatStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChatStatus'>
-    
-
-
-  /**
-   * Reference to a field of type 'ChatStatus[]'
-   */
-  export type ListEnumChatStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChatStatus[]'>
+  export type ListEnumTicketStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketStatus[]'>
     
 
 
@@ -36173,6 +36252,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewListRelationFilter
     reviews_reviewer?: ReviewListRelationFilter
     kyc_verifications?: KYCListRelationFilter
+    assigned_tickets?: TicketListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -36212,6 +36292,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewOrderByRelationAggregateInput
     reviews_reviewer?: ReviewOrderByRelationAggregateInput
     kyc_verifications?: KYCOrderByRelationAggregateInput
+    assigned_tickets?: TicketOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -36254,6 +36335,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewListRelationFilter
     reviews_reviewer?: ReviewListRelationFilter
     kyc_verifications?: KYCListRelationFilter
+    assigned_tickets?: TicketListRelationFilter
   }, "id" | "email" | "phone">
 
   export type UserOrderByWithAggregationInput = {
@@ -37497,7 +37579,7 @@ export namespace Prisma {
     OR?: MessageWhereInput[]
     NOT?: MessageWhereInput | MessageWhereInput[]
     id?: BigIntFilter<"Message"> | bigint | number
-    channel_id?: BigIntFilter<"Message"> | bigint | number
+    ticket_id?: BigIntFilter<"Message"> | bigint | number
     sender_id?: BigIntFilter<"Message"> | bigint | number
     message_text?: StringFilter<"Message"> | string
     message_type?: EnumMessageTypeFilter<"Message"> | $Enums.MessageType
@@ -37505,13 +37587,13 @@ export namespace Prisma {
     file_name?: StringNullableFilter<"Message"> | string | null
     read_at?: DateTimeNullableFilter<"Message"> | Date | string | null
     created_at?: DateTimeFilter<"Message"> | Date | string
-    channel?: XOR<CollaborationChannelScalarRelationFilter, CollaborationChannelWhereInput>
+    ticket?: XOR<TicketScalarRelationFilter, TicketWhereInput>
     sender?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type MessageOrderByWithRelationInput = {
     id?: SortOrder
-    channel_id?: SortOrder
+    ticket_id?: SortOrder
     sender_id?: SortOrder
     message_text?: SortOrder
     message_type?: SortOrder
@@ -37519,7 +37601,7 @@ export namespace Prisma {
     file_name?: SortOrderInput | SortOrder
     read_at?: SortOrderInput | SortOrder
     created_at?: SortOrder
-    channel?: CollaborationChannelOrderByWithRelationInput
+    ticket?: TicketOrderByWithRelationInput
     sender?: UserOrderByWithRelationInput
   }
 
@@ -37528,7 +37610,7 @@ export namespace Prisma {
     AND?: MessageWhereInput | MessageWhereInput[]
     OR?: MessageWhereInput[]
     NOT?: MessageWhereInput | MessageWhereInput[]
-    channel_id?: BigIntFilter<"Message"> | bigint | number
+    ticket_id?: BigIntFilter<"Message"> | bigint | number
     sender_id?: BigIntFilter<"Message"> | bigint | number
     message_text?: StringFilter<"Message"> | string
     message_type?: EnumMessageTypeFilter<"Message"> | $Enums.MessageType
@@ -37536,13 +37618,13 @@ export namespace Prisma {
     file_name?: StringNullableFilter<"Message"> | string | null
     read_at?: DateTimeNullableFilter<"Message"> | Date | string | null
     created_at?: DateTimeFilter<"Message"> | Date | string
-    channel?: XOR<CollaborationChannelScalarRelationFilter, CollaborationChannelWhereInput>
+    ticket?: XOR<TicketScalarRelationFilter, TicketWhereInput>
     sender?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type MessageOrderByWithAggregationInput = {
     id?: SortOrder
-    channel_id?: SortOrder
+    ticket_id?: SortOrder
     sender_id?: SortOrder
     message_text?: SortOrder
     message_type?: SortOrder
@@ -37562,7 +37644,7 @@ export namespace Prisma {
     OR?: MessageScalarWhereWithAggregatesInput[]
     NOT?: MessageScalarWhereWithAggregatesInput | MessageScalarWhereWithAggregatesInput[]
     id?: BigIntWithAggregatesFilter<"Message"> | bigint | number
-    channel_id?: BigIntWithAggregatesFilter<"Message"> | bigint | number
+    ticket_id?: BigIntWithAggregatesFilter<"Message"> | bigint | number
     sender_id?: BigIntWithAggregatesFilter<"Message"> | bigint | number
     message_text?: StringWithAggregatesFilter<"Message"> | string
     message_type?: EnumMessageTypeWithAggregatesFilter<"Message"> | $Enums.MessageType
@@ -38017,7 +38099,6 @@ export namespace Prisma {
     created_at?: DateTimeFilter<"CollaborationChannel"> | Date | string
     admin?: XOR<UserScalarRelationFilter, UserWhereInput>
     collaboration?: XOR<CollaborationScalarRelationFilter, CollaborationWhereInput>
-    messages?: MessageListRelationFilter
   }
 
   export type CollaborationChannelOrderByWithRelationInput = {
@@ -38027,7 +38108,6 @@ export namespace Prisma {
     created_at?: SortOrder
     admin?: UserOrderByWithRelationInput
     collaboration?: CollaborationOrderByWithRelationInput
-    messages?: MessageOrderByRelationAggregateInput
   }
 
   export type CollaborationChannelWhereUniqueInput = Prisma.AtLeast<{
@@ -38040,7 +38120,6 @@ export namespace Prisma {
     created_at?: DateTimeFilter<"CollaborationChannel"> | Date | string
     admin?: XOR<UserScalarRelationFilter, UserWhereInput>
     collaboration?: XOR<CollaborationScalarRelationFilter, CollaborationWhereInput>
-    messages?: MessageListRelationFilter
   }, "id" | "collaboration_id">
 
   export type CollaborationChannelOrderByWithAggregationInput = {
@@ -38170,15 +38249,12 @@ export namespace Prisma {
     order_date?: DateTimeFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableFilter<"Order"> | string | null
-    zoho_visitor_id?: StringNullableFilter<"Order"> | string | null
-    chat_session_id?: StringNullableFilter<"Order"> | string | null
-    chat_enabled?: BoolFilter<"Order"> | boolean
-    chat_started_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
     brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
     creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
     payments?: PaymentListRelationFilter
     invoices?: InvoiceListRelationFilter
+    ticket?: XOR<TicketNullableScalarRelationFilter, TicketWhereInput> | null
   }
 
   export type OrderOrderByWithRelationInput = {
@@ -38193,15 +38269,12 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrderInput | SortOrder
     rejection_message?: SortOrderInput | SortOrder
-    zoho_visitor_id?: SortOrderInput | SortOrder
-    chat_session_id?: SortOrderInput | SortOrder
-    chat_enabled?: SortOrder
-    chat_started_at?: SortOrderInput | SortOrder
     package?: PackageOrderByWithRelationInput
     brand?: BrandProfileOrderByWithRelationInput
     creator?: CreatorProfileOrderByWithRelationInput
     payments?: PaymentOrderByRelationAggregateInput
     invoices?: InvoiceOrderByRelationAggregateInput
+    ticket?: TicketOrderByWithRelationInput
   }
 
   export type OrderWhereUniqueInput = Prisma.AtLeast<{
@@ -38219,15 +38292,12 @@ export namespace Prisma {
     order_date?: DateTimeFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableFilter<"Order"> | string | null
-    zoho_visitor_id?: StringNullableFilter<"Order"> | string | null
-    chat_session_id?: StringNullableFilter<"Order"> | string | null
-    chat_enabled?: BoolFilter<"Order"> | boolean
-    chat_started_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
     brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
     creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
     payments?: PaymentListRelationFilter
     invoices?: InvoiceListRelationFilter
+    ticket?: XOR<TicketNullableScalarRelationFilter, TicketWhereInput> | null
   }, "id">
 
   export type OrderOrderByWithAggregationInput = {
@@ -38242,10 +38312,6 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrderInput | SortOrder
     rejection_message?: SortOrderInput | SortOrder
-    zoho_visitor_id?: SortOrderInput | SortOrder
-    chat_session_id?: SortOrderInput | SortOrder
-    chat_enabled?: SortOrder
-    chat_started_at?: SortOrderInput | SortOrder
     _count?: OrderCountOrderByAggregateInput
     _avg?: OrderAvgOrderByAggregateInput
     _max?: OrderMaxOrderByAggregateInput
@@ -38268,10 +38334,6 @@ export namespace Prisma {
     order_date?: DateTimeWithAggregatesFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableWithAggregatesFilter<"Order"> | string | null
-    zoho_visitor_id?: StringNullableWithAggregatesFilter<"Order"> | string | null
-    chat_session_id?: StringNullableWithAggregatesFilter<"Order"> | string | null
-    chat_enabled?: BoolWithAggregatesFilter<"Order"> | boolean
-    chat_started_at?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
   }
 
   export type PhoneVerificationWhereInput = {
@@ -38571,72 +38633,77 @@ export namespace Prisma {
     updated_at?: DateTimeWithAggregatesFilter<"PortfolioItem"> | Date | string
   }
 
-  export type OrderChatSessionWhereInput = {
-    AND?: OrderChatSessionWhereInput | OrderChatSessionWhereInput[]
-    OR?: OrderChatSessionWhereInput[]
-    NOT?: OrderChatSessionWhereInput | OrderChatSessionWhereInput[]
-    id?: StringFilter<"OrderChatSession"> | string
-    order_id?: StringFilter<"OrderChatSession"> | string
-    user_id?: StringFilter<"OrderChatSession"> | string
-    role?: EnumUserRoleFilter<"OrderChatSession"> | $Enums.UserRole
-    zoho_ticket_id?: StringFilter<"OrderChatSession"> | string
-    zoho_visitor_id?: StringNullableFilter<"OrderChatSession"> | string | null
-    status?: EnumChatStatusFilter<"OrderChatSession"> | $Enums.ChatStatus
-    created_at?: DateTimeFilter<"OrderChatSession"> | Date | string
+  export type TicketWhereInput = {
+    AND?: TicketWhereInput | TicketWhereInput[]
+    OR?: TicketWhereInput[]
+    NOT?: TicketWhereInput | TicketWhereInput[]
+    id?: BigIntFilter<"Ticket"> | bigint | number
+    order_id?: BigIntFilter<"Ticket"> | bigint | number
+    agent_id?: BigIntFilter<"Ticket"> | bigint | number
+    stream_channel_id?: StringFilter<"Ticket"> | string
+    status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
+    created_at?: DateTimeFilter<"Ticket"> | Date | string
+    updated_at?: DateTimeFilter<"Ticket"> | Date | string
+    order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
+    agent?: XOR<UserScalarRelationFilter, UserWhereInput>
+    messages?: MessageListRelationFilter
   }
 
-  export type OrderChatSessionOrderByWithRelationInput = {
+  export type TicketOrderByWithRelationInput = {
     id?: SortOrder
     order_id?: SortOrder
-    user_id?: SortOrder
-    role?: SortOrder
-    zoho_ticket_id?: SortOrder
-    zoho_visitor_id?: SortOrderInput | SortOrder
+    agent_id?: SortOrder
+    stream_channel_id?: SortOrder
     status?: SortOrder
     created_at?: SortOrder
+    updated_at?: SortOrder
+    order?: OrderOrderByWithRelationInput
+    agent?: UserOrderByWithRelationInput
+    messages?: MessageOrderByRelationAggregateInput
   }
 
-  export type OrderChatSessionWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    order_id_user_id_role?: OrderChatSessionOrder_idUser_idRoleCompoundUniqueInput
-    AND?: OrderChatSessionWhereInput | OrderChatSessionWhereInput[]
-    OR?: OrderChatSessionWhereInput[]
-    NOT?: OrderChatSessionWhereInput | OrderChatSessionWhereInput[]
-    order_id?: StringFilter<"OrderChatSession"> | string
-    user_id?: StringFilter<"OrderChatSession"> | string
-    role?: EnumUserRoleFilter<"OrderChatSession"> | $Enums.UserRole
-    zoho_ticket_id?: StringFilter<"OrderChatSession"> | string
-    zoho_visitor_id?: StringNullableFilter<"OrderChatSession"> | string | null
-    status?: EnumChatStatusFilter<"OrderChatSession"> | $Enums.ChatStatus
-    created_at?: DateTimeFilter<"OrderChatSession"> | Date | string
-  }, "id" | "order_id_user_id_role">
+  export type TicketWhereUniqueInput = Prisma.AtLeast<{
+    id?: bigint | number
+    order_id?: bigint | number
+    AND?: TicketWhereInput | TicketWhereInput[]
+    OR?: TicketWhereInput[]
+    NOT?: TicketWhereInput | TicketWhereInput[]
+    agent_id?: BigIntFilter<"Ticket"> | bigint | number
+    stream_channel_id?: StringFilter<"Ticket"> | string
+    status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
+    created_at?: DateTimeFilter<"Ticket"> | Date | string
+    updated_at?: DateTimeFilter<"Ticket"> | Date | string
+    order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
+    agent?: XOR<UserScalarRelationFilter, UserWhereInput>
+    messages?: MessageListRelationFilter
+  }, "id" | "order_id">
 
-  export type OrderChatSessionOrderByWithAggregationInput = {
+  export type TicketOrderByWithAggregationInput = {
     id?: SortOrder
     order_id?: SortOrder
-    user_id?: SortOrder
-    role?: SortOrder
-    zoho_ticket_id?: SortOrder
-    zoho_visitor_id?: SortOrderInput | SortOrder
+    agent_id?: SortOrder
+    stream_channel_id?: SortOrder
     status?: SortOrder
     created_at?: SortOrder
-    _count?: OrderChatSessionCountOrderByAggregateInput
-    _max?: OrderChatSessionMaxOrderByAggregateInput
-    _min?: OrderChatSessionMinOrderByAggregateInput
+    updated_at?: SortOrder
+    _count?: TicketCountOrderByAggregateInput
+    _avg?: TicketAvgOrderByAggregateInput
+    _max?: TicketMaxOrderByAggregateInput
+    _min?: TicketMinOrderByAggregateInput
+    _sum?: TicketSumOrderByAggregateInput
   }
 
-  export type OrderChatSessionScalarWhereWithAggregatesInput = {
-    AND?: OrderChatSessionScalarWhereWithAggregatesInput | OrderChatSessionScalarWhereWithAggregatesInput[]
-    OR?: OrderChatSessionScalarWhereWithAggregatesInput[]
-    NOT?: OrderChatSessionScalarWhereWithAggregatesInput | OrderChatSessionScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"OrderChatSession"> | string
-    order_id?: StringWithAggregatesFilter<"OrderChatSession"> | string
-    user_id?: StringWithAggregatesFilter<"OrderChatSession"> | string
-    role?: EnumUserRoleWithAggregatesFilter<"OrderChatSession"> | $Enums.UserRole
-    zoho_ticket_id?: StringWithAggregatesFilter<"OrderChatSession"> | string
-    zoho_visitor_id?: StringNullableWithAggregatesFilter<"OrderChatSession"> | string | null
-    status?: EnumChatStatusWithAggregatesFilter<"OrderChatSession"> | $Enums.ChatStatus
-    created_at?: DateTimeWithAggregatesFilter<"OrderChatSession"> | Date | string
+  export type TicketScalarWhereWithAggregatesInput = {
+    AND?: TicketScalarWhereWithAggregatesInput | TicketScalarWhereWithAggregatesInput[]
+    OR?: TicketScalarWhereWithAggregatesInput[]
+    NOT?: TicketScalarWhereWithAggregatesInput | TicketScalarWhereWithAggregatesInput[]
+    id?: BigIntWithAggregatesFilter<"Ticket"> | bigint | number
+    order_id?: BigIntWithAggregatesFilter<"Ticket"> | bigint | number
+    agent_id?: BigIntWithAggregatesFilter<"Ticket"> | bigint | number
+    stream_channel_id?: StringWithAggregatesFilter<"Ticket"> | string
+    status?: EnumTicketStatusWithAggregatesFilter<"Ticket"> | $Enums.TicketStatus
+    created_at?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
+    updated_at?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -38676,6 +38743,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -38715,6 +38783,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserUpdateInput = {
@@ -38754,6 +38823,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -38793,6 +38863,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -40204,13 +40275,13 @@ export namespace Prisma {
     file_name?: string | null
     read_at?: Date | string | null
     created_at?: Date | string
-    channel: CollaborationChannelCreateNestedOneWithoutMessagesInput
+    ticket: TicketCreateNestedOneWithoutMessagesInput
     sender: UserCreateNestedOneWithoutSent_messagesInput
   }
 
   export type MessageUncheckedCreateInput = {
     id?: bigint | number
-    channel_id: bigint | number
+    ticket_id: bigint | number
     sender_id: bigint | number
     message_text: string
     message_type?: $Enums.MessageType
@@ -40228,13 +40299,13 @@ export namespace Prisma {
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: CollaborationChannelUpdateOneRequiredWithoutMessagesNestedInput
+    ticket?: TicketUpdateOneRequiredWithoutMessagesNestedInput
     sender?: UserUpdateOneRequiredWithoutSent_messagesNestedInput
   }
 
   export type MessageUncheckedUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    channel_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    ticket_id?: BigIntFieldUpdateOperationsInput | bigint | number
     sender_id?: BigIntFieldUpdateOperationsInput | bigint | number
     message_text?: StringFieldUpdateOperationsInput | string
     message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
@@ -40246,7 +40317,7 @@ export namespace Prisma {
 
   export type MessageCreateManyInput = {
     id?: bigint | number
-    channel_id: bigint | number
+    ticket_id: bigint | number
     sender_id: bigint | number
     message_text: string
     message_type?: $Enums.MessageType
@@ -40268,7 +40339,7 @@ export namespace Prisma {
 
   export type MessageUncheckedUpdateManyInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    channel_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    ticket_id?: BigIntFieldUpdateOperationsInput | bigint | number
     sender_id?: BigIntFieldUpdateOperationsInput | bigint | number
     message_text?: StringFieldUpdateOperationsInput | string
     message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
@@ -40729,7 +40800,6 @@ export namespace Prisma {
     created_at?: Date | string
     admin: UserCreateNestedOneWithoutAdmin_channelsInput
     collaboration: CollaborationCreateNestedOneWithoutChannelsInput
-    messages?: MessageCreateNestedManyWithoutChannelInput
   }
 
   export type CollaborationChannelUncheckedCreateInput = {
@@ -40737,7 +40807,6 @@ export namespace Prisma {
     collaboration_id: bigint | number
     admin_id: bigint | number
     created_at?: Date | string
-    messages?: MessageUncheckedCreateNestedManyWithoutChannelInput
   }
 
   export type CollaborationChannelUpdateInput = {
@@ -40745,7 +40814,6 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     admin?: UserUpdateOneRequiredWithoutAdmin_channelsNestedInput
     collaboration?: CollaborationUpdateOneRequiredWithoutChannelsNestedInput
-    messages?: MessageUpdateManyWithoutChannelNestedInput
   }
 
   export type CollaborationChannelUncheckedUpdateInput = {
@@ -40753,7 +40821,6 @@ export namespace Prisma {
     collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    messages?: MessageUncheckedUpdateManyWithoutChannelNestedInput
   }
 
   export type CollaborationChannelCreateManyInput = {
@@ -40885,15 +40952,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     invoices?: InvoiceCreateNestedManyWithoutOrderInput
+    ticket?: TicketCreateNestedOneWithoutOrderInput
   }
 
   export type OrderUncheckedCreateInput = {
@@ -40908,12 +40972,9 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+    ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
   }
 
   export type OrderUpdateInput = {
@@ -40925,15 +40986,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateInput = {
@@ -40948,12 +41006,9 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderCreateManyInput = {
@@ -40968,10 +41023,6 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
   }
 
   export type OrderUpdateManyMutationInput = {
@@ -40983,10 +41034,6 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type OrderUncheckedUpdateManyInput = {
@@ -41001,10 +41048,6 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PhoneVerificationCreateInput = {
@@ -41338,81 +41381,76 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type OrderChatSessionCreateInput = {
-    id?: string
-    order_id: string
-    user_id: string
-    role: $Enums.UserRole
-    zoho_ticket_id: string
-    zoho_visitor_id?: string | null
-    status?: $Enums.ChatStatus
+  export type TicketCreateInput = {
+    id?: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
     created_at?: Date | string
+    updated_at?: Date | string
+    order: OrderCreateNestedOneWithoutTicketInput
+    agent: UserCreateNestedOneWithoutAssigned_ticketsInput
+    messages?: MessageCreateNestedManyWithoutTicketInput
   }
 
-  export type OrderChatSessionUncheckedCreateInput = {
-    id?: string
-    order_id: string
-    user_id: string
-    role: $Enums.UserRole
-    zoho_ticket_id: string
-    zoho_visitor_id?: string | null
-    status?: $Enums.ChatStatus
+  export type TicketUncheckedCreateInput = {
+    id?: bigint | number
+    order_id: bigint | number
+    agent_id: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
     created_at?: Date | string
+    updated_at?: Date | string
+    messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
   }
 
-  export type OrderChatSessionUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    order_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    zoho_ticket_id?: StringFieldUpdateOperationsInput | string
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumChatStatusFieldUpdateOperationsInput | $Enums.ChatStatus
+  export type TicketUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    order?: OrderUpdateOneRequiredWithoutTicketNestedInput
+    agent?: UserUpdateOneRequiredWithoutAssigned_ticketsNestedInput
+    messages?: MessageUpdateManyWithoutTicketNestedInput
   }
 
-  export type OrderChatSessionUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    order_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    zoho_ticket_id?: StringFieldUpdateOperationsInput | string
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumChatStatusFieldUpdateOperationsInput | $Enums.ChatStatus
+  export type TicketUncheckedUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
   }
 
-  export type OrderChatSessionCreateManyInput = {
-    id?: string
-    order_id: string
-    user_id: string
-    role: $Enums.UserRole
-    zoho_ticket_id: string
-    zoho_visitor_id?: string | null
-    status?: $Enums.ChatStatus
+  export type TicketCreateManyInput = {
+    id?: bigint | number
+    order_id: bigint | number
+    agent_id: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
     created_at?: Date | string
+    updated_at?: Date | string
   }
 
-  export type OrderChatSessionUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    order_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    zoho_ticket_id?: StringFieldUpdateOperationsInput | string
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumChatStatusFieldUpdateOperationsInput | $Enums.ChatStatus
+  export type TicketUpdateManyMutationInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type OrderChatSessionUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    order_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    zoho_ticket_id?: StringFieldUpdateOperationsInput | string
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumChatStatusFieldUpdateOperationsInput | $Enums.ChatStatus
+  export type TicketUncheckedUpdateManyInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BigIntFilter<$PrismaModel = never> = {
@@ -41573,6 +41611,12 @@ export namespace Prisma {
     none?: KYCWhereInput
   }
 
+  export type TicketListRelationFilter = {
+    every?: TicketWhereInput
+    some?: TicketWhereInput
+    none?: TicketWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -41615,6 +41659,10 @@ export namespace Prisma {
   }
 
   export type KYCOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TicketOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -43039,14 +43087,14 @@ export namespace Prisma {
     not?: NestedEnumMessageTypeFilter<$PrismaModel> | $Enums.MessageType
   }
 
-  export type CollaborationChannelScalarRelationFilter = {
-    is?: CollaborationChannelWhereInput
-    isNot?: CollaborationChannelWhereInput
+  export type TicketScalarRelationFilter = {
+    is?: TicketWhereInput
+    isNot?: TicketWhereInput
   }
 
   export type MessageCountOrderByAggregateInput = {
     id?: SortOrder
-    channel_id?: SortOrder
+    ticket_id?: SortOrder
     sender_id?: SortOrder
     message_text?: SortOrder
     message_type?: SortOrder
@@ -43058,13 +43106,13 @@ export namespace Prisma {
 
   export type MessageAvgOrderByAggregateInput = {
     id?: SortOrder
-    channel_id?: SortOrder
+    ticket_id?: SortOrder
     sender_id?: SortOrder
   }
 
   export type MessageMaxOrderByAggregateInput = {
     id?: SortOrder
-    channel_id?: SortOrder
+    ticket_id?: SortOrder
     sender_id?: SortOrder
     message_text?: SortOrder
     message_type?: SortOrder
@@ -43076,7 +43124,7 @@ export namespace Prisma {
 
   export type MessageMinOrderByAggregateInput = {
     id?: SortOrder
-    channel_id?: SortOrder
+    ticket_id?: SortOrder
     sender_id?: SortOrder
     message_text?: SortOrder
     message_type?: SortOrder
@@ -43088,7 +43136,7 @@ export namespace Prisma {
 
   export type MessageSumOrderByAggregateInput = {
     id?: SortOrder
-    channel_id?: SortOrder
+    ticket_id?: SortOrder
     sender_id?: SortOrder
   }
 
@@ -43549,6 +43597,11 @@ export namespace Prisma {
     isNot?: PackageWhereInput
   }
 
+  export type TicketNullableScalarRelationFilter = {
+    is?: TicketWhereInput | null
+    isNot?: TicketWhereInput | null
+  }
+
   export type OrderCountOrderByAggregateInput = {
     id?: SortOrder
     package_id?: SortOrder
@@ -43561,10 +43614,6 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrder
     rejection_message?: SortOrder
-    zoho_visitor_id?: SortOrder
-    chat_session_id?: SortOrder
-    chat_enabled?: SortOrder
-    chat_started_at?: SortOrder
   }
 
   export type OrderAvgOrderByAggregateInput = {
@@ -43588,10 +43637,6 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrder
     rejection_message?: SortOrder
-    zoho_visitor_id?: SortOrder
-    chat_session_id?: SortOrder
-    chat_enabled?: SortOrder
-    chat_started_at?: SortOrder
   }
 
   export type OrderMinOrderByAggregateInput = {
@@ -43606,10 +43651,6 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrder
     rejection_message?: SortOrder
-    zoho_visitor_id?: SortOrder
-    chat_session_id?: SortOrder
-    chat_enabled?: SortOrder
-    chat_started_at?: SortOrder
   }
 
   export type OrderSumOrderByAggregateInput = {
@@ -43870,77 +43911,68 @@ export namespace Prisma {
     _max?: NestedEnumSocialPlatformNullableFilter<$PrismaModel>
   }
 
-  export type EnumUserRoleFilter<$PrismaModel = never> = {
-    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  export type EnumTicketStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TicketStatus | EnumTicketStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TicketStatus[] | ListEnumTicketStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TicketStatus[] | ListEnumTicketStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTicketStatusFilter<$PrismaModel> | $Enums.TicketStatus
   }
 
-  export type EnumChatStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.ChatStatus | EnumChatStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumChatStatusFilter<$PrismaModel> | $Enums.ChatStatus
+  export type OrderScalarRelationFilter = {
+    is?: OrderWhereInput
+    isNot?: OrderWhereInput
   }
 
-  export type OrderChatSessionOrder_idUser_idRoleCompoundUniqueInput = {
-    order_id: string
-    user_id: string
-    role: $Enums.UserRole
-  }
-
-  export type OrderChatSessionCountOrderByAggregateInput = {
+  export type TicketCountOrderByAggregateInput = {
     id?: SortOrder
     order_id?: SortOrder
-    user_id?: SortOrder
-    role?: SortOrder
-    zoho_ticket_id?: SortOrder
-    zoho_visitor_id?: SortOrder
+    agent_id?: SortOrder
+    stream_channel_id?: SortOrder
     status?: SortOrder
     created_at?: SortOrder
+    updated_at?: SortOrder
   }
 
-  export type OrderChatSessionMaxOrderByAggregateInput = {
+  export type TicketAvgOrderByAggregateInput = {
     id?: SortOrder
     order_id?: SortOrder
-    user_id?: SortOrder
-    role?: SortOrder
-    zoho_ticket_id?: SortOrder
-    zoho_visitor_id?: SortOrder
-    status?: SortOrder
-    created_at?: SortOrder
+    agent_id?: SortOrder
   }
 
-  export type OrderChatSessionMinOrderByAggregateInput = {
+  export type TicketMaxOrderByAggregateInput = {
     id?: SortOrder
     order_id?: SortOrder
-    user_id?: SortOrder
-    role?: SortOrder
-    zoho_ticket_id?: SortOrder
-    zoho_visitor_id?: SortOrder
+    agent_id?: SortOrder
+    stream_channel_id?: SortOrder
     status?: SortOrder
     created_at?: SortOrder
+    updated_at?: SortOrder
   }
 
-  export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+  export type TicketMinOrderByAggregateInput = {
+    id?: SortOrder
+    order_id?: SortOrder
+    agent_id?: SortOrder
+    stream_channel_id?: SortOrder
+    status?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type TicketSumOrderByAggregateInput = {
+    id?: SortOrder
+    order_id?: SortOrder
+    agent_id?: SortOrder
+  }
+
+  export type EnumTicketStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TicketStatus | EnumTicketStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TicketStatus[] | ListEnumTicketStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TicketStatus[] | ListEnumTicketStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTicketStatusWithAggregatesFilter<$PrismaModel> | $Enums.TicketStatus
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumUserRoleFilter<$PrismaModel>
-    _max?: NestedEnumUserRoleFilter<$PrismaModel>
-  }
-
-  export type EnumChatStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.ChatStatus | EnumChatStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumChatStatusWithAggregatesFilter<$PrismaModel> | $Enums.ChatStatus
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumChatStatusFilter<$PrismaModel>
-    _max?: NestedEnumChatStatusFilter<$PrismaModel>
+    _min?: NestedEnumTicketStatusFilter<$PrismaModel>
+    _max?: NestedEnumTicketStatusFilter<$PrismaModel>
   }
 
   export type BrandProfileCreateNestedManyWithoutUserInput = {
@@ -44040,6 +44072,13 @@ export namespace Prisma {
     connect?: KYCWhereUniqueInput | KYCWhereUniqueInput[]
   }
 
+  export type TicketCreateNestedManyWithoutAgentInput = {
+    create?: XOR<TicketCreateWithoutAgentInput, TicketUncheckedCreateWithoutAgentInput> | TicketCreateWithoutAgentInput[] | TicketUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutAgentInput | TicketCreateOrConnectWithoutAgentInput[]
+    createMany?: TicketCreateManyAgentInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
+
   export type BrandProfileUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<BrandProfileCreateWithoutUserInput, BrandProfileUncheckedCreateWithoutUserInput> | BrandProfileCreateWithoutUserInput[] | BrandProfileUncheckedCreateWithoutUserInput[]
     connectOrCreate?: BrandProfileCreateOrConnectWithoutUserInput | BrandProfileCreateOrConnectWithoutUserInput[]
@@ -44135,6 +44174,13 @@ export namespace Prisma {
     connectOrCreate?: KYCCreateOrConnectWithoutVerifierInput | KYCCreateOrConnectWithoutVerifierInput[]
     createMany?: KYCCreateManyVerifierInputEnvelope
     connect?: KYCWhereUniqueInput | KYCWhereUniqueInput[]
+  }
+
+  export type TicketUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<TicketCreateWithoutAgentInput, TicketUncheckedCreateWithoutAgentInput> | TicketCreateWithoutAgentInput[] | TicketUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutAgentInput | TicketCreateOrConnectWithoutAgentInput[]
+    createMany?: TicketCreateManyAgentInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
   }
 
   export type BigIntFieldUpdateOperationsInput = {
@@ -44373,6 +44419,20 @@ export namespace Prisma {
     deleteMany?: KYCScalarWhereInput | KYCScalarWhereInput[]
   }
 
+  export type TicketUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<TicketCreateWithoutAgentInput, TicketUncheckedCreateWithoutAgentInput> | TicketCreateWithoutAgentInput[] | TicketUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutAgentInput | TicketCreateOrConnectWithoutAgentInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutAgentInput | TicketUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: TicketCreateManyAgentInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutAgentInput | TicketUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutAgentInput | TicketUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
+
   export type BrandProfileUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<BrandProfileCreateWithoutUserInput, BrandProfileUncheckedCreateWithoutUserInput> | BrandProfileCreateWithoutUserInput[] | BrandProfileUncheckedCreateWithoutUserInput[]
     connectOrCreate?: BrandProfileCreateOrConnectWithoutUserInput | BrandProfileCreateOrConnectWithoutUserInput[]
@@ -44563,6 +44623,20 @@ export namespace Prisma {
     update?: KYCUpdateWithWhereUniqueWithoutVerifierInput | KYCUpdateWithWhereUniqueWithoutVerifierInput[]
     updateMany?: KYCUpdateManyWithWhereWithoutVerifierInput | KYCUpdateManyWithWhereWithoutVerifierInput[]
     deleteMany?: KYCScalarWhereInput | KYCScalarWhereInput[]
+  }
+
+  export type TicketUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<TicketCreateWithoutAgentInput, TicketUncheckedCreateWithoutAgentInput> | TicketCreateWithoutAgentInput[] | TicketUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutAgentInput | TicketCreateOrConnectWithoutAgentInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutAgentInput | TicketUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: TicketCreateManyAgentInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutAgentInput | TicketUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutAgentInput | TicketUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutBrand_profilesInput = {
@@ -45953,10 +46027,10 @@ export namespace Prisma {
     update?: XOR<XOR<CreatorProfileUpdateToOneWithWhereWithoutInvoicesInput, CreatorProfileUpdateWithoutInvoicesInput>, CreatorProfileUncheckedUpdateWithoutInvoicesInput>
   }
 
-  export type CollaborationChannelCreateNestedOneWithoutMessagesInput = {
-    create?: XOR<CollaborationChannelCreateWithoutMessagesInput, CollaborationChannelUncheckedCreateWithoutMessagesInput>
-    connectOrCreate?: CollaborationChannelCreateOrConnectWithoutMessagesInput
-    connect?: CollaborationChannelWhereUniqueInput
+  export type TicketCreateNestedOneWithoutMessagesInput = {
+    create?: XOR<TicketCreateWithoutMessagesInput, TicketUncheckedCreateWithoutMessagesInput>
+    connectOrCreate?: TicketCreateOrConnectWithoutMessagesInput
+    connect?: TicketWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutSent_messagesInput = {
@@ -45969,12 +46043,12 @@ export namespace Prisma {
     set?: $Enums.MessageType
   }
 
-  export type CollaborationChannelUpdateOneRequiredWithoutMessagesNestedInput = {
-    create?: XOR<CollaborationChannelCreateWithoutMessagesInput, CollaborationChannelUncheckedCreateWithoutMessagesInput>
-    connectOrCreate?: CollaborationChannelCreateOrConnectWithoutMessagesInput
-    upsert?: CollaborationChannelUpsertWithoutMessagesInput
-    connect?: CollaborationChannelWhereUniqueInput
-    update?: XOR<XOR<CollaborationChannelUpdateToOneWithWhereWithoutMessagesInput, CollaborationChannelUpdateWithoutMessagesInput>, CollaborationChannelUncheckedUpdateWithoutMessagesInput>
+  export type TicketUpdateOneRequiredWithoutMessagesNestedInput = {
+    create?: XOR<TicketCreateWithoutMessagesInput, TicketUncheckedCreateWithoutMessagesInput>
+    connectOrCreate?: TicketCreateOrConnectWithoutMessagesInput
+    upsert?: TicketUpsertWithoutMessagesInput
+    connect?: TicketWhereUniqueInput
+    update?: XOR<XOR<TicketUpdateToOneWithWhereWithoutMessagesInput, TicketUpdateWithoutMessagesInput>, TicketUncheckedUpdateWithoutMessagesInput>
   }
 
   export type UserUpdateOneRequiredWithoutSent_messagesNestedInput = {
@@ -46147,20 +46221,6 @@ export namespace Prisma {
     connect?: CollaborationWhereUniqueInput
   }
 
-  export type MessageCreateNestedManyWithoutChannelInput = {
-    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
-    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
-    createMany?: MessageCreateManyChannelInputEnvelope
-    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-  }
-
-  export type MessageUncheckedCreateNestedManyWithoutChannelInput = {
-    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
-    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
-    createMany?: MessageCreateManyChannelInputEnvelope
-    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-  }
-
   export type UserUpdateOneRequiredWithoutAdmin_channelsNestedInput = {
     create?: XOR<UserCreateWithoutAdmin_channelsInput, UserUncheckedCreateWithoutAdmin_channelsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAdmin_channelsInput
@@ -46175,34 +46235,6 @@ export namespace Prisma {
     upsert?: CollaborationUpsertWithoutChannelsInput
     connect?: CollaborationWhereUniqueInput
     update?: XOR<XOR<CollaborationUpdateToOneWithWhereWithoutChannelsInput, CollaborationUpdateWithoutChannelsInput>, CollaborationUncheckedUpdateWithoutChannelsInput>
-  }
-
-  export type MessageUpdateManyWithoutChannelNestedInput = {
-    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
-    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
-    upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
-    createMany?: MessageCreateManyChannelInputEnvelope
-    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
-    updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
-    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
-  }
-
-  export type MessageUncheckedUpdateManyWithoutChannelNestedInput = {
-    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
-    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
-    upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
-    createMany?: MessageCreateManyChannelInputEnvelope
-    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
-    updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
-    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
   export type CreatorProfileCreateNestedOneWithoutPackages_createdInput = {
@@ -46297,6 +46329,12 @@ export namespace Prisma {
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
   }
 
+  export type TicketCreateNestedOneWithoutOrderInput = {
+    create?: XOR<TicketCreateWithoutOrderInput, TicketUncheckedCreateWithoutOrderInput>
+    connectOrCreate?: TicketCreateOrConnectWithoutOrderInput
+    connect?: TicketWhereUniqueInput
+  }
+
   export type PaymentUncheckedCreateNestedManyWithoutOrderInput = {
     create?: XOR<PaymentCreateWithoutOrderInput, PaymentUncheckedCreateWithoutOrderInput> | PaymentCreateWithoutOrderInput[] | PaymentUncheckedCreateWithoutOrderInput[]
     connectOrCreate?: PaymentCreateOrConnectWithoutOrderInput | PaymentCreateOrConnectWithoutOrderInput[]
@@ -46309,6 +46347,12 @@ export namespace Prisma {
     connectOrCreate?: InvoiceCreateOrConnectWithoutOrderInput | InvoiceCreateOrConnectWithoutOrderInput[]
     createMany?: InvoiceCreateManyOrderInputEnvelope
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
+  }
+
+  export type TicketUncheckedCreateNestedOneWithoutOrderInput = {
+    create?: XOR<TicketCreateWithoutOrderInput, TicketUncheckedCreateWithoutOrderInput>
+    connectOrCreate?: TicketCreateOrConnectWithoutOrderInput
+    connect?: TicketWhereUniqueInput
   }
 
   export type EnumOrderStatusFieldUpdateOperationsInput = {
@@ -46367,6 +46411,16 @@ export namespace Prisma {
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
   }
 
+  export type TicketUpdateOneWithoutOrderNestedInput = {
+    create?: XOR<TicketCreateWithoutOrderInput, TicketUncheckedCreateWithoutOrderInput>
+    connectOrCreate?: TicketCreateOrConnectWithoutOrderInput
+    upsert?: TicketUpsertWithoutOrderInput
+    disconnect?: TicketWhereInput | boolean
+    delete?: TicketWhereInput | boolean
+    connect?: TicketWhereUniqueInput
+    update?: XOR<XOR<TicketUpdateToOneWithWhereWithoutOrderInput, TicketUpdateWithoutOrderInput>, TicketUncheckedUpdateWithoutOrderInput>
+  }
+
   export type PaymentUncheckedUpdateManyWithoutOrderNestedInput = {
     create?: XOR<PaymentCreateWithoutOrderInput, PaymentUncheckedCreateWithoutOrderInput> | PaymentCreateWithoutOrderInput[] | PaymentUncheckedCreateWithoutOrderInput[]
     connectOrCreate?: PaymentCreateOrConnectWithoutOrderInput | PaymentCreateOrConnectWithoutOrderInput[]
@@ -46393,6 +46447,16 @@ export namespace Prisma {
     update?: InvoiceUpdateWithWhereUniqueWithoutOrderInput | InvoiceUpdateWithWhereUniqueWithoutOrderInput[]
     updateMany?: InvoiceUpdateManyWithWhereWithoutOrderInput | InvoiceUpdateManyWithWhereWithoutOrderInput[]
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+  }
+
+  export type TicketUncheckedUpdateOneWithoutOrderNestedInput = {
+    create?: XOR<TicketCreateWithoutOrderInput, TicketUncheckedCreateWithoutOrderInput>
+    connectOrCreate?: TicketCreateOrConnectWithoutOrderInput
+    upsert?: TicketUpsertWithoutOrderInput
+    disconnect?: TicketWhereInput | boolean
+    delete?: TicketWhereInput | boolean
+    connect?: TicketWhereUniqueInput
+    update?: XOR<XOR<TicketUpdateToOneWithWhereWithoutOrderInput, TicketUpdateWithoutOrderInput>, TicketUncheckedUpdateWithoutOrderInput>
   }
 
   export type UserCreateNestedOneWithoutPhone_verificationsInput = {
@@ -46485,12 +46549,78 @@ export namespace Prisma {
     update?: XOR<XOR<BrandProfileUpdateToOneWithWhereWithoutPortfolio_itemsInput, BrandProfileUpdateWithoutPortfolio_itemsInput>, BrandProfileUncheckedUpdateWithoutPortfolio_itemsInput>
   }
 
-  export type EnumUserRoleFieldUpdateOperationsInput = {
-    set?: $Enums.UserRole
+  export type OrderCreateNestedOneWithoutTicketInput = {
+    create?: XOR<OrderCreateWithoutTicketInput, OrderUncheckedCreateWithoutTicketInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutTicketInput
+    connect?: OrderWhereUniqueInput
   }
 
-  export type EnumChatStatusFieldUpdateOperationsInput = {
-    set?: $Enums.ChatStatus
+  export type UserCreateNestedOneWithoutAssigned_ticketsInput = {
+    create?: XOR<UserCreateWithoutAssigned_ticketsInput, UserUncheckedCreateWithoutAssigned_ticketsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAssigned_ticketsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type MessageCreateNestedManyWithoutTicketInput = {
+    create?: XOR<MessageCreateWithoutTicketInput, MessageUncheckedCreateWithoutTicketInput> | MessageCreateWithoutTicketInput[] | MessageUncheckedCreateWithoutTicketInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutTicketInput | MessageCreateOrConnectWithoutTicketInput[]
+    createMany?: MessageCreateManyTicketInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type MessageUncheckedCreateNestedManyWithoutTicketInput = {
+    create?: XOR<MessageCreateWithoutTicketInput, MessageUncheckedCreateWithoutTicketInput> | MessageCreateWithoutTicketInput[] | MessageUncheckedCreateWithoutTicketInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutTicketInput | MessageCreateOrConnectWithoutTicketInput[]
+    createMany?: MessageCreateManyTicketInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type EnumTicketStatusFieldUpdateOperationsInput = {
+    set?: $Enums.TicketStatus
+  }
+
+  export type OrderUpdateOneRequiredWithoutTicketNestedInput = {
+    create?: XOR<OrderCreateWithoutTicketInput, OrderUncheckedCreateWithoutTicketInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutTicketInput
+    upsert?: OrderUpsertWithoutTicketInput
+    connect?: OrderWhereUniqueInput
+    update?: XOR<XOR<OrderUpdateToOneWithWhereWithoutTicketInput, OrderUpdateWithoutTicketInput>, OrderUncheckedUpdateWithoutTicketInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutAssigned_ticketsNestedInput = {
+    create?: XOR<UserCreateWithoutAssigned_ticketsInput, UserUncheckedCreateWithoutAssigned_ticketsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAssigned_ticketsInput
+    upsert?: UserUpsertWithoutAssigned_ticketsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAssigned_ticketsInput, UserUpdateWithoutAssigned_ticketsInput>, UserUncheckedUpdateWithoutAssigned_ticketsInput>
+  }
+
+  export type MessageUpdateManyWithoutTicketNestedInput = {
+    create?: XOR<MessageCreateWithoutTicketInput, MessageUncheckedCreateWithoutTicketInput> | MessageCreateWithoutTicketInput[] | MessageUncheckedCreateWithoutTicketInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutTicketInput | MessageCreateOrConnectWithoutTicketInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutTicketInput | MessageUpsertWithWhereUniqueWithoutTicketInput[]
+    createMany?: MessageCreateManyTicketInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutTicketInput | MessageUpdateWithWhereUniqueWithoutTicketInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutTicketInput | MessageUpdateManyWithWhereWithoutTicketInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type MessageUncheckedUpdateManyWithoutTicketNestedInput = {
+    create?: XOR<MessageCreateWithoutTicketInput, MessageUncheckedCreateWithoutTicketInput> | MessageCreateWithoutTicketInput[] | MessageUncheckedCreateWithoutTicketInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutTicketInput | MessageCreateOrConnectWithoutTicketInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutTicketInput | MessageUpsertWithWhereUniqueWithoutTicketInput[]
+    createMany?: MessageCreateManyTicketInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutTicketInput | MessageUpdateWithWhereUniqueWithoutTicketInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutTicketInput | MessageUpdateManyWithWhereWithoutTicketInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
   export type NestedBigIntFilter<$PrismaModel = never> = {
@@ -47199,38 +47329,21 @@ export namespace Prisma {
     _max?: NestedEnumSocialPlatformNullableFilter<$PrismaModel>
   }
 
-  export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
-    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  export type NestedEnumTicketStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TicketStatus | EnumTicketStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TicketStatus[] | ListEnumTicketStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TicketStatus[] | ListEnumTicketStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTicketStatusFilter<$PrismaModel> | $Enums.TicketStatus
   }
 
-  export type NestedEnumChatStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.ChatStatus | EnumChatStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumChatStatusFilter<$PrismaModel> | $Enums.ChatStatus
-  }
-
-  export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+  export type NestedEnumTicketStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TicketStatus | EnumTicketStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TicketStatus[] | ListEnumTicketStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TicketStatus[] | ListEnumTicketStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTicketStatusWithAggregatesFilter<$PrismaModel> | $Enums.TicketStatus
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumUserRoleFilter<$PrismaModel>
-    _max?: NestedEnumUserRoleFilter<$PrismaModel>
-  }
-
-  export type NestedEnumChatStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.ChatStatus | EnumChatStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumChatStatusWithAggregatesFilter<$PrismaModel> | $Enums.ChatStatus
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumChatStatusFilter<$PrismaModel>
-    _max?: NestedEnumChatStatusFilter<$PrismaModel>
+    _min?: NestedEnumTicketStatusFilter<$PrismaModel>
+    _max?: NestedEnumTicketStatusFilter<$PrismaModel>
   }
 
   export type BrandProfileCreateWithoutUserInput = {
@@ -47301,14 +47414,12 @@ export namespace Prisma {
     id?: bigint | number
     created_at?: Date | string
     collaboration: CollaborationCreateNestedOneWithoutChannelsInput
-    messages?: MessageCreateNestedManyWithoutChannelInput
   }
 
   export type CollaborationChannelUncheckedCreateWithoutAdminInput = {
     id?: bigint | number
     collaboration_id: bigint | number
     created_at?: Date | string
-    messages?: MessageUncheckedCreateNestedManyWithoutChannelInput
   }
 
   export type CollaborationChannelCreateOrConnectWithoutAdminInput = {
@@ -47472,12 +47583,12 @@ export namespace Prisma {
     file_name?: string | null
     read_at?: Date | string | null
     created_at?: Date | string
-    channel: CollaborationChannelCreateNestedOneWithoutMessagesInput
+    ticket: TicketCreateNestedOneWithoutMessagesInput
   }
 
   export type MessageUncheckedCreateWithoutSenderInput = {
     id?: bigint | number
-    channel_id: bigint | number
+    ticket_id: bigint | number
     message_text: string
     message_type?: $Enums.MessageType
     file_url?: string | null
@@ -47806,6 +47917,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TicketCreateWithoutAgentInput = {
+    id?: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
+    created_at?: Date | string
+    updated_at?: Date | string
+    order: OrderCreateNestedOneWithoutTicketInput
+    messages?: MessageCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketUncheckedCreateWithoutAgentInput = {
+    id?: bigint | number
+    order_id: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
+    created_at?: Date | string
+    updated_at?: Date | string
+    messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketCreateOrConnectWithoutAgentInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutAgentInput, TicketUncheckedCreateWithoutAgentInput>
+  }
+
+  export type TicketCreateManyAgentInputEnvelope = {
+    data: TicketCreateManyAgentInput | TicketCreateManyAgentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BrandProfileUpsertWithWhereUniqueWithoutUserInput = {
     where: BrandProfileWhereUniqueInput
     update: XOR<BrandProfileUpdateWithoutUserInput, BrandProfileUncheckedUpdateWithoutUserInput>
@@ -48035,7 +48176,7 @@ export namespace Prisma {
     OR?: MessageScalarWhereInput[]
     NOT?: MessageScalarWhereInput | MessageScalarWhereInput[]
     id?: BigIntFilter<"Message"> | bigint | number
-    channel_id?: BigIntFilter<"Message"> | bigint | number
+    ticket_id?: BigIntFilter<"Message"> | bigint | number
     sender_id?: BigIntFilter<"Message"> | bigint | number
     message_text?: StringFilter<"Message"> | string
     message_type?: EnumMessageTypeFilter<"Message"> | $Enums.MessageType
@@ -48261,6 +48402,35 @@ export namespace Prisma {
     verified_by?: BigIntNullableFilter<"KYC"> | bigint | number | null
   }
 
+  export type TicketUpsertWithWhereUniqueWithoutAgentInput = {
+    where: TicketWhereUniqueInput
+    update: XOR<TicketUpdateWithoutAgentInput, TicketUncheckedUpdateWithoutAgentInput>
+    create: XOR<TicketCreateWithoutAgentInput, TicketUncheckedCreateWithoutAgentInput>
+  }
+
+  export type TicketUpdateWithWhereUniqueWithoutAgentInput = {
+    where: TicketWhereUniqueInput
+    data: XOR<TicketUpdateWithoutAgentInput, TicketUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type TicketUpdateManyWithWhereWithoutAgentInput = {
+    where: TicketScalarWhereInput
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutAgentInput>
+  }
+
+  export type TicketScalarWhereInput = {
+    AND?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    OR?: TicketScalarWhereInput[]
+    NOT?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    id?: BigIntFilter<"Ticket"> | bigint | number
+    order_id?: BigIntFilter<"Ticket"> | bigint | number
+    agent_id?: BigIntFilter<"Ticket"> | bigint | number
+    stream_channel_id?: StringFilter<"Ticket"> | string
+    status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
+    created_at?: DateTimeFilter<"Ticket"> | Date | string
+    updated_at?: DateTimeFilter<"Ticket"> | Date | string
+  }
+
   export type UserCreateWithoutBrand_profilesInput = {
     id?: bigint | number
     email?: string | null
@@ -48297,6 +48467,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutBrand_profilesInput = {
@@ -48335,6 +48506,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutBrand_profilesInput = {
@@ -48547,14 +48719,11 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     invoices?: InvoiceCreateNestedManyWithoutOrderInput
+    ticket?: TicketCreateNestedOneWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutBrandInput = {
@@ -48568,12 +48737,9 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+    ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutBrandInput = {
@@ -48633,6 +48799,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBrand_profilesInput = {
@@ -48671,6 +48838,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type CampaignUpsertWithWhereUniqueWithoutBrandInput = {
@@ -48854,10 +49022,6 @@ export namespace Prisma {
     order_date?: DateTimeFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableFilter<"Order"> | string | null
-    zoho_visitor_id?: StringNullableFilter<"Order"> | string | null
-    chat_session_id?: StringNullableFilter<"Order"> | string | null
-    chat_enabled?: BoolFilter<"Order"> | boolean
-    chat_started_at?: DateTimeNullableFilter<"Order"> | Date | string | null
   }
 
   export type CampaignApplicationCreateWithoutCreatorInput = {
@@ -48982,6 +49146,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutCreator_profilesInput = {
@@ -49020,6 +49185,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutCreator_profilesInput = {
@@ -49237,14 +49403,11 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     invoices?: InvoiceCreateNestedManyWithoutOrderInput
+    ticket?: TicketCreateNestedOneWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutCreatorInput = {
@@ -49258,12 +49421,9 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+    ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutCreatorInput = {
@@ -49372,6 +49532,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreator_profilesInput = {
@@ -49410,6 +49571,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type InvoiceUpsertWithWhereUniqueWithoutCreatorInput = {
@@ -50599,14 +50761,12 @@ export namespace Prisma {
     id?: bigint | number
     created_at?: Date | string
     admin: UserCreateNestedOneWithoutAdmin_channelsInput
-    messages?: MessageCreateNestedManyWithoutChannelInput
   }
 
   export type CollaborationChannelUncheckedCreateWithoutCollaborationInput = {
     id?: bigint | number
     admin_id: bigint | number
     created_at?: Date | string
-    messages?: MessageUncheckedCreateNestedManyWithoutChannelInput
   }
 
   export type CollaborationChannelCreateOrConnectWithoutCollaborationInput = {
@@ -51041,14 +51201,12 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     admin?: UserUpdateOneRequiredWithoutAdmin_channelsNestedInput
-    messages?: MessageUpdateManyWithoutChannelNestedInput
   }
 
   export type CollaborationChannelUncheckedUpdateWithoutCollaborationInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    messages?: MessageUncheckedUpdateManyWithoutChannelNestedInput
   }
 
   export type ContentSubmissionUpsertWithWhereUniqueWithoutCollaborationInput = {
@@ -51211,6 +51369,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutAdmin_content_submissionsInput = {
@@ -51249,6 +51408,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutAdmin_content_submissionsInput = {
@@ -51394,6 +51554,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdmin_content_submissionsInput = {
@@ -51432,6 +51593,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type CollaborationUpsertWithoutContent_submissionsInput = {
@@ -51562,6 +51724,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutContent_reviewsInput = {
@@ -51600,6 +51763,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutContent_reviewsInput = {
@@ -51703,6 +51867,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContent_reviewsInput = {
@@ -51741,6 +51906,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type UserCreateWithoutAdmin_paymentsInput = {
@@ -51779,6 +51945,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutAdmin_paymentsInput = {
@@ -51817,6 +51984,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutAdmin_paymentsInput = {
@@ -51833,14 +52001,11 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
     invoices?: InvoiceCreateNestedManyWithoutOrderInput
+    ticket?: TicketCreateNestedOneWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutPaymentsInput = {
@@ -51855,11 +52020,8 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+    ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutPaymentsInput = {
@@ -51946,6 +52108,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutPayments_payeeInput = {
@@ -51984,6 +52147,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutPayments_payeeInput = {
@@ -52027,6 +52191,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutPayments_payerInput = {
@@ -52065,6 +52230,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutPayments_payerInput = {
@@ -52119,6 +52285,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdmin_paymentsInput = {
@@ -52157,6 +52324,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type OrderUpsertWithoutPaymentsInput = {
@@ -52179,14 +52347,11 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
     invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutPaymentsInput = {
@@ -52201,11 +52366,8 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
   }
 
   export type CollaborationUpsertWithoutPaymentsInput = {
@@ -52304,6 +52466,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPayments_payeeInput = {
@@ -52342,6 +52505,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUpsertWithoutPayments_payerInput = {
@@ -52391,6 +52555,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPayments_payerInput = {
@@ -52429,6 +52594,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type BrandProfileCreateWithoutInvoicesInput = {
@@ -52499,14 +52665,11 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
+    ticket?: TicketCreateNestedOneWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutInvoicesInput = {
@@ -52521,11 +52684,8 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutInvoicesInput = {
@@ -52730,14 +52890,11 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutInvoicesInput = {
@@ -52752,11 +52909,8 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
   }
 
   export type CollaborationUpsertWithoutInvoicesInput = {
@@ -52883,23 +53037,29 @@ export namespace Prisma {
     orders_received?: OrderUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
-  export type CollaborationChannelCreateWithoutMessagesInput = {
+  export type TicketCreateWithoutMessagesInput = {
     id?: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
     created_at?: Date | string
-    admin: UserCreateNestedOneWithoutAdmin_channelsInput
-    collaboration: CollaborationCreateNestedOneWithoutChannelsInput
+    updated_at?: Date | string
+    order: OrderCreateNestedOneWithoutTicketInput
+    agent: UserCreateNestedOneWithoutAssigned_ticketsInput
   }
 
-  export type CollaborationChannelUncheckedCreateWithoutMessagesInput = {
+  export type TicketUncheckedCreateWithoutMessagesInput = {
     id?: bigint | number
-    collaboration_id: bigint | number
-    admin_id: bigint | number
+    order_id: bigint | number
+    agent_id: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
     created_at?: Date | string
+    updated_at?: Date | string
   }
 
-  export type CollaborationChannelCreateOrConnectWithoutMessagesInput = {
-    where: CollaborationChannelWhereUniqueInput
-    create: XOR<CollaborationChannelCreateWithoutMessagesInput, CollaborationChannelUncheckedCreateWithoutMessagesInput>
+  export type TicketCreateOrConnectWithoutMessagesInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutMessagesInput, TicketUncheckedCreateWithoutMessagesInput>
   }
 
   export type UserCreateWithoutSent_messagesInput = {
@@ -52938,6 +53098,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutSent_messagesInput = {
@@ -52976,6 +53137,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutSent_messagesInput = {
@@ -52983,29 +53145,35 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutSent_messagesInput, UserUncheckedCreateWithoutSent_messagesInput>
   }
 
-  export type CollaborationChannelUpsertWithoutMessagesInput = {
-    update: XOR<CollaborationChannelUpdateWithoutMessagesInput, CollaborationChannelUncheckedUpdateWithoutMessagesInput>
-    create: XOR<CollaborationChannelCreateWithoutMessagesInput, CollaborationChannelUncheckedCreateWithoutMessagesInput>
-    where?: CollaborationChannelWhereInput
+  export type TicketUpsertWithoutMessagesInput = {
+    update: XOR<TicketUpdateWithoutMessagesInput, TicketUncheckedUpdateWithoutMessagesInput>
+    create: XOR<TicketCreateWithoutMessagesInput, TicketUncheckedCreateWithoutMessagesInput>
+    where?: TicketWhereInput
   }
 
-  export type CollaborationChannelUpdateToOneWithWhereWithoutMessagesInput = {
-    where?: CollaborationChannelWhereInput
-    data: XOR<CollaborationChannelUpdateWithoutMessagesInput, CollaborationChannelUncheckedUpdateWithoutMessagesInput>
+  export type TicketUpdateToOneWithWhereWithoutMessagesInput = {
+    where?: TicketWhereInput
+    data: XOR<TicketUpdateWithoutMessagesInput, TicketUncheckedUpdateWithoutMessagesInput>
   }
 
-  export type CollaborationChannelUpdateWithoutMessagesInput = {
+  export type TicketUpdateWithoutMessagesInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    admin?: UserUpdateOneRequiredWithoutAdmin_channelsNestedInput
-    collaboration?: CollaborationUpdateOneRequiredWithoutChannelsNestedInput
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    order?: OrderUpdateOneRequiredWithoutTicketNestedInput
+    agent?: UserUpdateOneRequiredWithoutAssigned_ticketsNestedInput
   }
 
-  export type CollaborationChannelUncheckedUpdateWithoutMessagesInput = {
+  export type TicketUncheckedUpdateWithoutMessagesInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    admin_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserUpsertWithoutSent_messagesInput = {
@@ -53055,6 +53223,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSent_messagesInput = {
@@ -53093,6 +53262,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type CollaborationCreateWithoutReviewsInput = {
@@ -53174,6 +53344,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationCreateNestedManyWithoutUserInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutReviews_reviewedInput = {
@@ -53212,6 +53383,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutReviews_reviewedInput = {
@@ -53255,6 +53427,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationCreateNestedManyWithoutUserInput
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutReviews_reviewerInput = {
@@ -53293,6 +53466,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutReviews_reviewerInput = {
@@ -53396,6 +53570,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationUpdateManyWithoutUserNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviews_reviewedInput = {
@@ -53434,6 +53609,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUpsertWithoutReviews_reviewerInput = {
@@ -53483,6 +53659,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationUpdateManyWithoutUserNestedInput
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviews_reviewerInput = {
@@ -53521,6 +53698,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type CampaignCreateWithoutCampaign_analyticsInput = {
@@ -53894,6 +54072,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -53932,6 +54111,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -53986,6 +54166,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -54024,6 +54205,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type UserCreateWithoutAdmin_channelsInput = {
@@ -54062,6 +54244,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutAdmin_channelsInput = {
@@ -54100,6 +54283,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutAdmin_channelsInput = {
@@ -54150,38 +54334,6 @@ export namespace Prisma {
     create: XOR<CollaborationCreateWithoutChannelsInput, CollaborationUncheckedCreateWithoutChannelsInput>
   }
 
-  export type MessageCreateWithoutChannelInput = {
-    id?: bigint | number
-    message_text: string
-    message_type?: $Enums.MessageType
-    file_url?: string | null
-    file_name?: string | null
-    read_at?: Date | string | null
-    created_at?: Date | string
-    sender: UserCreateNestedOneWithoutSent_messagesInput
-  }
-
-  export type MessageUncheckedCreateWithoutChannelInput = {
-    id?: bigint | number
-    sender_id: bigint | number
-    message_text: string
-    message_type?: $Enums.MessageType
-    file_url?: string | null
-    file_name?: string | null
-    read_at?: Date | string | null
-    created_at?: Date | string
-  }
-
-  export type MessageCreateOrConnectWithoutChannelInput = {
-    where: MessageWhereUniqueInput
-    create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
-  }
-
-  export type MessageCreateManyChannelInputEnvelope = {
-    data: MessageCreateManyChannelInput | MessageCreateManyChannelInput[]
-    skipDuplicates?: boolean
-  }
-
   export type UserUpsertWithoutAdmin_channelsInput = {
     update: XOR<UserUpdateWithoutAdmin_channelsInput, UserUncheckedUpdateWithoutAdmin_channelsInput>
     create: XOR<UserCreateWithoutAdmin_channelsInput, UserUncheckedCreateWithoutAdmin_channelsInput>
@@ -54229,6 +54381,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdmin_channelsInput = {
@@ -54267,6 +54420,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type CollaborationUpsertWithoutChannelsInput = {
@@ -54316,22 +54470,6 @@ export namespace Prisma {
     invoices?: InvoiceUncheckedUpdateManyWithoutCollaborationNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutCollaborationNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutCollaborationNestedInput
-  }
-
-  export type MessageUpsertWithWhereUniqueWithoutChannelInput = {
-    where: MessageWhereUniqueInput
-    update: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
-    create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
-  }
-
-  export type MessageUpdateWithWhereUniqueWithoutChannelInput = {
-    where: MessageWhereUniqueInput
-    data: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
-  }
-
-  export type MessageUpdateManyWithWhereWithoutChannelInput = {
-    where: MessageScalarWhereInput
-    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutChannelInput>
   }
 
   export type CreatorProfileCreateWithoutPackages_createdInput = {
@@ -54412,14 +54550,11 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     invoices?: InvoiceCreateNestedManyWithoutOrderInput
+    ticket?: TicketCreateNestedOneWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutPackageInput = {
@@ -54433,12 +54568,9 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+    ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutPackageInput = {
@@ -54791,6 +54923,31 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TicketCreateWithoutOrderInput = {
+    id?: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
+    created_at?: Date | string
+    updated_at?: Date | string
+    agent: UserCreateNestedOneWithoutAssigned_ticketsInput
+    messages?: MessageCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketUncheckedCreateWithoutOrderInput = {
+    id?: bigint | number
+    agent_id: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
+    created_at?: Date | string
+    updated_at?: Date | string
+    messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketCreateOrConnectWithoutOrderInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutOrderInput, TicketUncheckedCreateWithoutOrderInput>
+  }
+
   export type PackageUpsertWithoutOrdersInput = {
     update: XOR<PackageUpdateWithoutOrdersInput, PackageUncheckedUpdateWithoutOrdersInput>
     create: XOR<PackageCreateWithoutOrdersInput, PackageUncheckedCreateWithoutOrdersInput>
@@ -55002,6 +55159,37 @@ export namespace Prisma {
     data: XOR<InvoiceUpdateManyMutationInput, InvoiceUncheckedUpdateManyWithoutOrderInput>
   }
 
+  export type TicketUpsertWithoutOrderInput = {
+    update: XOR<TicketUpdateWithoutOrderInput, TicketUncheckedUpdateWithoutOrderInput>
+    create: XOR<TicketCreateWithoutOrderInput, TicketUncheckedCreateWithoutOrderInput>
+    where?: TicketWhereInput
+  }
+
+  export type TicketUpdateToOneWithWhereWithoutOrderInput = {
+    where?: TicketWhereInput
+    data: XOR<TicketUpdateWithoutOrderInput, TicketUncheckedUpdateWithoutOrderInput>
+  }
+
+  export type TicketUpdateWithoutOrderInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    agent?: UserUpdateOneRequiredWithoutAssigned_ticketsNestedInput
+    messages?: MessageUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateWithoutOrderInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
+  }
+
   export type UserCreateWithoutPhone_verificationsInput = {
     id?: bigint | number
     email?: string | null
@@ -55038,6 +55226,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutPhone_verificationsInput = {
@@ -55076,6 +55265,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
     kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutPhone_verificationsInput = {
@@ -55130,6 +55320,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPhone_verificationsInput = {
@@ -55168,6 +55359,7 @@ export namespace Prisma {
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
     kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type CreatorProfileCreateWithoutKycInput = {
@@ -55275,6 +55467,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationCreateNestedManyWithoutUserInput
     reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
+    assigned_tickets?: TicketCreateNestedManyWithoutAgentInput
   }
 
   export type UserUncheckedCreateWithoutKyc_verificationsInput = {
@@ -55313,6 +55506,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
     reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
     reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
+    assigned_tickets?: TicketUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type UserCreateOrConnectWithoutKyc_verificationsInput = {
@@ -55442,6 +55636,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationUpdateManyWithoutUserNestedInput
     reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
+    assigned_tickets?: TicketUpdateManyWithoutAgentNestedInput
   }
 
   export type UserUncheckedUpdateWithoutKyc_verificationsInput = {
@@ -55480,6 +55675,7 @@ export namespace Prisma {
     phone_verifications?: PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
     reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
     reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
+    assigned_tickets?: TicketUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type CreatorProfileCreateWithoutPortfolio_itemsInput = {
@@ -55750,6 +55946,306 @@ export namespace Prisma {
     orders_placed?: OrderUncheckedUpdateManyWithoutBrandNestedInput
   }
 
+  export type OrderCreateWithoutTicketInput = {
+    id?: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    package: PackageCreateNestedOneWithoutOrdersInput
+    brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
+    creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
+    payments?: PaymentCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUncheckedCreateWithoutTicketInput = {
+    id?: bigint | number
+    package_id: bigint | number
+    brand_id: bigint | number
+    creator_id: bigint | number
+    quantity?: number
+    total_amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    status?: $Enums.OrderStatus
+    order_date?: Date | string
+    completed_at?: Date | string | null
+    rejection_message?: string | null
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderCreateOrConnectWithoutTicketInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutTicketInput, OrderUncheckedCreateWithoutTicketInput>
+  }
+
+  export type UserCreateWithoutAssigned_ticketsInput = {
+    id?: bigint | number
+    email?: string | null
+    password_hash?: string | null
+    user_type: $Enums.UserType
+    name: string
+    first_name?: string | null
+    last_name?: string | null
+    profile_image_url?: string | null
+    cover_image_url?: string | null
+    phone?: string | null
+    timezone?: string | null
+    language?: string | null
+    email_verified?: boolean
+    status?: $Enums.UserStatus
+    created_at?: Date | string
+    updated_at?: Date | string
+    last_login_at?: Date | string | null
+    auth_provider?: string | null
+    phone_verified?: boolean
+    onboarding_completed?: boolean
+    onboarding_step?: number | null
+    age?: number | null
+    brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
+    admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
+    content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
+    admin_content_submissions?: ContentSubmissionCreateNestedManyWithoutAdminInput
+    creator_profiles?: CreatorProfileCreateNestedOneWithoutUserInput
+    sent_messages?: MessageCreateNestedManyWithoutSenderInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    admin_payments?: PaymentCreateNestedManyWithoutAdminInput
+    payments_payee?: PaymentCreateNestedManyWithoutPayeeInput
+    payments_payer?: PaymentCreateNestedManyWithoutPayerInput
+    phone_verifications?: PhoneVerificationCreateNestedManyWithoutUserInput
+    reviews_reviewed?: ReviewCreateNestedManyWithoutReviewedInput
+    reviews_reviewer?: ReviewCreateNestedManyWithoutReviewerInput
+    kyc_verifications?: KYCCreateNestedManyWithoutVerifierInput
+  }
+
+  export type UserUncheckedCreateWithoutAssigned_ticketsInput = {
+    id?: bigint | number
+    email?: string | null
+    password_hash?: string | null
+    user_type: $Enums.UserType
+    name: string
+    first_name?: string | null
+    last_name?: string | null
+    profile_image_url?: string | null
+    cover_image_url?: string | null
+    phone?: string | null
+    timezone?: string | null
+    language?: string | null
+    email_verified?: boolean
+    status?: $Enums.UserStatus
+    created_at?: Date | string
+    updated_at?: Date | string
+    last_login_at?: Date | string | null
+    auth_provider?: string | null
+    phone_verified?: boolean
+    onboarding_completed?: boolean
+    onboarding_step?: number | null
+    age?: number | null
+    brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
+    admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
+    content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
+    admin_content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutAdminInput
+    creator_profiles?: CreatorProfileUncheckedCreateNestedOneWithoutUserInput
+    sent_messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    admin_payments?: PaymentUncheckedCreateNestedManyWithoutAdminInput
+    payments_payee?: PaymentUncheckedCreateNestedManyWithoutPayeeInput
+    payments_payer?: PaymentUncheckedCreateNestedManyWithoutPayerInput
+    phone_verifications?: PhoneVerificationUncheckedCreateNestedManyWithoutUserInput
+    reviews_reviewed?: ReviewUncheckedCreateNestedManyWithoutReviewedInput
+    reviews_reviewer?: ReviewUncheckedCreateNestedManyWithoutReviewerInput
+    kyc_verifications?: KYCUncheckedCreateNestedManyWithoutVerifierInput
+  }
+
+  export type UserCreateOrConnectWithoutAssigned_ticketsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutAssigned_ticketsInput, UserUncheckedCreateWithoutAssigned_ticketsInput>
+  }
+
+  export type MessageCreateWithoutTicketInput = {
+    id?: bigint | number
+    message_text: string
+    message_type?: $Enums.MessageType
+    file_url?: string | null
+    file_name?: string | null
+    read_at?: Date | string | null
+    created_at?: Date | string
+    sender: UserCreateNestedOneWithoutSent_messagesInput
+  }
+
+  export type MessageUncheckedCreateWithoutTicketInput = {
+    id?: bigint | number
+    sender_id: bigint | number
+    message_text: string
+    message_type?: $Enums.MessageType
+    file_url?: string | null
+    file_name?: string | null
+    read_at?: Date | string | null
+    created_at?: Date | string
+  }
+
+  export type MessageCreateOrConnectWithoutTicketInput = {
+    where: MessageWhereUniqueInput
+    create: XOR<MessageCreateWithoutTicketInput, MessageUncheckedCreateWithoutTicketInput>
+  }
+
+  export type MessageCreateManyTicketInputEnvelope = {
+    data: MessageCreateManyTicketInput | MessageCreateManyTicketInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OrderUpsertWithoutTicketInput = {
+    update: XOR<OrderUpdateWithoutTicketInput, OrderUncheckedUpdateWithoutTicketInput>
+    create: XOR<OrderCreateWithoutTicketInput, OrderUncheckedCreateWithoutTicketInput>
+    where?: OrderWhereInput
+  }
+
+  export type OrderUpdateToOneWithWhereWithoutTicketInput = {
+    where?: OrderWhereInput
+    data: XOR<OrderUpdateWithoutTicketInput, OrderUncheckedUpdateWithoutTicketInput>
+  }
+
+  export type OrderUpdateWithoutTicketInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
+    brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
+    creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
+    payments?: PaymentUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutTicketInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    package_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    brand_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    creator_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    status?: EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+    order_date?: DateTimeFieldUpdateOperationsInput | Date | string
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type UserUpsertWithoutAssigned_ticketsInput = {
+    update: XOR<UserUpdateWithoutAssigned_ticketsInput, UserUncheckedUpdateWithoutAssigned_ticketsInput>
+    create: XOR<UserCreateWithoutAssigned_ticketsInput, UserUncheckedCreateWithoutAssigned_ticketsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutAssigned_ticketsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutAssigned_ticketsInput, UserUncheckedUpdateWithoutAssigned_ticketsInput>
+  }
+
+  export type UserUpdateWithoutAssigned_ticketsInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: NullableStringFieldUpdateOperationsInput | string | null
+    user_type?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    name?: StringFieldUpdateOperationsInput | string
+    first_name?: NullableStringFieldUpdateOperationsInput | string | null
+    last_name?: NullableStringFieldUpdateOperationsInput | string | null
+    profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    language?: NullableStringFieldUpdateOperationsInput | string | null
+    email_verified?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_login_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    auth_provider?: NullableStringFieldUpdateOperationsInput | string | null
+    phone_verified?: BoolFieldUpdateOperationsInput | boolean
+    onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
+    onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
+    admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
+    content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
+    admin_content_submissions?: ContentSubmissionUpdateManyWithoutAdminNestedInput
+    creator_profiles?: CreatorProfileUpdateOneWithoutUserNestedInput
+    sent_messages?: MessageUpdateManyWithoutSenderNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    admin_payments?: PaymentUpdateManyWithoutAdminNestedInput
+    payments_payee?: PaymentUpdateManyWithoutPayeeNestedInput
+    payments_payer?: PaymentUpdateManyWithoutPayerNestedInput
+    phone_verifications?: PhoneVerificationUpdateManyWithoutUserNestedInput
+    reviews_reviewed?: ReviewUpdateManyWithoutReviewedNestedInput
+    reviews_reviewer?: ReviewUpdateManyWithoutReviewerNestedInput
+    kyc_verifications?: KYCUpdateManyWithoutVerifierNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutAssigned_ticketsInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: NullableStringFieldUpdateOperationsInput | string | null
+    user_type?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    name?: StringFieldUpdateOperationsInput | string
+    first_name?: NullableStringFieldUpdateOperationsInput | string | null
+    last_name?: NullableStringFieldUpdateOperationsInput | string | null
+    profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_image_url?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    language?: NullableStringFieldUpdateOperationsInput | string | null
+    email_verified?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_login_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    auth_provider?: NullableStringFieldUpdateOperationsInput | string | null
+    phone_verified?: BoolFieldUpdateOperationsInput | boolean
+    onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
+    onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
+    age?: NullableIntFieldUpdateOperationsInput | number | null
+    brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
+    admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
+    content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
+    admin_content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutAdminNestedInput
+    creator_profiles?: CreatorProfileUncheckedUpdateOneWithoutUserNestedInput
+    sent_messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    admin_payments?: PaymentUncheckedUpdateManyWithoutAdminNestedInput
+    payments_payee?: PaymentUncheckedUpdateManyWithoutPayeeNestedInput
+    payments_payer?: PaymentUncheckedUpdateManyWithoutPayerNestedInput
+    phone_verifications?: PhoneVerificationUncheckedUpdateManyWithoutUserNestedInput
+    reviews_reviewed?: ReviewUncheckedUpdateManyWithoutReviewedNestedInput
+    reviews_reviewer?: ReviewUncheckedUpdateManyWithoutReviewerNestedInput
+    kyc_verifications?: KYCUncheckedUpdateManyWithoutVerifierNestedInput
+  }
+
+  export type MessageUpsertWithWhereUniqueWithoutTicketInput = {
+    where: MessageWhereUniqueInput
+    update: XOR<MessageUpdateWithoutTicketInput, MessageUncheckedUpdateWithoutTicketInput>
+    create: XOR<MessageCreateWithoutTicketInput, MessageUncheckedCreateWithoutTicketInput>
+  }
+
+  export type MessageUpdateWithWhereUniqueWithoutTicketInput = {
+    where: MessageWhereUniqueInput
+    data: XOR<MessageUpdateWithoutTicketInput, MessageUncheckedUpdateWithoutTicketInput>
+  }
+
+  export type MessageUpdateManyWithWhereWithoutTicketInput = {
+    where: MessageScalarWhereInput
+    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutTicketInput>
+  }
+
   export type BrandProfileCreateManyUserInput = {
     id?: bigint | number
     company_name: string
@@ -55805,7 +56301,7 @@ export namespace Prisma {
 
   export type MessageCreateManySenderInput = {
     id?: bigint | number
-    channel_id: bigint | number
+    ticket_id: bigint | number
     message_text: string
     message_type?: $Enums.MessageType
     file_url?: string | null
@@ -55929,6 +56425,15 @@ export namespace Prisma {
     rejection_reason?: string | null
   }
 
+  export type TicketCreateManyAgentInput = {
+    id?: bigint | number
+    order_id: bigint | number
+    stream_channel_id: string
+    status?: $Enums.TicketStatus
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
   export type BrandProfileUpdateWithoutUserInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     company_name?: StringFieldUpdateOperationsInput | string
@@ -56009,14 +56514,12 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     collaboration?: CollaborationUpdateOneRequiredWithoutChannelsNestedInput
-    messages?: MessageUpdateManyWithoutChannelNestedInput
   }
 
   export type CollaborationChannelUncheckedUpdateWithoutAdminInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     collaboration_id?: BigIntFieldUpdateOperationsInput | bigint | number
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    messages?: MessageUncheckedUpdateManyWithoutChannelNestedInput
   }
 
   export type CollaborationChannelUncheckedUpdateManyWithoutAdminInput = {
@@ -56112,12 +56615,12 @@ export namespace Prisma {
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    channel?: CollaborationChannelUpdateOneRequiredWithoutMessagesNestedInput
+    ticket?: TicketUpdateOneRequiredWithoutMessagesNestedInput
   }
 
   export type MessageUncheckedUpdateWithoutSenderInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    channel_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    ticket_id?: BigIntFieldUpdateOperationsInput | bigint | number
     message_text?: StringFieldUpdateOperationsInput | string
     message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56128,7 +56631,7 @@ export namespace Prisma {
 
   export type MessageUncheckedUpdateManyWithoutSenderInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
-    channel_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    ticket_id?: BigIntFieldUpdateOperationsInput | bigint | number
     message_text?: StringFieldUpdateOperationsInput | string
     message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56482,6 +56985,35 @@ export namespace Prisma {
     rejection_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type TicketUpdateWithoutAgentInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    order?: OrderUpdateOneRequiredWithoutTicketNestedInput
+    messages?: MessageUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateWithoutAgentInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateManyWithoutAgentInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    order_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    stream_channel_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CampaignCreateManyBrandInput = {
     id?: bigint | number
     title: string
@@ -56563,10 +57095,6 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
   }
 
   export type CampaignUpdateWithoutBrandInput = {
@@ -56804,14 +57332,11 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutBrandInput = {
@@ -56825,12 +57350,9 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateManyWithoutBrandInput = {
@@ -56844,10 +57366,6 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type CampaignApplicationCreateManyCreatorInput = {
@@ -56946,10 +57464,6 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
   }
 
   export type CampaignApplicationUpdateWithoutCreatorInput = {
@@ -57230,14 +57744,11 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutCreatorInput = {
@@ -57251,12 +57762,9 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateManyWithoutCreatorInput = {
@@ -57270,10 +57778,6 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type CampaignAnalyticsCreateManyCampaignInput = {
@@ -57801,50 +58305,6 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type MessageCreateManyChannelInput = {
-    id?: bigint | number
-    sender_id: bigint | number
-    message_text: string
-    message_type?: $Enums.MessageType
-    file_url?: string | null
-    file_name?: string | null
-    read_at?: Date | string | null
-    created_at?: Date | string
-  }
-
-  export type MessageUpdateWithoutChannelInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    message_text?: StringFieldUpdateOperationsInput | string
-    message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-    file_url?: NullableStringFieldUpdateOperationsInput | string | null
-    file_name?: NullableStringFieldUpdateOperationsInput | string | null
-    read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    sender?: UserUpdateOneRequiredWithoutSent_messagesNestedInput
-  }
-
-  export type MessageUncheckedUpdateWithoutChannelInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    sender_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    message_text?: StringFieldUpdateOperationsInput | string
-    message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-    file_url?: NullableStringFieldUpdateOperationsInput | string | null
-    file_name?: NullableStringFieldUpdateOperationsInput | string | null
-    read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type MessageUncheckedUpdateManyWithoutChannelInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    sender_id?: BigIntFieldUpdateOperationsInput | bigint | number
-    message_text?: StringFieldUpdateOperationsInput | string
-    message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-    file_url?: NullableStringFieldUpdateOperationsInput | string | null
-    file_name?: NullableStringFieldUpdateOperationsInput | string | null
-    read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type OrderCreateManyPackageInput = {
     id?: bigint | number
     brand_id: bigint | number
@@ -57856,10 +58316,6 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
-    zoho_visitor_id?: string | null
-    chat_session_id?: string | null
-    chat_enabled?: boolean
-    chat_started_at?: Date | string | null
   }
 
   export type OrderUpdateWithoutPackageInput = {
@@ -57871,14 +58327,11 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutPackageInput = {
@@ -57892,12 +58345,9 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
+    ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateManyWithoutPackageInput = {
@@ -57911,10 +58361,6 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
-    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_session_id?: NullableStringFieldUpdateOperationsInput | string | null
-    chat_enabled?: BoolFieldUpdateOperationsInput | boolean
-    chat_started_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PaymentCreateManyOrderInput = {
@@ -58051,6 +58497,50 @@ export namespace Prisma {
     status?: EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
     issued_at?: DateTimeFieldUpdateOperationsInput | Date | string
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MessageCreateManyTicketInput = {
+    id?: bigint | number
+    sender_id: bigint | number
+    message_text: string
+    message_type?: $Enums.MessageType
+    file_url?: string | null
+    file_name?: string | null
+    read_at?: Date | string | null
+    created_at?: Date | string
+  }
+
+  export type MessageUpdateWithoutTicketInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    message_text?: StringFieldUpdateOperationsInput | string
+    message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+    file_url?: NullableStringFieldUpdateOperationsInput | string | null
+    file_name?: NullableStringFieldUpdateOperationsInput | string | null
+    read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    sender?: UserUpdateOneRequiredWithoutSent_messagesNestedInput
+  }
+
+  export type MessageUncheckedUpdateWithoutTicketInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    sender_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    message_text?: StringFieldUpdateOperationsInput | string
+    message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+    file_url?: NullableStringFieldUpdateOperationsInput | string | null
+    file_name?: NullableStringFieldUpdateOperationsInput | string | null
+    read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageUncheckedUpdateManyWithoutTicketInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    sender_id?: BigIntFieldUpdateOperationsInput | bigint | number
+    message_text?: StringFieldUpdateOperationsInput | string
+    message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+    file_url?: NullableStringFieldUpdateOperationsInput | string | null
+    file_name?: NullableStringFieldUpdateOperationsInput | string | null
+    read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 
