@@ -43,8 +43,7 @@ if (fs.existsSync(buildGradlePath)) {
 console.log('\n📦 Checking dependencies...');
 try {
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-  const hasZoho = packageJson.dependencies && packageJson.dependencies['react-native-zohosalesiq-mobilisten'];
-  console.log(hasZoho ? '✅ Zoho SalesIQ SDK installed' : '❌ Zoho SalesIQ SDK missing');
+
 } catch (error) {
   console.log('❌ Error reading package.json');
 }

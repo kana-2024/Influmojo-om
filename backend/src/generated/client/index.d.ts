@@ -133,6 +133,11 @@ export type KYC = $Result.DefaultSelection<Prisma.$KYCPayload>
  * 
  */
 export type PortfolioItem = $Result.DefaultSelection<Prisma.$PortfolioItemPayload>
+/**
+ * Model OrderChatSession
+ * 
+ */
+export type OrderChatSession = $Result.DefaultSelection<Prisma.$OrderChatSessionPayload>
 
 /**
  * Enums
@@ -349,6 +354,23 @@ export const OrderStatus: {
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
+
+export const ChatStatus: {
+  open: 'open',
+  pending: 'pending',
+  closed: 'closed'
+};
+
+export type ChatStatus = (typeof ChatStatus)[keyof typeof ChatStatus]
+
+
+export const UserRole: {
+  brand: 'brand',
+  influencer: 'influencer'
+};
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
 }
 
 export type UserType = $Enums.UserType
@@ -434,6 +456,14 @@ export const PortfolioMediaType: typeof $Enums.PortfolioMediaType
 export type OrderStatus = $Enums.OrderStatus
 
 export const OrderStatus: typeof $Enums.OrderStatus
+
+export type ChatStatus = $Enums.ChatStatus
+
+export const ChatStatus: typeof $Enums.ChatStatus
+
+export type UserRole = $Enums.UserRole
+
+export const UserRole: typeof $Enums.UserRole
 
 /**
  * ##  Prisma Client ʲˢ
@@ -799,6 +829,16 @@ export class PrismaClient<
     * ```
     */
   get portfolioItem(): Prisma.PortfolioItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.orderChatSession`: Exposes CRUD operations for the **OrderChatSession** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more OrderChatSessions
+    * const orderChatSessions = await prisma.orderChatSession.findMany()
+    * ```
+    */
+  get orderChatSession(): Prisma.OrderChatSessionDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1262,7 +1302,8 @@ export namespace Prisma {
     Order: 'Order',
     PhoneVerification: 'PhoneVerification',
     KYC: 'KYC',
-    PortfolioItem: 'PortfolioItem'
+    PortfolioItem: 'PortfolioItem',
+    OrderChatSession: 'OrderChatSession'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1281,7 +1322,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "brandProfile" | "creatorProfile" | "socialMediaAccount" | "campaign" | "campaignApplication" | "collaboration" | "contentSubmission" | "contentReview" | "payment" | "invoice" | "message" | "review" | "campaignAnalytics" | "contentPerformance" | "category" | "notification" | "platformSetting" | "collaborationChannel" | "package" | "order" | "phoneVerification" | "kYC" | "portfolioItem"
+      modelProps: "user" | "brandProfile" | "creatorProfile" | "socialMediaAccount" | "campaign" | "campaignApplication" | "collaboration" | "contentSubmission" | "contentReview" | "payment" | "invoice" | "message" | "review" | "campaignAnalytics" | "contentPerformance" | "category" | "notification" | "platformSetting" | "collaborationChannel" | "package" | "order" | "phoneVerification" | "kYC" | "portfolioItem" | "orderChatSession"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3061,6 +3102,80 @@ export namespace Prisma {
           }
         }
       }
+      OrderChatSession: {
+        payload: Prisma.$OrderChatSessionPayload<ExtArgs>
+        fields: Prisma.OrderChatSessionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.OrderChatSessionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.OrderChatSessionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+          }
+          findFirst: {
+            args: Prisma.OrderChatSessionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.OrderChatSessionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+          }
+          findMany: {
+            args: Prisma.OrderChatSessionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>[]
+          }
+          create: {
+            args: Prisma.OrderChatSessionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+          }
+          createMany: {
+            args: Prisma.OrderChatSessionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.OrderChatSessionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>[]
+          }
+          delete: {
+            args: Prisma.OrderChatSessionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+          }
+          update: {
+            args: Prisma.OrderChatSessionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+          }
+          deleteMany: {
+            args: Prisma.OrderChatSessionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.OrderChatSessionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.OrderChatSessionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>[]
+          }
+          upsert: {
+            args: Prisma.OrderChatSessionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderChatSessionPayload>
+          }
+          aggregate: {
+            args: Prisma.OrderChatSessionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOrderChatSession>
+          }
+          groupBy: {
+            args: Prisma.OrderChatSessionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OrderChatSessionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.OrderChatSessionCountArgs<ExtArgs>
+            result: $Utils.Optional<OrderChatSessionCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -3169,6 +3284,7 @@ export namespace Prisma {
     phoneVerification?: PhoneVerificationOmit
     kYC?: KYCOmit
     portfolioItem?: PortfolioItemOmit
+    orderChatSession?: OrderChatSessionOmit
   }
 
   /* Types for Logging */
@@ -34040,6 +34156,1040 @@ export namespace Prisma {
 
 
   /**
+   * Model OrderChatSession
+   */
+
+  export type AggregateOrderChatSession = {
+    _count: OrderChatSessionCountAggregateOutputType | null
+    _min: OrderChatSessionMinAggregateOutputType | null
+    _max: OrderChatSessionMaxAggregateOutputType | null
+  }
+
+  export type OrderChatSessionMinAggregateOutputType = {
+    id: string | null
+    order_id: string | null
+    user_id: string | null
+    role: $Enums.UserRole | null
+    zoho_ticket_id: string | null
+    zoho_visitor_id: string | null
+    status: $Enums.ChatStatus | null
+    created_at: Date | null
+  }
+
+  export type OrderChatSessionMaxAggregateOutputType = {
+    id: string | null
+    order_id: string | null
+    user_id: string | null
+    role: $Enums.UserRole | null
+    zoho_ticket_id: string | null
+    zoho_visitor_id: string | null
+    status: $Enums.ChatStatus | null
+    created_at: Date | null
+  }
+
+  export type OrderChatSessionCountAggregateOutputType = {
+    id: number
+    order_id: number
+    user_id: number
+    role: number
+    zoho_ticket_id: number
+    zoho_visitor_id: number
+    status: number
+    created_at: number
+    _all: number
+  }
+
+
+  export type OrderChatSessionMinAggregateInputType = {
+    id?: true
+    order_id?: true
+    user_id?: true
+    role?: true
+    zoho_ticket_id?: true
+    zoho_visitor_id?: true
+    status?: true
+    created_at?: true
+  }
+
+  export type OrderChatSessionMaxAggregateInputType = {
+    id?: true
+    order_id?: true
+    user_id?: true
+    role?: true
+    zoho_ticket_id?: true
+    zoho_visitor_id?: true
+    status?: true
+    created_at?: true
+  }
+
+  export type OrderChatSessionCountAggregateInputType = {
+    id?: true
+    order_id?: true
+    user_id?: true
+    role?: true
+    zoho_ticket_id?: true
+    zoho_visitor_id?: true
+    status?: true
+    created_at?: true
+    _all?: true
+  }
+
+  export type OrderChatSessionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OrderChatSession to aggregate.
+     */
+    where?: OrderChatSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OrderChatSessions to fetch.
+     */
+    orderBy?: OrderChatSessionOrderByWithRelationInput | OrderChatSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: OrderChatSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OrderChatSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OrderChatSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned OrderChatSessions
+    **/
+    _count?: true | OrderChatSessionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: OrderChatSessionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: OrderChatSessionMaxAggregateInputType
+  }
+
+  export type GetOrderChatSessionAggregateType<T extends OrderChatSessionAggregateArgs> = {
+        [P in keyof T & keyof AggregateOrderChatSession]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateOrderChatSession[P]>
+      : GetScalarType<T[P], AggregateOrderChatSession[P]>
+  }
+
+
+
+
+  export type OrderChatSessionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderChatSessionWhereInput
+    orderBy?: OrderChatSessionOrderByWithAggregationInput | OrderChatSessionOrderByWithAggregationInput[]
+    by: OrderChatSessionScalarFieldEnum[] | OrderChatSessionScalarFieldEnum
+    having?: OrderChatSessionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: OrderChatSessionCountAggregateInputType | true
+    _min?: OrderChatSessionMinAggregateInputType
+    _max?: OrderChatSessionMaxAggregateInputType
+  }
+
+  export type OrderChatSessionGroupByOutputType = {
+    id: string
+    order_id: string
+    user_id: string
+    role: $Enums.UserRole
+    zoho_ticket_id: string
+    zoho_visitor_id: string | null
+    status: $Enums.ChatStatus
+    created_at: Date
+    _count: OrderChatSessionCountAggregateOutputType | null
+    _min: OrderChatSessionMinAggregateOutputType | null
+    _max: OrderChatSessionMaxAggregateOutputType | null
+  }
+
+  type GetOrderChatSessionGroupByPayload<T extends OrderChatSessionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<OrderChatSessionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof OrderChatSessionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], OrderChatSessionGroupByOutputType[P]>
+            : GetScalarType<T[P], OrderChatSessionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type OrderChatSessionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    order_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    zoho_ticket_id?: boolean
+    zoho_visitor_id?: boolean
+    status?: boolean
+    created_at?: boolean
+  }, ExtArgs["result"]["orderChatSession"]>
+
+  export type OrderChatSessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    order_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    zoho_ticket_id?: boolean
+    zoho_visitor_id?: boolean
+    status?: boolean
+    created_at?: boolean
+  }, ExtArgs["result"]["orderChatSession"]>
+
+  export type OrderChatSessionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    order_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    zoho_ticket_id?: boolean
+    zoho_visitor_id?: boolean
+    status?: boolean
+    created_at?: boolean
+  }, ExtArgs["result"]["orderChatSession"]>
+
+  export type OrderChatSessionSelectScalar = {
+    id?: boolean
+    order_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    zoho_ticket_id?: boolean
+    zoho_visitor_id?: boolean
+    status?: boolean
+    created_at?: boolean
+  }
+
+  export type OrderChatSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "order_id" | "user_id" | "role" | "zoho_ticket_id" | "zoho_visitor_id" | "status" | "created_at", ExtArgs["result"]["orderChatSession"]>
+
+  export type $OrderChatSessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "OrderChatSession"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      order_id: string
+      user_id: string
+      role: $Enums.UserRole
+      zoho_ticket_id: string
+      zoho_visitor_id: string | null
+      status: $Enums.ChatStatus
+      created_at: Date
+    }, ExtArgs["result"]["orderChatSession"]>
+    composites: {}
+  }
+
+  type OrderChatSessionGetPayload<S extends boolean | null | undefined | OrderChatSessionDefaultArgs> = $Result.GetResult<Prisma.$OrderChatSessionPayload, S>
+
+  type OrderChatSessionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<OrderChatSessionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: OrderChatSessionCountAggregateInputType | true
+    }
+
+  export interface OrderChatSessionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['OrderChatSession'], meta: { name: 'OrderChatSession' } }
+    /**
+     * Find zero or one OrderChatSession that matches the filter.
+     * @param {OrderChatSessionFindUniqueArgs} args - Arguments to find a OrderChatSession
+     * @example
+     * // Get one OrderChatSession
+     * const orderChatSession = await prisma.orderChatSession.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends OrderChatSessionFindUniqueArgs>(args: SelectSubset<T, OrderChatSessionFindUniqueArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one OrderChatSession that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {OrderChatSessionFindUniqueOrThrowArgs} args - Arguments to find a OrderChatSession
+     * @example
+     * // Get one OrderChatSession
+     * const orderChatSession = await prisma.orderChatSession.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends OrderChatSessionFindUniqueOrThrowArgs>(args: SelectSubset<T, OrderChatSessionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OrderChatSession that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderChatSessionFindFirstArgs} args - Arguments to find a OrderChatSession
+     * @example
+     * // Get one OrderChatSession
+     * const orderChatSession = await prisma.orderChatSession.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends OrderChatSessionFindFirstArgs>(args?: SelectSubset<T, OrderChatSessionFindFirstArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OrderChatSession that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderChatSessionFindFirstOrThrowArgs} args - Arguments to find a OrderChatSession
+     * @example
+     * // Get one OrderChatSession
+     * const orderChatSession = await prisma.orderChatSession.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends OrderChatSessionFindFirstOrThrowArgs>(args?: SelectSubset<T, OrderChatSessionFindFirstOrThrowArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more OrderChatSessions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderChatSessionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all OrderChatSessions
+     * const orderChatSessions = await prisma.orderChatSession.findMany()
+     * 
+     * // Get first 10 OrderChatSessions
+     * const orderChatSessions = await prisma.orderChatSession.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const orderChatSessionWithIdOnly = await prisma.orderChatSession.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends OrderChatSessionFindManyArgs>(args?: SelectSubset<T, OrderChatSessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a OrderChatSession.
+     * @param {OrderChatSessionCreateArgs} args - Arguments to create a OrderChatSession.
+     * @example
+     * // Create one OrderChatSession
+     * const OrderChatSession = await prisma.orderChatSession.create({
+     *   data: {
+     *     // ... data to create a OrderChatSession
+     *   }
+     * })
+     * 
+     */
+    create<T extends OrderChatSessionCreateArgs>(args: SelectSubset<T, OrderChatSessionCreateArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many OrderChatSessions.
+     * @param {OrderChatSessionCreateManyArgs} args - Arguments to create many OrderChatSessions.
+     * @example
+     * // Create many OrderChatSessions
+     * const orderChatSession = await prisma.orderChatSession.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends OrderChatSessionCreateManyArgs>(args?: SelectSubset<T, OrderChatSessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many OrderChatSessions and returns the data saved in the database.
+     * @param {OrderChatSessionCreateManyAndReturnArgs} args - Arguments to create many OrderChatSessions.
+     * @example
+     * // Create many OrderChatSessions
+     * const orderChatSession = await prisma.orderChatSession.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many OrderChatSessions and only return the `id`
+     * const orderChatSessionWithIdOnly = await prisma.orderChatSession.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends OrderChatSessionCreateManyAndReturnArgs>(args?: SelectSubset<T, OrderChatSessionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a OrderChatSession.
+     * @param {OrderChatSessionDeleteArgs} args - Arguments to delete one OrderChatSession.
+     * @example
+     * // Delete one OrderChatSession
+     * const OrderChatSession = await prisma.orderChatSession.delete({
+     *   where: {
+     *     // ... filter to delete one OrderChatSession
+     *   }
+     * })
+     * 
+     */
+    delete<T extends OrderChatSessionDeleteArgs>(args: SelectSubset<T, OrderChatSessionDeleteArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one OrderChatSession.
+     * @param {OrderChatSessionUpdateArgs} args - Arguments to update one OrderChatSession.
+     * @example
+     * // Update one OrderChatSession
+     * const orderChatSession = await prisma.orderChatSession.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends OrderChatSessionUpdateArgs>(args: SelectSubset<T, OrderChatSessionUpdateArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more OrderChatSessions.
+     * @param {OrderChatSessionDeleteManyArgs} args - Arguments to filter OrderChatSessions to delete.
+     * @example
+     * // Delete a few OrderChatSessions
+     * const { count } = await prisma.orderChatSession.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends OrderChatSessionDeleteManyArgs>(args?: SelectSubset<T, OrderChatSessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OrderChatSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderChatSessionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many OrderChatSessions
+     * const orderChatSession = await prisma.orderChatSession.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends OrderChatSessionUpdateManyArgs>(args: SelectSubset<T, OrderChatSessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OrderChatSessions and returns the data updated in the database.
+     * @param {OrderChatSessionUpdateManyAndReturnArgs} args - Arguments to update many OrderChatSessions.
+     * @example
+     * // Update many OrderChatSessions
+     * const orderChatSession = await prisma.orderChatSession.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more OrderChatSessions and only return the `id`
+     * const orderChatSessionWithIdOnly = await prisma.orderChatSession.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends OrderChatSessionUpdateManyAndReturnArgs>(args: SelectSubset<T, OrderChatSessionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one OrderChatSession.
+     * @param {OrderChatSessionUpsertArgs} args - Arguments to update or create a OrderChatSession.
+     * @example
+     * // Update or create a OrderChatSession
+     * const orderChatSession = await prisma.orderChatSession.upsert({
+     *   create: {
+     *     // ... data to create a OrderChatSession
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the OrderChatSession we want to update
+     *   }
+     * })
+     */
+    upsert<T extends OrderChatSessionUpsertArgs>(args: SelectSubset<T, OrderChatSessionUpsertArgs<ExtArgs>>): Prisma__OrderChatSessionClient<$Result.GetResult<Prisma.$OrderChatSessionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of OrderChatSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderChatSessionCountArgs} args - Arguments to filter OrderChatSessions to count.
+     * @example
+     * // Count the number of OrderChatSessions
+     * const count = await prisma.orderChatSession.count({
+     *   where: {
+     *     // ... the filter for the OrderChatSessions we want to count
+     *   }
+     * })
+    **/
+    count<T extends OrderChatSessionCountArgs>(
+      args?: Subset<T, OrderChatSessionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], OrderChatSessionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a OrderChatSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderChatSessionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends OrderChatSessionAggregateArgs>(args: Subset<T, OrderChatSessionAggregateArgs>): Prisma.PrismaPromise<GetOrderChatSessionAggregateType<T>>
+
+    /**
+     * Group by OrderChatSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderChatSessionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends OrderChatSessionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: OrderChatSessionGroupByArgs['orderBy'] }
+        : { orderBy?: OrderChatSessionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, OrderChatSessionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOrderChatSessionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the OrderChatSession model
+   */
+  readonly fields: OrderChatSessionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for OrderChatSession.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__OrderChatSessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the OrderChatSession model
+   */
+  interface OrderChatSessionFieldRefs {
+    readonly id: FieldRef<"OrderChatSession", 'String'>
+    readonly order_id: FieldRef<"OrderChatSession", 'String'>
+    readonly user_id: FieldRef<"OrderChatSession", 'String'>
+    readonly role: FieldRef<"OrderChatSession", 'UserRole'>
+    readonly zoho_ticket_id: FieldRef<"OrderChatSession", 'String'>
+    readonly zoho_visitor_id: FieldRef<"OrderChatSession", 'String'>
+    readonly status: FieldRef<"OrderChatSession", 'ChatStatus'>
+    readonly created_at: FieldRef<"OrderChatSession", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * OrderChatSession findUnique
+   */
+  export type OrderChatSessionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * Filter, which OrderChatSession to fetch.
+     */
+    where: OrderChatSessionWhereUniqueInput
+  }
+
+  /**
+   * OrderChatSession findUniqueOrThrow
+   */
+  export type OrderChatSessionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * Filter, which OrderChatSession to fetch.
+     */
+    where: OrderChatSessionWhereUniqueInput
+  }
+
+  /**
+   * OrderChatSession findFirst
+   */
+  export type OrderChatSessionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * Filter, which OrderChatSession to fetch.
+     */
+    where?: OrderChatSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OrderChatSessions to fetch.
+     */
+    orderBy?: OrderChatSessionOrderByWithRelationInput | OrderChatSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OrderChatSessions.
+     */
+    cursor?: OrderChatSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OrderChatSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OrderChatSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OrderChatSessions.
+     */
+    distinct?: OrderChatSessionScalarFieldEnum | OrderChatSessionScalarFieldEnum[]
+  }
+
+  /**
+   * OrderChatSession findFirstOrThrow
+   */
+  export type OrderChatSessionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * Filter, which OrderChatSession to fetch.
+     */
+    where?: OrderChatSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OrderChatSessions to fetch.
+     */
+    orderBy?: OrderChatSessionOrderByWithRelationInput | OrderChatSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OrderChatSessions.
+     */
+    cursor?: OrderChatSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OrderChatSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OrderChatSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OrderChatSessions.
+     */
+    distinct?: OrderChatSessionScalarFieldEnum | OrderChatSessionScalarFieldEnum[]
+  }
+
+  /**
+   * OrderChatSession findMany
+   */
+  export type OrderChatSessionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * Filter, which OrderChatSessions to fetch.
+     */
+    where?: OrderChatSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OrderChatSessions to fetch.
+     */
+    orderBy?: OrderChatSessionOrderByWithRelationInput | OrderChatSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing OrderChatSessions.
+     */
+    cursor?: OrderChatSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OrderChatSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OrderChatSessions.
+     */
+    skip?: number
+    distinct?: OrderChatSessionScalarFieldEnum | OrderChatSessionScalarFieldEnum[]
+  }
+
+  /**
+   * OrderChatSession create
+   */
+  export type OrderChatSessionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * The data needed to create a OrderChatSession.
+     */
+    data: XOR<OrderChatSessionCreateInput, OrderChatSessionUncheckedCreateInput>
+  }
+
+  /**
+   * OrderChatSession createMany
+   */
+  export type OrderChatSessionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many OrderChatSessions.
+     */
+    data: OrderChatSessionCreateManyInput | OrderChatSessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * OrderChatSession createManyAndReturn
+   */
+  export type OrderChatSessionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * The data used to create many OrderChatSessions.
+     */
+    data: OrderChatSessionCreateManyInput | OrderChatSessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * OrderChatSession update
+   */
+  export type OrderChatSessionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * The data needed to update a OrderChatSession.
+     */
+    data: XOR<OrderChatSessionUpdateInput, OrderChatSessionUncheckedUpdateInput>
+    /**
+     * Choose, which OrderChatSession to update.
+     */
+    where: OrderChatSessionWhereUniqueInput
+  }
+
+  /**
+   * OrderChatSession updateMany
+   */
+  export type OrderChatSessionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update OrderChatSessions.
+     */
+    data: XOR<OrderChatSessionUpdateManyMutationInput, OrderChatSessionUncheckedUpdateManyInput>
+    /**
+     * Filter which OrderChatSessions to update
+     */
+    where?: OrderChatSessionWhereInput
+    /**
+     * Limit how many OrderChatSessions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * OrderChatSession updateManyAndReturn
+   */
+  export type OrderChatSessionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * The data used to update OrderChatSessions.
+     */
+    data: XOR<OrderChatSessionUpdateManyMutationInput, OrderChatSessionUncheckedUpdateManyInput>
+    /**
+     * Filter which OrderChatSessions to update
+     */
+    where?: OrderChatSessionWhereInput
+    /**
+     * Limit how many OrderChatSessions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * OrderChatSession upsert
+   */
+  export type OrderChatSessionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * The filter to search for the OrderChatSession to update in case it exists.
+     */
+    where: OrderChatSessionWhereUniqueInput
+    /**
+     * In case the OrderChatSession found by the `where` argument doesn't exist, create a new OrderChatSession with this data.
+     */
+    create: XOR<OrderChatSessionCreateInput, OrderChatSessionUncheckedCreateInput>
+    /**
+     * In case the OrderChatSession was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<OrderChatSessionUpdateInput, OrderChatSessionUncheckedUpdateInput>
+  }
+
+  /**
+   * OrderChatSession delete
+   */
+  export type OrderChatSessionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+    /**
+     * Filter which OrderChatSession to delete.
+     */
+    where: OrderChatSessionWhereUniqueInput
+  }
+
+  /**
+   * OrderChatSession deleteMany
+   */
+  export type OrderChatSessionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OrderChatSessions to delete
+     */
+    where?: OrderChatSessionWhereInput
+    /**
+     * Limit how many OrderChatSessions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * OrderChatSession without action
+   */
+  export type OrderChatSessionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderChatSession
+     */
+    select?: OrderChatSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderChatSession
+     */
+    omit?: OrderChatSessionOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -34493,6 +35643,20 @@ export namespace Prisma {
   export type PortfolioItemScalarFieldEnum = (typeof PortfolioItemScalarFieldEnum)[keyof typeof PortfolioItemScalarFieldEnum]
 
 
+  export const OrderChatSessionScalarFieldEnum: {
+    id: 'id',
+    order_id: 'order_id',
+    user_id: 'user_id',
+    role: 'role',
+    zoho_ticket_id: 'zoho_ticket_id',
+    zoho_visitor_id: 'zoho_visitor_id',
+    status: 'status',
+    created_at: 'created_at'
+  };
+
+  export type OrderChatSessionScalarFieldEnum = (typeof OrderChatSessionScalarFieldEnum)[keyof typeof OrderChatSessionScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -34921,6 +36085,34 @@ export namespace Prisma {
    * Reference to a field of type 'PortfolioMediaType[]'
    */
   export type ListEnumPortfolioMediaTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PortfolioMediaType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'UserRole'
+   */
+  export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
+
+
+  /**
+   * Reference to a field of type 'UserRole[]'
+   */
+  export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ChatStatus'
+   */
+  export type EnumChatStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChatStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ChatStatus[]'
+   */
+  export type ListEnumChatStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChatStatus[]'>
     
 
 
@@ -37377,6 +38569,74 @@ export namespace Prisma {
     is_featured?: BoolWithAggregatesFilter<"PortfolioItem"> | boolean
     created_at?: DateTimeWithAggregatesFilter<"PortfolioItem"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"PortfolioItem"> | Date | string
+  }
+
+  export type OrderChatSessionWhereInput = {
+    AND?: OrderChatSessionWhereInput | OrderChatSessionWhereInput[]
+    OR?: OrderChatSessionWhereInput[]
+    NOT?: OrderChatSessionWhereInput | OrderChatSessionWhereInput[]
+    id?: StringFilter<"OrderChatSession"> | string
+    order_id?: StringFilter<"OrderChatSession"> | string
+    user_id?: StringFilter<"OrderChatSession"> | string
+    role?: EnumUserRoleFilter<"OrderChatSession"> | $Enums.UserRole
+    zoho_ticket_id?: StringFilter<"OrderChatSession"> | string
+    zoho_visitor_id?: StringNullableFilter<"OrderChatSession"> | string | null
+    status?: EnumChatStatusFilter<"OrderChatSession"> | $Enums.ChatStatus
+    created_at?: DateTimeFilter<"OrderChatSession"> | Date | string
+  }
+
+  export type OrderChatSessionOrderByWithRelationInput = {
+    id?: SortOrder
+    order_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    zoho_ticket_id?: SortOrder
+    zoho_visitor_id?: SortOrderInput | SortOrder
+    status?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type OrderChatSessionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    order_id_user_id_role?: OrderChatSessionOrder_idUser_idRoleCompoundUniqueInput
+    AND?: OrderChatSessionWhereInput | OrderChatSessionWhereInput[]
+    OR?: OrderChatSessionWhereInput[]
+    NOT?: OrderChatSessionWhereInput | OrderChatSessionWhereInput[]
+    order_id?: StringFilter<"OrderChatSession"> | string
+    user_id?: StringFilter<"OrderChatSession"> | string
+    role?: EnumUserRoleFilter<"OrderChatSession"> | $Enums.UserRole
+    zoho_ticket_id?: StringFilter<"OrderChatSession"> | string
+    zoho_visitor_id?: StringNullableFilter<"OrderChatSession"> | string | null
+    status?: EnumChatStatusFilter<"OrderChatSession"> | $Enums.ChatStatus
+    created_at?: DateTimeFilter<"OrderChatSession"> | Date | string
+  }, "id" | "order_id_user_id_role">
+
+  export type OrderChatSessionOrderByWithAggregationInput = {
+    id?: SortOrder
+    order_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    zoho_ticket_id?: SortOrder
+    zoho_visitor_id?: SortOrderInput | SortOrder
+    status?: SortOrder
+    created_at?: SortOrder
+    _count?: OrderChatSessionCountOrderByAggregateInput
+    _max?: OrderChatSessionMaxOrderByAggregateInput
+    _min?: OrderChatSessionMinOrderByAggregateInput
+  }
+
+  export type OrderChatSessionScalarWhereWithAggregatesInput = {
+    AND?: OrderChatSessionScalarWhereWithAggregatesInput | OrderChatSessionScalarWhereWithAggregatesInput[]
+    OR?: OrderChatSessionScalarWhereWithAggregatesInput[]
+    NOT?: OrderChatSessionScalarWhereWithAggregatesInput | OrderChatSessionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"OrderChatSession"> | string
+    order_id?: StringWithAggregatesFilter<"OrderChatSession"> | string
+    user_id?: StringWithAggregatesFilter<"OrderChatSession"> | string
+    role?: EnumUserRoleWithAggregatesFilter<"OrderChatSession"> | $Enums.UserRole
+    zoho_ticket_id?: StringWithAggregatesFilter<"OrderChatSession"> | string
+    zoho_visitor_id?: StringNullableWithAggregatesFilter<"OrderChatSession"> | string | null
+    status?: EnumChatStatusWithAggregatesFilter<"OrderChatSession"> | $Enums.ChatStatus
+    created_at?: DateTimeWithAggregatesFilter<"OrderChatSession"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -40078,6 +41338,83 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type OrderChatSessionCreateInput = {
+    id?: string
+    order_id: string
+    user_id: string
+    role: $Enums.UserRole
+    zoho_ticket_id: string
+    zoho_visitor_id?: string | null
+    status?: $Enums.ChatStatus
+    created_at?: Date | string
+  }
+
+  export type OrderChatSessionUncheckedCreateInput = {
+    id?: string
+    order_id: string
+    user_id: string
+    role: $Enums.UserRole
+    zoho_ticket_id: string
+    zoho_visitor_id?: string | null
+    status?: $Enums.ChatStatus
+    created_at?: Date | string
+  }
+
+  export type OrderChatSessionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    order_id?: StringFieldUpdateOperationsInput | string
+    user_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    zoho_ticket_id?: StringFieldUpdateOperationsInput | string
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumChatStatusFieldUpdateOperationsInput | $Enums.ChatStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderChatSessionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    order_id?: StringFieldUpdateOperationsInput | string
+    user_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    zoho_ticket_id?: StringFieldUpdateOperationsInput | string
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumChatStatusFieldUpdateOperationsInput | $Enums.ChatStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderChatSessionCreateManyInput = {
+    id?: string
+    order_id: string
+    user_id: string
+    role: $Enums.UserRole
+    zoho_ticket_id: string
+    zoho_visitor_id?: string | null
+    status?: $Enums.ChatStatus
+    created_at?: Date | string
+  }
+
+  export type OrderChatSessionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    order_id?: StringFieldUpdateOperationsInput | string
+    user_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    zoho_ticket_id?: StringFieldUpdateOperationsInput | string
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumChatStatusFieldUpdateOperationsInput | $Enums.ChatStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderChatSessionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    order_id?: StringFieldUpdateOperationsInput | string
+    user_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    zoho_ticket_id?: StringFieldUpdateOperationsInput | string
+    zoho_visitor_id?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumChatStatusFieldUpdateOperationsInput | $Enums.ChatStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type BigIntFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
@@ -42531,6 +43868,79 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumSocialPlatformNullableFilter<$PrismaModel>
     _max?: NestedEnumSocialPlatformNullableFilter<$PrismaModel>
+  }
+
+  export type EnumUserRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  }
+
+  export type EnumChatStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ChatStatus | EnumChatStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumChatStatusFilter<$PrismaModel> | $Enums.ChatStatus
+  }
+
+  export type OrderChatSessionOrder_idUser_idRoleCompoundUniqueInput = {
+    order_id: string
+    user_id: string
+    role: $Enums.UserRole
+  }
+
+  export type OrderChatSessionCountOrderByAggregateInput = {
+    id?: SortOrder
+    order_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    zoho_ticket_id?: SortOrder
+    zoho_visitor_id?: SortOrder
+    status?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type OrderChatSessionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    order_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    zoho_ticket_id?: SortOrder
+    zoho_visitor_id?: SortOrder
+    status?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type OrderChatSessionMinOrderByAggregateInput = {
+    id?: SortOrder
+    order_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    zoho_ticket_id?: SortOrder
+    zoho_visitor_id?: SortOrder
+    status?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserRoleFilter<$PrismaModel>
+    _max?: NestedEnumUserRoleFilter<$PrismaModel>
+  }
+
+  export type EnumChatStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ChatStatus | EnumChatStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumChatStatusWithAggregatesFilter<$PrismaModel> | $Enums.ChatStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumChatStatusFilter<$PrismaModel>
+    _max?: NestedEnumChatStatusFilter<$PrismaModel>
   }
 
   export type BrandProfileCreateNestedManyWithoutUserInput = {
@@ -45075,6 +46485,14 @@ export namespace Prisma {
     update?: XOR<XOR<BrandProfileUpdateToOneWithWhereWithoutPortfolio_itemsInput, BrandProfileUpdateWithoutPortfolio_itemsInput>, BrandProfileUncheckedUpdateWithoutPortfolio_itemsInput>
   }
 
+  export type EnumUserRoleFieldUpdateOperationsInput = {
+    set?: $Enums.UserRole
+  }
+
+  export type EnumChatStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ChatStatus
+  }
+
   export type NestedBigIntFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
@@ -45779,6 +47197,40 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumSocialPlatformNullableFilter<$PrismaModel>
     _max?: NestedEnumSocialPlatformNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  }
+
+  export type NestedEnumChatStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ChatStatus | EnumChatStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumChatStatusFilter<$PrismaModel> | $Enums.ChatStatus
+  }
+
+  export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserRoleFilter<$PrismaModel>
+    _max?: NestedEnumUserRoleFilter<$PrismaModel>
+  }
+
+  export type NestedEnumChatStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ChatStatus | EnumChatStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ChatStatus[] | ListEnumChatStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumChatStatusWithAggregatesFilter<$PrismaModel> | $Enums.ChatStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumChatStatusFilter<$PrismaModel>
+    _max?: NestedEnumChatStatusFilter<$PrismaModel>
   }
 
   export type BrandProfileCreateWithoutUserInput = {

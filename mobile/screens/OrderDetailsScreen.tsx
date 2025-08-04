@@ -14,7 +14,7 @@ import { ENV } from '../config/env';
 import { getToken } from '../services/storage';
 import { ordersAPI } from '../services/apiService';
 import { orderChatService } from '../services/orderChatService';
-import { ZohoChatWidget } from '../components';
+
 
 interface OrderDetails {
   id: string;
@@ -168,7 +168,7 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
       // Update local state to show chat
       setCurrentOrderChat({
         orderId: orderId,
-        visitorId: session.zoho_ticket_id,
+        visitorId: session.id,
         sessionId: session.id
       });
       setShowChat(true);
@@ -412,12 +412,7 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
         )}
       </ScrollView>
 
-      {/* Zoho Chat Widget */}
-      <ZohoChatWidget
-        visible={showChat}
-        onClose={handleChatClose}
-        onMessageSent={handleChatMessageSent}
-      />
+
     </View>
   );
 };

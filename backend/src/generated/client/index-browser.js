@@ -488,6 +488,17 @@ exports.Prisma.PortfolioItemScalarFieldEnum = {
   updated_at: 'updated_at'
 };
 
+exports.Prisma.OrderChatSessionScalarFieldEnum = {
+  id: 'id',
+  order_id: 'order_id',
+  user_id: 'user_id',
+  role: 'role',
+  zoho_ticket_id: 'zoho_ticket_id',
+  zoho_visitor_id: 'zoho_visitor_id',
+  status: 'status',
+  created_at: 'created_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -662,6 +673,17 @@ exports.PortfolioMediaType = exports.$Enums.PortfolioMediaType = {
   text: 'text'
 };
 
+exports.UserRole = exports.$Enums.UserRole = {
+  brand: 'brand',
+  influencer: 'influencer'
+};
+
+exports.ChatStatus = exports.$Enums.ChatStatus = {
+  open: 'open',
+  pending: 'pending',
+  closed: 'closed'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   BrandProfile: 'BrandProfile',
@@ -686,7 +708,8 @@ exports.Prisma.ModelName = {
   Order: 'Order',
   PhoneVerification: 'PhoneVerification',
   KYC: 'KYC',
-  PortfolioItem: 'PortfolioItem'
+  PortfolioItem: 'PortfolioItem',
+  OrderChatSession: 'OrderChatSession'
 };
 
 /**

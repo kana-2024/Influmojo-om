@@ -35,13 +35,11 @@ rootProject.name = 'Influ Mojo'
 
 expoAutolinking.useExpoVersionCatalog()
 
-// Add Zoho Maven repository for SalesIQ SDK
 dependencyResolutionManagement {
   repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
   repositories {
     google()
     mavenCentral()
-    maven { url 'https://maven.zohodl.com' }
     maven { url 'https://www.jitpack.io' }
     
     // Expo Maven repository (using HTTP to avoid SSL issues)

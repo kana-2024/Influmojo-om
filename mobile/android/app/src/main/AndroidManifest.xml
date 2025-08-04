@@ -19,10 +19,7 @@
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
     
-    <!-- Zoho SalesIQ Configuration -->
-    <meta-data android:name="com.zoho.salesiq.mobilisten.APP_KEY" android:value="%2B0on0Wj2V1Rb9Y0bMjazQB0E7UDv26mgOQlqXGO6%2FfrEVDVKDG8SoISWk6ZiC6MV_in"/>
-    <meta-data android:name="com.zoho.salesiq.mobilisten.ACCESS_KEY" android:value="%2B3Hm71aKZBss%2B4VVpGh81W4VRTpWsfrPQNX1Y45ECdXkR%2FMoB%2Bl9gNouU9DCIXjmXs8O2KOI8z4ZU5OQLG000Er8kdfE8hod%2BYFZwfgMJnwjsKlhE%2Frs2RPCANC9LnQa"/>
-    <meta-data android:name="com.zoho.salesiq.mobilisten.DEPARTMENT_ID" android:value="kaana6"/>
+
     <activity android:name=".MainActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize" android:theme="@style/Theme.App.SplashScreen" android:exported="true" android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>

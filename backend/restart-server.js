@@ -50,7 +50,7 @@ const restartServer = async () => {
     startServer();
     
     console.log('✅ Server restart initiated. Check the server logs for any errors.');
-    console.log('💡 You can now test the Zoho chat integration again.');
+    console.log('💡 Server restarted successfully.');
     
   } catch (error) {
     console.error('❌ Error restarting server:', error);

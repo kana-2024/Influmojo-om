@@ -30,7 +30,7 @@ allprojects {
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }
-    maven { url 'https://maven.zohodl.com' }
+
     
     // Expo Maven repository (using HTTP to avoid SSL issues)
     maven { 

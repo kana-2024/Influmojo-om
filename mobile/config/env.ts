@@ -12,11 +12,7 @@ export const ENV = {
  
   GOOGLE_CLIENT_SECRET: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || '',
   
-  // Zoho SalesIQ Configuration
-  ZOHO_IOS_APP_KEY: process.env.EXPO_PUBLIC_ZOHO_IOS_APP_KEY || '',
-  ZOHO_IOS_ACCESS_KEY: process.env.EXPO_PUBLIC_ZOHO_IOS_ACCESS_KEY || '',
-  ZOHO_ANDROID_APP_KEY: process.env.EXPO_PUBLIC_ZOHO_ANDROID_APP_KEY || '',
-  ZOHO_ANDROID_ACCESS_KEY: process.env.EXPO_PUBLIC_ZOHO_ANDROID_ACCESS_KEY || '',
+
   
   // App Configuration
   APP_NAME: 'Influ Mojo',
@@ -68,17 +64,7 @@ export const API_ENDPOINTS = {
   GET_CREATORS: `${ENV.API_BASE_URL}/api/profile/creators`,
   GET_CREATOR_PROFILE_BY_ID: `${ENV.API_BASE_URL}/api/profile/creators`,
 
-  // Zoho endpoints
-  ZOHO_CHAT_CONFIG: `${ENV.API_BASE_URL}/api/zoho/chat/config`,
-  ZOHO_CHAT_INITIALIZE: `${ENV.API_BASE_URL}/api/zoho/chat/initialize`,
-  ZOHO_CHAT_SEND_MESSAGE: `${ENV.API_BASE_URL}/api/zoho/chat/send-message`,
-  ZOHO_CHAT_HISTORY: `${ENV.API_BASE_URL}/api/zoho/chat/history`,
-  ZOHO_SYNC_CONTACT: `${ENV.API_BASE_URL}/api/zoho/sync-contact`,
-  ZOHO_CREATE_DEAL: `${ENV.API_BASE_URL}/api/zoho/create-deal`,
-  ZOHO_CREATE_TASK: `${ENV.API_BASE_URL}/api/zoho/create-task`,
-  ZOHO_CREATE_CONTACT: `${ENV.API_BASE_URL}/api/zoho/create-contact`,
-  ZOHO_TEST_CONNECTION: `${ENV.API_BASE_URL}/api/zoho/test-connection`,
-  ZOHO_CONFIG_STATUS: `${ENV.API_BASE_URL}/api/zoho/config-status`,
+
 };
 
 // Debug environment variables (only in development)

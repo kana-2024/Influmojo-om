@@ -3,7 +3,7 @@ import { getToken } from './storage';
 
 /**
  * Order Chat Service
- * Handles order-specific chat sessions with Zoho integration
+ * Handles order-specific chat sessions
  */
 
 export interface ChatSession {
@@ -11,7 +11,6 @@ export interface ChatSession {
   order_id: string;
   user_id: string;
   role: 'brand' | 'influencer';
-  zoho_ticket_id: string;
   status: 'open' | 'pending' | 'closed';
   created_at: string;
 }
@@ -46,7 +45,7 @@ export interface OrderChatService {
   // Get all chat sessions for an order
   getOrderSessions(orderId: string): Promise<ChatSession[]>;
   
-  // Initialize Zoho chat widget for order
+  // Initialize chat widget for order
   initializeOrderChat(session: ChatSession, userData: any): Promise<void>;
 }
 
@@ -172,78 +171,18 @@ class OrderChatServiceImpl implements OrderChatService {
 
   async initializeOrderChat(session: ChatSession, userData: any): Promise<void> {
     try {
-      // Import Zoho SalesIQ for React Native
-      const { ZohoSalesIQ } = require('react-native-zohosalesiq-mobilisten');
+      console.log('🔧 Initializing order-specific chat for order:', session.order_id);
+      console.log('👤 User data:', { name: userData.name, email: userData.email });
       
-      // Check if ZohoSalesIQ is properly imported and available
-      if (!ZohoSalesIQ) {
-        console.warn('⚠️ ZohoSalesIQ module is not available, using fallback');
-        this.initializeOrderChatFallback(session, userData);
-        return;
-      }
-
-      // Wait for SDK to be ready (retry mechanism)
-      let retryCount = 0;
-      const maxRetries = 5;
+      // For now, just log the information
+      // In a real implementation, you might want to:
+      // 1. Open a web view with chat interface
+      // 2. Use a different chat solution
+      // 3. Show a message to the user
       
-      while (retryCount < maxRetries) {
-        if (typeof ZohoSalesIQ.setVisitorInfo === 'function' && 
-            typeof ZohoSalesIQ.setCustomAction === 'function' && 
-            typeof ZohoSalesIQ.showChat === 'function') {
-          break;
-        }
-        
-        console.log(`⏳ Waiting for ZohoSalesIQ to be ready... (attempt ${retryCount + 1}/${maxRetries})`);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        retryCount++;
-      }
-
-      // Final check after retries
-      if (typeof ZohoSalesIQ.setVisitorInfo !== 'function') {
-        console.warn('⚠️ ZohoSalesIQ SDK is not properly initialized, using fallback');
-        this.initializeOrderChatFallback(session, userData);
-        return;
-      }
-
-      if (typeof ZohoSalesIQ.setCustomAction !== 'function') {
-        console.warn('⚠️ ZohoSalesIQ.setCustomAction is not available, using fallback');
-        this.initializeOrderChatFallback(session, userData);
-        return;
-      }
-
-      if (typeof ZohoSalesIQ.showChat !== 'function') {
-        console.warn('⚠️ ZohoSalesIQ.showChat is not available, using fallback');
-        this.initializeOrderChatFallback(session, userData);
-        return;
-      }
+      console.log('✅ Order-specific chat initialization completed');
+      console.log('💡 Note: Chat functionality is currently being updated.');
       
-      // Create unique email for each order to enable re-identification
-      const orderSpecificEmail = this.createOrderSpecificEmail(userData.email, session.order_id);
-      
-      console.log('🔧 Initializing order-specific chat with email:', orderSpecificEmail);
-      console.log('🔧 ZohoSalesIQ object:', typeof ZohoSalesIQ);
-      console.log('🔧 Available methods:', Object.keys(ZohoSalesIQ));
-      
-      // Set visitor information with order-specific email for re-identification
-      ZohoSalesIQ.setVisitorInfo({
-        name: userData.name || 'User',
-        email: orderSpecificEmail, // This enables re-identification per order
-        phone: userData.phone || '',
-        addInfo: `order_id:${session.order_id} ticket_id:${session.zoho_ticket_id} role:${session.role}`
-      });
-
-      // Set custom action for order tracking
-      ZohoSalesIQ.setCustomAction(`order_${session.order_id}`);
-
-      // Show chat widget
-      ZohoSalesIQ.showChat();
-
-      console.log('✅ Order-specific chat initialized:', {
-        orderId: session.order_id,
-        email: orderSpecificEmail,
-        sessionId: session.id,
-        zohoSalesIQAvailable: !!ZohoSalesIQ
-      });
     } catch (error) {
       console.error('❌ Error initializing order chat:', error);
       console.error('❌ Error details:', {
@@ -251,51 +190,12 @@ class OrderChatServiceImpl implements OrderChatService {
         stack: error.stack,
         name: error.name
       });
-      
-      // Use fallback if Zoho SDK fails
-      console.warn('⚠️ Using fallback chat initialization');
-      this.initializeOrderChatFallback(session, userData);
     }
   }
 
-  /**
-   * Fallback method when Zoho SalesIQ is not available
-   */
-  private initializeOrderChatFallback(session: ChatSession, userData: any): void {
-    try {
-      const orderSpecificEmail = this.createOrderSpecificEmail(userData.email, session.order_id);
-      
-      console.log('🔄 Using fallback chat initialization for order:', session.order_id);
-      console.log('📧 Order-specific email:', orderSpecificEmail);
-      console.log('🎫 Zoho ticket ID:', session.zoho_ticket_id);
-      
-      // For now, just log the information
-      // In a real implementation, you might want to:
-      // 1. Open a web view with Zoho chat
-      // 2. Use a different chat solution
-      // 3. Show a message to the user
-      
-      console.log('✅ Fallback chat initialization completed');
-      console.log('💡 Note: Zoho SalesIQ SDK is not available. Consider rebuilding the app or checking native dependencies.');
-      
-    } catch (error) {
-      console.error('❌ Error in fallback chat initialization:', error);
-    }
-  }
 
-  /**
-   * Create order-specific email for re-identification
-   * This ensures each order gets a separate chat session
-   */
-  private createOrderSpecificEmail(baseEmail: string, orderId: string): string {
-    if (!baseEmail) {
-      return `order-${orderId}@influmojo.app`;
-    }
-    
-    // Use email plus addressing for unique identification
-    const [localPart, domain] = baseEmail.split('@');
-    return `${localPart}+order${orderId}@${domain}`;
-  }
+
+
 }
 
 // Export singleton instance
@@ -314,7 +214,7 @@ export const useOrderChat = () => {
         userData.user_type === 'brand' ? 'brand' : 'influencer'
       );
 
-      // Initialize Zoho chat
+      // Initialize chat
       await orderChatService.initializeOrderChat(session, userData);
 
       return session;

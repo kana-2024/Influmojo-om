@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppSelector } from '../store/hooks';
 import { ordersAPI } from '../services/apiService';
 import { orderChatService } from '../services/orderChatService';
-import { BottomNavBar, ZohoChatWidget } from '../components';
+import { BottomNavBar } from '../components';
 
 interface Order {
   id: string;
@@ -44,7 +44,7 @@ interface Order {
   rejection_message?: string;
   // Chat integration fields
   chat_enabled?: boolean;
-  zoho_visitor_id?: string;
+
   chat_session_id?: string;
 }
 
@@ -426,7 +426,7 @@ const OrdersScreen = ({ navigation }: any) => {
       // Update local state to show chat
       setCurrentOrderChat({
         orderId: order.id,
-        visitorId: session.zoho_ticket_id,
+        visitorId: session.id,
         sessionId: session.id
       });
       setShowChat(true);
@@ -487,13 +487,13 @@ const OrdersScreen = ({ navigation }: any) => {
 
       console.log('✅ Order-specific chat session created/retrieved:', session.id);
 
-      // Initialize Zoho chat with order context
+      // Initialize chat with order context
       await orderChatService.initializeOrderChat(session, userData);
 
       // Update local state to show chat
       setCurrentOrderChat({
         orderId: order.id,
-        visitorId: session.zoho_ticket_id,
+        visitorId: session.id,
         sessionId: session.id
       });
       setShowChat(true);
@@ -686,13 +686,7 @@ const OrdersScreen = ({ navigation }: any) => {
         currentRoute="orders"
       />
 
-      {/* Zoho Chat Widget */}
-      <ZohoChatWidget
-        visible={showChat}
-        onClose={handleChatClose}
-        onMessageSent={handleChatMessageSent}
-        orderInfo={currentOrderChat}
-      />
+
 
       {/* Order Details Modal */}
       {renderOrderDetailsModal()}

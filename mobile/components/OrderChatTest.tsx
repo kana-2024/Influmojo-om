@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { ZohoSalesIQ } from 'react-native-zohosalesiq-mobilisten';
+
 
 /**
  * Test Component for Order-Specific Chat Re-identification
@@ -24,18 +24,11 @@ const OrderChatTest: React.FC<OrderChatTestProps> = ({ userEmail, userName }) =>
       
       console.log('📧 Order-specific email:', orderSpecificEmail);
       
-      // Set visitor information with order-specific email
-      ZohoSalesIQ.setVisitorInfo({
-        name: userName,
-        email: orderSpecificEmail,
-        addInfo: `order_id:${orderId} test_mode:true`
-      });
-
-      // Set custom action for order tracking
-      ZohoSalesIQ.setCustomAction(`order_chat_${orderId}`);
-
-      // Show chat widget
-      ZohoSalesIQ.showChat();
+      // For now, just show a message
+      Alert.alert(
+        'Chat Test',
+        `Order ${orderId} chat test with email: ${orderSpecificEmail}\n\nChat functionality is currently being updated.`
+      );
 
       setCurrentOrder(orderId);
       

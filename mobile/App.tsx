@@ -9,7 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { registerRootComponent } from 'expo';
 import * as NavigationBar from 'expo-navigation-bar';
-import { ZohoSalesIQ } from 'react-native-zohosalesiq-mobilisten';
+
 import WelcomeScreen from './screens/WelcomeScreen';
 import UserRoleScreen from './screens/UserRoleScreen';
 import SignUpScreen from './screens/SignUpScreen';
@@ -36,7 +36,7 @@ import EditPackageScreen from './screens/creator/EditPackageScreen';
 import CreatePortfolioScreen from './screens/creator/CreatePortfolioScreen';
 import SplashScreen from './screens/SplashScreen';
 import { ENV } from './config/env';
-import ZohoInitializer from './components/ZohoInitializer';
+
 
 
 
@@ -120,7 +120,7 @@ export default function App() {
     <ErrorBoundary>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <ZohoInitializer />
+  
           <NavigationContainer>
             <Stack.Navigator 
               initialRouteName="SplashScreen"

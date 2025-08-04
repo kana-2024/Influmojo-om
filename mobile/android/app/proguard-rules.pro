@@ -13,5 +13,5 @@
 
 # Add any project specific keep options here:
 
-# Zoho SalesIQ Mobilisten ProGuard rules
+
 -dontwarn kotlinx.parcelize.Parcelize

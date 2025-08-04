@@ -632,3 +632,28 @@ enum OrderStatus {
   cancelled
   refunded
 }
+
+model OrderChatSession {
+  id             String   @id @default(uuid())
+  order_id       String
+  user_id        String
+  role           UserRole
+  zoho_ticket_id String   // Same ticket ID for both brand and creator sessions
+  zoho_visitor_id String? // Unique visitor ID for each chat session
+  status         ChatStatus @default(open)
+  created_at     DateTime   @default(now())
+
+  @@unique([order_id, user_id, role]) // Allow separate sessions for brand and creator
+  @@index([order_id, zoho_ticket_id]) // Index for ticket-based queries
+}
+
+enum ChatStatus {
+  open
+  pending
+  closed
+}
+
+enum UserRole {
+  brand
+  influencer
+}

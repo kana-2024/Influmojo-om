@@ -4,11 +4,12 @@ import {
   StyleSheet,
   View,
   Text,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ZohoSalesIQ } from 'react-native-zohosalesiq-mobilisten';
+
 import COLORS from '../config/colors';
 
 interface ChatButtonProps {
@@ -44,36 +45,13 @@ const ChatButton: React.FC<ChatButtonProps> = ({
 
   const openZohoChat = () => {
     try {
-      console.log('🎯 Opening Zoho SalesIQ chat...');
+      console.log('🎯 Opening chat...');
       
-      // Set order context if available
-      if (orderInfo) {
-        console.log('📦 Setting order context:', orderInfo);
-        
-        // Set custom fields for order context
-        try {
-          ZohoSalesIQ.setCustomField('order_id', orderInfo.orderId);
-          if (orderInfo.orderNumber) {
-            ZohoSalesIQ.setCustomField('order_number', orderInfo.orderNumber);
-          }
-          if (orderInfo.orderStatus) {
-            ZohoSalesIQ.setCustomField('order_status', orderInfo.orderStatus);
-          }
-          if (orderInfo.amount) {
-            ZohoSalesIQ.setCustomField('order_amount', orderInfo.amount.toString());
-          }
-          console.log('✅ Order context set in Zoho SalesIQ');
-        } catch (error) {
-          console.error('❌ Error setting order context:', error);
-        }
-      }
-      
-      // Show the chat using the simplified method
-      ZohoSalesIQ.showChat();
-      console.log('✅ Zoho SalesIQ chat opened');
+      // For now, just show a message
+      Alert.alert('Chat', 'Chat functionality is currently being updated.');
       
     } catch (error) {
-      console.error('❌ Error opening Zoho SalesIQ chat:', error);
+      console.error('❌ Error opening chat:', error);
     }
   };
 
