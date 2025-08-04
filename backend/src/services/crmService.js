@@ -230,6 +230,35 @@ class CRMService {
   }
 
   /**
+   * Get messages for a specific ticket
+   */
+  async getTicketMessages(ticketId) {
+    try {
+      const messages = await prisma.message.findMany({
+        where: { ticket_id: BigInt(ticketId) },
+        include: {
+          sender: { select: { name: true, user_type: true } }
+        },
+        orderBy: { created_at: 'asc' }
+      });
+
+      return messages.map(message => ({
+        id: message.id.toString(),
+        text: message.message_text,
+        sender: message.sender.user_type,
+        sender_name: message.sender.name,
+        timestamp: message.created_at,
+        message_type: message.message_type,
+        file_url: message.file_url,
+        file_name: message.file_name
+      }));
+    } catch (error) {
+      console.error('❌ Error getting ticket messages:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Reassign ticket to different agent
    */
   async reassignTicket(ticketId, newAgentId) {

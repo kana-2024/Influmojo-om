@@ -56,6 +56,68 @@ router.post('/tickets', [
   }
 }));
 
+// Get messages for a specific ticket
+router.get('/tickets/:ticketId/messages', asyncHandler(async (req, res) => {
+  try {
+    const { ticketId } = req.params;
+
+    console.log('💬 Getting messages for ticket:', ticketId);
+
+    const messages = await crmService.getTicketMessages(ticketId);
+
+    res.json({
+      success: true,
+      message: 'Messages retrieved successfully',
+      data: { messages }
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting ticket messages:', error);
+    res.status(500).json({
+      error: 'Failed to get messages',
+      message: error.message
+    });
+  }
+}));
+
+// Add message to ticket
+router.post('/tickets/:ticketId/messages', [
+  body('sender_id').isInt().withMessage('Valid sender_id is required'),
+  body('message_text').isString().withMessage('Message text is required'),
+  body('message_type').optional().isIn(['text', 'file', 'system']).withMessage('Valid message type is required'),
+  body('file_url').optional().isString().withMessage('File URL must be a string'),
+  body('file_name').optional().isString().withMessage('File name must be a string')
+], validateRequest, asyncHandler(async (req, res) => {
+  try {
+    const { ticketId } = req.params;
+    const { sender_id, message_text, message_type = 'text', file_url, file_name } = req.body;
+
+    console.log('💬 Adding message to ticket:', ticketId);
+
+    const message = await crmService.addMessage(
+      ticketId, 
+      sender_id, 
+      message_text, 
+      message_type, 
+      file_url, 
+      file_name
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Message added successfully',
+      data: { message }
+    });
+
+  } catch (error) {
+    console.error('❌ Error adding message:', error);
+    res.status(500).json({
+      error: 'Failed to add message',
+      message: error.message
+    });
+  }
+}));
+
 // Get ticket by order ID
 router.get('/tickets/order/:orderId', asyncHandler(async (req, res) => {
   try {
@@ -109,44 +171,6 @@ router.put('/tickets/:ticketId/status', [
     console.error('❌ Error updating ticket status:', error);
     res.status(500).json({
       error: 'Failed to update ticket status',
-      message: error.message
-    });
-  }
-}));
-
-// Add message to ticket
-router.post('/tickets/:ticketId/messages', [
-  body('sender_id').isInt().withMessage('Valid sender_id is required'),
-  body('message_text').isString().withMessage('Message text is required'),
-  body('message_type').optional().isIn(['text', 'file', 'system']).withMessage('Valid message type is required'),
-  body('file_url').optional().isString().withMessage('File URL must be a string'),
-  body('file_name').optional().isString().withMessage('File name must be a string')
-], validateRequest, asyncHandler(async (req, res) => {
-  try {
-    const { ticketId } = req.params;
-    const { sender_id, message_text, message_type = 'text', file_url, file_name } = req.body;
-
-    console.log('💬 Adding message to ticket:', ticketId);
-
-    const message = await crmService.addMessage(
-      ticketId, 
-      sender_id, 
-      message_text, 
-      message_type, 
-      file_url, 
-      file_name
-    );
-
-    res.status(201).json({
-      success: true,
-      message: 'Message added successfully',
-      data: { message }
-    });
-
-  } catch (error) {
-    console.error('❌ Error adding message:', error);
-    res.status(500).json({
-      error: 'Failed to add message',
       message: error.message
     });
   }

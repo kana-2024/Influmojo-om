@@ -203,11 +203,17 @@ class AgentService {
         }
       });
 
+      // Calculate average tickets per agent
+      const totalTickets = await prisma.ticket.count();
+      const avgTicketsPerAgent = totalAgents > 0 ? Math.round((totalTickets / totalAgents) * 100) / 100 : 0;
+
       return {
-        total: totalAgents,
-        active: activeAgents,
-        suspended: suspendedAgents,
-        pending: pendingAgents
+        total_agents: totalAgents,
+        active_agents: activeAgents,
+        suspended_agents: suspendedAgents,
+        pending_agents: pendingAgents,
+        avg_tickets_per_agent: avgTicketsPerAgent,
+        total_tickets: totalTickets
       };
     } catch (error) {
       console.error('❌ Error getting agent stats:', error);

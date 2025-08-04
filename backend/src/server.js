@@ -24,24 +24,27 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
 
-// Global BigInt serializer for JSON responses
+// Global BigInt and Date serializer for JSON responses
 const originalJson = express.response.json;
 express.response.json = function(data) {
-  const serializeBigInt = (obj) => {
+  const serializeData = (obj) => {
     if (obj === null || obj === undefined) {
       return obj;
     }
     if (typeof obj === 'bigint') {
       return obj.toString();
     }
+    if (obj instanceof Date) {
+      return obj.toISOString();
+    }
     if (Array.isArray(obj)) {
-      return obj.map(serializeBigInt);
+      return obj.map(serializeData);
     }
     if (typeof obj === 'object') {
       const result = {};
       for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
-          result[key] = serializeBigInt(obj[key]);
+          result[key] = serializeData(obj[key]);
         }
       }
       return result;
@@ -49,7 +52,7 @@ express.response.json = function(data) {
     return obj;
   };
   
-  return originalJson.call(this, serializeBigInt(data));
+  return originalJson.call(this, serializeData(data));
 };
 
 // Rate limiting
