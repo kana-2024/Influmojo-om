@@ -160,14 +160,17 @@ const OrdersScreen = ({ navigation }: any) => {
     }
   };
 
-  const getStatusDisplayText = (status: string) => {
+  const getStatusDisplayText = (status: string, rejectionMessage?: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
         return 'Waiting for Creator Approval';
       case 'accepted':
         return 'Accepted by Creator';
       case 'rejected':
-        return 'Rejected by Creator';
+        if (rejectionMessage) {
+          return `Rejected: ${rejectionMessage}`;
+        }
+        return 'Rejected by Creator - Sorry couldn\'t process the order due to unavailability of the creator';
       case 'in_progress':
         return 'In Progress';
       case 'review':
@@ -232,8 +235,10 @@ const OrdersScreen = ({ navigation }: any) => {
             try {
               const response = await ordersAPI.acceptOrder(orderId);
               if (response.success) {
-                Alert.alert('Success', 'Order accepted successfully!');
+                Alert.alert('Success', 'Order accepted successfully! It has been moved to Ongoing orders.');
                 fetchOrders(); // Refresh orders
+                // Switch to Ongoing tab after accepting
+                setActiveTab('Ongoing');
               } else {
                 Alert.alert('Error', response.message || 'Failed to accept order');
               }
@@ -262,6 +267,30 @@ const OrdersScreen = ({ navigation }: any) => {
               if (response.success) {
                 Alert.alert('Success', 'Order rejected successfully!');
                 fetchOrders(); // Refresh orders
+                
+                // If user is brand, show rejection message with options
+                if (userType === 'brand') {
+                  Alert.alert(
+                    'Order Rejected',
+                    'Sorry couldn\'t process the order due to unavailability of the creator. Don\'t worry, browse through our creators!',
+                    [
+                      {
+                        text: 'Browse Creators',
+                        onPress: () => {
+                          // Navigate to home page to browse creators
+                          navigation.navigate('BrandHome');
+                        }
+                      },
+                      {
+                        text: 'Go to Home',
+                        onPress: () => {
+                          // Navigate to home page
+                          navigation.navigate('BrandHome');
+                        }
+                      }
+                    ]
+                  );
+                }
               } else {
                 Alert.alert('Error', response.message || 'Failed to reject order');
               }
@@ -342,7 +371,7 @@ const OrdersScreen = ({ navigation }: any) => {
                 <View style={styles.modalDetailRow}>
                   <Text style={styles.modalDetailLabel}>Status:</Text>
                   <View style={[styles.statusBadge, { backgroundColor: getStatusColor(selectedOrder.status) }]}>
-                    <Text style={styles.statusText}>{getStatusDisplayText(selectedOrder.status)}</Text>
+                    <Text style={styles.statusText}>{getStatusDisplayText(selectedOrder.status, selectedOrder.rejection_message)}</Text>
                   </View>
                 </View>
                 <View style={styles.modalDetailRow}>
@@ -409,6 +438,32 @@ const OrdersScreen = ({ navigation }: any) => {
                 </View>
               )}
 
+              {/* Contact Support button for creators on ongoing orders */}
+              {isCreator && (selectedOrder.status.toLowerCase() === 'accepted' || selectedOrder.status.toLowerCase() === 'in_progress' || selectedOrder.status.toLowerCase() === 'review') && (
+                <View style={styles.modalBrandActionsContainer}>
+                  <TouchableOpacity 
+                    style={[
+                      styles.modalChatButton,
+                      chatLoading && styles.modalChatButtonDisabled
+                    ]}
+                    onPress={() => handleChatPressFromDetails(selectedOrder)}
+                    disabled={chatLoading}
+                  >
+                    <Ionicons 
+                      name="chatbubble-ellipses-outline" 
+                      size={20} 
+                      color={chatLoading ? "#999" : "#20536d"} 
+                    />
+                    <Text style={[
+                      styles.modalChatButtonText,
+                      chatLoading && styles.modalChatButtonTextDisabled
+                    ]}>
+                      {chatLoading ? 'Opening Chat...' : 'Contact Support'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
               {/* Chat button for brand users */}
               {!isCreator && (
                 <View style={styles.modalBrandActionsContainer}>
@@ -430,6 +485,28 @@ const OrdersScreen = ({ navigation }: any) => {
                       chatLoading && styles.modalChatButtonTextDisabled
                     ]}>
                       {chatLoading ? 'Opening Chat...' : 'Chat with Support'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Browse Creators button for brands on rejected orders */}
+              {!isCreator && selectedOrder.status.toLowerCase() === 'rejected' && (
+                <View style={styles.modalBrandActionsContainer}>
+                  <TouchableOpacity 
+                    style={styles.modalBrowseCreatorsButton}
+                    onPress={() => {
+                      setShowOrderDetails(false);
+                      navigation.navigate('BrandHome');
+                    }}
+                  >
+                    <Ionicons 
+                      name="people-outline" 
+                      size={20} 
+                      color="#f8f4e8" 
+                    />
+                    <Text style={styles.modalBrowseCreatorsButtonText}>
+                      Browse Creators
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -621,7 +698,7 @@ const OrdersScreen = ({ navigation }: any) => {
           <View style={styles.orderCardStatusContainer}>
             <View style={[styles.orderCardStatusDot, { backgroundColor: getStatusColor(order.status) }]} />
             <Text style={[styles.orderCardStatusText, { color: getStatusColor(order.status) }]}>
-              {getStatusDisplayText(order.status)}
+              {getStatusDisplayText(order.status, order.rejection_message)}
             </Text>
           </View>
           <View style={styles.orderCardViewDetails}>
@@ -652,6 +729,38 @@ const OrdersScreen = ({ navigation }: any) => {
             >
               <Ionicons name="checkmark" size={16} color="#f8f4e8" />
               <Text style={styles.orderCardAcceptText}>Accept</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Contact Support button for creators on ongoing orders */}
+        {isCreator && (order.status.toLowerCase() === 'accepted' || order.status.toLowerCase() === 'in_progress' || order.status.toLowerCase() === 'review') && (
+          <View style={styles.orderCardActions}>
+            <TouchableOpacity 
+              style={styles.orderCardContactSupportButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleChatPress(order);
+              }}
+            >
+              <Ionicons name="chatbubble-ellipses-outline" size={16} color="#f8f4e8" />
+              <Text style={styles.orderCardContactSupportText}>Contact Support</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Browse Creators button for brands on rejected orders */}
+        {!isCreator && order.status.toLowerCase() === 'rejected' && (
+          <View style={styles.orderCardActions}>
+            <TouchableOpacity 
+              style={styles.orderCardBrowseCreatorsButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                navigation.navigate('BrandHome');
+              }}
+            >
+              <Ionicons name="people-outline" size={16} color="#f8f4e8" />
+              <Text style={styles.orderCardBrowseCreatorsText}>Browse Creators</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -1043,6 +1152,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  orderCardContactSupportButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#20536d', // Dark blue for contact support
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    gap: 4,
+  },
+  orderCardContactSupportText: {
+    color: '#f8f4e8',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  orderCardBrowseCreatorsButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#20536d', // Dark blue for browse creators
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    gap: 4,
+  },
+  orderCardBrowseCreatorsText: {
+    color: '#f8f4e8',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   orderCardChatIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1302,6 +1443,21 @@ const styles = StyleSheet.create({
   orderCardViewDetails: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  modalBrowseCreatorsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#20536d', // Dark blue for browse creators
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 8,
+  },
+  modalBrowseCreatorsButtonText: {
+    color: '#f8f4e8',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

@@ -9,18 +9,18 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  TextInput,
 } from 'react-native';
 import { StreamChat } from 'stream-chat';
 import {
   Chat,
   Channel,
-  MessageInput,
   MessageList,
   OverlayProvider,
 } from 'stream-chat-react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { streamChatService } from '../services/streamChatService';
-import { apiService } from '../services/apiService';
+import { ticketAPI } from '../services/apiService';
 
 interface TicketChatProps {
   ticketId: string;
@@ -43,6 +43,8 @@ export default function TicketChat({ ticketId, onClose, navigation }: TicketChat
     error: null,
   });
   const [isConnected, setIsConnected] = useState(false);
+  const [newMessage, setNewMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
   const channelRef = useRef<any>(null);
 
   // Initialize StreamChat when component mounts
@@ -158,10 +160,40 @@ export default function TicketChat({ ticketId, onClose, navigation }: TicketChat
         throw new Error('Channel not available');
       }
 
-      await streamChatService.sendMessage(chatState.channel.id, message);
+      setIsSending(true);
+      
+      // Extract ticket ID from channel ID
+      const ticketId = chatState.channel.id.replace(/^ticket[-_]/, '');
+      
+      if (!ticketId) {
+        throw new Error('Invalid channel ID format');
+      }
+
+      // Get current user role
+      const currentUser = streamChatService.getCurrentUser();
+      const senderRole = (currentUser?.role as 'brand' | 'creator' | 'agent' | 'system') || 'agent';
+
+      // Send message through backend API
+      await ticketAPI.sendTicketMessage(ticketId, {
+        message_text: message,
+        message_type: 'text',
+        sender_role: senderRole
+      });
+
+      // Clear the input
+      setNewMessage('');
+      
     } catch (error) {
       console.error('❌ Error sending message:', error);
       Alert.alert('Error', 'Failed to send message. Please try again.');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleSendPress = () => {
+    if (newMessage.trim() && !isSending) {
+      handleSendMessage(newMessage.trim());
     }
   };
 
@@ -250,7 +282,27 @@ export default function TicketChat({ ticketId, onClose, navigation }: TicketChat
             >
               <View style={styles.chatContainer}>
                 <MessageList />
-                <MessageInput />
+                {/* Custom Message Input */}
+                <View style={styles.messageInputContainer}>
+                  <TextInput
+                    style={styles.messageInput}
+                    value={newMessage}
+                    onChangeText={setNewMessage}
+                    placeholder="Type your message..."
+                    multiline
+                    maxLength={1000}
+                    editable={!isSending}
+                  />
+                  <TouchableOpacity
+                    style={[styles.sendButton, (!newMessage.trim() || isSending) && styles.sendButtonDisabled]}
+                    onPress={handleSendPress}
+                    disabled={!newMessage.trim() || isSending}
+                  >
+                    <Text style={styles.sendButtonText}>
+                      {isSending ? 'Sending...' : 'Send'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </Channel>
           </Chat>
@@ -331,6 +383,45 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   retryButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  messageInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#ffffff',
+    borderTopWidth: 1,
+    borderTopColor: '#e2e8f0',
+  },
+  messageInput: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: '#f1f5f9',
+    fontSize: 16,
+    minHeight: 40,
+    maxHeight: 150,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  sendButton: {
+    backgroundColor: '#0ea5e9',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendButtonDisabled: {
+    backgroundColor: '#94a3b8',
+    opacity: 0.7,
+  },
+  sendButtonText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',

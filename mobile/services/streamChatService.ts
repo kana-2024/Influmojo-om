@@ -1,5 +1,5 @@
 import { StreamChat } from 'stream-chat';
-import { apiService } from './apiService';
+import { ticketAPI } from './apiService';
 
 // StreamChat client instance
 let chatClient: StreamChat | null = null;
@@ -68,9 +68,9 @@ class StreamChatService {
 
       this.currentUser = {
         id: userId,
-        name: user.name || userId,
-        image: user.image || undefined,
-        role: user.role || 'user'
+        name: (user as any).name || userId,
+        image: (user as any).image || undefined,
+        role: (user as any).role || 'user'
       };
 
       console.log(`✅ User ${userId} connected to StreamChat`);
@@ -88,19 +88,40 @@ class StreamChatService {
     try {
       console.log('🔑 Getting StreamChat token from backend...');
 
-      const response = await apiService.get('/chat/token');
+      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/token`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await this.getStoredToken()}`
+        }
+      });
+
+      const data = await response.json();
       
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to get StreamChat token');
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to get StreamChat token');
       }
 
-      const { token, userId, apiKey } = response.data;
+      const { token, userId, apiKey } = data.data;
       
       console.log(`✅ StreamChat token received for user ${userId}`);
       return { token, userId, apiKey };
     } catch (error) {
       console.error('❌ Error getting StreamChat token:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Get stored token (helper method)
+   */
+  private async getStoredToken(): Promise<string | null> {
+    try {
+      const { getToken } = await import('./storage');
+      return await getToken();
+    } catch (error) {
+      console.error('❌ Error getting stored token:', error);
+      return null;
     }
   }
 
@@ -115,13 +136,21 @@ class StreamChatService {
 
       console.log(`🎫 Joining ticket channel for ticket ${ticketId}...`);
 
-      const response = await apiService.post(`/chat/tickets/${ticketId}/join`);
+      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/tickets/${ticketId}/join`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await this.getStoredToken()}`
+        }
+      });
+
+      const data = await response.json();
       
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to join ticket channel');
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to join ticket channel');
       }
 
-      const { channelId } = response.data;
+      const { channelId } = data.data;
       
       console.log(`✅ Joined ticket channel: ${channelId}`);
       return channelId;
@@ -138,10 +167,18 @@ class StreamChatService {
     try {
       console.log(`👋 Leaving ticket channel for ticket ${ticketId}...`);
 
-      const response = await apiService.post(`/chat/tickets/${ticketId}/leave`);
+      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/tickets/${ticketId}/leave`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await this.getStoredToken()}`
+        }
+      });
+
+      const data = await response.json();
       
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to leave ticket channel');
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to leave ticket channel');
       }
 
       console.log(`✅ Left ticket channel for ticket ${ticketId}`);
@@ -162,13 +199,21 @@ class StreamChatService {
 
       console.log('📋 Getting user channels...');
 
-      const response = await apiService.get('/chat/channels');
+      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/channels`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await this.getStoredToken()}`
+        }
+      });
+
+      const data = await response.json();
       
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to get user channels');
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to get user channels');
       }
 
-      const channels = response.data.channels.map((channel: any) => ({
+      const channels = data.data.channels.map((channel: any) => ({
         id: channel.id,
         name: channel.name || `Channel ${channel.id}`,
         members: channel.members || [],
@@ -195,14 +240,22 @@ class StreamChatService {
 
       console.log(`📊 Getting channel info for ${channelId}...`);
 
-      const response = await apiService.get(`/chat/channels/${channelId}`);
+      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/channels/${channelId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await this.getStoredToken()}`
+        }
+      });
+
+      const data = await response.json();
       
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to get channel info');
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to get channel info');
       }
 
       console.log(`✅ Retrieved channel info for ${channelId}`);
-      return response.data;
+      return data.data;
     } catch (error) {
       console.error('❌ Error getting channel info:', error);
       throw error;
@@ -239,9 +292,18 @@ class StreamChatService {
 
       console.log(`💬 Sending message to channel ${channelId}...`);
 
-      const channel = this.client.channel('messaging', channelId);
-      const response = await channel.sendMessage({
-        text: message
+      // Extract ticket ID from channel ID (format: ticket-{ticketId} or ticket_{ticketId})
+      const ticketId = channelId.replace(/^ticket[-_]/, '');
+      
+      if (!ticketId) {
+        throw new Error('Invalid channel ID format');
+      }
+
+      // Send message through backend API
+      const response = await ticketAPI.sendTicketMessage(ticketId, {
+        message_text: message,
+        message_type: 'text',
+        sender_role: (this.currentUser?.role as 'brand' | 'creator' | 'agent' | 'system') || 'agent'
       });
 
       console.log(`✅ Message sent to channel ${channelId}`);

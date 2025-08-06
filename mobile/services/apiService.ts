@@ -53,13 +53,14 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     },
   };
 
-  // Debug: Log the request details
-  console.log('[apiService] Making request:', {
-    url: endpoint,
-    method: config.method || 'GET',
-    hasAuthHeader: !!token,
-    authHeaderLength: token?.length || 0
-  });
+  // Debug logging only in development
+  if (__DEV__) {
+    console.log('[apiService] Making request:', {
+      url: endpoint,
+      method: config.method || 'GET',
+      hasAuthHeader: !!token
+    });
+  }
 
   // Check if token is required but not present
   if (!token && endpoint.includes('/creator-profile') && config.method === 'GET') {
@@ -83,21 +84,12 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
         console.error('[apiService] JSON parse error for JSON content-type:', {
           url: endpoint,
           status: response.status,
-          responseText: responseText.substring(0, 200), // Log first 200 chars
-          parseError
+          responseText: responseText.substring(0, 200)
         });
         throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
       }
     } else {
       // Non-JSON response
-      console.error('[apiService] Non-JSON response:', {
-        url: endpoint,
-        status: response.status,
-        contentType,
-        responseText: responseText.substring(0, 200), // Log first 200 chars
-      });
-      
-      // If it's an error response, create a proper error object
       if (!response.ok) {
         throw new Error(`Server error (${response.status}): ${responseText.substring(0, 100)}`);
       }
@@ -163,12 +155,14 @@ export const authAPI = {
 
   // Verify OTP
   verifyOTP: async (phone: string, code: string, fullName?: string, userType: string = 'creator') => {
-    // Debug: Check if token is present
-    const token = await getToken();
-    console.log('[apiService] verifyOTP - Token present:', !!token, 'Phone:', phone, 'UserType:', userType);
-    
-    if (!token) {
-      console.warn('[apiService] verifyOTP - No JWT token found! This may cause duplicate user creation.');
+    // Debug logging only in development
+    if (__DEV__) {
+      const token = await getToken();
+      console.log('[apiService] verifyOTP - Token present:', !!token, 'Phone:', phone, 'UserType:', userType);
+      
+      if (!token) {
+        console.warn('[apiService] verifyOTP - No JWT token found! This may cause duplicate user creation.');
+      }
     }
     
     const response = await apiRequest(API_ENDPOINTS.VERIFY_OTP, {
@@ -478,9 +472,24 @@ export const ordersAPI = {
 
   // Accept order (creators only)
   acceptOrder: async (orderId: string) => {
-    return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/accept`, {
-      method: 'PUT',
-    });
+    if (!orderId || orderId === 'undefined' || orderId === 'null') {
+      throw new Error('Invalid order ID provided');
+    }
+    
+    try {
+      const response = await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/accept`, {
+        method: 'PUT',
+      });
+      
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to accept order');
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('[apiService] Error accepting order:', error);
+      throw new Error(error.message || 'Failed to accept order. Please try again.');
+    }
   },
 
   // Reject order (creators only)

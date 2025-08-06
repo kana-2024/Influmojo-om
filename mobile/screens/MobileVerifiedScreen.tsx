@@ -15,10 +15,13 @@ const MobileVerifiedScreen = ({ navigation }: any) => {
       const profile = await apiService.authAPI.getUserProfile();
       const userType = profile.user?.userType || profile.user?.user_type || 'creator';
       
-      console.log('🔍 MobileVerifiedScreen: User profile loaded:', {
-        userType: userType,
-        user: profile.user
-      });
+      // Debug logging only in development
+      if (__DEV__) {
+        console.log('🔍 MobileVerifiedScreen: User profile loaded:', {
+          userType: userType,
+          user: profile.user
+        });
+      }
       
       // Navigate to appropriate profile setup screen
       if (userType === 'brand') {

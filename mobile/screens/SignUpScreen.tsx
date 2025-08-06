@@ -22,15 +22,6 @@ import googleAuthService from '../services/googleAuth';
 import * as apiService from '../services/apiService';
 import COLORS from '../config/colors';
 
-// Debug import (only in development)
-if (__DEV__) {
-  console.log('SignUpScreen: googleAuthService imported:', !!googleAuthService);
-  console.log('SignUpScreen: apiService imported:', !!apiService);
-  console.log('SignUpScreen: apiService.authAPI exists:', !!apiService?.authAPI);
-  console.log('SignUpScreen: apiService.authAPI.sendOTP exists:', !!apiService?.authAPI?.sendOTP);
-  console.log('SignUpScreen: apiService.authAPI methods:', Object.keys(apiService?.authAPI || {}));
-}
-
 const SignUpScreen = ({ navigation, route }: any) => {
   useEffect(() => {
     // NavigationBar.setBackgroundColorAsync('#f8f4e8'); // Removed as per edit hint
@@ -50,42 +41,21 @@ const SignUpScreen = ({ navigation, route }: any) => {
   const userType = route.params?.userType || 'creator'; // Get user type from navigation params
 
   const handleGoogleAuth = async () => {
-    if (__DEV__) {
-      console.log('=== Google Auth Button Pressed ===');
-      console.log('API Base URL:', ENV.API_BASE_URL);
-    }
     setWarning('');
     setGoogleLoading(true);
     
     // Test backend connectivity first
     const backendOk = await testBackendConnection();
-    if (__DEV__) {
-      console.log('Backend connectivity:', backendOk);
-    }
     
           try {
-        if (__DEV__) {
-          console.log('Starting Google sign-in process...');
-          console.log('googleAuthService imported:', !!googleAuthService);
-        }
         const result = await googleAuthService.signIn();
-        if (__DEV__) {
-          console.log('Google sign-in result:', result);
-        }
         
         if (result.success && result.user && result.idToken) {
           setGoogleLoading(false);
-          if (__DEV__) {
-            console.log('Google sign-in successful, calling backend API...');
-          }
           
           try {
             // Call backend API with Google ID token for signup
             const apiResult = await apiService.authAPI.googleAuth(result.idToken, true, userType); // isSignup = true, userType
-            if (__DEV__) {
-              console.log('Backend API response:', apiResult);
-              console.log('[SignUpScreen] Google auth successful, token saved:', !!apiResult.token);
-            }
           
           if (apiResult.success) {
             // New user created successfully, proceed to verification
@@ -100,9 +70,6 @@ const SignUpScreen = ({ navigation, route }: any) => {
         }
               } else {
           setGoogleLoading(false);
-          if (__DEV__) {
-            console.log('Google sign-in failed:', result.error);
-          }
           setWarning(result.error || 'Google sign-in failed. Please try again.');
         }
     } catch (error) {
