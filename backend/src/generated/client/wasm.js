@@ -490,6 +490,7 @@ exports.Prisma.TicketScalarFieldEnum = {
   agent_id: 'agent_id',
   stream_channel_id: 'stream_channel_id',
   status: 'status',
+  priority: 'priority',
   created_at: 'created_at',
   updated_at: 'updated_at'
 };
@@ -674,6 +675,13 @@ exports.TicketStatus = exports.$Enums.TicketStatus = {
   in_progress: 'in_progress',
   resolved: 'resolved',
   closed: 'closed'
+};
+
+exports.TicketPriority = exports.$Enums.TicketPriority = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  urgent: 'urgent'
 };
 
 exports.Prisma.ModelName = {

@@ -1,17 +1,19 @@
 const { PrismaClient } = require('../generated/client');
+const streamService = require('./streamService');
 
 const prisma = new PrismaClient();
 
 class CRMService {
   /**
-   * Create a new ticket for an order with round-robin agent assignment
+   * Create a ticket for an order - ONLY called when order is created
+   * This ensures ONE ticket per order for the entire lifecycle
    */
-  async createTicket(orderId, streamChannelId) {
+  async createTicket(orderId, streamChannelId = null) {
     try {
       // Get all admin users for round-robin assignment
       const adminUsers = await prisma.user.findMany({
         where: { user_type: 'admin' },
-        select: { id: true }
+        select: { id: true, name: true, email: true }
       });
 
       if (adminUsers.length === 0) {
@@ -30,16 +32,74 @@ class CRMService {
         nextAgentIndex = (currentAgentIndex + 1) % adminUsers.length;
       }
 
-      const assignedAgentId = adminUsers[nextAgentIndex].id;
+      const assignedAgent = adminUsers[nextAgentIndex];
 
-      // Create the ticket
+      // Get order details to extract brand and creator IDs
+      const order = await prisma.order.findUnique({
+        where: { id: BigInt(orderId) },
+        include: {
+          brand: { 
+            select: { 
+              id: true,
+              user: { select: { name: true, email: true } }
+            } 
+          },
+          creator: { 
+            select: { 
+              id: true,
+              user: { select: { name: true, email: true } }
+            } 
+          },
+          package: { select: { title: true } }
+        }
+      });
+
+      if (!order) {
+        throw new Error(`Order ${orderId} not found`);
+      }
+
+      // Create unified StreamChat channel if not provided
+      if (!streamChannelId) {
+        try {
+          streamChannelId = await streamService.createUnifiedTicketChannel(
+            orderId.toString(),
+            assignedAgent.id.toString(),
+            order.brand.id.toString(),
+            order.creator.id.toString()
+          );
+          console.log(`🎫 Unified StreamChat channel created: ${streamChannelId}`);
+        } catch (streamError) {
+          console.error('⚠️ Failed to create unified StreamChat channel:', streamError);
+          // Continue without StreamChat channel if it fails
+          streamChannelId = 'no-channel';
+        }
+      }
+
+      // Ensure streamChannelId is never null
+      const finalStreamChannelId = streamChannelId || 'no-channel';
+
+      // Create the ticket using simple approach
+      const ticketData = {
+        order_id: BigInt(orderId),
+        agent_id: assignedAgent.id,
+        stream_channel_id: finalStreamChannelId,
+        status: 'open'
+      };
+
+      console.log('🎫 Creating ticket with data:', {
+        order_id: orderId,
+        agent_id: assignedAgent.id.toString(),
+        stream_channel_id: ticketData.stream_channel_id,
+        status: ticketData.status
+      });
+
       const ticket = await prisma.ticket.create({
-        data: {
-          order_id: BigInt(orderId),
-          agent_id: assignedAgentId,
-          stream_channel_id: streamChannelId,
-          status: 'open'
-        },
+        data: ticketData
+      });
+
+      // Fetch the ticket with all the related data after creation
+      const ticketWithRelations = await prisma.ticket.findUnique({
+        where: { id: ticket.id },
         include: {
           order: {
             include: {
@@ -56,8 +116,61 @@ class CRMService {
         }
       });
 
-      console.log(`✅ Ticket created for order ${orderId}, assigned to agent ${ticket.agent.name}`);
-      return ticket;
+      // Send initial system message and agent acknowledgment
+      try {
+        // Send welcome message
+        await this.addMessage(
+          ticketWithRelations.id.toString(),
+          assignedAgent.id.toString(),
+          `🎫 Support ticket #${ticketWithRelations.id} has been created for order #${orderId}.\n\n**Order Details:**\n• Package: ${order.package.title}\n• Brand: ${order.brand.user.name}\n• Creator: ${order.creator.user.name}\n\nAn agent will assist you shortly.`,
+          'system',
+          null,
+          null,
+          'system'
+        );
+
+        // Send agent acknowledgment message
+        await this.addMessage(
+          ticketWithRelations.id.toString(),
+          assignedAgent.id.toString(),
+          `👋 Hello! I'm ${assignedAgent.name}, your assigned support agent. I've received your ticket and will be assisting you with order #${orderId}.\n\nPlease let me know how I can help you today!`,
+          'text',
+          null,
+          null,
+          'agent'
+        );
+
+        console.log(`✅ Initial messages sent for ticket ${ticketWithRelations.id}`);
+      } catch (messageError) {
+        console.error('⚠️ Failed to send initial messages:', messageError);
+        // Continue even if messages fail
+      }
+
+      // Create notification for the assigned agent
+      try {
+        await prisma.notification.create({
+          data: {
+            user_id: assignedAgent.id,
+            type: 'new_ticket',
+            title: 'New Support Ticket Assigned',
+            message: `You have been assigned ticket #${ticketWithRelations.id} for order #${orderId}`,
+            data: {
+              ticket_id: ticketWithRelations.id.toString(),
+              order_id: orderId,
+              order_title: order.package.title,
+              brand_name: order.brand.user.name,
+              creator_name: order.creator.user.name
+            }
+          }
+        });
+        console.log(`✅ Notification created for agent ${assignedAgent.name}`);
+      } catch (notificationError) {
+        console.error('⚠️ Failed to create agent notification:', notificationError);
+        // Continue even if notification fails
+      }
+
+      console.log(`✅ Ticket created for order ${orderId}, assigned to agent ${ticketWithRelations.agent.name}, StreamChat channel: ${finalStreamChannelId}`);
+      return ticketWithRelations;
     } catch (error) {
       console.error('❌ Error creating ticket:', error);
       throw error;
@@ -65,7 +178,8 @@ class CRMService {
   }
 
   /**
-   * Get ticket by order ID
+   * Get ticket by order ID - DO NOT create if doesn't exist
+   * Tickets are only created when orders are created
    */
   async getTicketByOrderId(orderId) {
     try {
@@ -92,6 +206,11 @@ class CRMService {
           }
         }
       });
+
+      if (!ticket) {
+        console.log(`🎫 No ticket found for order ${orderId} - tickets are only created when orders are created`);
+        return null;
+      }
 
       return ticket;
     } catch (error) {
@@ -130,8 +249,18 @@ class CRMService {
   /**
    * Add message to ticket
    */
-  async addMessage(ticketId, senderId, messageText, messageType = 'text', fileUrl = null, fileName = null) {
+  async addMessage(ticketId, senderId, messageText, messageType = 'text', fileUrl = null, fileName = null, senderRole = null) {
     try {
+      // Get sender information to determine role if not provided
+      let role = senderRole;
+      if (!role) {
+        const sender = await prisma.user.findUnique({
+          where: { id: BigInt(senderId) },
+          select: { user_type: true }
+        });
+        role = sender?.user_type || 'agent';
+      }
+
       const message = await prisma.message.create({
         data: {
           ticket_id: BigInt(ticketId),
@@ -146,8 +275,14 @@ class CRMService {
         }
       });
 
-      console.log(`✅ Message added to ticket ${ticketId}`);
-      return message;
+      // Add sender_role to the response
+      const messageWithRole = {
+        ...message,
+        sender_role: role
+      };
+
+      console.log(`✅ Message added to ticket ${ticketId} with role ${role}`);
+      return messageWithRole;
     } catch (error) {
       console.error('❌ Error adding message:', error);
       throw error;
@@ -250,7 +385,8 @@ class CRMService {
         timestamp: message.created_at,
         message_type: message.message_type,
         file_url: message.file_url,
-        file_name: message.file_name
+        file_name: message.file_name,
+        sender_role: message.sender.user_type // Add sender_role to the response
       }));
     } catch (error) {
       console.error('❌ Error getting ticket messages:', error);
@@ -281,6 +417,33 @@ class CRMService {
       return ticket;
     } catch (error) {
       console.error('❌ Error reassigning ticket:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update ticket priority
+   */
+  async updateTicketPriority(ticketId, priority) {
+    try {
+      const ticket = await prisma.ticket.update({
+        where: { id: BigInt(ticketId) },
+        data: { priority },
+        include: {
+          order: {
+            include: {
+              brand: { include: { user: { select: { name: true, email: true } } } },
+              creator: { include: { user: { select: { name: true, email: true } } } }
+            }
+          },
+          agent: { select: { name: true, email: true } }
+        }
+      });
+
+      console.log(`✅ Ticket ${ticketId} priority updated to ${priority}`);
+      return ticket;
+    } catch (error) {
+      console.error('❌ Error updating ticket priority:', error);
       throw error;
     }
   }

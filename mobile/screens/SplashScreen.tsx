@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Image, Animated, Easing, ActivityIndicator } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { getToken } from '../services/storage';
+import { getToken, getUserData } from '../services/storage';
+import { loginSuccess, setUserType } from '../store/slices/authSlice';
 
 // debug logging
 console.log('=== SplashScreen Loading ===');
@@ -12,6 +13,7 @@ const SplashScreen = ({ navigation }: any) => {
   const logoAnim = useRef(new Animated.Value(0)).current;
   const textAnim = useRef(new Animated.Value(0)).current;
   const spinnerAnim = useRef(new Animated.Value(0)).current;
+  const dispatch = useDispatch();
   
   // Get authentication state from Redux
   const { isAuthenticated, user, userType } = useSelector((state: RootState) => state.auth);
@@ -21,15 +23,27 @@ const SplashScreen = ({ navigation }: any) => {
       try {
         // Check if we have a stored token
         const token = await getToken();
+        const storedUserData = await getUserData();
         console.log('[SplashScreen] Token present:', !!token);
+        console.log('[SplashScreen] Stored user data:', !!storedUserData);
         console.log('[SplashScreen] Redux auth state:', { isAuthenticated, userType, user: !!user });
         
         // Determine navigation based on authentication state
         let targetScreen = 'Welcome';
         
-        if (token && isAuthenticated && user) {
+        if (token && storedUserData) {
+          // Initialize Redux state with stored user data
+          if (!isAuthenticated || !user) {
+            console.log('[SplashScreen] Initializing Redux state with stored user data');
+            dispatch(loginSuccess(storedUserData));
+            if (storedUserData.user_type) {
+              dispatch(setUserType(storedUserData.user_type));
+            }
+          }
+          
           // User is authenticated, navigate to appropriate profile
-          if (userType === 'brand') {
+          const currentUserType = userType || storedUserData.user_type;
+          if (currentUserType === 'brand') {
             targetScreen = 'BrandProfile';
           } else {
             targetScreen = 'CreatorProfile';
@@ -74,7 +88,7 @@ const SplashScreen = ({ navigation }: any) => {
     };
 
     checkAuthAndNavigate();
-  }, [isAuthenticated, user, userType]);
+  }, [isAuthenticated, user, userType, dispatch]);
 
   return (
     <View style={styles.container}>

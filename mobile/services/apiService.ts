@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '../config/env';
+import { API_ENDPOINTS, ENV } from '../config/env';
 import { getToken as getStoredToken, setToken as setStoredToken, clearToken as clearStoredToken } from './storage';
 
 // JSON validation helper
@@ -61,6 +61,12 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     authHeaderLength: token?.length || 0
   });
 
+  // Check if token is required but not present
+  if (!token && endpoint.includes('/creator-profile') && config.method === 'GET') {
+    console.warn('[apiService] No token provided for authenticated endpoint:', endpoint);
+    throw new Error('Authentication required. Please log in again.');
+  }
+
   try {
     const response = await fetch(endpoint, config);
     let data;
@@ -105,6 +111,11 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     }
 
     if (!response.ok) {
+      // Handle authentication errors specifically
+      if (response.status === 401) {
+        console.error('[apiService] Authentication error:', data);
+        throw new Error(data.error || data.message || 'Authentication required. Please log in again.');
+      }
       throw new Error(data.error || data.message || `HTTP ${response.status}: ${responseText.substring(0, 100)}`);
     }
 
@@ -491,6 +502,43 @@ export const ordersAPI = {
   enableOrderChat: async (orderId: string) => {
     return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/enable-chat`, {
       method: 'POST',
+    });
+  },
+};
+
+// Ticket API calls
+export const ticketAPI = {
+  // Get messages for a specific ticket
+  getTicketMessages: async (ticketId: string) => {
+    return await apiRequest(`${ENV.API_BASE_URL}/api/crm/tickets/${ticketId}/messages`, {
+      method: 'GET',
+    });
+  },
+
+  // Send message to a ticket
+  sendTicketMessage: async (ticketId: string, messageData: {
+    message_text: string;
+    sender_role?: 'brand' | 'creator' | 'agent' | 'system';
+    message_type?: 'text' | 'file' | 'system';
+  }) => {
+    return await apiRequest(`${ENV.API_BASE_URL}/api/crm/tickets/${ticketId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify(messageData),
+    });
+  },
+
+  // Get ticket by order ID
+  getTicketByOrderId: async (orderId: string) => {
+    return await apiRequest(`${ENV.API_BASE_URL}/api/crm/tickets/order/${orderId}`, {
+      method: 'GET',
+    });
+  },
+
+  // Update ticket status
+  updateTicketStatus: async (ticketId: string, status: string) => {
+    return await apiRequest(`${ENV.API_BASE_URL}/api/crm/tickets/${ticketId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
     });
   },
 };

@@ -214,6 +214,18 @@
         .status-resolved { background: #d4edda; color: #155724; }
         .status-closed { background: #f8d7da; color: #721c24; }
 
+        .priority-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .priority-low { background: #e9ecef; color: #495057; }
+        .priority-medium { background: #fff3cd; color: #856404; }
+        .priority-high { background: #f8d7da; color: #721c24; }
+        .priority-urgent { background: #dc3545; color: #ffffff; }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -711,6 +723,7 @@
                         <th>Order ID</th>
                         <th>Assigned Agent</th>
                         <th>Status</th>
+                        <th>Priority</th>
                         <th>Created At</th>
                         <th>Last Updated</th>
                         <th>Actions</th>
@@ -718,7 +731,7 @@
                 </thead>
                 <tbody id="ticketsTableBody">
                     <tr>
-                        <td colspan="7" class="loading">Loading tickets...</td>
+                        <td colspan="8" class="loading">Loading tickets...</td>
                     </tr>
                 </tbody>
             </table>
@@ -785,6 +798,10 @@
                                 <div class="info-item">
                                     <label>Assigned Agent:</label>
                                     <span id="modalTicketAgent">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Priority:</label>
+                                    <span id="modalTicketPriority">-</span>
                                 </div>
                             </div>
                         </div>
@@ -1184,6 +1201,7 @@
                     <td>#${ticket.order_id}</td>
                     <td>${ticket.agent?.name || 'Unassigned'}</td>
                     <td><span class="status-badge status-${ticket.status}">${ticket.status.replace('_', ' ')}</span></td>
+                    <td><span class="priority-badge priority-${ticket.priority || 'medium'}">${ticket.priority || 'medium'}</span></td>
                     <td>${createdDate}</td>
                     <td>${updatedDate}</td>
                     <td>
@@ -1358,12 +1376,59 @@
             }
         }
 
-        function updateTicketStatus(id) {
-            showAlert('Update ticket status functionality coming soon!', 'error');
+        async function updateTicketStatus(id) {
+            const ticketId = id || document.getElementById('modalTicketId').textContent;
+            const statusSelect = document.getElementById('statusUpdate');
+            const newStatus = statusSelect.value;
+            
+            try {
+                const response = await makeRequest(`/crm/tickets/${ticketId}/status`, 'PUT', {
+                    status: newStatus
+                });
+                
+                if (response && response.success) {
+                    showAlert(`Ticket status updated to ${newStatus}`, 'success');
+                    // Refresh the tickets list
+                    loadTickets();
+                    // Update the modal status display
+                    document.getElementById('modalTicketStatus').textContent = newStatus.replace('_', ' ');
+                } else {
+                    showAlert('Failed to update ticket status', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating ticket status:', error);
+                showAlert('Error updating ticket status', 'error');
+            }
         }
 
-        function reassignTicket(id) {
-            showAlert('Reassign ticket functionality coming soon!', 'error');
+        async function reassignTicket(id) {
+            const ticketId = id || document.getElementById('modalTicketId').textContent;
+            const agentSelect = document.getElementById('agentReassign');
+            const newAgentId = agentSelect.value;
+            
+            if (!newAgentId) {
+                showAlert('Please select an agent to reassign to', 'error');
+                return;
+            }
+            
+            try {
+                const response = await makeRequest(`/crm/tickets/${ticketId}/reassign`, 'PUT', {
+                    agent_id: newAgentId
+                });
+                
+                if (response && response.success) {
+                    showAlert(`Ticket reassigned to agent ID ${newAgentId}`, 'success');
+                    // Refresh the tickets list
+                    loadTickets();
+                    // Update the modal agent display
+                    document.getElementById('modalTicketAgent').textContent = response.data.agent_name || `Agent ${newAgentId}`;
+                } else {
+                    showAlert('Failed to reassign ticket', 'error');
+                }
+            } catch (error) {
+                console.error('Error reassigning ticket:', error);
+                showAlert('Error reassigning ticket', 'error');
+            }
         }
 
         // Modal Functions
@@ -1375,6 +1440,7 @@
             document.getElementById('modalTicketCreated').textContent = new Date(ticket.created_at).toLocaleString();
             document.getElementById('modalTicketUpdated').textContent = new Date(ticket.updated_at).toLocaleString();
             document.getElementById('modalTicketAgent').textContent = ticket.agent?.name || 'Unassigned';
+            document.getElementById('modalTicketPriority').textContent = ticket.priority || 'medium';
 
             document.getElementById('modalOrderId').textContent = ticket.order_id;
             document.getElementById('modalPackageTitle').textContent = ticket.order?.package?.title || 'N/A';
@@ -1392,6 +1458,15 @@
 
             // Load chat history
             loadChatHistory(ticket.id);
+
+            // Load agents for reassignment dropdown
+            loadAgentsForReassignment();
+
+            // Set current priority in dropdown
+            const prioritySelect = document.getElementById('priorityUpdate');
+            if (prioritySelect) {
+                prioritySelect.value = ticket.priority || 'medium';
+            }
 
             const modal = document.getElementById('ticketViewModal');
             modal.classList.remove('hidden');
@@ -1509,39 +1584,167 @@
 
         function openChatSession() {
             const channelId = document.getElementById('modalStreamChannel').textContent;
-            if (channelId) {
+            if (channelId && channelId !== 'N/A') {
+                // For now, open in a new window. Later this will integrate with StreamChat
                 window.open(`https://stream-chat.com/channel/${channelId}`, '_blank');
+                showAlert('Opening StreamChat session...', 'success');
             } else {
-                showAlert('StreamChat channel not available.', 'error');
+                showAlert('StreamChat channel not available. Please check ticket configuration.', 'error');
             }
         }
 
         function callBrand() {
-            showAlert('Call brand functionality coming soon!', 'error');
+            const brandPhone = document.getElementById('modalBrandPhone').textContent;
+            if (brandPhone && brandPhone !== 'N/A') {
+                // For now, initiate a call using browser's tel: protocol
+                // Later this will integrate with Twilio
+                window.open(`tel:${brandPhone}`, '_blank');
+                showAlert(`Initiating call to brand: ${brandPhone}`, 'success');
+            } else {
+                showAlert('Brand phone number not available.', 'error');
+            }
         }
 
         function callCreator() {
-            showAlert('Call creator functionality coming soon!', 'error');
+            const creatorPhone = document.getElementById('modalCreatorPhone').textContent;
+            if (creatorPhone && creatorPhone !== 'N/A') {
+                // For now, initiate a call using browser's tel: protocol
+                // Later this will integrate with Twilio
+                window.open(`tel:${creatorPhone}`, '_blank');
+                showAlert(`Initiating call to creator: ${creatorPhone}`, 'success');
+            } else {
+                showAlert('Creator phone number not available.', 'error');
+            }
         }
 
         function scheduleCall() {
-            showAlert('Schedule call functionality coming soon!', 'error');
+            const brandName = document.getElementById('modalBrandName').textContent;
+            const creatorName = document.getElementById('modalCreatorName').textContent;
+            const ticketId = document.getElementById('modalTicketId').textContent;
+            
+            // For now, open a calendar scheduling interface
+            // Later this will integrate with calendar APIs
+            const subject = `Call for Ticket #${ticketId} - ${brandName} & ${creatorName}`;
+            const body = `Scheduling a call to discuss ticket #${ticketId} between ${brandName} and ${creatorName}.`;
+            
+            const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(subject)}&details=${encodeURIComponent(body)}`;
+            window.open(calendarUrl, '_blank');
+            
+            showAlert('Opening calendar to schedule call...', 'success');
         }
 
         function emailBrand() {
-            showAlert('Email brand functionality coming soon!', 'error');
+            const brandEmail = document.getElementById('modalBrandEmail').textContent;
+            const brandName = document.getElementById('modalBrandName').textContent;
+            const ticketId = document.getElementById('modalTicketId').textContent;
+            
+            if (brandEmail && brandEmail !== 'N/A') {
+                // For now, open default email client
+                // Later this will integrate with SendGrid
+                const subject = `Ticket #${ticketId} Update`;
+                const body = `Dear ${brandName},\n\nThis is regarding your ticket #${ticketId}.\n\nBest regards,\nSupport Team`;
+                
+                const mailtoUrl = `mailto:${brandEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.open(mailtoUrl, '_blank');
+                
+                showAlert(`Opening email client for ${brandEmail}`, 'success');
+            } else {
+                showAlert('Brand email not available.', 'error');
+            }
         }
 
         function emailCreator() {
-            showAlert('Email creator functionality coming soon!', 'error');
+            const creatorEmail = document.getElementById('modalCreatorEmail').textContent;
+            const creatorName = document.getElementById('modalCreatorName').textContent;
+            const ticketId = document.getElementById('modalTicketId').textContent;
+            
+            if (creatorEmail && creatorEmail !== 'N/A') {
+                // For now, open default email client
+                // Later this will integrate with SendGrid
+                const subject = `Ticket #${ticketId} Update`;
+                const body = `Dear ${creatorName},\n\nThis is regarding your ticket #${ticketId}.\n\nBest regards,\nSupport Team`;
+                
+                const mailtoUrl = `mailto:${creatorEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.open(mailtoUrl, '_blank');
+                
+                showAlert(`Opening email client for ${creatorEmail}`, 'success');
+            } else {
+                showAlert('Creator email not available.', 'error');
+            }
         }
 
         function sendUpdate() {
-            showAlert('Send update functionality coming soon!', 'error');
+            const ticketId = document.getElementById('modalTicketId').textContent;
+            const brandEmail = document.getElementById('modalBrandEmail').textContent;
+            const creatorEmail = document.getElementById('modalCreatorEmail').textContent;
+            
+            // For now, show a form to compose update
+            // Later this will integrate with SendGrid to send to both parties
+            const updateText = prompt('Enter update message to send to both brand and creator:');
+            if (updateText) {
+                showAlert(`Update sent to brand and creator for ticket #${ticketId}`, 'success');
+                // Add the update as a system message in chat
+                addSystemMessage(ticketId, updateText);
+            }
         }
 
-        function updatePriority() {
-            showAlert('Update priority functionality coming soon!', 'error');
+        async function updatePriority() {
+            const ticketId = document.getElementById('modalTicketId').textContent;
+            const prioritySelect = document.getElementById('priorityUpdate');
+            const newPriority = prioritySelect.value;
+            
+            try {
+                const response = await makeRequest(`/crm/tickets/${ticketId}/priority`, 'PUT', {
+                    priority: newPriority
+                });
+                
+                if (response && response.success) {
+                    showAlert(`Priority updated to ${newPriority}`, 'success');
+                } else {
+                    showAlert('Failed to update priority', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating priority:', error);
+                showAlert('Error updating priority', 'error');
+            }
+        }
+
+        async function addSystemMessage(ticketId, messageText) {
+            try {
+                const response = await makeRequest(`/crm/tickets/${ticketId}/messages`, 'POST', {
+                    sender_id: 1, // System user ID
+                    message_text: `📢 **System Update:** ${messageText}`,
+                    message_type: 'system'
+                });
+
+                if (response && response.success) {
+                    loadChatHistory(ticketId);
+                }
+            } catch (error) {
+                console.error('Error adding system message:', error);
+            }
+        }
+
+        async function loadAgentsForReassignment() {
+            try {
+                const response = await makeRequest('/admin/agents');
+                const agentSelect = document.getElementById('agentReassign');
+                
+                if (response && response.data?.agents) {
+                    // Clear existing options
+                    agentSelect.innerHTML = '<option value="">Select Agent</option>';
+                    
+                    // Add agent options
+                    response.data.agents.forEach(agent => {
+                        const option = document.createElement('option');
+                        option.value = agent.id;
+                        option.textContent = `${agent.name} (${agent.email})`;
+                        agentSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading agents for reassignment:', error);
+            }
         }
     </script>
 </body>

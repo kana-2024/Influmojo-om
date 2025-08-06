@@ -19,6 +19,10 @@ export const COLORS = {
   // Placeholder text color
   placeholder: '#9CA3AF',
   
+  // Additional colors
+  error: '#EF4444',      // Red for errors
+  white: '#FFFFFF',      // White
+  
   // Legacy colors (keeping for reference)
   legacyChipBlue: '#B1E5FC',
   legacyChipYellow: '#FFD88D',

@@ -62,7 +62,7 @@ export default {
     ],
     extra: {
       eas: {
-        projectId: "0c7595f8-c315-4e49-a04e-df831f906d17"
+        projectId: "67d33b3a-4f6c-4440-be38-ab9129e33700"
       },
       apiBaseUrl: process.env.EXPO_PUBLIC_API_URL,
       googleClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID

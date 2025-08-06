@@ -4,16 +4,18 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  TouchableOpacity,
   ActivityIndicator,
   Alert,
-  TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../store/hooks';
+import { ordersAPI } from '../services/apiService';
+import { ticketAPI } from '../services/apiService';
+import COLORS from '../config/colors';
 import { ENV } from '../config/env';
 import { getToken } from '../services/storage';
-import { ordersAPI } from '../services/apiService';
-import { orderChatService } from '../services/orderChatService';
 
 
 interface OrderDetails {
@@ -103,15 +105,20 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'active':
-        return '#4CAF50';
+      case 'accepted':
+      case 'in_progress':
+        return '#4CAF50'; // Green for active/accepted
       case 'completed':
-        return '#2196F3';
+        return '#2196F3'; // Blue for completed
       case 'cancelled':
-        return '#F44336';
+      case 'rejected':
+        return '#F44336'; // Red for cancelled/rejected
       case 'pending':
-        return '#FF9800';
+        return '#f37135'; // Brand orange for pending
+      case 'review':
+        return '#20536d'; // Brand tertiary color for review
       default:
-        return '#757575';
+        return '#757575'; // Gray for default
     }
   };
 
@@ -132,8 +139,8 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
 
   // Chat handling functions
   const handleChatPress = async () => {
-    if (userType !== 'brand') {
-      Alert.alert('Info', 'Chat is only available for brand users');
+    if (userType !== 'brand' && userType !== 'creator') {
+      Alert.alert('Info', 'Chat is only available for brand and creator users');
       return;
     }
 
@@ -144,35 +151,29 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
 
     setChatLoading(true);
     try {
-      // Get user data for chat session
-      const userData = {
-        id: userId,
-        name: user?.name || 'Brand User',
-        email: user?.email || '',
-        phone: user?.phone || '',
-        user_type: userType
-      };
-
-      // Get or create order-specific chat session
-      const session = await orderChatService.getOrCreateSession(
-        orderId,
-        userId,
-        'brand'
-      );
-
-      console.log('✅ Order-specific chat session created/retrieved:', session.id);
-
-      // Initialize Zoho chat with order context
-      await orderChatService.initializeOrderChat(session, userData);
-
-      // Update local state to show chat
-      setCurrentOrderChat({
-        orderId: orderId,
-        visitorId: session.id,
-        sessionId: session.id
-      });
-      setShowChat(true);
-
+      // Get ticket by order ID (tickets are only created when orders are created)
+      const ticketResponse = await ticketAPI.getTicketByOrderId(orderId);
+      
+      if (ticketResponse.success && ticketResponse.data.ticket) {
+        const ticket = ticketResponse.data.ticket;
+        
+        // Navigate to appropriate chat screen based on user type
+        if (userType === 'brand') {
+          navigation.navigate('BrandChat', {
+            ticketId: ticket.id,
+            orderId: orderId,
+            orderTitle: orderDetails?.package?.title || `Order #${orderId}`
+          });
+        } else if (userType === 'creator') {
+          navigation.navigate('CreatorChat', {
+            ticketId: ticket.id,
+            orderId: orderId,
+            orderTitle: orderDetails?.package?.title || `Order #${orderId}`
+          });
+        }
+      } else {
+        Alert.alert('Error', 'No support ticket found for this order. Support tickets are created automatically when orders are placed.');
+      }
     } catch (error) {
       console.error('Error handling order-specific chat:', error);
       Alert.alert('Error', 'Failed to open order chat. Please try again.');
@@ -231,7 +232,7 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Order Details</Text>
-        {userType === 'brand' && (
+        {(userType === 'brand' || userType === 'creator') && (
           <TouchableOpacity
             style={[
               styles.chatButton,
@@ -247,7 +248,7 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
             />
           </TouchableOpacity>
         )}
-        {userType !== 'brand' && <View style={styles.headerSpacer} />}
+        {userType !== 'brand' && userType !== 'creator' && <View style={styles.headerSpacer} />}
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -403,7 +404,7 @@ const OrderDetailsScreen = ({ route, navigation }: any) => {
             <View style={styles.deliverablesCard}>
               {orderDetails.package.deliverables.map((deliverable: any, index: number) => (
                 <View key={index} style={styles.deliverableItem}>
-                  <Ionicons name="checkmark-circle-outline" size={16} color="#4CAF50" />
+                  <Ionicons name="checkmark-circle-outline" size={16} color="#f37135" />
                   <Text style={styles.deliverableText}>{deliverable}</Text>
                 </View>
               ))}

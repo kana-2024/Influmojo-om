@@ -19,6 +19,7 @@ const ordersRoutes = require('./routes/orders');
 const packagesRoutes = require('./routes/packages');
 const crmRoutes = require('./routes/crm');
 const adminRoutes = require('./routes/admin');
+const chatRoutes = require('./routes/chat');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -112,6 +113,7 @@ app.use('/api/orders', ordersRoutes);
 app.use('/api/packages', packagesRoutes);
 app.use('/api/crm', crmRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Catch-all 404 handler for unknown routes
 app.use((req, res, next) => {

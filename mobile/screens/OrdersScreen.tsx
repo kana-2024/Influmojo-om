@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
-  RefreshControl,
   ActivityIndicator,
+  RefreshControl,
   Alert,
-  SafeAreaView,
   Modal,
+  SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../store/hooks';
 import { ordersAPI } from '../services/apiService';
-import { orderChatService } from '../services/orderChatService';
+import { ticketAPI } from '../services/apiService';
+import COLORS from '../config/colors';
 import { BottomNavBar } from '../components';
 
 interface Order {
@@ -44,19 +47,8 @@ interface Order {
   rejection_message?: string;
   // Chat integration fields
   chat_enabled?: boolean;
-
   chat_session_id?: string;
 }
-
-// Color constants
-const COLORS = {
-  primary: '#f8f4e8',    // Cream
-  secondary: '#f37135',  // Orange
-  textDark: '#1A1D1F',
-  textGray: '#6B7280',
-  borderLight: '#E5E7EB',
-  backgroundLight: '#F5F5F5'
-};
 
 const tabList = [
   { key: 'New', label: 'New' },
@@ -64,6 +56,40 @@ const tabList = [
   { key: 'Completed', label: 'Completed' },
   { key: 'Cancelled', label: 'Cancelled' },
 ];
+
+// Utility function to extract package type from package title
+const getPackageType = (packageTitle: string) => {
+  if (!packageTitle) return 'Package';
+  
+  // Try to extract the platform and content type from the title
+  const title = packageTitle.toLowerCase();
+  
+  // Check for common platforms
+  if (title.includes('instagram')) {
+    if (title.includes('reel')) return 'Instagram Reel';
+    if (title.includes('story')) return 'Instagram Story';
+    if (title.includes('post')) return 'Instagram Post';
+    return 'Instagram Content';
+  }
+  if (title.includes('facebook')) {
+    if (title.includes('feed')) return 'Facebook Feed';
+    if (title.includes('story')) return 'Facebook Story';
+    if (title.includes('post')) return 'Facebook Post';
+    return 'Facebook Content';
+  }
+  if (title.includes('youtube')) {
+    if (title.includes('video')) return 'YouTube Video';
+    if (title.includes('short')) return 'YouTube Short';
+    return 'YouTube Content';
+  }
+  if (title.includes('tiktok')) return 'TikTok Video';
+  if (title.includes('linkedin')) return 'LinkedIn Post';
+  if (title.includes('twitter')) return 'Twitter Post';
+  
+  // If no specific platform found, return the first part of the title
+  const words = packageTitle.split(' ');
+  return words.length > 0 ? words[0] : 'Package';
+};
 
 const OrdersScreen = ({ navigation }: any) => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -117,16 +143,41 @@ const OrdersScreen = ({ navigation }: any) => {
     switch (status.toLowerCase()) {
       case 'active':
       case 'ongoing':
-        return '#4CAF50';
+      case 'in_progress':
+      case 'accepted':
+        return '#4CAF50'; // Green for active/accepted
       case 'completed':
-        return '#2196F3';
+        return '#2196F3'; // Blue for completed
       case 'cancelled':
-        return '#F44336';
+      case 'rejected':
+        return '#F44336'; // Red for cancelled/rejected
       case 'pending':
-      case 'new':
-        return '#FF9800';
+        return '#f37135'; // Brand orange for pending
+      case 'review':
+        return '#20536d'; // Brand tertiary color for review
       default:
-        return '#757575';
+        return '#757575'; // Gray for default
+    }
+  };
+
+  const getStatusDisplayText = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Waiting for Creator Approval';
+      case 'accepted':
+        return 'Accepted by Creator';
+      case 'rejected':
+        return 'Rejected by Creator';
+      case 'in_progress':
+        return 'In Progress';
+      case 'review':
+        return 'Under Review';
+      case 'completed':
+        return 'Completed';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
     }
   };
 
@@ -147,13 +198,13 @@ const OrdersScreen = ({ navigation }: any) => {
     switch (tab) {
       case 'New':
         return orders.filter(order => 
-          order.status.toLowerCase() === 'pending' || 
-          order.status.toLowerCase() === 'new'
+          order.status.toLowerCase() === 'pending'
         );
       case 'Ongoing':
         return orders.filter(order => 
-          order.status.toLowerCase() === 'confirmed' || 
-          order.status.toLowerCase() === 'in_progress'
+          order.status.toLowerCase() === 'accepted' || 
+          order.status.toLowerCase() === 'in_progress' ||
+          order.status.toLowerCase() === 'review'
         );
       case 'Completed':
         return orders.filter(order => 
@@ -161,7 +212,8 @@ const OrdersScreen = ({ navigation }: any) => {
         );
       case 'Cancelled':
         return orders.filter(order => 
-          order.status.toLowerCase() === 'cancelled'
+          order.status.toLowerCase() === 'cancelled' ||
+          order.status.toLowerCase() === 'rejected'
         );
       default:
         return orders;
@@ -234,24 +286,25 @@ const OrdersScreen = ({ navigation }: any) => {
       : (otherParty as any)?.user?.name;
     const otherPartyLocation = isCreator 
       ? `${(otherParty as any)?.location_city || ''} ${(otherParty as any)?.location_state || ''}`.trim()
-      : '';
+      : `${(otherParty as any)?.location_city || ''} ${(otherParty as any)?.location_state || ''}`.trim();
+
+    // Extract package type from the package title or use a default
+    const packageType = getPackageType(selectedOrder.package.title);
 
     return (
       <Modal
         visible={showOrderDetails}
-        transparent
         animationType="slide"
+        transparent={true}
         onRequestClose={handleCloseOrderDetails}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            {/* Modal Header */}
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Order Details</Text>
-              <TouchableOpacity onPress={handleCloseOrderDetails} style={styles.modalCloseButton}>
-                <Ionicons name="close" size={24} color={COLORS.textDark} />
-              </TouchableOpacity>
-            </View>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Order Details</Text>
+            <TouchableOpacity onPress={handleCloseOrderDetails} style={styles.modalCloseButton}>
+              <Ionicons name="close" size={24} color={COLORS.textDark} />
+            </TouchableOpacity>
+          </View>
 
             <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
               {/* Order Header */}
@@ -260,7 +313,7 @@ const OrdersScreen = ({ navigation }: any) => {
                   <View style={styles.modalOrderTypeIcon}>
                     <Ionicons name="film-outline" size={20} color="#E4405F" />
                   </View>
-                  <Text style={styles.modalOrderTypeText}>Instagram Reel</Text>
+                  <Text style={styles.modalOrderTypeText}>{packageType}</Text>
                 </View>
                 <Text style={styles.modalOrderId}>Order ID: #{selectedOrder.id.slice(-6)}</Text>
               </View>
@@ -289,7 +342,7 @@ const OrdersScreen = ({ navigation }: any) => {
                 <View style={styles.modalDetailRow}>
                   <Text style={styles.modalDetailLabel}>Status:</Text>
                   <View style={[styles.statusBadge, { backgroundColor: getStatusColor(selectedOrder.status) }]}>
-                    <Text style={styles.statusText}>{selectedOrder.status}</Text>
+                    <Text style={styles.statusText}>{getStatusDisplayText(selectedOrder.status)}</Text>
                   </View>
                 </View>
                 <View style={styles.modalDetailRow}>
@@ -383,15 +436,14 @@ const OrdersScreen = ({ navigation }: any) => {
               )}
             </ScrollView>
           </View>
-        </View>
-      </Modal>
+        </Modal>
     );
   };
 
   // Chat handling functions
   const handleChatPress = async (order: Order) => {
-    if (userType !== 'brand') {
-      Alert.alert('Info', 'Chat is only available for brand users');
+    if (userType !== 'brand' && userType !== 'creator') {
+      Alert.alert('Info', 'Chat is only available for brand and creator users');
       return;
     }
 
@@ -402,35 +454,29 @@ const OrdersScreen = ({ navigation }: any) => {
 
     setChatLoading(true);
     try {
-      // Get user data for chat session
-      const userData = {
-        id: userId,
-        name: user?.name || 'Brand User',
-        email: user?.email || '',
-        phone: user?.phone || '',
-        user_type: userType
-      };
-
-      // Get or create order-specific chat session
-      const session = await orderChatService.getOrCreateSession(
-        order.id,
-        userId,
-        'brand'
-      );
-
-      console.log('✅ Order-specific chat session created/retrieved:', session.id);
-
-      // Initialize Zoho chat with order context
-      await orderChatService.initializeOrderChat(session, userData);
-
-      // Update local state to show chat
-      setCurrentOrderChat({
-        orderId: order.id,
-        visitorId: session.id,
-        sessionId: session.id
-      });
-      setShowChat(true);
-
+      // Get ticket by order ID (tickets are only created when orders are created)
+      const ticketResponse = await ticketAPI.getTicketByOrderId(order.id);
+      
+      if (ticketResponse.success && ticketResponse.data.ticket) {
+        const ticket = ticketResponse.data.ticket;
+        
+        // Navigate to appropriate chat screen based on user type
+        if (userType === 'brand') {
+          navigation.navigate('BrandChat', {
+            ticketId: ticket.id,
+            orderId: order.id,
+            orderTitle: order.package.title
+          });
+        } else if (userType === 'creator') {
+          navigation.navigate('CreatorChat', {
+            ticketId: ticket.id,
+            orderId: order.id,
+            orderTitle: order.package.title
+          });
+        }
+      } else {
+        Alert.alert('Error', 'No support ticket found for this order. Support tickets are created automatically when orders are placed.');
+      }
     } catch (error) {
       console.error('Error handling order-specific chat:', error);
       Alert.alert('Error', 'Failed to open order chat. Please try again.');
@@ -457,8 +503,8 @@ const OrdersScreen = ({ navigation }: any) => {
 
   // Handle chat button press from order details modal
   const handleChatPressFromDetails = async (order: Order) => {
-    if (userType !== 'brand') {
-      Alert.alert('Info', 'Chat is only available for brand users');
+    if (userType !== 'brand' && userType !== 'creator') {
+      Alert.alert('Info', 'Chat is only available for brand and creator users');
       return;
     }
 
@@ -469,38 +515,32 @@ const OrdersScreen = ({ navigation }: any) => {
 
     setChatLoading(true);
     try {
-      // Get user data for chat session
-      const userData = {
-        id: userId,
-        name: user?.name || 'Brand User',
-        email: user?.email || '',
-        phone: user?.phone || '',
-        user_type: userType
-      };
-
-      // Get or create order-specific chat session
-      const session = await orderChatService.getOrCreateSession(
-        order.id,
-        userId,
-        'brand'
-      );
-
-      console.log('✅ Order-specific chat session created/retrieved:', session.id);
-
-      // Initialize chat with order context
-      await orderChatService.initializeOrderChat(session, userData);
-
-      // Update local state to show chat
-      setCurrentOrderChat({
-        orderId: order.id,
-        visitorId: session.id,
-        sessionId: session.id
-      });
-      setShowChat(true);
+      // Get ticket by order ID (tickets are only created when orders are created)
+      const ticketResponse = await ticketAPI.getTicketByOrderId(order.id);
       
-      // Close the order details modal when opening chat
-      setShowOrderDetails(false);
-
+      if (ticketResponse.success && ticketResponse.data.ticket) {
+        const ticket = ticketResponse.data.ticket;
+        
+        // Navigate to appropriate chat screen based on user type
+        if (userType === 'brand') {
+          navigation.navigate('BrandChat', {
+            ticketId: ticket.id,
+            orderId: order.id,
+            orderTitle: order.package.title
+          });
+        } else if (userType === 'creator') {
+          navigation.navigate('CreatorChat', {
+            ticketId: ticket.id,
+            orderId: order.id,
+            orderTitle: order.package.title
+          });
+        }
+        
+        // Close the order details modal when opening chat
+        setShowOrderDetails(false);
+      } else {
+        Alert.alert('Error', 'No support ticket found for this order. Support tickets are created automatically when orders are placed.');
+      }
     } catch (error) {
       console.error('Error handling order-specific chat:', error);
       Alert.alert('Error', 'Failed to open order chat. Please try again.');
@@ -522,6 +562,9 @@ const OrdersScreen = ({ navigation }: any) => {
       ? (otherParty as any)?.company_name 
       : (otherParty as any)?.user?.name;
 
+    // Extract package type from the package title or use a default
+    const packageType = getPackageType(order.package.title);
+
     return (
       <TouchableOpacity 
         key={order.id} 
@@ -529,54 +572,63 @@ const OrdersScreen = ({ navigation }: any) => {
         onPress={() => handleOrderCardPress(order)}
         activeOpacity={0.8}
       >
-        {/* Order Header */}
+        {/* Header Row */}
         <View style={styles.orderCardHeader}>
-          <View style={styles.orderTypeContainer}>
+          <View style={styles.orderCardLeft}>
             <View style={styles.orderTypeIcon}>
               <Ionicons name="film-outline" size={16} color="#E4405F" />
             </View>
-            <Text style={styles.orderTypeText}>Instagram Reel</Text>
-          </View>
-          <Text style={styles.orderId}>#{order.id.slice(-6)}</Text>
-        </View>
-
-        {/* Order Title */}
-        <Text style={styles.orderCardTitle} numberOfLines={2}>
-          {order.package.title}
-        </Text>
-
-        {/* Basic Details Row */}
-        <View style={styles.orderCardDetails}>
-          <View style={styles.orderCardDetailItem}>
-            <Text style={styles.orderCardDetailLabel}>Status</Text>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) }]}>
-              <Text style={styles.statusText}>{order.status}</Text>
+            <View style={styles.orderCardInfo}>
+              <Text style={styles.orderCardTitle} numberOfLines={1}>
+                {order.package.title}
+              </Text>
+              <Text style={styles.orderCardType}>{packageType}</Text>
             </View>
           </View>
-          <View style={styles.orderCardDetailItem}>
-            <Text style={styles.orderCardDetailLabel}>Quantity</Text>
-            <Text style={styles.orderCardDetailValue}>{order.quantity}</Text>
-          </View>
-          <View style={styles.orderCardDetailItem}>
-            <Text style={styles.orderCardDetailLabel}>Price</Text>
-            <Text style={styles.orderCardDetailValue}>{formatPrice(order.total_amount)}</Text>
+          <View style={styles.orderCardQuantity}>
+            <Text style={styles.orderCardQuantityLabel}>Qty</Text>
+            <Text style={styles.orderCardQuantityValue}>{order.quantity}</Text>
           </View>
         </View>
 
-        {/* Other Party Info */}
-        {otherParty && (
-          <View style={styles.orderCardParty}>
-            <Text style={styles.orderCardPartyLabel}>
-              {isCreator ? 'Brand:' : 'Creator:'}
-            </Text>
-            <Text style={styles.orderCardPartyName} numberOfLines={1}>
-              {otherPartyName || 'N/A'}
+        {/* Details Row */}
+        <View style={styles.orderCardDetails}>
+          <View style={styles.orderCardDetail}>
+            <Text style={styles.orderCardDetailLabel}>Amount</Text>
+            <Text style={styles.orderCardDetailValue}>{formatPrice(order.total_amount)}</Text>
+          </View>
+
+          <View style={styles.orderCardDetail}>
+            <Text style={styles.orderCardDetailLabel}>Order ID</Text>
+            <Text style={styles.orderCardDetailValue}>#{order.id.slice(-6)}</Text>
+          </View>
+        </View>
+
+        {/* Footer Row */}
+        <View style={styles.orderCardFooter}>
+          <View style={styles.orderCardFooterLeft}>
+            {otherParty && (
+              <Text style={styles.orderCardParty}>
+                {isCreator ? 'Brand: ' : 'Creator: '}{otherPartyName || 'N/A'}
+              </Text>
+            )}
+            <Text style={styles.orderCardDate}>• {formatDate(order.created_at)}</Text>
+          </View>
+        </View>
+
+        {/* Status Row */}
+        <View style={styles.orderCardStatusRow}>
+          <View style={styles.orderCardStatusContainer}>
+            <View style={[styles.orderCardStatusDot, { backgroundColor: getStatusColor(order.status) }]} />
+            <Text style={[styles.orderCardStatusText, { color: getStatusColor(order.status) }]}>
+              {getStatusDisplayText(order.status)}
             </Text>
           </View>
-        )}
-
-        {/* Date */}
-        <Text style={styles.orderCardDate}>{formatDate(order.created_at)}</Text>
+          <View style={styles.orderCardViewDetails}>
+            <Text style={styles.orderCardClickText}>View Details</Text>
+            <Ionicons name="chevron-forward" size={16} color="#20536d" />
+          </View>
+        </View>
 
         {/* Action buttons for creators on pending orders */}
         {isCreator && order.status.toLowerCase() === 'pending' && (
@@ -690,6 +742,11 @@ const OrdersScreen = ({ navigation }: any) => {
 
       {/* Order Details Modal */}
       {renderOrderDetailsModal()}
+
+      {/* Overlay for order details modal */}
+      {showOrderDetails && (
+        <View style={styles.modalOverlay} />
+      )}
     </SafeAreaView>
   );
 };
@@ -791,25 +848,82 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   // New order card styles
+  orderCard: {
+    backgroundColor: '#f8f4e8',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
   orderCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
+  },
+  orderCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  orderTypeIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#E4405F20',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  orderCardInfo: {
+    flex: 1,
   },
   orderCardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#1A1A1A',
-    marginBottom: 12,
+    marginBottom: 4,
+  },
+  orderCardType: {
+    fontSize: 14,
+    color: '#666',
+  },
+  orderCardQuantity: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E0E0E0',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#B0B0B0',
+  },
+  orderCardQuantityLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginRight: 4,
+  },
+  orderCardQuantityValue: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#1A1A1A',
   },
   orderCardDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  orderCardDetailItem: {
     alignItems: 'center',
+    marginBottom: 12,
+    gap: 40,
+  },
+  orderCardDetail: {
+    alignItems: 'flex-start',
   },
   orderCardDetailLabel: {
     fontSize: 12,
@@ -818,40 +932,91 @@ const styles = StyleSheet.create({
   },
   orderCardDetailValue: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: '#1A1A1A',
   },
-  orderCardParty: {
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#f8f4e8',
+  },
+  orderCardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  orderCardFooterLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
-  },
-  orderCardPartyLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginRight: 8,
-  },
-  orderCardPartyName: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1A1A1A',
     flex: 1,
+  },
+  orderCardParty: {
+    fontSize: 14,
+    color: '#666',
+    marginRight: 12,
   },
   orderCardDate: {
     fontSize: 12,
     color: '#666',
-    marginBottom: 8,
+  },
+  orderCardFooterRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  orderCardStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F8F8',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  orderCardStatusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  orderCardStatusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  orderCardClickText: {
+    fontSize: 12,
+    color: '#20536d',
+    fontWeight: '500',
+  },
+  // Missing styles for modal
+  paymentStatusBadge: {
+    backgroundColor: '#4CAF50', // Green for completed/payment status
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  paymentStatusText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#f8f4e8',
   },
   orderCardActions: {
     flexDirection: 'row',
     gap: 8,
+    marginTop: 12,
   },
   orderCardRejectButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF4444',
+    backgroundColor: '#F44336', // Red for reject
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 6,
@@ -867,7 +1032,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4CAF50', // Green for accept
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 6,
@@ -892,15 +1057,24 @@ const styles = StyleSheet.create({
   },
   // Modal styles
   modalOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    zIndex: 1,
   },
   modalContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#f8f4e8',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '90%',
+    zIndex: 2,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -1036,7 +1210,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF4444',
+    backgroundColor: '#F44336', // Red for reject
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -1052,7 +1226,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4CAF50', // Green for accept
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -1087,241 +1261,6 @@ const styles = StyleSheet.create({
   modalChatButtonTextDisabled: {
     color: '#CCC',
   },
-  orderCard: {
-    backgroundColor: '#f8f4e8',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  orderHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  orderTypeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  orderTypeIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#E4405F20',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  orderTypeText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  orderId: {
-    fontSize: 14,
-    color: '#666',
-  },
-  orderTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-    marginBottom: 16,
-  },
-  orderDetails: {
-    marginBottom: 16,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  detailLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  detailValue: {
-    fontSize: 14,
-    color: '#1A1A1A',
-    fontWeight: '500',
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#f8f4e8',
-  },
-  paymentStatusBadge: {
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  paymentStatusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#f8f4e8',
-  },
-  descriptionContainer: {
-    marginBottom: 16,
-  },
-  descriptionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 8,
-  },
-  descriptionText: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-  },
-  priceContainer: {
-    marginBottom: 16,
-  },
-  priceText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#f37135',
-  },
-  otherPartyContainer: {
-    marginBottom: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#E1E5E9',
-  },
-  otherPartyTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-    marginBottom: 12,
-  },
-  otherPartyInfoRow: {
-    flexDirection: 'row',
-    marginBottom: 6,
-  },
-  otherPartyInfoLabel: {
-    fontSize: 14,
-    color: '#666',
-    width: 80,
-  },
-  otherPartyInfoValue: {
-    fontSize: 14,
-    color: '#1A1A1A',
-    fontWeight: '500',
-    flex: 1,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  rejectButton: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F44336',
-    paddingVertical: 12,
-    borderRadius: 8,
-    gap: 8,
-  },
-  rejectButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#f8f4e8',
-  },
-  acceptButton: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    borderRadius: 8,
-    gap: 8,
-  },
-  acceptButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#f8f4e8',
-  },
-  brandStatusContainer: {
-    marginTop: 12,
-    padding: 12,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 8,
-  },
-  brandStatusText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  browseCreatorsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: '#f8f4e8',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#f37135',
-  },
-  browseCreatorsText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#f37135',
-    marginRight: 8,
-  },
-  // Rejection message styles
-  rejectionMessageContainer: {
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#E1E5E9',
-  },
-  rejectionMessageHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  rejectionMessageTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-  },
-  rejectionMessageCard: {
-    backgroundColor: '#f8f4e8',
-    borderRadius: 12,
-    padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#f37135',
-  },
-  rejectionMessageText: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  rejectionMessageOrderId: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    fontWeight: '500',
-  },
   // New styles for chat button
   brandActionsContainer: {
     marginTop: 12,
@@ -1353,6 +1292,16 @@ const styles = StyleSheet.create({
   },
   chatButtonTextDisabled: {
     color: '#999',
+  },
+  orderCardStatusRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  orderCardViewDetails: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

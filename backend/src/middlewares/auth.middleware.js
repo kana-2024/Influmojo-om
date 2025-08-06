@@ -21,7 +21,7 @@ function authenticateJWT(req, res, next) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = {
-      id: decoded.id,
+      id: decoded.userId || decoded.id, // Support both userId and id for backward compatibility
       email: decoded.email,
       user_type: decoded.user_type,
     };
@@ -51,7 +51,7 @@ function optionalAuth(req, res, next) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = {
-      id: decoded.id,
+      id: decoded.userId || decoded.id, // Support both userId and id for backward compatibility
       email: decoded.email,
       user_type: decoded.user_type,
     };

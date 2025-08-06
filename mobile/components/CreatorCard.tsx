@@ -127,7 +127,7 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, platform, onPress })
         
         {/* Platform Badge */}
         <View style={styles.platformBadge}>
-          <Ionicons name={getPlatformIcon(platform)} size={16} color="#FD5D27" />
+          <Ionicons name={getPlatformIcon(platform)} size={16} color={COLORS.secondary} />
         </View>
         
         {/* Favorite Button */}
@@ -139,7 +139,7 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, platform, onPress })
           <Ionicons 
             name={isFavorite ? "heart" : "heart-outline"} 
             size={20} 
-            color={isFavorite ? "#FD5D27" : "#FD5D27"} 
+            color={isFavorite ? COLORS.secondary : COLORS.secondary} 
           />
         </TouchableOpacity>
       </View>
@@ -166,19 +166,19 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, platform, onPress })
         {/* Demographics and Response Time in same row */}
         <View style={styles.demographicsRow}>
           <View style={styles.demographicItem}>
-            <MaterialIcons name="person-outline" size={14} color="#FD5D27" />
+            <MaterialIcons name="person-outline" size={14} color={COLORS.secondary} />
             <Text style={styles.demographicText}>
               {creator.gender || 'Not specified'}
             </Text>
           </View>
           <View style={styles.demographicItem}>
-            <MaterialIcons name="cake" size={14} color="#FD5D27" />
+            <MaterialIcons name="cake" size={14} color={COLORS.secondary} />
             <Text style={styles.demographicText}>
               {getAgeDisplay()}
             </Text>
           </View>
           <View style={styles.demographicItem}>
-            <MaterialIcons name="schedule" size={14} color="#FD5D27" />
+            <MaterialIcons name="schedule" size={14} color={COLORS.secondary} />
             <Text style={styles.demographicText}>
               {creator.average_response_time || 'Within 24h'}
             </Text>
@@ -188,7 +188,7 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, platform, onPress })
         {/* Platform and Engagement */}
         <View style={styles.engagementRow}>
           <View style={styles.platformInfo}>
-            <Ionicons name={getPlatformIcon(platform)} size={16} color="#FD5D27" />
+            <Ionicons name={getPlatformIcon(platform)} size={16} color={COLORS.secondary} />
             <Text style={styles.platformText}>{platform}</Text>
           </View>
           {creator.social_accounts?.[0]?.engagement_rate && (
@@ -286,16 +286,15 @@ const styles = StyleSheet.create({
   },
   demographicsRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     marginBottom: 12,
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   demographicItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 8,
     flex: 1,
-    minWidth: 0,
+    justifyContent: 'flex-start',
   },
   demographicText: {
     fontSize: 12,

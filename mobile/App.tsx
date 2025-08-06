@@ -9,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { registerRootComponent } from 'expo';
 import * as NavigationBar from 'expo-navigation-bar';
+import 'react-native-reanimated';
 
 import WelcomeScreen from './screens/WelcomeScreen';
 import UserRoleScreen from './screens/UserRoleScreen';
@@ -34,6 +35,8 @@ import CreateCampaignScreen from './screens/brand/CreateCampaignScreen';
 import CreateCampaignModal from './screens/brand/CreateCampaignModal';
 import EditPackageScreen from './screens/creator/EditPackageScreen';
 import CreatePortfolioScreen from './screens/creator/CreatePortfolioScreen';
+import BrandChatScreen from './screens/brand/BrandChatScreen';
+import CreatorChatScreen from './screens/creator/CreatorChatScreen';
 import SplashScreen from './screens/SplashScreen';
 import { ENV } from './config/env';
 
@@ -153,6 +156,8 @@ export default function App() {
               <Stack.Screen name="CreateProject" component={CreateProjectScreen} />
               <Stack.Screen name="CreateCampaign" component={CreateCampaignScreen} />
               <Stack.Screen name="CreateCampaignModal" component={CreateCampaignModal} />
+              <Stack.Screen name="BrandChat" component={BrandChatScreen} />
+              <Stack.Screen name="CreatorChat" component={CreatorChatScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </PersistGate>

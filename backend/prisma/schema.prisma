@@ -638,6 +638,7 @@ model Ticket {
   agent_id         BigInt
   stream_channel_id String
   status           TicketStatus @default(open)
+  priority         TicketPriority @default(medium)
   created_at       DateTime   @default(now())
   updated_at       DateTime   @updatedAt
 
@@ -653,4 +654,11 @@ enum TicketStatus {
   in_progress
   resolved
   closed
+}
+
+enum TicketPriority {
+  low
+  medium
+  high
+  urgent
 }

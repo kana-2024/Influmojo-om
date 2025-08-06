@@ -200,6 +200,13 @@ const CreatorProfile = () => {
         setLoading(false);
         return;
       }
+
+      // Check if user is authenticated
+      if (!user || !user.id) {
+        console.log('🔍 User not authenticated, skipping creator profile load');
+        setLoading(false);
+        return;
+      }
       
       const response = await profileAPI.getCreatorProfile();
       console.log('✅ Creator profile response:', response);
@@ -236,6 +243,7 @@ const CreatorProfile = () => {
         setCreatorProfile(profileData);
       } else {
         console.error('❌ Creator profile failed:', response.error);
+        setError(response.error || 'Failed to load creator profile');
       }
     } catch (error) {
       console.error('❌ Error loading creator profile:', error);
@@ -243,6 +251,14 @@ const CreatorProfile = () => {
         message: error.message,
         stack: error.stack
       });
+      
+      // Check if error is due to authentication
+      if (error.message && (error.message.includes('No token provided') || error.message.includes('Authentication required'))) {
+        console.log('🔍 Authentication error detected, user needs to log in');
+        setError('Please log in to view your profile');
+        setLoading(false);
+        return;
+      }
       
       // Check if error is due to user type mismatch
       if (error.message && error.message.includes('User is not a creator')) {
@@ -263,6 +279,7 @@ const CreatorProfile = () => {
         portfolio_items: [],
         social_media_accounts: []
       });
+      setError('Failed to load profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -289,22 +306,23 @@ const CreatorProfile = () => {
       return;
     }
     
-    // Check if user is a brand and prevent creator profile loading (only for non-readonly mode)
-    if (userType === 'brand' && !readonly) {
-      console.log('🔍 CreatorProfile: User is a brand, should not be on CreatorProfile screen');
+    // If user is not authenticated, show error
+    if (!currentUser || !currentUser.id) {
+      console.log('🔍 CreatorProfile: User not authenticated');
+      setError('Please log in to view your profile');
       setLoading(false);
       return;
     }
     
-    // If user is null, try to get from Redux store
-    if (!currentUser) {
-      console.log('🔍 CreatorProfile: User is null, checking Redux store...');
-      // We'll still try to load the profile, but the API call will fail for brand users
-      // and show the error message we added
+    // Load creator profile if user is authenticated
+    if (currentUser && (!userType || userType === 'creator')) {
+      console.log('🔍 CreatorProfile: Loading creator profile for authenticated user');
+      loadCreatorProfile();
+    } else {
+      console.log('🔍 CreatorProfile: User is not a creator, skipping profile load');
+      setLoading(false);
     }
-    
-    loadCreatorProfile();
-  }, [user, readonly, creatorId, platform, loadCreatorProfile, loadCreatorProfileForBrand]);
+  }, [user, readonly, creatorId, platform, dispatch]);
 
   const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -445,6 +463,32 @@ const CreatorProfile = () => {
               <Text style={{ marginTop: 16, fontSize: 16, color: '#6B7280' }}>
                 Loading creator profile...
               </Text>
+            </View>
+          ) : error && !readonly ? (
+            // Show authentication error for non-readonly mode
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f4e8', padding: 20 }}>
+              <Ionicons name="lock-closed" size={64} color="#f37135" />
+              <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
+                Authentication Required
+              </Text>
+              <Text style={{ fontSize: 14, color: '#6B7280', marginTop: 8, textAlign: 'center', lineHeight: 20 }}>
+                {error}
+              </Text>
+              <TouchableOpacity 
+                style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 12, backgroundColor: '#f37135', borderRadius: 8 }}
+                onPress={() => {
+                  setError(null);
+                  loadCreatorProfile();
+                }}
+              >
+                <Text style={{ color: '#f8f4e8', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={{ marginTop: 12, paddingHorizontal: 20, paddingVertical: 12, backgroundColor: 'transparent', borderRadius: 8, borderWidth: 1, borderColor: '#f37135' }}
+                onPress={() => navigation.navigate('Login' as never)}
+              >
+                <Text style={{ color: '#f37135', fontSize: 16, fontWeight: '600' }}>Go to Login</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <>

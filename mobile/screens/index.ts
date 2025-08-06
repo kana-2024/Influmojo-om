@@ -17,11 +17,13 @@ export { default as MobileVerifiedScreen } from './MobileVerifiedScreen';
 export { default as CreatorPreferencesScreen } from './creator/CreatorPreferencesScreen';
 export { default as CreatePortfolioScreen } from './creator/CreatePortfolioScreen';
 export { default as CreatePackageScreen } from './creator/CreatePackageScreen';
+export { default as CreatorChatScreen } from './creator/CreatorChatScreen';
 
 // Brand-specific screens
 export { default as BrandPreferencesScreen } from './brand/BrandPreferencesScreen';
 export { default as CreateCampaignScreen } from './brand/CreateCampaignScreen';
 export { default as CreateProjectScreen } from './brand/CreateProjectScreen';
+export { default as BrandChatScreen } from './brand/BrandChatScreen';
 
 // Order screens
 export { default as OrdersScreen } from './OrdersScreen';

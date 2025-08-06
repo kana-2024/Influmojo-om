@@ -365,6 +365,16 @@ export const TicketStatus: {
 
 export type TicketStatus = (typeof TicketStatus)[keyof typeof TicketStatus]
 
+
+export const TicketPriority: {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  urgent: 'urgent'
+};
+
+export type TicketPriority = (typeof TicketPriority)[keyof typeof TicketPriority]
+
 }
 
 export type UserType = $Enums.UserType
@@ -454,6 +464,10 @@ export const OrderStatus: typeof $Enums.OrderStatus
 export type TicketStatus = $Enums.TicketStatus
 
 export const TicketStatus: typeof $Enums.TicketStatus
+
+export type TicketPriority = $Enums.TicketPriority
+
+export const TicketPriority: typeof $Enums.TicketPriority
 
 /**
  * ##  Prisma Client ʲˢ
@@ -34153,6 +34167,7 @@ export namespace Prisma {
     agent_id: bigint | null
     stream_channel_id: string | null
     status: $Enums.TicketStatus | null
+    priority: $Enums.TicketPriority | null
     created_at: Date | null
     updated_at: Date | null
   }
@@ -34163,6 +34178,7 @@ export namespace Prisma {
     agent_id: bigint | null
     stream_channel_id: string | null
     status: $Enums.TicketStatus | null
+    priority: $Enums.TicketPriority | null
     created_at: Date | null
     updated_at: Date | null
   }
@@ -34173,6 +34189,7 @@ export namespace Prisma {
     agent_id: number
     stream_channel_id: number
     status: number
+    priority: number
     created_at: number
     updated_at: number
     _all: number
@@ -34197,6 +34214,7 @@ export namespace Prisma {
     agent_id?: true
     stream_channel_id?: true
     status?: true
+    priority?: true
     created_at?: true
     updated_at?: true
   }
@@ -34207,6 +34225,7 @@ export namespace Prisma {
     agent_id?: true
     stream_channel_id?: true
     status?: true
+    priority?: true
     created_at?: true
     updated_at?: true
   }
@@ -34217,6 +34236,7 @@ export namespace Prisma {
     agent_id?: true
     stream_channel_id?: true
     status?: true
+    priority?: true
     created_at?: true
     updated_at?: true
     _all?: true
@@ -34314,6 +34334,7 @@ export namespace Prisma {
     agent_id: bigint
     stream_channel_id: string
     status: $Enums.TicketStatus
+    priority: $Enums.TicketPriority
     created_at: Date
     updated_at: Date
     _count: TicketCountAggregateOutputType | null
@@ -34343,6 +34364,7 @@ export namespace Prisma {
     agent_id?: boolean
     stream_channel_id?: boolean
     status?: boolean
+    priority?: boolean
     created_at?: boolean
     updated_at?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
@@ -34357,6 +34379,7 @@ export namespace Prisma {
     agent_id?: boolean
     stream_channel_id?: boolean
     status?: boolean
+    priority?: boolean
     created_at?: boolean
     updated_at?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
@@ -34369,6 +34392,7 @@ export namespace Prisma {
     agent_id?: boolean
     stream_channel_id?: boolean
     status?: boolean
+    priority?: boolean
     created_at?: boolean
     updated_at?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
@@ -34381,11 +34405,12 @@ export namespace Prisma {
     agent_id?: boolean
     stream_channel_id?: boolean
     status?: boolean
+    priority?: boolean
     created_at?: boolean
     updated_at?: boolean
   }
 
-  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "order_id" | "agent_id" | "stream_channel_id" | "status" | "created_at" | "updated_at", ExtArgs["result"]["ticket"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "order_id" | "agent_id" | "stream_channel_id" | "status" | "priority" | "created_at" | "updated_at", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     order?: boolean | OrderDefaultArgs<ExtArgs>
     agent?: boolean | UserDefaultArgs<ExtArgs>
@@ -34414,6 +34439,7 @@ export namespace Prisma {
       agent_id: bigint
       stream_channel_id: string
       status: $Enums.TicketStatus
+      priority: $Enums.TicketPriority
       created_at: Date
       updated_at: Date
     }, ExtArgs["result"]["ticket"]>
@@ -34847,6 +34873,7 @@ export namespace Prisma {
     readonly agent_id: FieldRef<"Ticket", 'BigInt'>
     readonly stream_channel_id: FieldRef<"Ticket", 'String'>
     readonly status: FieldRef<"Ticket", 'TicketStatus'>
+    readonly priority: FieldRef<"Ticket", 'TicketPriority'>
     readonly created_at: FieldRef<"Ticket", 'DateTime'>
     readonly updated_at: FieldRef<"Ticket", 'DateTime'>
   }
@@ -35743,6 +35770,7 @@ export namespace Prisma {
     agent_id: 'agent_id',
     stream_channel_id: 'stream_channel_id',
     status: 'status',
+    priority: 'priority',
     created_at: 'created_at',
     updated_at: 'updated_at'
   };
@@ -36192,6 +36220,20 @@ export namespace Prisma {
    * Reference to a field of type 'TicketStatus[]'
    */
   export type ListEnumTicketStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'TicketPriority'
+   */
+  export type EnumTicketPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketPriority'>
+    
+
+
+  /**
+   * Reference to a field of type 'TicketPriority[]'
+   */
+  export type ListEnumTicketPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketPriority[]'>
     
 
 
@@ -38642,6 +38684,7 @@ export namespace Prisma {
     agent_id?: BigIntFilter<"Ticket"> | bigint | number
     stream_channel_id?: StringFilter<"Ticket"> | string
     status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFilter<"Ticket"> | $Enums.TicketPriority
     created_at?: DateTimeFilter<"Ticket"> | Date | string
     updated_at?: DateTimeFilter<"Ticket"> | Date | string
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
@@ -38655,6 +38698,7 @@ export namespace Prisma {
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
     status?: SortOrder
+    priority?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
     order?: OrderOrderByWithRelationInput
@@ -38671,6 +38715,7 @@ export namespace Prisma {
     agent_id?: BigIntFilter<"Ticket"> | bigint | number
     stream_channel_id?: StringFilter<"Ticket"> | string
     status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFilter<"Ticket"> | $Enums.TicketPriority
     created_at?: DateTimeFilter<"Ticket"> | Date | string
     updated_at?: DateTimeFilter<"Ticket"> | Date | string
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
@@ -38684,6 +38729,7 @@ export namespace Prisma {
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
     status?: SortOrder
+    priority?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
     _count?: TicketCountOrderByAggregateInput
@@ -38702,6 +38748,7 @@ export namespace Prisma {
     agent_id?: BigIntWithAggregatesFilter<"Ticket"> | bigint | number
     stream_channel_id?: StringWithAggregatesFilter<"Ticket"> | string
     status?: EnumTicketStatusWithAggregatesFilter<"Ticket"> | $Enums.TicketStatus
+    priority?: EnumTicketPriorityWithAggregatesFilter<"Ticket"> | $Enums.TicketPriority
     created_at?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
   }
@@ -41385,6 +41432,7 @@ export namespace Prisma {
     id?: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
     order: OrderCreateNestedOneWithoutTicketInput
@@ -41398,6 +41446,7 @@ export namespace Prisma {
     agent_id: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
@@ -41407,6 +41456,7 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     order?: OrderUpdateOneRequiredWithoutTicketNestedInput
@@ -41420,6 +41470,7 @@ export namespace Prisma {
     agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
@@ -41431,6 +41482,7 @@ export namespace Prisma {
     agent_id: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
   }
@@ -41439,6 +41491,7 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41449,6 +41502,7 @@ export namespace Prisma {
     agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -43918,6 +43972,13 @@ export namespace Prisma {
     not?: NestedEnumTicketStatusFilter<$PrismaModel> | $Enums.TicketStatus
   }
 
+  export type EnumTicketPriorityFilter<$PrismaModel = never> = {
+    equals?: $Enums.TicketPriority | EnumTicketPriorityFieldRefInput<$PrismaModel>
+    in?: $Enums.TicketPriority[] | ListEnumTicketPriorityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TicketPriority[] | ListEnumTicketPriorityFieldRefInput<$PrismaModel>
+    not?: NestedEnumTicketPriorityFilter<$PrismaModel> | $Enums.TicketPriority
+  }
+
   export type OrderScalarRelationFilter = {
     is?: OrderWhereInput
     isNot?: OrderWhereInput
@@ -43929,6 +43990,7 @@ export namespace Prisma {
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
     status?: SortOrder
+    priority?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
   }
@@ -43945,6 +44007,7 @@ export namespace Prisma {
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
     status?: SortOrder
+    priority?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
   }
@@ -43955,6 +44018,7 @@ export namespace Prisma {
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
     status?: SortOrder
+    priority?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
   }
@@ -43973,6 +44037,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumTicketStatusFilter<$PrismaModel>
     _max?: NestedEnumTicketStatusFilter<$PrismaModel>
+  }
+
+  export type EnumTicketPriorityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TicketPriority | EnumTicketPriorityFieldRefInput<$PrismaModel>
+    in?: $Enums.TicketPriority[] | ListEnumTicketPriorityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TicketPriority[] | ListEnumTicketPriorityFieldRefInput<$PrismaModel>
+    not?: NestedEnumTicketPriorityWithAggregatesFilter<$PrismaModel> | $Enums.TicketPriority
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTicketPriorityFilter<$PrismaModel>
+    _max?: NestedEnumTicketPriorityFilter<$PrismaModel>
   }
 
   export type BrandProfileCreateNestedManyWithoutUserInput = {
@@ -46579,6 +46653,10 @@ export namespace Prisma {
     set?: $Enums.TicketStatus
   }
 
+  export type EnumTicketPriorityFieldUpdateOperationsInput = {
+    set?: $Enums.TicketPriority
+  }
+
   export type OrderUpdateOneRequiredWithoutTicketNestedInput = {
     create?: XOR<OrderCreateWithoutTicketInput, OrderUncheckedCreateWithoutTicketInput>
     connectOrCreate?: OrderCreateOrConnectWithoutTicketInput
@@ -47336,6 +47414,13 @@ export namespace Prisma {
     not?: NestedEnumTicketStatusFilter<$PrismaModel> | $Enums.TicketStatus
   }
 
+  export type NestedEnumTicketPriorityFilter<$PrismaModel = never> = {
+    equals?: $Enums.TicketPriority | EnumTicketPriorityFieldRefInput<$PrismaModel>
+    in?: $Enums.TicketPriority[] | ListEnumTicketPriorityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TicketPriority[] | ListEnumTicketPriorityFieldRefInput<$PrismaModel>
+    not?: NestedEnumTicketPriorityFilter<$PrismaModel> | $Enums.TicketPriority
+  }
+
   export type NestedEnumTicketStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.TicketStatus | EnumTicketStatusFieldRefInput<$PrismaModel>
     in?: $Enums.TicketStatus[] | ListEnumTicketStatusFieldRefInput<$PrismaModel>
@@ -47344,6 +47429,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumTicketStatusFilter<$PrismaModel>
     _max?: NestedEnumTicketStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTicketPriorityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TicketPriority | EnumTicketPriorityFieldRefInput<$PrismaModel>
+    in?: $Enums.TicketPriority[] | ListEnumTicketPriorityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TicketPriority[] | ListEnumTicketPriorityFieldRefInput<$PrismaModel>
+    not?: NestedEnumTicketPriorityWithAggregatesFilter<$PrismaModel> | $Enums.TicketPriority
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTicketPriorityFilter<$PrismaModel>
+    _max?: NestedEnumTicketPriorityFilter<$PrismaModel>
   }
 
   export type BrandProfileCreateWithoutUserInput = {
@@ -47921,6 +48016,7 @@ export namespace Prisma {
     id?: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
     order: OrderCreateNestedOneWithoutTicketInput
@@ -47932,6 +48028,7 @@ export namespace Prisma {
     order_id: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
@@ -48427,6 +48524,7 @@ export namespace Prisma {
     agent_id?: BigIntFilter<"Ticket"> | bigint | number
     stream_channel_id?: StringFilter<"Ticket"> | string
     status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFilter<"Ticket"> | $Enums.TicketPriority
     created_at?: DateTimeFilter<"Ticket"> | Date | string
     updated_at?: DateTimeFilter<"Ticket"> | Date | string
   }
@@ -53041,6 +53139,7 @@ export namespace Prisma {
     id?: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
     order: OrderCreateNestedOneWithoutTicketInput
@@ -53053,6 +53152,7 @@ export namespace Prisma {
     agent_id: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
   }
@@ -53160,6 +53260,7 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     order?: OrderUpdateOneRequiredWithoutTicketNestedInput
@@ -53172,6 +53273,7 @@ export namespace Prisma {
     agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -54927,6 +55029,7 @@ export namespace Prisma {
     id?: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
     agent: UserCreateNestedOneWithoutAssigned_ticketsInput
@@ -54938,6 +55041,7 @@ export namespace Prisma {
     agent_id: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
@@ -55174,6 +55278,7 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     agent?: UserUpdateOneRequiredWithoutAssigned_ticketsNestedInput
@@ -55185,6 +55290,7 @@ export namespace Prisma {
     agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
@@ -56430,6 +56536,7 @@ export namespace Prisma {
     order_id: bigint | number
     stream_channel_id: string
     status?: $Enums.TicketStatus
+    priority?: $Enums.TicketPriority
     created_at?: Date | string
     updated_at?: Date | string
   }
@@ -56989,6 +57096,7 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     order?: OrderUpdateOneRequiredWithoutTicketNestedInput
@@ -57000,6 +57108,7 @@ export namespace Prisma {
     order_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
@@ -57010,6 +57119,7 @@ export namespace Prisma {
     order_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
