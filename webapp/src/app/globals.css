@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS variables for design system */
+:root {
+  --color-primary: #f8f4e8;
+  --color-secondary: #f37135;
+  --color-tertiary: #20536d;
+  --color-text-dark: #1A1D1F;
+  --color-text-gray: #6B7280;
+  --color-border-light: #E5E7EB;
+  --color-background-light: #F5F5F5;
+  --color-chip-blue: #aad6f3;
+  --color-chip-yellow: #ffd365;
+  --color-placeholder: #9CA3AF;
+  --color-error: #EF4444;
+  --color-white: #FFFFFF;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--color-primary);
+  color: var(--color-text-dark);
+}
+
+/* Custom font classes - matching mobile app exactly */
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+.font-poppins-regular {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+}
+
+.font-poppins-medium {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+.font-poppins-semibold {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+}
+
+.font-poppins-bold {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
+
+.font-alice {
+  font-family: 'Alice', serif;
+}
+
+.font-alice-italic {
+  font-family: 'Alice', serif;
+  font-style: italic;
+}
+
+/* Custom component styles */
+@layer components {
+  .btn-primary {
+    @apply bg-secondary text-white font-poppins-medium px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all duration-200;
+  }
+  
+  .btn-secondary {
+    @apply border-2 border-secondary text-secondary font-poppins-medium px-6 py-3 rounded-lg hover:bg-secondary hover:text-white transition-all duration-200;
+  }
+  
+  .btn-tertiary {
+    @apply bg-tertiary text-white font-poppins-medium px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all duration-200;
+  }
+  
+  .card {
+    @apply bg-white rounded-2xl shadow-soft border border-borderLight;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border border-borderLight rounded-lg font-poppins text-body focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent;
+  }
+  
+  .chip-blue {
+    @apply bg-chipBlue text-textDark px-3 py-1 rounded-xl text-small font-poppins-semibold;
+  }
+  
+  .chip-yellow {
+    @apply bg-chipYellow text-textDark px-3 py-1 rounded-xl text-small font-poppins-semibold;
+  }
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-secondary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-tertiary);
+} 
