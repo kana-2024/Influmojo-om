@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { ApiResponse, PaginatedResponse, Agent, Ticket, Message, AgentStats, TicketStats } from '@/types';
+import { ApiResponse, PaginatedResponse, Agent, Ticket, Message, AgentStats, TicketStats, User } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api';
+// Use relative URL to leverage Next.js proxy
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -52,6 +53,18 @@ export const authAPI = {
     if (typeof window === 'undefined') return false;
     return !!localStorage.getItem('jwtToken');
   },
+
+  // Get current user information
+  getCurrentUser: async (): Promise<ApiResponse<{ user: User }>> => {
+    const response = await api.get('/auth/me');
+    return response.data;
+  },
+
+  // Agent email login
+  agentLogin: async (email: string, password: string): Promise<ApiResponse<{ token: string; user: User }>> => {
+    const response = await api.post('/auth/agent-login', { email, password });
+    return response.data;
+  },
 };
 
 // Agents API
@@ -85,6 +98,12 @@ export const agentsAPI = {
     const response = await api.get('/admin/agents/stats');
     return response.data;
   },
+
+  // Get agent's assigned tickets
+  getAssignedTickets: async (agentId: string): Promise<ApiResponse<{ tickets: Ticket[] }>> => {
+    const response = await api.get(`/admin/agents/${agentId}/tickets`);
+    return response.data;
+  },
 };
 
 // Tickets API
@@ -99,39 +118,66 @@ export const ticketsAPI = {
     const response = await api.get('/crm/tickets', { params });
     return response.data;
   },
-  
+
+  // Get tickets assigned to current agent
+  getMyTickets: async (): Promise<ApiResponse<{ tickets: Ticket[] }>> => {
+    const response = await api.get('/crm/tickets/my');
+    return response.data;
+  },
+
+  // Get ticket by ID
   getById: async (id: string): Promise<ApiResponse<{ ticket: Ticket }>> => {
     const response = await api.get(`/crm/tickets/${id}`);
     return response.data;
   },
-  
+
+  // Update ticket status
   updateStatus: async (id: string, status: string): Promise<ApiResponse<{ ticket: Ticket }>> => {
     const response = await api.put(`/crm/tickets/${id}/status`, { status });
     return response.data;
   },
-  
+
+  // Update ticket priority
   updatePriority: async (id: string, priority: string): Promise<ApiResponse<{ ticket: Ticket }>> => {
     const response = await api.put(`/crm/tickets/${id}/priority`, { priority });
     return response.data;
   },
-  
-  reassign: async (id: string, agent_id: string): Promise<ApiResponse<{ ticket: Ticket }>> => {
-    const response = await api.put(`/crm/tickets/${id}/reassign`, { agent_id });
+
+  // Assign ticket to agent
+  assignToAgent: async (ticketId: string, agentId: string): Promise<ApiResponse<{ ticket: Ticket }>> => {
+    const response = await api.put(`/crm/tickets/${ticketId}/assign`, { agentId });
     return response.data;
   },
-  
-  getMessages: async (id: string): Promise<ApiResponse<{ messages: Message[] }>> => {
-    const response = await api.get(`/crm/tickets/${id}/messages`);
+
+  // Get messages for a ticket
+  getMessages: async (ticketId: string, channelType?: 'brand_agent' | 'creator_agent'): Promise<ApiResponse<{ messages: Message[] }>> => {
+    const params: any = {};
+    if (channelType) {
+      params.channelType = channelType;
+    }
+    
+    const response = await api.get(`/crm/tickets/${ticketId}/messages`, { params });
     return response.data;
   },
-  
-  sendMessage: async (id: string, message: string): Promise<ApiResponse<{ message: Message }>> => {
-    const response = await api.post(`/crm/tickets/${id}/messages`, { message_text: message });
-    return response.data;
-  },
-  
-  getStats: async (): Promise<ApiResponse<TicketStats>> => {
-    const response = await api.get('/crm/tickets/stats');
+
+  // Send message to a ticket
+  sendMessage: async (ticketId: string, message: string, channelType: 'brand_agent' | 'creator_agent' = 'brand_agent'): Promise<ApiResponse<{ message: Message }>> => {
+    const body: any = { 
+      message_text: message, // Use message_text as the primary field
+      message: message, // Also include message field for backward compatibility
+      message_type: 'text', // Always send 'text' for admin dashboard
+      sender_role: 'agent', // Always send 'agent' for admin dashboard
+      channel_type: channelType // Use the specified channel type
+    };
+    
+    console.log('📤 Sending message from admin dashboard:', {
+      ticketId,
+      message,
+      channelType,
+      body
+    });
+    
+    const response = await api.post(`/crm/tickets/${ticketId}/messages`, body);
     return response.data;
   },
 };
@@ -142,22 +188,22 @@ export const streamChatAPI = {
     const response = await api.get('/chat/token');
     return response.data;
   },
-  
+
   joinTicketChannel: async (ticketId: string): Promise<ApiResponse<{ channelId: string }>> => {
     const response = await api.post(`/chat/tickets/${ticketId}/join`);
     return response.data;
   },
-  
+
   leaveTicketChannel: async (ticketId: string): Promise<ApiResponse<{ message: string }>> => {
     const response = await api.post(`/chat/tickets/${ticketId}/leave`);
     return response.data;
   },
-  
+
   getChannels: async (): Promise<ApiResponse<{ channels: any[] }>> => {
     const response = await api.get('/chat/channels');
     return response.data;
   },
-  
+
   getChannelInfo: async (channelId: string): Promise<ApiResponse<{ channel: any }>> => {
     const response = await api.get(`/chat/channels/${channelId}`);
     return response.data;

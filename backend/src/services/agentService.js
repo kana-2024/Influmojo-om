@@ -28,7 +28,7 @@ class AgentService {
         data: {
           email,
           name,
-          user_type: 'admin',
+          user_type: 'agent',
           status: 'active',
           email_verified: false, // Will need to verify email
           onboarding_completed: false
@@ -57,7 +57,7 @@ class AgentService {
   async getAllAgents() {
     try {
       const agents = await prisma.user.findMany({
-        where: { user_type: 'admin' },
+        where: { user_type: 'agent' },
         select: {
           id: true,
           email: true,
@@ -87,7 +87,7 @@ class AgentService {
       const agent = await prisma.user.findFirst({
         where: { 
           id: BigInt(agentId),
-          user_type: 'admin'
+          user_type: 'agent'
         },
         select: {
           id: true,
@@ -121,7 +121,7 @@ class AgentService {
       const agent = await prisma.user.update({
         where: { 
           id: BigInt(agentId),
-          user_type: 'admin' // Ensure we're only updating admin users
+          user_type: 'agent' // Ensure we're only updating agent users
         },
         data: { status },
         select: {
@@ -151,7 +151,7 @@ class AgentService {
       const agent = await prisma.user.update({
         where: { 
           id: BigInt(agentId),
-          user_type: 'admin'
+          user_type: 'agent'
         },
         data: { status: 'suspended' },
         select: {
@@ -179,26 +179,26 @@ class AgentService {
   async getAgentStats() {
     try {
       const totalAgents = await prisma.user.count({
-        where: { user_type: 'admin' }
+        where: { user_type: 'agent' }
       });
 
       const activeAgents = await prisma.user.count({
         where: { 
-          user_type: 'admin',
+          user_type: 'agent',
           status: 'active'
         }
       });
 
       const suspendedAgents = await prisma.user.count({
         where: { 
-          user_type: 'admin',
+          user_type: 'agent',
           status: 'suspended'
         }
       });
 
       const pendingAgents = await prisma.user.count({
         where: { 
-          user_type: 'admin',
+          user_type: 'agent',
           status: 'pending'
         }
       });

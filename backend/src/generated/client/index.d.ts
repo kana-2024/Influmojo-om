@@ -146,8 +146,8 @@ export namespace $Enums {
   export const UserType: {
   brand: 'brand',
   creator: 'creator',
-  admin: 'admin',
-  super_admin: 'super_admin'
+  super_admin: 'super_admin',
+  agent: 'agent'
 };
 
 export type UserType = (typeof UserType)[keyof typeof UserType]
@@ -160,6 +160,16 @@ export const UserStatus: {
 };
 
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
+
+
+export const AgentStatus: {
+  available: 'available',
+  busy: 'busy',
+  offline: 'offline',
+  away: 'away'
+};
+
+export type AgentStatus = (typeof AgentStatus)[keyof typeof AgentStatus]
 
 
 export const AvailabilityStatus: {
@@ -346,6 +356,8 @@ export type PortfolioMediaType = (typeof PortfolioMediaType)[keyof typeof Portfo
 
 export const OrderStatus: {
   pending: 'pending',
+  accepted: 'accepted',
+  rejected: 'rejected',
   confirmed: 'confirmed',
   in_progress: 'in_progress',
   completed: 'completed',
@@ -384,6 +396,10 @@ export const UserType: typeof $Enums.UserType
 export type UserStatus = $Enums.UserStatus
 
 export const UserStatus: typeof $Enums.UserStatus
+
+export type AgentStatus = $Enums.AgentStatus
+
+export const AgentStatus: typeof $Enums.AgentStatus
 
 export type AvailabilityStatus = $Enums.AvailabilityStatus
 
@@ -4009,6 +4025,9 @@ export namespace Prisma {
     onboarding_completed: boolean | null
     onboarding_step: number | null
     age: number | null
+    is_online: boolean | null
+    last_online_at: Date | null
+    agent_status: $Enums.AgentStatus | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -4034,6 +4053,9 @@ export namespace Prisma {
     onboarding_completed: boolean | null
     onboarding_step: number | null
     age: number | null
+    is_online: boolean | null
+    last_online_at: Date | null
+    agent_status: $Enums.AgentStatus | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -4059,6 +4081,9 @@ export namespace Prisma {
     onboarding_completed: number
     onboarding_step: number
     age: number
+    is_online: number
+    last_online_at: number
+    agent_status: number
     _all: number
   }
 
@@ -4098,6 +4123,9 @@ export namespace Prisma {
     onboarding_completed?: true
     onboarding_step?: true
     age?: true
+    is_online?: true
+    last_online_at?: true
+    agent_status?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -4123,6 +4151,9 @@ export namespace Prisma {
     onboarding_completed?: true
     onboarding_step?: true
     age?: true
+    is_online?: true
+    last_online_at?: true
+    agent_status?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -4148,6 +4179,9 @@ export namespace Prisma {
     onboarding_completed?: true
     onboarding_step?: true
     age?: true
+    is_online?: true
+    last_online_at?: true
+    agent_status?: true
     _all?: true
   }
 
@@ -4260,6 +4294,9 @@ export namespace Prisma {
     onboarding_completed: boolean
     onboarding_step: number | null
     age: number | null
+    is_online: boolean
+    last_online_at: Date | null
+    agent_status: $Enums.AgentStatus
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -4304,6 +4341,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: boolean
     age?: boolean
+    is_online?: boolean
+    last_online_at?: boolean
+    agent_status?: boolean
     brand_profiles?: boolean | User$brand_profilesArgs<ExtArgs>
     admin_channels?: boolean | User$admin_channelsArgs<ExtArgs>
     content_reviews?: boolean | User$content_reviewsArgs<ExtArgs>
@@ -4345,6 +4385,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: boolean
     age?: boolean
+    is_online?: boolean
+    last_online_at?: boolean
+    agent_status?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4370,6 +4413,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: boolean
     age?: boolean
+    is_online?: boolean
+    last_online_at?: boolean
+    agent_status?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -4395,9 +4441,12 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: boolean
     age?: boolean
+    is_online?: boolean
+    last_online_at?: boolean
+    agent_status?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password_hash" | "user_type" | "name" | "first_name" | "last_name" | "profile_image_url" | "cover_image_url" | "phone" | "timezone" | "language" | "email_verified" | "status" | "created_at" | "updated_at" | "last_login_at" | "auth_provider" | "phone_verified" | "onboarding_completed" | "onboarding_step" | "age", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password_hash" | "user_type" | "name" | "first_name" | "last_name" | "profile_image_url" | "cover_image_url" | "phone" | "timezone" | "language" | "email_verified" | "status" | "created_at" | "updated_at" | "last_login_at" | "auth_provider" | "phone_verified" | "onboarding_completed" | "onboarding_step" | "age" | "is_online" | "last_online_at" | "agent_status", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     brand_profiles?: boolean | User$brand_profilesArgs<ExtArgs>
     admin_channels?: boolean | User$admin_channelsArgs<ExtArgs>
@@ -4461,6 +4510,9 @@ export namespace Prisma {
       onboarding_completed: boolean
       onboarding_step: number | null
       age: number | null
+      is_online: boolean
+      last_online_at: Date | null
+      agent_status: $Enums.AgentStatus
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -4921,6 +4973,9 @@ export namespace Prisma {
     readonly onboarding_completed: FieldRef<"User", 'Boolean'>
     readonly onboarding_step: FieldRef<"User", 'Int'>
     readonly age: FieldRef<"User", 'Int'>
+    readonly is_online: FieldRef<"User", 'Boolean'>
+    readonly last_online_at: FieldRef<"User", 'DateTime'>
+    readonly agent_status: FieldRef<"User", 'AgentStatus'>
   }
     
 
@@ -18889,6 +18944,9 @@ export namespace Prisma {
     file_url: string | null
     file_name: string | null
     read_at: Date | null
+    sender_role: string | null
+    channel_type: string | null
+    target_tab: string | null
     created_at: Date | null
   }
 
@@ -18901,6 +18959,9 @@ export namespace Prisma {
     file_url: string | null
     file_name: string | null
     read_at: Date | null
+    sender_role: string | null
+    channel_type: string | null
+    target_tab: string | null
     created_at: Date | null
   }
 
@@ -18913,6 +18974,9 @@ export namespace Prisma {
     file_url: number
     file_name: number
     read_at: number
+    sender_role: number
+    channel_type: number
+    target_tab: number
     created_at: number
     _all: number
   }
@@ -18939,6 +19003,9 @@ export namespace Prisma {
     file_url?: true
     file_name?: true
     read_at?: true
+    sender_role?: true
+    channel_type?: true
+    target_tab?: true
     created_at?: true
   }
 
@@ -18951,6 +19018,9 @@ export namespace Prisma {
     file_url?: true
     file_name?: true
     read_at?: true
+    sender_role?: true
+    channel_type?: true
+    target_tab?: true
     created_at?: true
   }
 
@@ -18963,6 +19033,9 @@ export namespace Prisma {
     file_url?: true
     file_name?: true
     read_at?: true
+    sender_role?: true
+    channel_type?: true
+    target_tab?: true
     created_at?: true
     _all?: true
   }
@@ -19062,6 +19135,9 @@ export namespace Prisma {
     file_url: string | null
     file_name: string | null
     read_at: Date | null
+    sender_role: string | null
+    channel_type: string | null
+    target_tab: string | null
     created_at: Date
     _count: MessageCountAggregateOutputType | null
     _avg: MessageAvgAggregateOutputType | null
@@ -19093,6 +19169,9 @@ export namespace Prisma {
     file_url?: boolean
     file_name?: boolean
     read_at?: boolean
+    sender_role?: boolean
+    channel_type?: boolean
+    target_tab?: boolean
     created_at?: boolean
     ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
@@ -19107,6 +19186,9 @@ export namespace Prisma {
     file_url?: boolean
     file_name?: boolean
     read_at?: boolean
+    sender_role?: boolean
+    channel_type?: boolean
+    target_tab?: boolean
     created_at?: boolean
     ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
@@ -19121,6 +19203,9 @@ export namespace Prisma {
     file_url?: boolean
     file_name?: boolean
     read_at?: boolean
+    sender_role?: boolean
+    channel_type?: boolean
+    target_tab?: boolean
     created_at?: boolean
     ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
@@ -19135,10 +19220,13 @@ export namespace Prisma {
     file_url?: boolean
     file_name?: boolean
     read_at?: boolean
+    sender_role?: boolean
+    channel_type?: boolean
+    target_tab?: boolean
     created_at?: boolean
   }
 
-  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticket_id" | "sender_id" | "message_text" | "message_type" | "file_url" | "file_name" | "read_at" | "created_at", ExtArgs["result"]["message"]>
+  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticket_id" | "sender_id" | "message_text" | "message_type" | "file_url" | "file_name" | "read_at" | "sender_role" | "channel_type" | "target_tab" | "created_at", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     ticket?: boolean | TicketDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
@@ -19167,6 +19255,9 @@ export namespace Prisma {
       file_url: string | null
       file_name: string | null
       read_at: Date | null
+      sender_role: string | null
+      channel_type: string | null
+      target_tab: string | null
       created_at: Date
     }, ExtArgs["result"]["message"]>
     composites: {}
@@ -19601,6 +19692,9 @@ export namespace Prisma {
     readonly file_url: FieldRef<"Message", 'String'>
     readonly file_name: FieldRef<"Message", 'String'>
     readonly read_at: FieldRef<"Message", 'DateTime'>
+    readonly sender_role: FieldRef<"Message", 'String'>
+    readonly channel_type: FieldRef<"Message", 'String'>
+    readonly target_tab: FieldRef<"Message", 'String'>
     readonly created_at: FieldRef<"Message", 'DateTime'>
   }
     
@@ -34166,6 +34260,8 @@ export namespace Prisma {
     order_id: bigint | null
     agent_id: bigint | null
     stream_channel_id: string | null
+    brand_agent_channel: string | null
+    creator_agent_channel: string | null
     status: $Enums.TicketStatus | null
     priority: $Enums.TicketPriority | null
     created_at: Date | null
@@ -34177,6 +34273,8 @@ export namespace Prisma {
     order_id: bigint | null
     agent_id: bigint | null
     stream_channel_id: string | null
+    brand_agent_channel: string | null
+    creator_agent_channel: string | null
     status: $Enums.TicketStatus | null
     priority: $Enums.TicketPriority | null
     created_at: Date | null
@@ -34188,6 +34286,8 @@ export namespace Prisma {
     order_id: number
     agent_id: number
     stream_channel_id: number
+    brand_agent_channel: number
+    creator_agent_channel: number
     status: number
     priority: number
     created_at: number
@@ -34213,6 +34313,8 @@ export namespace Prisma {
     order_id?: true
     agent_id?: true
     stream_channel_id?: true
+    brand_agent_channel?: true
+    creator_agent_channel?: true
     status?: true
     priority?: true
     created_at?: true
@@ -34224,6 +34326,8 @@ export namespace Prisma {
     order_id?: true
     agent_id?: true
     stream_channel_id?: true
+    brand_agent_channel?: true
+    creator_agent_channel?: true
     status?: true
     priority?: true
     created_at?: true
@@ -34235,6 +34339,8 @@ export namespace Prisma {
     order_id?: true
     agent_id?: true
     stream_channel_id?: true
+    brand_agent_channel?: true
+    creator_agent_channel?: true
     status?: true
     priority?: true
     created_at?: true
@@ -34333,6 +34439,8 @@ export namespace Prisma {
     order_id: bigint
     agent_id: bigint
     stream_channel_id: string
+    brand_agent_channel: string | null
+    creator_agent_channel: string | null
     status: $Enums.TicketStatus
     priority: $Enums.TicketPriority
     created_at: Date
@@ -34363,6 +34471,8 @@ export namespace Prisma {
     order_id?: boolean
     agent_id?: boolean
     stream_channel_id?: boolean
+    brand_agent_channel?: boolean
+    creator_agent_channel?: boolean
     status?: boolean
     priority?: boolean
     created_at?: boolean
@@ -34378,6 +34488,8 @@ export namespace Prisma {
     order_id?: boolean
     agent_id?: boolean
     stream_channel_id?: boolean
+    brand_agent_channel?: boolean
+    creator_agent_channel?: boolean
     status?: boolean
     priority?: boolean
     created_at?: boolean
@@ -34391,6 +34503,8 @@ export namespace Prisma {
     order_id?: boolean
     agent_id?: boolean
     stream_channel_id?: boolean
+    brand_agent_channel?: boolean
+    creator_agent_channel?: boolean
     status?: boolean
     priority?: boolean
     created_at?: boolean
@@ -34404,13 +34518,15 @@ export namespace Prisma {
     order_id?: boolean
     agent_id?: boolean
     stream_channel_id?: boolean
+    brand_agent_channel?: boolean
+    creator_agent_channel?: boolean
     status?: boolean
     priority?: boolean
     created_at?: boolean
     updated_at?: boolean
   }
 
-  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "order_id" | "agent_id" | "stream_channel_id" | "status" | "priority" | "created_at" | "updated_at", ExtArgs["result"]["ticket"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "order_id" | "agent_id" | "stream_channel_id" | "brand_agent_channel" | "creator_agent_channel" | "status" | "priority" | "created_at" | "updated_at", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     order?: boolean | OrderDefaultArgs<ExtArgs>
     agent?: boolean | UserDefaultArgs<ExtArgs>
@@ -34438,6 +34554,8 @@ export namespace Prisma {
       order_id: bigint
       agent_id: bigint
       stream_channel_id: string
+      brand_agent_channel: string | null
+      creator_agent_channel: string | null
       status: $Enums.TicketStatus
       priority: $Enums.TicketPriority
       created_at: Date
@@ -34872,6 +34990,8 @@ export namespace Prisma {
     readonly order_id: FieldRef<"Ticket", 'BigInt'>
     readonly agent_id: FieldRef<"Ticket", 'BigInt'>
     readonly stream_channel_id: FieldRef<"Ticket", 'String'>
+    readonly brand_agent_channel: FieldRef<"Ticket", 'String'>
+    readonly creator_agent_channel: FieldRef<"Ticket", 'String'>
     readonly status: FieldRef<"Ticket", 'TicketStatus'>
     readonly priority: FieldRef<"Ticket", 'TicketPriority'>
     readonly created_at: FieldRef<"Ticket", 'DateTime'>
@@ -35350,7 +35470,10 @@ export namespace Prisma {
     phone_verified: 'phone_verified',
     onboarding_completed: 'onboarding_completed',
     onboarding_step: 'onboarding_step',
-    age: 'age'
+    age: 'age',
+    is_online: 'is_online',
+    last_online_at: 'last_online_at',
+    agent_status: 'agent_status'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -35574,6 +35697,9 @@ export namespace Prisma {
     file_url: 'file_url',
     file_name: 'file_name',
     read_at: 'read_at',
+    sender_role: 'sender_role',
+    channel_type: 'channel_type',
+    target_tab: 'target_tab',
     created_at: 'created_at'
   };
 
@@ -35769,6 +35895,8 @@ export namespace Prisma {
     order_id: 'order_id',
     agent_id: 'agent_id',
     stream_channel_id: 'stream_channel_id',
+    brand_agent_channel: 'brand_agent_channel',
+    creator_agent_channel: 'creator_agent_channel',
     status: 'status',
     priority: 'priority',
     created_at: 'created_at',
@@ -35912,6 +36040,20 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AgentStatus'
+   */
+  export type EnumAgentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AgentStatus[]'
+   */
+  export type ListEnumAgentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentStatus[]'>
     
 
 
@@ -36280,6 +36422,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFilter<"User"> | boolean
     onboarding_step?: IntNullableFilter<"User"> | number | null
     age?: IntNullableFilter<"User"> | number | null
+    is_online?: BoolFilter<"User"> | boolean
+    last_online_at?: DateTimeNullableFilter<"User"> | Date | string | null
+    agent_status?: EnumAgentStatusFilter<"User"> | $Enums.AgentStatus
     brand_profiles?: BrandProfileListRelationFilter
     admin_channels?: CollaborationChannelListRelationFilter
     content_reviews?: ContentReviewListRelationFilter
@@ -36320,6 +36465,9 @@ export namespace Prisma {
     onboarding_completed?: SortOrder
     onboarding_step?: SortOrderInput | SortOrder
     age?: SortOrderInput | SortOrder
+    is_online?: SortOrder
+    last_online_at?: SortOrderInput | SortOrder
+    agent_status?: SortOrder
     brand_profiles?: BrandProfileOrderByRelationAggregateInput
     admin_channels?: CollaborationChannelOrderByRelationAggregateInput
     content_reviews?: ContentReviewOrderByRelationAggregateInput
@@ -36363,6 +36511,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFilter<"User"> | boolean
     onboarding_step?: IntNullableFilter<"User"> | number | null
     age?: IntNullableFilter<"User"> | number | null
+    is_online?: BoolFilter<"User"> | boolean
+    last_online_at?: DateTimeNullableFilter<"User"> | Date | string | null
+    agent_status?: EnumAgentStatusFilter<"User"> | $Enums.AgentStatus
     brand_profiles?: BrandProfileListRelationFilter
     admin_channels?: CollaborationChannelListRelationFilter
     content_reviews?: ContentReviewListRelationFilter
@@ -36403,6 +36554,9 @@ export namespace Prisma {
     onboarding_completed?: SortOrder
     onboarding_step?: SortOrderInput | SortOrder
     age?: SortOrderInput | SortOrder
+    is_online?: SortOrder
+    last_online_at?: SortOrderInput | SortOrder
+    agent_status?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -36436,6 +36590,9 @@ export namespace Prisma {
     onboarding_completed?: BoolWithAggregatesFilter<"User"> | boolean
     onboarding_step?: IntNullableWithAggregatesFilter<"User"> | number | null
     age?: IntNullableWithAggregatesFilter<"User"> | number | null
+    is_online?: BoolWithAggregatesFilter<"User"> | boolean
+    last_online_at?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    agent_status?: EnumAgentStatusWithAggregatesFilter<"User"> | $Enums.AgentStatus
   }
 
   export type BrandProfileWhereInput = {
@@ -37628,6 +37785,9 @@ export namespace Prisma {
     file_url?: StringNullableFilter<"Message"> | string | null
     file_name?: StringNullableFilter<"Message"> | string | null
     read_at?: DateTimeNullableFilter<"Message"> | Date | string | null
+    sender_role?: StringNullableFilter<"Message"> | string | null
+    channel_type?: StringNullableFilter<"Message"> | string | null
+    target_tab?: StringNullableFilter<"Message"> | string | null
     created_at?: DateTimeFilter<"Message"> | Date | string
     ticket?: XOR<TicketScalarRelationFilter, TicketWhereInput>
     sender?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -37642,6 +37802,9 @@ export namespace Prisma {
     file_url?: SortOrderInput | SortOrder
     file_name?: SortOrderInput | SortOrder
     read_at?: SortOrderInput | SortOrder
+    sender_role?: SortOrderInput | SortOrder
+    channel_type?: SortOrderInput | SortOrder
+    target_tab?: SortOrderInput | SortOrder
     created_at?: SortOrder
     ticket?: TicketOrderByWithRelationInput
     sender?: UserOrderByWithRelationInput
@@ -37659,6 +37822,9 @@ export namespace Prisma {
     file_url?: StringNullableFilter<"Message"> | string | null
     file_name?: StringNullableFilter<"Message"> | string | null
     read_at?: DateTimeNullableFilter<"Message"> | Date | string | null
+    sender_role?: StringNullableFilter<"Message"> | string | null
+    channel_type?: StringNullableFilter<"Message"> | string | null
+    target_tab?: StringNullableFilter<"Message"> | string | null
     created_at?: DateTimeFilter<"Message"> | Date | string
     ticket?: XOR<TicketScalarRelationFilter, TicketWhereInput>
     sender?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -37673,6 +37839,9 @@ export namespace Prisma {
     file_url?: SortOrderInput | SortOrder
     file_name?: SortOrderInput | SortOrder
     read_at?: SortOrderInput | SortOrder
+    sender_role?: SortOrderInput | SortOrder
+    channel_type?: SortOrderInput | SortOrder
+    target_tab?: SortOrderInput | SortOrder
     created_at?: SortOrder
     _count?: MessageCountOrderByAggregateInput
     _avg?: MessageAvgOrderByAggregateInput
@@ -37693,6 +37862,9 @@ export namespace Prisma {
     file_url?: StringNullableWithAggregatesFilter<"Message"> | string | null
     file_name?: StringNullableWithAggregatesFilter<"Message"> | string | null
     read_at?: DateTimeNullableWithAggregatesFilter<"Message"> | Date | string | null
+    sender_role?: StringNullableWithAggregatesFilter<"Message"> | string | null
+    channel_type?: StringNullableWithAggregatesFilter<"Message"> | string | null
+    target_tab?: StringNullableWithAggregatesFilter<"Message"> | string | null
     created_at?: DateTimeWithAggregatesFilter<"Message"> | Date | string
   }
 
@@ -38683,6 +38855,8 @@ export namespace Prisma {
     order_id?: BigIntFilter<"Ticket"> | bigint | number
     agent_id?: BigIntFilter<"Ticket"> | bigint | number
     stream_channel_id?: StringFilter<"Ticket"> | string
+    brand_agent_channel?: StringNullableFilter<"Ticket"> | string | null
+    creator_agent_channel?: StringNullableFilter<"Ticket"> | string | null
     status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
     priority?: EnumTicketPriorityFilter<"Ticket"> | $Enums.TicketPriority
     created_at?: DateTimeFilter<"Ticket"> | Date | string
@@ -38697,6 +38871,8 @@ export namespace Prisma {
     order_id?: SortOrder
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
+    brand_agent_channel?: SortOrderInput | SortOrder
+    creator_agent_channel?: SortOrderInput | SortOrder
     status?: SortOrder
     priority?: SortOrder
     created_at?: SortOrder
@@ -38714,6 +38890,8 @@ export namespace Prisma {
     NOT?: TicketWhereInput | TicketWhereInput[]
     agent_id?: BigIntFilter<"Ticket"> | bigint | number
     stream_channel_id?: StringFilter<"Ticket"> | string
+    brand_agent_channel?: StringNullableFilter<"Ticket"> | string | null
+    creator_agent_channel?: StringNullableFilter<"Ticket"> | string | null
     status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
     priority?: EnumTicketPriorityFilter<"Ticket"> | $Enums.TicketPriority
     created_at?: DateTimeFilter<"Ticket"> | Date | string
@@ -38728,6 +38906,8 @@ export namespace Prisma {
     order_id?: SortOrder
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
+    brand_agent_channel?: SortOrderInput | SortOrder
+    creator_agent_channel?: SortOrderInput | SortOrder
     status?: SortOrder
     priority?: SortOrder
     created_at?: SortOrder
@@ -38747,6 +38927,8 @@ export namespace Prisma {
     order_id?: BigIntWithAggregatesFilter<"Ticket"> | bigint | number
     agent_id?: BigIntWithAggregatesFilter<"Ticket"> | bigint | number
     stream_channel_id?: StringWithAggregatesFilter<"Ticket"> | string
+    brand_agent_channel?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    creator_agent_channel?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     status?: EnumTicketStatusWithAggregatesFilter<"Ticket"> | $Enums.TicketStatus
     priority?: EnumTicketPriorityWithAggregatesFilter<"Ticket"> | $Enums.TicketPriority
     created_at?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
@@ -38776,6 +38958,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -38816,6 +39001,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -38856,6 +39044,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -38896,6 +39087,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -38936,6 +39130,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
   }
 
   export type UserUpdateManyMutationInput = {
@@ -38961,6 +39158,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -38986,6 +39186,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   }
 
   export type BrandProfileCreateInput = {
@@ -40321,6 +40524,9 @@ export namespace Prisma {
     file_url?: string | null
     file_name?: string | null
     read_at?: Date | string | null
+    sender_role?: string | null
+    channel_type?: string | null
+    target_tab?: string | null
     created_at?: Date | string
     ticket: TicketCreateNestedOneWithoutMessagesInput
     sender: UserCreateNestedOneWithoutSent_messagesInput
@@ -40335,6 +40541,9 @@ export namespace Prisma {
     file_url?: string | null
     file_name?: string | null
     read_at?: Date | string | null
+    sender_role?: string | null
+    channel_type?: string | null
+    target_tab?: string | null
     created_at?: Date | string
   }
 
@@ -40345,6 +40554,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     ticket?: TicketUpdateOneRequiredWithoutMessagesNestedInput
     sender?: UserUpdateOneRequiredWithoutSent_messagesNestedInput
@@ -40359,6 +40571,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -40371,6 +40586,9 @@ export namespace Prisma {
     file_url?: string | null
     file_name?: string | null
     read_at?: Date | string | null
+    sender_role?: string | null
+    channel_type?: string | null
+    target_tab?: string | null
     created_at?: Date | string
   }
 
@@ -40381,6 +40599,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -40393,6 +40614,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -41431,6 +41655,8 @@ export namespace Prisma {
   export type TicketCreateInput = {
     id?: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -41445,6 +41671,8 @@ export namespace Prisma {
     order_id: bigint | number
     agent_id: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -41455,6 +41683,8 @@ export namespace Prisma {
   export type TicketUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41469,6 +41699,8 @@ export namespace Prisma {
     order_id?: BigIntFieldUpdateOperationsInput | bigint | number
     agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41481,6 +41713,8 @@ export namespace Prisma {
     order_id: bigint | number
     agent_id: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -41490,6 +41724,8 @@ export namespace Prisma {
   export type TicketUpdateManyMutationInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41501,6 +41737,8 @@ export namespace Prisma {
     order_id?: BigIntFieldUpdateOperationsInput | bigint | number
     agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41598,6 +41836,13 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type EnumAgentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentStatus | EnumAgentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentStatus[] | ListEnumAgentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentStatus[] | ListEnumAgentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentStatusFilter<$PrismaModel> | $Enums.AgentStatus
   }
 
   export type BrandProfileListRelationFilter = {
@@ -41743,6 +41988,9 @@ export namespace Prisma {
     onboarding_completed?: SortOrder
     onboarding_step?: SortOrder
     age?: SortOrder
+    is_online?: SortOrder
+    last_online_at?: SortOrder
+    agent_status?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -41774,6 +42022,9 @@ export namespace Prisma {
     onboarding_completed?: SortOrder
     onboarding_step?: SortOrder
     age?: SortOrder
+    is_online?: SortOrder
+    last_online_at?: SortOrder
+    agent_status?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -41799,6 +42050,9 @@ export namespace Prisma {
     onboarding_completed?: SortOrder
     onboarding_step?: SortOrder
     age?: SortOrder
+    is_online?: SortOrder
+    last_online_at?: SortOrder
+    agent_status?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -41929,6 +42183,16 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type EnumAgentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentStatus | EnumAgentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentStatus[] | ListEnumAgentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentStatus[] | ListEnumAgentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentStatusWithAggregatesFilter<$PrismaModel> | $Enums.AgentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAgentStatusFilter<$PrismaModel>
+    _max?: NestedEnumAgentStatusFilter<$PrismaModel>
   }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -43155,6 +43419,9 @@ export namespace Prisma {
     file_url?: SortOrder
     file_name?: SortOrder
     read_at?: SortOrder
+    sender_role?: SortOrder
+    channel_type?: SortOrder
+    target_tab?: SortOrder
     created_at?: SortOrder
   }
 
@@ -43173,6 +43440,9 @@ export namespace Prisma {
     file_url?: SortOrder
     file_name?: SortOrder
     read_at?: SortOrder
+    sender_role?: SortOrder
+    channel_type?: SortOrder
+    target_tab?: SortOrder
     created_at?: SortOrder
   }
 
@@ -43185,6 +43455,9 @@ export namespace Prisma {
     file_url?: SortOrder
     file_name?: SortOrder
     read_at?: SortOrder
+    sender_role?: SortOrder
+    channel_type?: SortOrder
+    target_tab?: SortOrder
     created_at?: SortOrder
   }
 
@@ -43989,6 +44262,8 @@ export namespace Prisma {
     order_id?: SortOrder
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
+    brand_agent_channel?: SortOrder
+    creator_agent_channel?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     created_at?: SortOrder
@@ -44006,6 +44281,8 @@ export namespace Prisma {
     order_id?: SortOrder
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
+    brand_agent_channel?: SortOrder
+    creator_agent_channel?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     created_at?: SortOrder
@@ -44017,6 +44294,8 @@ export namespace Prisma {
     order_id?: SortOrder
     agent_id?: SortOrder
     stream_channel_id?: SortOrder
+    brand_agent_channel?: SortOrder
+    creator_agent_channel?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     created_at?: SortOrder
@@ -44299,6 +44578,10 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type EnumAgentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.AgentStatus
   }
 
   export type BrandProfileUpdateManyWithoutUserNestedInput = {
@@ -46792,6 +47075,13 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedEnumAgentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentStatus | EnumAgentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentStatus[] | ListEnumAgentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentStatus[] | ListEnumAgentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentStatusFilter<$PrismaModel> | $Enums.AgentStatus
+  }
+
   export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
@@ -46945,6 +47235,16 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumAgentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentStatus | EnumAgentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentStatus[] | ListEnumAgentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentStatus[] | ListEnumAgentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentStatusWithAggregatesFilter<$PrismaModel> | $Enums.AgentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAgentStatusFilter<$PrismaModel>
+    _max?: NestedEnumAgentStatusFilter<$PrismaModel>
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -47677,6 +47977,9 @@ export namespace Prisma {
     file_url?: string | null
     file_name?: string | null
     read_at?: Date | string | null
+    sender_role?: string | null
+    channel_type?: string | null
+    target_tab?: string | null
     created_at?: Date | string
     ticket: TicketCreateNestedOneWithoutMessagesInput
   }
@@ -47689,6 +47992,9 @@ export namespace Prisma {
     file_url?: string | null
     file_name?: string | null
     read_at?: Date | string | null
+    sender_role?: string | null
+    channel_type?: string | null
+    target_tab?: string | null
     created_at?: Date | string
   }
 
@@ -48015,6 +48321,8 @@ export namespace Prisma {
   export type TicketCreateWithoutAgentInput = {
     id?: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -48027,6 +48335,8 @@ export namespace Prisma {
     id?: bigint | number
     order_id: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -48280,6 +48590,9 @@ export namespace Prisma {
     file_url?: StringNullableFilter<"Message"> | string | null
     file_name?: StringNullableFilter<"Message"> | string | null
     read_at?: DateTimeNullableFilter<"Message"> | Date | string | null
+    sender_role?: StringNullableFilter<"Message"> | string | null
+    channel_type?: StringNullableFilter<"Message"> | string | null
+    target_tab?: StringNullableFilter<"Message"> | string | null
     created_at?: DateTimeFilter<"Message"> | Date | string
   }
 
@@ -48523,6 +48836,8 @@ export namespace Prisma {
     order_id?: BigIntFilter<"Ticket"> | bigint | number
     agent_id?: BigIntFilter<"Ticket"> | bigint | number
     stream_channel_id?: StringFilter<"Ticket"> | string
+    brand_agent_channel?: StringNullableFilter<"Ticket"> | string | null
+    creator_agent_channel?: StringNullableFilter<"Ticket"> | string | null
     status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
     priority?: EnumTicketPriorityFilter<"Ticket"> | $Enums.TicketPriority
     created_at?: DateTimeFilter<"Ticket"> | Date | string
@@ -48552,6 +48867,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
     admin_content_submissions?: ContentSubmissionCreateNestedManyWithoutAdminInput
@@ -48591,6 +48909,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
     admin_content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutAdminInput
@@ -48884,6 +49205,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
     admin_content_submissions?: ContentSubmissionUpdateManyWithoutAdminNestedInput
@@ -48923,6 +49247,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
     admin_content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutAdminNestedInput
@@ -49231,6 +49558,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -49270,6 +49600,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -49617,6 +49950,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -49656,6 +49992,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -51454,6 +51793,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -51493,6 +51835,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -51639,6 +51984,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -51678,6 +52026,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -51809,6 +52160,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     admin_content_submissions?: ContentSubmissionCreateNestedManyWithoutAdminInput
@@ -51848,6 +52202,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     admin_content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutAdminInput
@@ -51952,6 +52309,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     admin_content_submissions?: ContentSubmissionUpdateManyWithoutAdminNestedInput
@@ -51991,6 +52351,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     admin_content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutAdminNestedInput
@@ -52030,6 +52393,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -52069,6 +52435,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -52193,6 +52562,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -52232,6 +52604,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -52276,6 +52651,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -52315,6 +52693,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -52370,6 +52751,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -52409,6 +52793,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -52551,6 +52938,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -52590,6 +52980,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -52640,6 +53033,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -52679,6 +53075,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -53138,6 +53537,8 @@ export namespace Prisma {
   export type TicketCreateWithoutMessagesInput = {
     id?: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -53151,6 +53552,8 @@ export namespace Prisma {
     order_id: bigint | number
     agent_id: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -53185,6 +53588,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -53224,6 +53630,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -53259,6 +53668,8 @@ export namespace Prisma {
   export type TicketUpdateWithoutMessagesInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -53272,6 +53683,8 @@ export namespace Prisma {
     order_id?: BigIntFieldUpdateOperationsInput | bigint | number
     agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -53312,6 +53725,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -53351,6 +53767,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -53433,6 +53852,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -53472,6 +53894,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -53516,6 +53941,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -53555,6 +53983,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -53659,6 +54090,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -53698,6 +54132,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -53748,6 +54185,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -53787,6 +54227,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -54161,6 +54604,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -54200,6 +54646,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -54255,6 +54704,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -54294,6 +54746,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -54333,6 +54788,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
     admin_content_submissions?: ContentSubmissionCreateNestedManyWithoutAdminInput
@@ -54372,6 +54830,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
     admin_content_submissions?: ContentSubmissionUncheckedCreateNestedManyWithoutAdminInput
@@ -54470,6 +54931,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
     admin_content_submissions?: ContentSubmissionUpdateManyWithoutAdminNestedInput
@@ -54509,6 +54973,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
     admin_content_submissions?: ContentSubmissionUncheckedUpdateManyWithoutAdminNestedInput
@@ -55028,6 +55495,8 @@ export namespace Prisma {
   export type TicketCreateWithoutOrderInput = {
     id?: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -55040,6 +55509,8 @@ export namespace Prisma {
     id?: bigint | number
     agent_id: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -55277,6 +55748,8 @@ export namespace Prisma {
   export type TicketUpdateWithoutOrderInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -55289,6 +55762,8 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     agent_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -55319,6 +55794,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -55358,6 +55836,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -55413,6 +55894,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -55452,6 +55936,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -55560,6 +56047,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -55599,6 +56089,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -55729,6 +56222,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -55768,6 +56264,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -56112,6 +56611,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewCreateNestedManyWithoutReviewerInput
@@ -56151,6 +56653,9 @@ export namespace Prisma {
     onboarding_completed?: boolean
     onboarding_step?: number | null
     age?: number | null
+    is_online?: boolean
+    last_online_at?: Date | string | null
+    agent_status?: $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedCreateNestedManyWithoutUserInput
     admin_channels?: CollaborationChannelUncheckedCreateNestedManyWithoutAdminInput
     content_reviews?: ContentReviewUncheckedCreateNestedManyWithoutReviewerInput
@@ -56179,6 +56684,9 @@ export namespace Prisma {
     file_url?: string | null
     file_name?: string | null
     read_at?: Date | string | null
+    sender_role?: string | null
+    channel_type?: string | null
+    target_tab?: string | null
     created_at?: Date | string
     sender: UserCreateNestedOneWithoutSent_messagesInput
   }
@@ -56191,6 +56699,9 @@ export namespace Prisma {
     file_url?: string | null
     file_name?: string | null
     read_at?: Date | string | null
+    sender_role?: string | null
+    channel_type?: string | null
+    target_tab?: string | null
     created_at?: Date | string
   }
 
@@ -56281,6 +56792,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUpdateManyWithoutReviewerNestedInput
@@ -56320,6 +56834,9 @@ export namespace Prisma {
     onboarding_completed?: BoolFieldUpdateOperationsInput | boolean
     onboarding_step?: NullableIntFieldUpdateOperationsInput | number | null
     age?: NullableIntFieldUpdateOperationsInput | number | null
+    is_online?: BoolFieldUpdateOperationsInput | boolean
+    last_online_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    agent_status?: EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
     brand_profiles?: BrandProfileUncheckedUpdateManyWithoutUserNestedInput
     admin_channels?: CollaborationChannelUncheckedUpdateManyWithoutAdminNestedInput
     content_reviews?: ContentReviewUncheckedUpdateManyWithoutReviewerNestedInput
@@ -56413,6 +56930,9 @@ export namespace Prisma {
     file_url?: string | null
     file_name?: string | null
     read_at?: Date | string | null
+    sender_role?: string | null
+    channel_type?: string | null
+    target_tab?: string | null
     created_at?: Date | string
   }
 
@@ -56535,6 +57055,8 @@ export namespace Prisma {
     id?: bigint | number
     order_id: bigint | number
     stream_channel_id: string
+    brand_agent_channel?: string | null
+    creator_agent_channel?: string | null
     status?: $Enums.TicketStatus
     priority?: $Enums.TicketPriority
     created_at?: Date | string
@@ -56721,6 +57243,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     ticket?: TicketUpdateOneRequiredWithoutMessagesNestedInput
   }
@@ -56733,6 +57258,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -56744,6 +57272,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -57095,6 +57626,8 @@ export namespace Prisma {
   export type TicketUpdateWithoutAgentInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -57107,6 +57640,8 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     order_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -57118,6 +57653,8 @@ export namespace Prisma {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     order_id?: BigIntFieldUpdateOperationsInput | bigint | number
     stream_channel_id?: StringFieldUpdateOperationsInput | string
+    brand_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
+    creator_agent_channel?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -58617,6 +59154,9 @@ export namespace Prisma {
     file_url?: string | null
     file_name?: string | null
     read_at?: Date | string | null
+    sender_role?: string | null
+    channel_type?: string | null
+    target_tab?: string | null
     created_at?: Date | string
   }
 
@@ -58627,6 +59167,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     sender?: UserUpdateOneRequiredWithoutSent_messagesNestedInput
   }
@@ -58639,6 +59182,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -58650,6 +59196,9 @@ export namespace Prisma {
     file_url?: NullableStringFieldUpdateOperationsInput | string | null
     file_name?: NullableStringFieldUpdateOperationsInput | string | null
     read_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sender_role?: NullableStringFieldUpdateOperationsInput | string | null
+    channel_type?: NullableStringFieldUpdateOperationsInput | string | null
+    target_tab?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

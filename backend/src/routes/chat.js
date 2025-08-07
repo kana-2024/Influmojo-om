@@ -34,15 +34,41 @@ router.get('/token', authenticateJWT, asyncHandler(async (req, res) => {
     
     console.log(`🔑 Generating StreamChat token for user: ${userId}`);
     
+    // Check if StreamChat environment variables are configured
+    if (!process.env.STREAM_API_KEY) {
+      console.error('❌ STREAM_API_KEY not configured');
+      return res.status(500).json({
+        error: 'StreamChat not configured',
+        message: 'StreamChat API key is not configured on the server'
+      });
+    }
+    
+    if (!process.env.STREAM_API_SECRET) {
+      console.error('❌ STREAM_API_SECRET not configured');
+      return res.status(500).json({
+        error: 'StreamChat not configured',
+        message: 'StreamChat API secret is not configured on the server'
+      });
+    }
+    
     // Create or get user in StreamChat
-    await streamService.createOrGetUser(userId, {
-      name: user.name || userId,
-      image: user.profile_image_url || null,
-      role: user.user_type === 'admin' ? 'admin' : 'user'
-    });
+    try {
+      await streamService.createOrGetUser(userId, {
+        name: user.name || userId,
+        image: user.profile_image_url || null,
+        role: user.user_type === 'agent' ? 'admin' : 'user'
+      });
+    } catch (userError) {
+      console.error('❌ Error creating/getting user in StreamChat:', userError);
+      // Continue with token generation even if user creation fails
+    }
     
     // Generate token
     const token = await streamService.generateUserToken(userId);
+    
+    if (!token) {
+      throw new Error('Failed to generate StreamChat token');
+    }
     
     res.json({
       success: true,
@@ -257,7 +283,7 @@ router.get('/channels/:channelId', authenticateJWT, asyncHandler(async (req, res
     
     // Check if user is a member of this channel
     const isMember = channelInfo.members.some(member => member.user_id === userId);
-    if (!isMember && user.user_type !== 'admin') {
+    if (!isMember && user.user_type !== 'agent') {
       return res.status(403).json({
         error: 'Access denied',
         message: 'You do not have permission to access this channel'
@@ -280,13 +306,13 @@ router.get('/channels/:channelId', authenticateJWT, asyncHandler(async (req, res
 
 // Helper function to check user permission for ticket
 async function checkUserPermission(user, ticket) {
-  // Admin users can join any ticket
-  if (user.user_type === 'admin') {
+  // Agent users can join any ticket
+  if (user.user_type === 'agent') {
     return true;
   }
   
-  // Agent users can only join their assigned tickets
-  if (user.user_type === 'admin' && ticket.agent_id === user.id) {
+  // Super admin users can join any ticket
+  if (user.user_type === 'super_admin') {
     return true;
   }
   

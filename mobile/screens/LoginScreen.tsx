@@ -118,6 +118,8 @@ export default function LoginScreen({ navigation }: any) {
     const userType = user?.userType || user?.user_type;
     if (userType === 'brand') {
       navigation.navigate('BrandProfile');
+    } else if (userType === 'agent' || userType === 'super_admin') {
+      navigation.navigate('AgentDashboard');
     } else {
       navigation.navigate('CreatorProfile');
     }

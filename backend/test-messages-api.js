@@ -34,8 +34,25 @@ async function testMessagesAPI() {
     console.log('🔍 Testing crmService.getTicketMessages:');
     const messages = await crmService.getTicketMessages(ticket.id.toString());
     
-    console.log('📋 Service Response:');
+    console.log('📋 Service Response (all messages - backward compatibility):');
     console.log(JSON.stringify(messages, null, 2));
+    console.log('');
+
+    // Test role-based filtering
+    console.log('🔍 Testing role-based message filtering:');
+    
+    // Test as agent (should see all messages)
+    const agentMessages = await crmService.getTicketMessages(ticket.id.toString(), '1', 'agent');
+    console.log(`📋 Agent view: ${agentMessages.length} messages`);
+    
+    // Test as brand (should only see agent messages and own messages)
+    const brandMessages = await crmService.getTicketMessages(ticket.id.toString(), ticket.order?.brand?.user?.id?.toString(), 'brand');
+    console.log(`📋 Brand view: ${brandMessages.length} messages`);
+    
+    // Test as creator (should only see agent messages and own messages)
+    const creatorMessages = await crmService.getTicketMessages(ticket.id.toString(), ticket.order?.creator?.user?.id?.toString(), 'creator');
+    console.log(`📋 Creator view: ${creatorMessages.length} messages`);
+    
     console.log('');
 
     // Simulate the API response structure

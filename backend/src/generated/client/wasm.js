@@ -142,7 +142,10 @@ exports.Prisma.UserScalarFieldEnum = {
   phone_verified: 'phone_verified',
   onboarding_completed: 'onboarding_completed',
   onboarding_step: 'onboarding_step',
-  age: 'age'
+  age: 'age',
+  is_online: 'is_online',
+  last_online_at: 'last_online_at',
+  agent_status: 'agent_status'
 };
 
 exports.Prisma.BrandProfileScalarFieldEnum = {
@@ -333,6 +336,9 @@ exports.Prisma.MessageScalarFieldEnum = {
   file_url: 'file_url',
   file_name: 'file_name',
   read_at: 'read_at',
+  sender_role: 'sender_role',
+  channel_type: 'channel_type',
+  target_tab: 'target_tab',
   created_at: 'created_at'
 };
 
@@ -489,6 +495,8 @@ exports.Prisma.TicketScalarFieldEnum = {
   order_id: 'order_id',
   agent_id: 'agent_id',
   stream_channel_id: 'stream_channel_id',
+  brand_agent_channel: 'brand_agent_channel',
+  creator_agent_channel: 'creator_agent_channel',
   status: 'status',
   priority: 'priority',
   created_at: 'created_at',
@@ -523,14 +531,21 @@ exports.Prisma.JsonNullValueFilter = {
 exports.UserType = exports.$Enums.UserType = {
   brand: 'brand',
   creator: 'creator',
-  admin: 'admin',
-  super_admin: 'super_admin'
+  super_admin: 'super_admin',
+  agent: 'agent'
 };
 
 exports.UserStatus = exports.$Enums.UserStatus = {
   active: 'active',
   suspended: 'suspended',
   pending: 'pending'
+};
+
+exports.AgentStatus = exports.$Enums.AgentStatus = {
+  available: 'available',
+  busy: 'busy',
+  offline: 'offline',
+  away: 'away'
 };
 
 exports.AvailabilityStatus = exports.$Enums.AvailabilityStatus = {
@@ -651,6 +666,8 @@ exports.PackageType = exports.$Enums.PackageType = {
 
 exports.OrderStatus = exports.$Enums.OrderStatus = {
   pending: 'pending',
+  accepted: 'accepted',
+  rejected: 'rejected',
   confirmed: 'confirmed',
   in_progress: 'in_progress',
   completed: 'completed',

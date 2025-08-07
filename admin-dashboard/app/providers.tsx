@@ -17,6 +17,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   }));
 
   const [streamApiKey, setStreamApiKey] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
 
   // Get StreamChat API key on component mount and when authentication changes
   useEffect(() => {
@@ -26,6 +27,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         const token = localStorage.getItem('jwtToken');
         if (!token) {
           console.log('⚠️ No JWT token found, skipping StreamChat initialization');
+          setStreamApiKey('');
+          setIsLoading(false);
           return;
         }
 
@@ -36,10 +39,14 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           console.log('✅ StreamChat API key retrieved successfully');
         } else {
           console.error('❌ Failed to get StreamChat API key:', response.message);
+          setStreamApiKey('');
         }
       } catch (error) {
         console.error('❌ Failed to get StreamChat API key:', error);
+        setStreamApiKey('');
         // Don't show error toast here as it might be expected when not authenticated
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -61,6 +68,18 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+        </div>
+        <Toaster position="top-right" />
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -5,40 +5,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('../generated/client');
 const asyncHandler = require('../utils/asyncHandler');
+const { authenticateJWT } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 const prisma = new PrismaClient();
-
-// Middleware to verify JWT token and attach user info
-const authenticateToken = (req, res, next) => {
-  // Allow bypass for testing in development
-  if (req.headers['x-bypass-auth'] === 'true' && process.env.NODE_ENV !== 'production') {
-    req.user = {
-      id: BigInt(1), // Use a default user ID for testing
-      user_type: 'brand' // Default to brand for testing
-    };
-    req.userId = '1'; // Also set userId for compatibility
-    return next();
-  }
-  
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  
-  if (!token) {
-    return res.status(401).json({ error: 'No token provided' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    req.user = {
-      id: BigInt(decoded.userId),
-      user_type: decoded.user_type || 'creator' // Default to creator if not specified
-    };
-    req.userId = decoded.userId; // Also set userId for compatibility
-    next();
-  } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
-};
 
 // Google OAuth client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -62,10 +32,90 @@ const validateRequest = (req, res, next) => {
 const generateToken = (userId, userType = 'creator') => {
   return jwt.sign(
     { userId: userId.toString(), user_type: userType, iat: Date.now() },
-    process.env.JWT_SECRET || 'your-secret-key',
+    process.env.JWT_SECRET || 'your_jwt_secret',
     { expiresIn: '7d' }
   );
 };
+
+// Email/Password login endpoint
+router.post('/login', [
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], validateRequest, asyncHandler(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() }
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password'
+      });
+    }
+
+    // Check if user has password_hash (email/password auth)
+    if (!user.password_hash) {
+      return res.status(401).json({
+        success: false,
+        error: 'This account uses a different authentication method. Please use Google or phone login.'
+      });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password'
+      });
+    }
+
+    // Check if user is active
+    if (user.status !== 'active') {
+      return res.status(401).json({
+        success: false,
+        error: 'Account is not active. Please contact support.'
+      });
+    }
+
+    // Update last login
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { last_login_at: new Date() }
+    });
+
+    // Generate JWT token
+    const token = generateToken(user.id, user.user_type);
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      user: {
+        id: user.id.toString(),
+        email: user.email,
+        name: user.name,
+        profileImage: user.profile_image_url,
+        cover_image_url: user.cover_image_url,
+        isVerified: user.email_verified,
+        user_type: user.user_type,
+        status: user.status
+      },
+      token
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Login failed',
+      message: error.message
+    });
+  }
+}));
 
 // Clean up old OTP records periodically (every 5 minutes)
 let cleanupInterval;
@@ -438,11 +488,8 @@ router.post('/send-phone-verification-code', [
   try {
     const { phone } = req.body;
     
-    console.log(`🔍 OTP request for ${phone} at ${new Date().toISOString()}`);
-    
     // Check for duplicate requests
     if (pendingRequests.has(phone)) {
-      console.log(`🔄 Duplicate request detected for ${phone}, returning existing promise`);
       const existingPromise = pendingRequests.get(phone);
       const result = await existingPromise;
       return res.json(result);
@@ -454,58 +501,41 @@ router.post('/send-phone-verification-code', [
         // Check for recent OTP requests to prevent spam
         const rateLimitWindow = process.env.NODE_ENV === 'production' ? 60 * 1000 : 10 * 1000; // 10 seconds in dev, 60 in prod
         
-        // Temporarily disable rate limiting in development
-        if (process.env.NODE_ENV !== 'production') {
-          console.log(`🔧 Development: Rate limiting disabled for ${phone}`);
-        } else {
-          const recentVerification = await prisma.phoneVerification.findFirst({
-            where: {
-              phone,
-              created_at: { gt: new Date(Date.now() - rateLimitWindow) }
-            },
-            orderBy: {
-              created_at: 'desc'
+        // Check for recent verification attempts
+        const recentVerification = await prisma.phoneVerification.findFirst({
+          where: {
+            phone,
+            created_at: {
+              gte: new Date(Date.now() - rateLimitWindow)
             }
-          });
+          },
+          orderBy: {
+            created_at: 'desc'
+          }
+        });
+        
+        if (recentVerification) {
+          const timeElapsed = Date.now() - recentVerification.created_at.getTime();
+          const timeRemaining = Math.ceil((rateLimitWindow - timeElapsed) / 1000); // seconds remaining
           
-          console.log(`🔍 Rate limit check for ${phone}:`, {
-            hasRecentVerification: !!recentVerification,
-            currentTime: new Date().toISOString(),
-            checkTime: new Date(Date.now() - rateLimitWindow).toISOString(),
-            recentVerificationTime: recentVerification?.created_at?.toISOString(),
-            timeDifference: recentVerification ? Date.now() - recentVerification.created_at.getTime() : 'N/A',
-            rateLimitWindow: `${rateLimitWindow / 1000}s`,
-            phoneNumber: phone
-          });
-          
-          if (recentVerification) {
-            const timeElapsed = Date.now() - recentVerification.created_at.getTime();
-            const timeRemaining = Math.ceil((rateLimitWindow - timeElapsed) / 1000); // seconds remaining
-            
-            console.log(`⏰ Rate limit hit for ${phone}. Last OTP sent: ${recentVerification.created_at.toISOString()}, Time remaining: ${timeRemaining}s`);
-            
-            // In development, allow bypassing rate limit with a special flag
-            if (process.env.NODE_ENV !== 'production' && req.headers['x-bypass-rate-limit'] === 'true') {
-              console.log(`🔧 Development: Bypassing rate limit for ${phone}`);
-            } else if (process.env.NODE_ENV !== 'production' && process.env.DISABLE_RATE_LIMIT === 'true') {
-              console.log(`🔧 Development: Rate limiting disabled globally for ${phone}`);
-            } else if (process.env.NODE_ENV !== 'production' && process.env.DEV_MODE === 'true') {
-              console.log(`🔧 Development: DEV_MODE enabled, bypassing rate limit for ${phone}`);
-            } else {
-              return {
-                status: 429,
-                data: {
-                  error: 'Rate limit exceeded',
-                  message: `Please wait ${timeRemaining} seconds before requesting another code`,
-                  timeRemaining,
-                  retryAfter: timeRemaining
-                }
-              };
-            }
+          // In development, allow bypassing rate limit with a special flag
+          if (process.env.NODE_ENV !== 'production' && req.headers['x-bypass-rate-limit'] === 'true') {
+            // Allow bypass in development
+          } else if (process.env.NODE_ENV !== 'production' && process.env.DISABLE_RATE_LIMIT === 'true') {
+            // Allow bypass in development
+          } else if (process.env.NODE_ENV !== 'production' && process.env.DEV_MODE === 'true') {
+            // Allow bypass in development
+          } else {
+            return {
+              status: 429,
+              data: {
+                error: 'Rate limit exceeded',
+                message: `Please wait ${timeRemaining} seconds before requesting another code.`,
+                timeRemaining
+              }
+            };
           }
         }
-
-        console.log(`✅ No rate limit for ${phone}, proceeding with OTP generation`);
 
         // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -522,8 +552,6 @@ router.post('/send-phone-verification-code', [
             expires_at: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
           }
         });
-
-        console.log(`💾 OTP stored in database for ${phone} at ${verificationRecord.created_at.toISOString()}`);
 
         // Send SMS using Twilio Verify (if configured)
         let smsSent = false;
@@ -556,8 +584,6 @@ router.post('/send-phone-verification-code', [
           // Development mode - just log the OTP
           console.log(`🔧 Development OTP for ${phone}: ${otp} (Twilio not configured)`);
         }
-
-        console.log(`✅ OTP request completed successfully for ${phone}`);
 
         return {
           status: 200,
@@ -627,16 +653,11 @@ router.post('/verify-phone-code', [
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.replace('Bearer ', '');
-        console.log('[verify-phone-code] Received JWT token length:', token.length);
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
         authUserId = decoded.userId;
-        console.log('[verify-phone-code] JWT token decoded successfully, authUserId:', authUserId, 'Full decoded:', decoded);
       } catch (err) {
-        console.log('[verify-phone-code] JWT token verification failed:', err.message);
         // Invalid token, ignore
       }
-    } else {
-      console.log('[verify-phone-code] No Authorization header found');
     }
 
     // Verify with Twilio Verify (if configured)
@@ -888,6 +909,69 @@ router.get('/profile', asyncHandler(async (req, res) => {
   } catch (error) {
     console.error('Get profile error:', error);
     res.status(401).json({ error: 'Invalid token' });
+  }
+}));
+
+// Get current user information
+router.get('/me', authenticateJWT, asyncHandler(async (req, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        user_type: true,
+        profile_image_url: true,
+        cover_image_url: true,
+        status: true,
+        created_at: true,
+        last_login_at: true,
+        email_verified: true,
+        phone_verified: true,
+        onboarding_completed: true,
+        onboarding_step: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        user: {
+          id: user.id.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          user_type: user.user_type,
+          profile_image_url: user.profile_image_url,
+          cover_image_url: user.cover_image_url,
+          status: user.status,
+          created_at: user.created_at,
+          last_login_at: user.last_login_at,
+          email_verified: user.email_verified,
+          phone_verified: user.phone_verified,
+          onboarding_completed: user.onboarding_completed,
+          onboarding_step: user.onboarding_step
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get current user error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get user information',
+      message: error.message
+    });
   }
 }));
 
@@ -1217,4 +1301,251 @@ router.post('/check-user-exists', [
   }
 }));
 
-module.exports = { router, authenticateToken }; 
+// Agent email login
+router.post('/agent-login', [
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], validateRequest, asyncHandler(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials',
+        message: 'Email or password is incorrect'
+      });
+    }
+
+    // Check if user is an agent
+    if (user.user_type !== 'agent') {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied',
+        message: 'Only agents can login through this endpoint'
+      });
+    }
+
+    // Check if user has a password (for existing agents without passwords)
+    if (!user.password_hash) {
+      // For existing agents without passwords, create a default password
+      const defaultPassword = 'agent123'; // You can change this default password
+      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+      
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { password_hash: hashedPassword }
+      });
+
+      console.log(`🔑 Created default password for agent ${user.email}`);
+      
+      // For now, allow login with default password
+      if (password !== defaultPassword) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid credentials',
+          message: `Please use the default password: ${defaultPassword}`
+        });
+      }
+    } else {
+      // Verify password for existing agents
+      const isValidPassword = await bcrypt.compare(password, user.password_hash);
+      if (!isValidPassword) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid credentials',
+          message: 'Email or password is incorrect'
+        });
+      }
+    }
+
+    // Generate JWT token
+    const token = generateToken(user.id, user.user_type);
+
+    // Update last login
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { last_login_at: new Date() }
+    });
+
+    console.log('✅ Agent login successful:', user.email);
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        token,
+        user: {
+          id: user.id.toString(),
+          name: user.name,
+          email: user.email,
+          user_type: user.user_type,
+          status: user.status
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Agent login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Login failed',
+      message: error.message
+    });
+  }
+}));
+
+// Super Admin email login
+router.post('/super-admin-login', [
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], validateRequest, asyncHandler(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials',
+        message: 'Email or password is incorrect'
+      });
+    }
+
+    // Check if user is a super admin
+    if (user.user_type !== 'super_admin') {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied',
+        message: 'Only super admins can login through this endpoint'
+      });
+    }
+
+    // Check if user has a password
+    if (!user.password_hash) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials',
+        message: 'Password not set for this account'
+      });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials',
+        message: 'Email or password is incorrect'
+      });
+    }
+
+    // Generate JWT token
+    const token = generateToken(user.id, user.user_type);
+
+    // Update last login
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { last_login_at: new Date() }
+    });
+
+    console.log('✅ Super Admin login successful:', user.email);
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        token,
+        user: {
+          id: user.id.toString(),
+          name: user.name,
+          email: user.email,
+          user_type: user.user_type,
+          status: user.status
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Super Admin login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Login failed',
+      message: error.message
+    });
+  }
+}));
+
+// Get current user information
+router.get('/me', authenticateJWT, asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const user = await prisma.user.findUnique({
+      where: { id: BigInt(userId) },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        user_type: true,
+        status: true,
+        profile_image_url: true,
+        cover_image_url: true,
+        email_verified: true,
+        phone_verified: true,
+        created_at: true,
+        last_login_at: true,
+        auth_provider: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'User information retrieved successfully',
+      data: {
+        user: {
+          id: user.id.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          user_type: user.user_type,
+          status: user.status,
+          profile_image_url: user.profile_image_url,
+          cover_image_url: user.cover_image_url,
+          email_verified: user.email_verified,
+          phone_verified: user.phone_verified,
+          created_at: user.created_at,
+          last_login_at: user.last_login_at,
+          auth_provider: user.auth_provider
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting user info:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get user information',
+      message: error.message
+    });
+  }
+}));
+
+module.exports = { router }; 

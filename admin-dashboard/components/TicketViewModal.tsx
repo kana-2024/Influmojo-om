@@ -36,16 +36,17 @@ export default function TicketViewModal({ ticket, isOpen, onClose }: TicketViewM
   const [newMessage, setNewMessage] = useState('');
   const [selectedAgent, setSelectedAgent] = useState('');
   const [showStreamChat, setShowStreamChat] = useState(true); // Default to live chat
+  const [activeTab, setActiveTab] = useState<'brand' | 'creator'>('brand'); // New: Tab for separate channels
   const queryClient = useQueryClient();
 
-  // Fetch ticket messages
+  // Fetch ticket messages for the active tab
   const {
     data: messagesData,
     isLoading: messagesLoading,
     refetch: refetchMessages
   } = useQuery({
-    queryKey: ['ticket-messages', ticket?.id],
-    queryFn: () => ticketsAPI.getMessages(ticket?.id || ''),
+    queryKey: ['ticket-messages', ticket?.id, activeTab],
+    queryFn: () => ticketsAPI.getMessages(ticket?.id || '', activeTab),
     enabled: !!ticket?.id,
   });
 
@@ -63,14 +64,23 @@ export default function TicketViewModal({ ticket, isOpen, onClose }: TicketViewM
 
   // Mutations
   const sendMessageMutation = useMutation({
-    mutationFn: (message: string) => ticketsAPI.sendMessage(ticket?.id || '', message),
-    onSuccess: () => {
+    mutationFn: (message: string) => {
+      console.log('🔧 sendMessageMutation.mutationFn called with:', {
+        ticketId: ticket?.id,
+        message,
+        activeTab
+      });
+      return ticketsAPI.sendMessage(ticket?.id || '', message, activeTab);
+    },
+    onSuccess: (data) => {
+      console.log('✅ Message sent successfully:', data);
       setNewMessage('');
       refetchMessages();
       toast.success('Message sent successfully');
     },
-    onError: () => {
-      toast.error('Failed to send message');
+    onError: (error) => {
+      console.error('❌ Failed to send message:', error);
+      toast.error(`Failed to send message: ${error.message || 'Unknown error'}`);
     },
   });
 
@@ -96,21 +106,26 @@ export default function TicketViewModal({ ticket, isOpen, onClose }: TicketViewM
     },
   });
 
-  const reassignTicketMutation = useMutation({
-    mutationFn: (agentId: string) => ticketsAPI.reassign(ticket?.id || '', agentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      toast.success('Ticket reassigned successfully');
-    },
-    onError: () => {
-      toast.error('Failed to reassign ticket');
-    },
-  });
-
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('📝 handleSendMessage called:', {
+      newMessage,
+      newMessageTrimmed: newMessage.trim(),
+      newMessageLength: newMessage.length,
+      ticketId: ticket?.id,
+      activeTab
+    });
+    
     if (newMessage.trim() && ticket?.id) {
+      console.log('📤 Calling sendMessageMutation with:', newMessage.trim());
       sendMessageMutation.mutate(newMessage.trim());
+    } else {
+      console.log('❌ Message validation failed in handleSendMessage:', {
+        hasNewMessage: !!newMessage,
+        newMessageTrimmed: newMessage.trim(),
+        newMessageTrimmedLength: newMessage.trim().length,
+        hasTicketId: !!ticket?.id
+      });
     }
   };
 
@@ -127,10 +142,8 @@ export default function TicketViewModal({ ticket, isOpen, onClose }: TicketViewM
   };
 
   const handleReassign = () => {
-    if (selectedAgent && ticket?.id) {
-      reassignTicketMutation.mutate(selectedAgent);
-      setSelectedAgent('');
-    }
+    // Reassign functionality removed - not implemented in API
+    toast.success('Reassign functionality not implemented');
   };
 
   const handleCommunication = (type: string, contact: string) => {
@@ -152,25 +165,22 @@ export default function TicketViewModal({ ticket, isOpen, onClose }: TicketViewM
 
   // Helper function to get message styling based on sender role
   const getMessageStyle = (message: Message) => {
-    const senderRole = message.sender_role || message.sender;
+    const senderRole = message.sender_role || message.sender?.user_type;
     
     switch (senderRole) {
       case 'brand':
-      case 'brand_':
         return {
           container: 'justify-start',
           bubble: 'bg-blue-100 text-blue-900 border border-blue-200',
           sender: 'text-blue-700 font-medium'
         };
       case 'creator':
-      case 'creator_':
         return {
           container: 'justify-start',
           bubble: 'bg-green-100 text-green-900 border border-green-200',
           sender: 'text-green-700 font-medium'
         };
       case 'agent':
-      case 'agent_':
         return {
           container: 'justify-end',
           bubble: 'bg-gray-800 text-white',
@@ -193,22 +203,50 @@ export default function TicketViewModal({ ticket, isOpen, onClose }: TicketViewM
 
   // Helper function to get sender display name
   const getSenderDisplayName = (message: Message) => {
-    const senderRole = message.sender_role || message.sender;
+    const senderRole = message.sender_role || message.sender?.user_type;
     
     switch (senderRole) {
       case 'brand':
-      case 'brand_':
         return ticket?.order?.brand?.company_name || 'Brand';
       case 'creator':
-      case 'creator_':
-        return ticket?.order?.creator?.name || 'Creator';
+        return ticket?.order?.creator?.user?.name || 'Creator';
       case 'agent':
-      case 'agent_':
         return ticket?.agent?.name || 'Agent';
       case 'system':
         return 'System';
       default:
-        return message.sender_name || 'Unknown';
+        return message.sender_name || message.sender?.name || 'Unknown';
+    }
+  };
+
+  // Helper function to format timestamp
+  const formatTimestamp = (timestamp: string) => {
+    if (!timestamp) return 'N/A';
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid timestamp:', timestamp);
+        return 'N/A';
+      }
+      
+      // Check if the timestamp is very recent (within 1 minute)
+      const now = new Date();
+      const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+      
+      if (diffInSeconds < 60) {
+        return 'Just now';
+      } else if (diffInSeconds < 3600) { // Less than 1 hour
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        return `${diffInMinutes}m ago`;
+      } else {
+        return date.toLocaleTimeString([], { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+      }
+    } catch (error) {
+      console.error('Error formatting timestamp:', error);
+      return 'N/A';
     }
   };
 
@@ -255,252 +293,176 @@ export default function TicketViewModal({ ticket, isOpen, onClose }: TicketViewM
                     <span className="font-medium">{ticket.order?.package?.title || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Amount:</span>
-                    <span className="font-medium">${ticket.order?.amount || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
-                    <span className="font-medium">{ticket.order?.status || 'N/A'}</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      ticket.status === 'open' ? 'bg-green-100 text-green-800' :
+                      ticket.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+                      ticket.status === 'resolved' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {ticket.status.replace('_', ' ').toUpperCase()}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Brand Information */}
-              <div className="bg-blue-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
-                  <User className="h-4 w-4 mr-2" />
-                  Brand Information
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="font-medium">{ticket.order?.brand?.company_name || 'N/A'}</div>
-                  <div className="text-gray-600">{ticket.order?.brand?.user?.name || 'N/A'}</div>
-                  <div className="text-gray-600">{ticket.order?.brand?.user?.email || 'N/A'}</div>
-                  <div className="text-gray-600">{ticket.order?.brand?.phone || 'N/A'}</div>
+              {/* Brand & Creator Information */}
+              <div className="space-y-4">
+                {/* Brand Information */}
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-900 mb-2 flex items-center">
+                    <User className="h-4 w-4 mr-2" />
+                    Brand
+                  </h3>
+                  <div className="space-y-1 text-sm">
+                    <div className="font-medium">{ticket.order?.brand?.company_name || 'N/A'}</div>
+                    <div className="text-blue-600">{ticket.order?.brand?.user?.email || 'N/A'}</div>
+                  </div>
+                </div>
+
+                {/* Creator Information */}
+                <div className="bg-green-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-green-900 mb-2 flex items-center">
+                    <User className="h-4 w-4 mr-2" />
+                    Creator
+                  </h3>
+                  <div className="space-y-1 text-sm">
+                    <div className="font-medium">{ticket.order?.creator?.user?.name || 'N/A'}</div>
+                    <div className="text-green-600">{ticket.order?.creator?.user?.email || 'N/A'}</div>
+                  </div>
                 </div>
               </div>
 
-              {/* Creator Information */}
-              <div className="bg-green-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
-                  <User className="h-4 w-4 mr-2" />
-                  Creator Information
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="font-medium">{ticket.order?.creator?.name || 'N/A'}</div>
-                  <div className="text-gray-600">{ticket.order?.creator?.user?.email || 'N/A'}</div>
-                  <div className="text-gray-600">{ticket.order?.creator?.phone || 'N/A'}</div>
-                  <div className="text-gray-600">{ticket.order?.creator?.bio || 'N/A'}</div>
-                </div>
-              </div>
-
-              {/* Communication Options */}
-              <div className="bg-yellow-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Communication Options</h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => handleCommunication('call', ticket.order?.brand?.phone || '')}
-                    className="w-full flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call Brand
-                  </button>
-                  <button
-                    onClick={() => handleCommunication('email', ticket.order?.brand?.user?.email || '')}
-                    className="w-full flex items-center justify-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
-                  >
-                    <Mail className="h-4 w-4 mr-2" />
-                    Email Brand
-                  </button>
-                  <button
-                    onClick={() => handleCommunication('call', ticket.order?.creator?.phone || '')}
-                    className="w-full flex items-center justify-center px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call Creator
-                  </button>
-                  <button
-                    onClick={() => handleCommunication('email', ticket.order?.creator?.user?.email || '')}
-                    className="w-full flex items-center justify-center px-3 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm"
-                  >
-                    <Mail className="h-4 w-4 mr-2" />
-                    Email Creator
-                  </button>
-                  <button
-                    onClick={() => handleCommunication('schedule', '')}
-                    className="w-full flex items-center justify-center px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
-                  >
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Schedule Call
-                  </button>
-                </div>
-              </div>
-
-              {/* Ticket Actions */}
+              {/* Agent Information */}
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Ticket Actions</h3>
-                <div className="space-y-3">
-                  {/* Status Update */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select
-                      value={ticket.status}
-                      onChange={(e) => handleStatusUpdate(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                    >
-                      <option value="open">Open</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="resolved">Resolved</option>
-                      <option value="closed">Closed</option>
-                    </select>
+                <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Assigned Agent
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{ticket.agent?.name || 'N/A'}</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      ticket.agent?.is_online ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {ticket.agent?.is_online ? 'Online' : 'Offline'}
+                    </span>
                   </div>
+                  <div className="text-sm text-gray-600">{ticket.agent?.email || 'N/A'}</div>
+                </div>
+              </div>
 
-                  {/* Priority Update */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                    <select
-                      value={ticket.priority}
-                      onChange={(e) => handlePriorityUpdate(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                    >
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                      <option value="urgent">Urgent</option>
-                    </select>
-                  </div>
-
-                  {/* Reassign Agent */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Reassign Agent</label>
-                    <div className="flex space-x-2">
-                      <select
-                        value={selectedAgent}
-                        onChange={(e) => setSelectedAgent(e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-                      >
-                        <option value="">Select Agent</option>
-                        {agents.map((agent) => (
-                          <option key={agent.id} value={agent.id}>
-                            {agent.name}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={handleReassign}
-                        disabled={!selectedAgent}
-                        className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm"
-                      >
-                        Reassign
-                      </button>
-                    </div>
-                  </div>
+              {/* Quick Actions */}
+              <div className="space-y-2">
+                <h3 className="font-semibold text-gray-900">Quick Actions</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleStatusUpdate('in_progress')}
+                    className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors"
+                  >
+                    Start Working
+                  </button>
+                  <button
+                    onClick={() => handleStatusUpdate('resolved')}
+                    className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition-colors"
+                  >
+                    Resolve
+                  </button>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Panel - Unified Chat */}
-          <div className="w-2/3 flex flex-col">
-            {/* Chat Header */}
-            <div className="p-4 border-b border-gray-200 bg-gray-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-gray-900 flex items-center">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    {showStreamChat ? 'Live Chat' : 'Chat History'}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {showStreamChat ? 'Real-time messaging with brand, creator, and agent' : `${messages.length} messages`}
-                  </p>
-                </div>
-                <div className="flex space-x-2">
+          {/* Right Panel - Chat Interface */}
+          <div className="flex-1 flex flex-col">
+            {/* Chat Header with Tabs */}
+            <div className="border-b border-gray-200">
+              <div className="flex items-center justify-between p-4">
+                <div className="flex space-x-1">
                   <button
-                    onClick={() => setShowStreamChat(!showStreamChat)}
-                    className={`px-3 py-1 text-sm rounded-md ${
-                      showStreamChat 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    onClick={() => setActiveTab('brand')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      activeTab === 'brand'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    {showStreamChat ? 'Show History' : 'Live Chat'}
+                    Brand Support
                   </button>
+                  <button
+                    onClick={() => setActiveTab('creator')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      activeTab === 'creator'
+                        ? 'bg-green-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Creator Support
+                  </button>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-500">
+                    {activeTab === 'brand' ? 'Brand-Agent Channel' : 'Creator-Agent Channel'}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Chat Content */}
-            {showStreamChat ? (
-              <div className="flex-1">
-                <TicketChat 
-                  ticketId={ticket.id} 
-                  ticketTitle={`Ticket #${ticket.id}`}
-                />
-              </div>
-            ) : (
-              <>
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messagesLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    </div>
-                  ) : messages.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      No messages yet
-                    </div>
-                  ) : (
-                    messages.map((message) => {
-                      const messageStyle = getMessageStyle(message);
-                      const senderName = getSenderDisplayName(message);
-                      
-                      return (
-                        <div
-                          key={message.id}
-                          className={`flex ${messageStyle.container}`}
-                        >
-                          <div
-                            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${messageStyle.bubble}`}
-                          >
-                            <div className={`text-sm mb-1 ${messageStyle.sender}`}>
-                              {senderName}
-                            </div>
-                            <div className="text-sm whitespace-pre-wrap">
-                              {message.text}
-                            </div>
-                            <div className={`text-xs mt-1 ${
-                              messageStyle.bubble.includes('text-white') ? 'text-gray-300' : 'text-gray-500'
-                            }`}>
-                              {format(new Date(message.timestamp), 'MMM dd, yyyy HH:mm')}
-                            </div>
-                          </div>
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messagesLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="text-center">
+                    <MessageSquare className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                    <p>No messages yet</p>
+                    <p className="text-sm">Start the conversation with the {activeTab}</p>
+                  </div>
+                </div>
+              ) : (
+                messages.map((message) => {
+                  const style = getMessageStyle(message);
+                  const senderName = getSenderDisplayName(message);
+                  
+                  return (
+                    <div key={message.id} className={`flex ${style.container}`}>
+                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${style.bubble}`}>
+                        <div className={`text-xs ${style.sender} mb-1`}>
+                          {senderName}
                         </div>
-                      );
-                    })
-                  )}
-                </div>
+                        <div className="text-sm">{message.text}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {message.timestamp ? formatTimestamp(message.timestamp) : 'N/A'}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
 
-                {/* Message Input */}
-                <div className="p-4 border-t border-gray-200">
-                  <form onSubmit={handleSendMessage} className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type your message as agent..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      disabled={sendMessageMutation.isPending}
-                    />
-                    <button
-                      type="submit"
-                      disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
-                    >
-                      <Send className="h-4 w-4" />
-                    </button>
-                  </form>
-                </div>
-              </>
-            )}
+            {/* Message Input */}
+            <div className="border-t border-gray-200 p-4">
+              <form onSubmit={handleSendMessage} className="flex space-x-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder={`Send a message to ${activeTab}...`}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>

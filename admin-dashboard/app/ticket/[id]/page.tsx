@@ -35,7 +35,7 @@ export default function TicketPage() {
   const params = useParams();
   const router = useRouter();
   const ticketId = params.id as string;
-  const [activeTab, setActiveTab] = useState<'brand' | 'creator'>('brand');
+  const [activeChannel, setActiveChannel] = useState<'brand_agent' | 'creator_agent'>('brand_agent');
   const [newMessage, setNewMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [lastMessageId, setLastMessageId] = useState<string | null>(null);
@@ -65,8 +65,8 @@ export default function TicketPage() {
     refetch: refetchMessages,
     error: messagesError
   } = useQuery({
-    queryKey: ['ticket-messages', ticketId],
-    queryFn: () => ticketsAPI.getMessages(ticketId),
+    queryKey: ['ticket-messages', ticketId, activeChannel],
+    queryFn: () => ticketsAPI.getMessages(ticketId, activeChannel),
     enabled: !!ticketId,
     refetchInterval: 3000, // Poll every 3 seconds for new messages
     refetchIntervalInBackground: true,
@@ -96,8 +96,15 @@ export default function TicketPage() {
 
   // Combine server messages with optimistic messages
   const allMessages = [...messages, ...optimisticMessages].sort((a, b) => {
-    const dateA = new Date(a.timestamp || a.created_at).getTime();
-    const dateB = new Date(b.timestamp || b.created_at).getTime();
+    // Handle different date field names
+    const getDate = (message: any) => {
+      if (message.created_at) return new Date(message.created_at).getTime();
+      if (message.timestamp) return new Date(message.timestamp).getTime();
+      return new Date().getTime(); // Fallback for messages without date
+    };
+    
+    const dateA = getDate(a);
+    const dateB = getDate(b);
     return dateA - dateB;
   });
 
@@ -132,13 +139,18 @@ export default function TicketPage() {
 
   // Mutations
   const sendMessageMutation = useMutation({
-    mutationFn: (message: string) => ticketsAPI.sendMessage(ticketId, message),
+    mutationFn: ({ message, channelType }: { message: string; channelType: 'brand_agent' | 'creator_agent' }) => 
+      ticketsAPI.sendMessage(ticketId, message, channelType),
     onSuccess: (response) => {
       setNewMessage('');
-      // Remove optimistic message and let the server response take over
-      setOptimisticMessages(prev => prev.filter(msg => !optimisticMessageIdsRef.current.has(msg.id)));
-      optimisticMessageIdsRef.current.clear();
-      refetchMessages();
+      // Invalidate and refetch messages to get the updated message
+      queryClient.invalidateQueries({ queryKey: ['ticket-messages', ticketId, activeChannel] });
+      // Keep optimistic messages for a longer time to ensure they show up properly
+      // Only remove them after the server response is processed and the new message is loaded
+      setTimeout(() => {
+        setOptimisticMessages(prev => prev.filter(msg => !optimisticMessageIdsRef.current.has(msg.id)));
+        optimisticMessageIdsRef.current.clear();
+      }, 5000); // Increased to 5 seconds to ensure proper handling
       toast.success('Message sent successfully');
     },
     onError: (error) => {
@@ -183,12 +195,13 @@ export default function TicketPage() {
       id: tempId,
       ticket_id: ticketId,
       sender_id: 'agent',
-      sender: 'agent',
-      sender_name: 'Agent',
+      message_text: messageText,
+      text: messageText, // Add text field for consistency with backend
+      message_type: 'text',
+      created_at: new Date().toISOString(),
+      timestamp: new Date().toISOString(), // Add timestamp field for consistency
       sender_role: 'agent',
-      text: messageText,
-      timestamp: new Date().toISOString(),
-      created_at: new Date().toISOString()
+      channel_type: activeChannel // Use channel_type instead of target_tab
     };
 
     // Add optimistic message immediately
@@ -201,7 +214,8 @@ export default function TicketPage() {
     setTimeout(scrollToBottom, 100);
 
     try {
-      await sendMessageMutation.mutateAsync(messageText);
+      // Send message with active tab information
+      await sendMessageMutation.mutateAsync({ message: messageText, channelType: activeChannel });
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
@@ -268,7 +282,7 @@ export default function TicketPage() {
       case 'creator':
         return ticket?.order?.creator?.user?.name || 'Creator';
       case 'agent':
-        return 'Agent';
+        return ticket?.agent?.name || 'Agent';
       case 'system':
         return 'System';
       default:
@@ -276,19 +290,74 @@ export default function TicketPage() {
     }
   };
 
-  // Helper function to filter messages based on active tab
+  // Helper function to filter messages based on active channel
   const getFilteredMessages = () => {
     return allMessages.filter((message) => {
       const senderRole = message.sender_role || message.sender || 'unknown';
-      if (activeTab === 'brand') {
-        // Show brand messages, agent messages, and system messages
-        return senderRole === 'brand' || senderRole === 'agent' || senderRole === 'system';
-      } else if (activeTab === 'creator') {
-        // Show creator messages, agent messages, and system messages
-        return senderRole === 'creator' || senderRole === 'agent' || senderRole === 'system';
+      const messageChannelType = message.channel_type || 'brand_agent';
+      
+      if (activeChannel === 'brand_agent') {
+        // Show brand messages, system messages, and agent messages that were sent to brand_agent channel
+        if (senderRole === 'brand' || senderRole === 'system') {
+          return true;
+        } else if (senderRole === 'agent') {
+          // Only show agent messages that were sent to the brand_agent channel
+          return messageChannelType === 'brand_agent';
+        }
+        return false;
+      } else if (activeChannel === 'creator_agent') {
+        // Show creator messages, system messages, and agent messages that were sent to creator_agent channel
+        if (senderRole === 'creator' || senderRole === 'system') {
+          return true;
+        } else if (senderRole === 'agent') {
+          // Only show agent messages that were sent to the creator_agent channel
+          return messageChannelType === 'creator_agent';
+        }
+        return false;
       }
-      return true;
+      return false;
     });
+  };
+
+  // Helper function to safely parse and format dates
+  const formatMessageTime = (dateString: string | null | undefined) => {
+    if (!dateString) return 'Unknown time';
+    
+    try {
+      // Handle different date formats
+      let date: Date;
+      
+      if (typeof dateString === 'string') {
+        // Try parsing as ISO string first
+        date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          // If that fails, try parsing as a different format
+          const timestamp = Date.parse(dateString);
+          if (isNaN(timestamp)) {
+            console.error('Invalid date string:', dateString);
+            return 'Invalid time';
+          }
+          date = new Date(timestamp);
+        }
+      } else {
+        console.error('Invalid date type:', typeof dateString, dateString);
+        return 'Invalid time';
+      }
+      
+      if (isNaN(date.getTime())) {
+        console.error('Invalid date after parsing:', dateString);
+        return 'Invalid time';
+      }
+      
+      // Simply return the time when the message was sent
+      return date.toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error parsing date:', dateString, error);
+      return 'Invalid time';
+    }
   };
 
   // Cleanup polling on unmount
@@ -400,12 +469,8 @@ export default function TicketPage() {
                   <span className="font-medium">{packageInfo?.title || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Amount:</span>
-                  <span className="font-medium">${ticket.order?.amount || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Status:</span>
-                  <span className="font-medium">{ticket.order?.status || 'N/A'}</span>
+                  <span className="text-gray-600">Ticket Status:</span>
+                  <span className="font-medium">{ticket.status || 'N/A'}</span>
                 </div>
               </div>
             </div>
@@ -496,9 +561,9 @@ export default function TicketPage() {
                 <div className="flex items-center justify-between p-4">
                   <div className="flex space-x-1">
                     <button
-                      onClick={() => setActiveTab('brand')}
+                      onClick={() => setActiveChannel('brand_agent')}
                       className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                        activeTab === 'brand'
+                        activeChannel === 'brand_agent'
                           ? 'bg-blue-100 text-blue-700 border border-blue-200'
                           : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                       }`}
@@ -509,9 +574,9 @@ export default function TicketPage() {
                       </div>
                     </button>
                     <button
-                      onClick={() => setActiveTab('creator')}
+                      onClick={() => setActiveChannel('creator_agent')}
                       className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                        activeTab === 'creator'
+                        activeChannel === 'creator_agent'
                           ? 'bg-green-100 text-green-700 border border-green-200'
                           : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                       }`}
@@ -551,7 +616,7 @@ export default function TicketPage() {
                 ) : getFilteredMessages().length === 0 ? (
                   <div className="text-center py-8">
                     <MessageSquare className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500">No messages for {activeTab === 'brand' ? brand?.company_name || 'Brand' : creator?.user?.name || 'Creator'} yet</p>
+                    <p className="text-gray-500">No messages for {activeChannel === 'brand_agent' ? brand?.company_name || 'Brand' : creator?.user?.name || 'Creator'} yet</p>
                     <p className="text-sm text-gray-400">Start the conversation by sending a message</p>
                   </div>
                 ) : (
@@ -571,13 +636,10 @@ export default function TicketPage() {
                                 {isOptimistic && <span className="ml-1 text-gray-400">(sending...)</span>}
                               </span>
                             </div>
-                            <p className="text-sm">{message.text}</p>
+                            <p className="text-sm">{message.text || message.message_text || 'No message content'}</p>
                             <div className="flex items-center justify-between mt-1">
                               <span className="text-xs text-gray-500">
-                                {new Date(message.timestamp || message.created_at).toLocaleTimeString([], { 
-                                  hour: '2-digit', 
-                                  minute: '2-digit' 
-                                })}
+                                {formatMessageTime(message.timestamp || message.created_at)}
                               </span>
                             </div>
                           </div>
@@ -610,7 +672,7 @@ export default function TicketPage() {
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={`Type your message to ${activeTab === 'brand' ? brand?.company_name || 'Brand' : creator?.user?.name || 'Creator'}...`}
+                    placeholder={`Type your message to ${activeChannel === 'brand_agent' ? brand?.company_name || 'Brand' : creator?.user?.name || 'Creator'}...`}
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     disabled={isSending}
                   />

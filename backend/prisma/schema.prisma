@@ -31,6 +31,10 @@ model User {
   onboarding_completed      Boolean                @default(false)
   onboarding_step           Int?                   @default(0)
   age                       Int?
+  // Agent status tracking
+  is_online                 Boolean                @default(true)
+  last_online_at            DateTime?
+  agent_status              AgentStatus            @default(available)
   brand_profiles            BrandProfile[]
   admin_channels            CollaborationChannel[] @relation("AdminChannels")
   content_reviews           ContentReview[]        @relation("ContentReviewers")
@@ -287,6 +291,9 @@ model Message {
   file_url     String?
   file_name    String?
   read_at      DateTime?
+  sender_role  String?      // New: Explicit sender role (brand, creator, agent, system)
+  channel_type String?      // New: Which channel this message belongs to (brand_agent, creator_agent)
+  target_tab   String?      // Track which tab the agent was in when sending the message ('brand' or 'creator')
   created_at   DateTime     @default(now())
 
   ticket       Ticket       @relation(fields: [ticket_id], references: [id])
@@ -483,8 +490,8 @@ model PortfolioItem {
 enum UserType {
   brand
   creator
-  admin
   super_admin
+  agent
 }
 
 enum UserStatus {
@@ -493,7 +500,12 @@ enum UserStatus {
   pending
 }
 
-
+enum AgentStatus {
+  available
+  busy
+  offline
+  away
+}
 
 enum AvailabilityStatus {
   available
@@ -625,6 +637,8 @@ enum PortfolioMediaType {
 
 enum OrderStatus {
   pending
+  accepted
+  rejected
   confirmed
   in_progress
   completed
@@ -633,18 +647,20 @@ enum OrderStatus {
 }
 
 model Ticket {
-  id               BigInt     @id @default(autoincrement())
-  order_id         BigInt     @unique
-  agent_id         BigInt
-  stream_channel_id String
-  status           TicketStatus @default(open)
-  priority         TicketPriority @default(medium)
-  created_at       DateTime   @default(now())
-  updated_at       DateTime   @updatedAt
+  id                    BigInt     @id @default(autoincrement())
+  order_id              BigInt     @unique
+  agent_id              BigInt
+  stream_channel_id     String     // Legacy field - keeping for backward compatibility
+  brand_agent_channel   String?    // New: Separate channel for brand-agent communication
+  creator_agent_channel String?    // New: Separate channel for creator-agent communication
+  status                TicketStatus @default(open)
+  priority              TicketPriority @default(medium)
+  created_at            DateTime   @default(now())
+  updated_at            DateTime   @updatedAt
 
-  order            Order      @relation(fields: [order_id], references: [id])
-  agent            User       @relation("TicketAgent", fields: [agent_id], references: [id])
-  messages         Message[]
+  order                 Order      @relation(fields: [order_id], references: [id])
+  agent                 User       @relation("TicketAgent", fields: [agent_id], references: [id])
+  messages              Message[]
 }
 
 

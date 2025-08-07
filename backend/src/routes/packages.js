@@ -1,13 +1,13 @@
 const express = require('express');
 const { PrismaClient } = require('../generated/client');
 const asyncHandler = require('../utils/asyncHandler');
-const { authenticateToken } = require('./auth');
+const { authenticateJWT } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Create a new package (for creators)
-router.post('/', authenticateToken, asyncHandler(async (req, res) => {
+router.post('/', authenticateJWT, asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const userType = req.user.user_type;
   const { title, description, price, currency, deliverables, type } = req.body;
@@ -172,7 +172,7 @@ router.get('/', asyncHandler(async (req, res) => {
 }));
 
 // Get packages created by the authenticated creator
-router.get('/my-packages', authenticateToken, asyncHandler(async (req, res) => {
+router.get('/my-packages', authenticateJWT, asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const userType = req.user.user_type;
 
@@ -324,7 +324,7 @@ router.get('/:packageId', asyncHandler(async (req, res) => {
 }));
 
 // Update package (for creators)
-router.put('/:packageId', authenticateToken, asyncHandler(async (req, res) => {
+router.put('/:packageId', authenticateJWT, asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const userType = req.user.user_type;
   const packageId = req.params.packageId;
@@ -424,7 +424,7 @@ router.put('/:packageId', authenticateToken, asyncHandler(async (req, res) => {
 }));
 
 // Delete package (for creators)
-router.delete('/:packageId', authenticateToken, asyncHandler(async (req, res) => {
+router.delete('/:packageId', authenticateJWT, asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const userType = req.user.user_type;
   const packageId = req.params.packageId;

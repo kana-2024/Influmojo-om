@@ -22,9 +22,9 @@ function isSuperAdmin(req, res, next) {
 }
 
 /**
- * Admin authorization middleware (for regular admin users)
+ * Admin authorization middleware (for agents and super admins)
  * Must be used after authenticateJWT middleware
- * Checks if the authenticated user has admin or super_admin privileges
+ * Checks if the authenticated user has agent or super_admin privileges
  */
 function isAdmin(req, res, next) {
   if (!req.user) {
@@ -34,10 +34,10 @@ function isAdmin(req, res, next) {
     });
   }
 
-  if (req.user.user_type !== 'admin' && req.user.user_type !== 'super_admin') {
+  if (req.user.user_type !== 'agent' && req.user.user_type !== 'super_admin') {
     return res.status(403).json({ 
       error: 'Access denied',
-      message: 'Admin privileges required'
+      message: 'Agent or super admin privileges required'
     });
   }
 

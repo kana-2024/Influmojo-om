@@ -199,31 +199,38 @@ This ticket has been automatically created to provide support for this order. Pl
         }
       });
 
-      // Add status update message to ticket if it exists
+      // Add status update message to ticket if it exists (handle gracefully if it fails)
       if (order.ticket) {
-        const statusMessages = {
-          'pending': '⏳ **Order Status: Waiting for Creator Approval**\n\nThe creator has been notified and will review your order. You can contact support if you have any questions.',
-          'accepted': '✅ **Order Status: Accepted by Creator**\n\nThe creator has accepted your order and will begin working on it.',
-          'rejected': '❌ **Order Status: Rejected by Creator**\n\nThe creator has rejected this order. Please contact support for assistance.',
-          'in_progress': '🚀 **Order Status: In Progress**\n\nThe creator is actively working on your order.',
-          'review': '👀 **Order Status: Under Review**\n\nThe order is being reviewed before final delivery.',
-          'completed': '🎉 **Order Status: Completed**\n\nYour order has been successfully completed and delivered.',
-          'cancelled': '🚫 **Order Status: Cancelled**\n\nThis order has been cancelled.'
-        };
+        try {
+          const statusMessages = {
+            'pending': '⏳ **Order Status: Waiting for Creator Approval**\n\nThe creator has been notified and will review your order. You can contact support if you have any questions.',
+            'accepted': '✅ **Order Status: Accepted by Creator**\n\nThe creator has accepted your order and will begin working on it.',
+            'rejected': '❌ **Order Status: Rejected by Creator**\n\nThe creator has rejected this order. Please contact support for assistance.',
+            'in_progress': '🚀 **Order Status: In Progress**\n\nThe creator is actively working on your order.',
+            'review': '👀 **Order Status: Under Review**\n\nThe order is being reviewed before final delivery.',
+            'completed': '🎉 **Order Status: Completed**\n\nYour order has been successfully completed and delivered.',
+            'cancelled': '🚫 **Order Status: Cancelled**\n\nThis order has been cancelled.'
+          };
 
-        const statusMessage = statusMessages[newStatus] || `📊 **Order Status Updated**\n\nOrder #${order.id} status has been updated to: **${newStatus}**`;
+          const statusMessage = statusMessages[newStatus] || `📊 **Order Status Updated**\n\nOrder #${order.id} status has been updated to: **${newStatus}**`;
 
-        await crmService.addMessage(
-          order.ticket.id.toString(),
-          order.ticket.agent.id.toString(),
-          statusMessage,
-          'system',
-          null,
-          null,
-          'system'
-        );
+          await crmService.addMessage(
+            order.ticket.id.toString(),
+            order.ticket.agent.id.toString(),
+            statusMessage,
+            'system',
+            null,
+            null,
+            'system'
+          );
 
-        console.log(`✅ Status update message added to ticket ${order.ticket.id}`);
+          console.log(`✅ Status update message added to ticket ${order.ticket.id}`);
+        } catch (messageError) {
+          console.error('⚠️ Failed to add status update message to ticket:', messageError);
+          // Don't fail the entire operation if message addition fails
+        }
+      } else {
+        console.log('⚠️ No ticket found for order, skipping status update message');
       }
 
       return order;
@@ -378,13 +385,43 @@ This ticket has been automatically created to provide support for this order. Pl
   /**
    * Creator accepts an order
    */
-  async acceptOrder(orderId, creatorId) {
+  async acceptOrder(orderId, userId) {
     try {
-      console.log(`✅ Creator ${creatorId} accepting order ${orderId}`);
+      console.log(`✅ Creator ${userId} accepting order ${orderId}`);
+
+      // Validate inputs
+      if (!orderId || !userId) {
+        throw new Error('Order ID and User ID are required');
+      }
+
+      // Convert orderId to BigInt safely
+      let orderIdBigInt;
+      try {
+        orderIdBigInt = BigInt(orderId);
+      } catch (error) {
+        throw new Error('Invalid order ID format');
+      }
+
+      // Convert userId to BigInt safely
+      let userIdBigInt;
+      try {
+        userIdBigInt = BigInt(userId);
+      } catch (error) {
+        throw new Error('Invalid user ID format');
+      }
+
+      // First, get the creator profile for this user
+      const creatorProfile = await prisma.creatorProfile.findUnique({
+        where: { user_id: userIdBigInt }
+      });
+
+      if (!creatorProfile) {
+        throw new Error('Creator profile not found for this user');
+      }
 
       // Verify the creator owns this order
       const order = await prisma.order.findUnique({
-        where: { id: BigInt(orderId) },
+        where: { id: orderIdBigInt },
         include: {
           creator: {
             include: {
@@ -403,7 +440,8 @@ This ticket has been automatically created to provide support for this order. Pl
         throw new Error('Order not found');
       }
 
-      if (order.creator_id.toString() !== creatorId) {
+      // Check if the creator profile ID matches the order's creator_id
+      if (order.creator_id !== creatorProfile.id) {
         throw new Error('Unauthorized: Only the assigned creator can accept this order');
       }
 
@@ -414,20 +452,28 @@ This ticket has been automatically created to provide support for this order. Pl
       // Update order status to accepted
       const updatedOrder = await this.updateOrderStatus(orderId, 'accepted');
 
-      // Add creator acceptance message to ticket
+      // Add creator acceptance message to ticket (handle gracefully if it fails)
       if (order.ticket) {
-        await crmService.addMessage(
-          order.ticket.id.toString(),
-          creatorId,
-          `✅ **Order Accepted**\n\nI have accepted this order and will begin working on it. I'll keep you updated on the progress!`,
-          'text',
-          null,
-          null,
-          'creator'
-        );
+        try {
+          await crmService.addMessage(
+            order.ticket.id.toString(),
+            userId,
+            `✅ **Order Accepted**\n\nI have accepted this order and will begin working on it. I'll keep you updated on the progress!`,
+            'text',
+            null,
+            null,
+            'creator'
+          );
+          console.log(`✅ Acceptance message added to ticket ${order.ticket.id}`);
+        } catch (messageError) {
+          console.error('⚠️ Failed to add acceptance message to ticket:', messageError);
+          // Don't fail the entire operation if message addition fails
+        }
+      } else {
+        console.log('⚠️ No ticket found for order, skipping message addition');
       }
 
-      console.log(`✅ Order ${orderId} accepted by creator ${creatorId}`);
+      console.log(`✅ Order ${orderId} accepted by creator ${userId}`);
       return updatedOrder;
 
     } catch (error) {
@@ -439,13 +485,43 @@ This ticket has been automatically created to provide support for this order. Pl
   /**
    * Creator rejects an order
    */
-  async rejectOrder(orderId, creatorId, rejectionReason = null) {
+  async rejectOrder(orderId, userId, rejectionReason = null) {
     try {
-      console.log(`❌ Creator ${creatorId} rejecting order ${orderId}`);
+      console.log(`❌ Creator ${userId} rejecting order ${orderId}`);
+
+      // Validate inputs
+      if (!orderId || !userId) {
+        throw new Error('Order ID and User ID are required');
+      }
+
+      // Convert orderId to BigInt safely
+      let orderIdBigInt;
+      try {
+        orderIdBigInt = BigInt(orderId);
+      } catch (error) {
+        throw new Error('Invalid order ID format');
+      }
+
+      // Convert userId to BigInt safely
+      let userIdBigInt;
+      try {
+        userIdBigInt = BigInt(userId);
+      } catch (error) {
+        throw new Error('Invalid user ID format');
+      }
+
+      // First, get the creator profile for this user
+      const creatorProfile = await prisma.creatorProfile.findUnique({
+        where: { user_id: userIdBigInt }
+      });
+
+      if (!creatorProfile) {
+        throw new Error('Creator profile not found for this user');
+      }
 
       // Verify the creator owns this order
       const order = await prisma.order.findUnique({
-        where: { id: BigInt(orderId) },
+        where: { id: orderIdBigInt },
         include: {
           creator: {
             include: {
@@ -464,7 +540,8 @@ This ticket has been automatically created to provide support for this order. Pl
         throw new Error('Order not found');
       }
 
-      if (order.creator_id.toString() !== creatorId) {
+      // Check if the creator profile ID matches the order's creator_id
+      if (order.creator_id !== creatorProfile.id) {
         throw new Error('Unauthorized: Only the assigned creator can reject this order');
       }
 
@@ -475,24 +552,32 @@ This ticket has been automatically created to provide support for this order. Pl
       // Update order status to rejected
       const updatedOrder = await this.updateOrderStatus(orderId, 'rejected');
 
-      // Add creator rejection message to ticket
+      // Add creator rejection message to ticket (handle gracefully if it fails)
       if (order.ticket) {
-        const rejectionMessage = rejectionReason 
-          ? `❌ **Order Rejected**\n\nI have rejected this order.\n\n**Reason:** ${rejectionReason}\n\nPlease contact support if you have any questions.`
-          : `❌ **Order Rejected**\n\nI have rejected this order. Please contact support if you have any questions.`;
+        try {
+          const rejectionMessage = rejectionReason 
+            ? `❌ **Order Rejected**\n\nI have rejected this order.\n\n**Reason:** ${rejectionReason}\n\nPlease contact support if you have any questions.`
+            : `❌ **Order Rejected**\n\nI have rejected this order. Please contact support if you have any questions.`;
 
-        await crmService.addMessage(
-          order.ticket.id.toString(),
-          creatorId,
-          rejectionMessage,
-          'text',
-          null,
-          null,
-          'creator'
-        );
+          await crmService.addMessage(
+            order.ticket.id.toString(),
+            userId,
+            rejectionMessage,
+            'text',
+            null,
+            null,
+            'creator'
+          );
+          console.log(`✅ Rejection message added to ticket ${order.ticket.id}`);
+        } catch (messageError) {
+          console.error('⚠️ Failed to add rejection message to ticket:', messageError);
+          // Don't fail the entire operation if message addition fails
+        }
+      } else {
+        console.log('⚠️ No ticket found for order, skipping message addition');
       }
 
-      console.log(`✅ Order ${orderId} rejected by creator ${creatorId}`);
+      console.log(`✅ Order ${orderId} rejected by creator ${userId}`);
       return updatedOrder;
 
     } catch (error) {

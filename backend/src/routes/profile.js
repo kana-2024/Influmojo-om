@@ -1,7 +1,8 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('../generated/client');
+const asyncHandler = require('../utils/asyncHandler');
+const { authenticateJWT } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -10,37 +11,12 @@ const prisma = new PrismaClient();
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log('Validation errors:', errors.array());
     return res.status(400).json({ 
       error: 'Validation failed', 
-      message: errors.array()[0]?.msg || 'Validation failed',
       details: errors.array() 
     });
   }
   next();
-};
-
-// Middleware to verify JWT token
-const authenticateToken = (req, res, next) => {
-  // Allow bypass for testing in development
-  if (req.headers['x-bypass-auth'] === 'true' && process.env.NODE_ENV !== 'production') {
-    req.userId = '1'; // Use a default user ID for testing
-    return next();
-  }
-  
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  
-  if (!token) {
-    return res.status(401).json({ error: 'No token provided' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    req.userId = decoded.userId;
-    next();
-  } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
 };
 
 // Get available industries for selection
@@ -111,10 +87,10 @@ router.post('/update-basic-info', [
     return true;
   }),
   body('role').optional()
-], validateRequest, authenticateToken, async (req, res) => {
+], validateRequest, authenticateJWT, async (req, res) => {
   try {
     const { gender, email, phone, dob, state, city, business_type, website_url, role } = req.body;
-    const userId = BigInt(req.userId);
+    const userId = BigInt(req.user.id);
 
     // Get user to check user type
     const user = await prisma.user.findUnique({
@@ -338,10 +314,10 @@ router.post('/update-preferences', [
   body('platform').optional().isArray().withMessage('Platform must be an array'),
   body('role').optional(),
   body('dateOfBirth').optional().isISO8601().withMessage('Valid date required')
-], validateRequest, authenticateToken, async (req, res) => {
+], validateRequest, authenticateJWT, async (req, res) => {
   try {
     const { categories, about, languages, platform, role, dateOfBirth } = req.body;
-    const userId = BigInt(req.userId);
+    const userId = BigInt(req.user.id);
 
     console.log('Update preferences request:', {
       userId: userId.toString(),
@@ -516,7 +492,7 @@ router.post('/create-package', [
   body('duration2').notEmpty().withMessage('Duration 2 is required'),
   body('price').isFloat({ min: 0 }).withMessage('Valid price required'),
   body('description').optional()
-], validateRequest, authenticateToken, async (req, res) => {
+], validateRequest, authenticateJWT, async (req, res) => {
   try {
     const { 
       platform, 
@@ -528,7 +504,7 @@ router.post('/create-package', [
       price, 
       description 
     } = req.body;
-    const userId = BigInt(req.userId);
+    const userId = BigInt(req.user.id);
 
     // Get user to check user type
     const user = await prisma.user.findUnique({
@@ -632,7 +608,7 @@ router.put('/update-package', [
   body('duration2').notEmpty().withMessage('Duration 2 is required'),
   body('price').isFloat({ min: 0 }).withMessage('Valid price required'),
   body('description').optional()
-], validateRequest, authenticateToken, async (req, res) => {
+], validateRequest, authenticateJWT, async (req, res) => {
   try {
     const { 
       id,
@@ -645,7 +621,7 @@ router.put('/update-package', [
       price, 
       description 
     } = req.body;
-    const userId = BigInt(req.userId);
+    const userId = BigInt(req.user.id);
 
     // Get user to check user type
     const user = await prisma.user.findUnique({
@@ -753,10 +729,10 @@ router.put('/update-package', [
 });
 
 // Delete package - Now using unified Package table
-router.delete('/delete-package/:packageId', authenticateToken, async (req, res) => {
+router.delete('/delete-package/:packageId', authenticateJWT, async (req, res) => {
   try {
     const { packageId } = req.params;
-    const userId = BigInt(req.userId);
+    const userId = BigInt(req.user.id);
 
     // Get user to check user type
     const user = await prisma.user.findUnique({
@@ -845,10 +821,10 @@ router.post('/create-portfolio', [
   body('fileName').notEmpty().withMessage('File name is required'),
   body('fileSize').isInt({ min: 1 }).withMessage('Valid file size required'),
   body('mimeType').optional()
-], validateRequest, authenticateToken, async (req, res) => {
+], validateRequest, authenticateJWT, async (req, res) => {
   try {
     const { mediaUrl, mediaType, fileName, fileSize, mimeType } = req.body;
-    const userId = BigInt(req.userId);
+    const userId = BigInt(req.user.id);
 
     // Get user to check user type
     const user = await prisma.user.findUnique({
@@ -955,10 +931,10 @@ router.post('/submit-kyc', [
   body('backImageUrl').optional(),
   body('aadhaarData').optional(),
   body('verificationMethod').optional()
-], validateRequest, authenticateToken, async (req, res) => {
+], validateRequest, authenticateJWT, async (req, res) => {
   try {
     const { documentType, frontImageUrl, backImageUrl, aadhaarData, verificationMethod } = req.body;
-    const userId = BigInt(req.userId);
+    const userId = BigInt(req.user.id);
 
     // Get user to check user type
     const user = await prisma.user.findUnique({
@@ -1061,9 +1037,9 @@ router.post('/submit-kyc', [
 });
 
 // Get user profile with all related data
-router.get('/profile', authenticateToken, async (req, res) => {
+router.get('/profile', authenticateJWT, async (req, res) => {
   try {
-    const userId = BigInt(req.userId);
+    const userId = BigInt(req.user.id);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -1126,10 +1102,10 @@ router.get('/profile', authenticateToken, async (req, res) => {
 });
 
 // Get creator profile with all related data
-router.get('/creator-profile', authenticateToken, async (req, res) => {
+router.get('/creator-profile', authenticateJWT, async (req, res) => {
   try {
-    console.log('🔍 Creator profile request received for user ID:', req.userId);
-    const userId = BigInt(req.userId);
+    console.log('🔍 Creator profile request received for user ID:', req.user.id);
+    const userId = BigInt(req.user.id);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -1156,7 +1132,7 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
     }
 
     if (!user) {
-      console.log('❌ User not found for ID:', req.userId);
+      console.log('❌ User not found for ID:', req.user.id);
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -1166,7 +1142,7 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
     }
 
     if (!user.creator_profiles) {
-      console.log('❌ Creator profile not found for user ID:', req.userId);
+      console.log('❌ Creator profile not found for user ID:', req.user.id);
       return res.status(404).json({ error: 'Creator profile not found' });
     }
 
@@ -1303,10 +1279,10 @@ router.get('/creator-profile', authenticateToken, async (req, res) => {
 });
 
 // Get brand profile with all related data
-router.get('/brand-profile', authenticateToken, async (req, res) => {
+router.get('/brand-profile', authenticateJWT, async (req, res) => {
   try {
-    console.log('🔍 Brand profile request received for user ID:', req.userId);
-    const userId = BigInt(req.userId);
+    console.log('🔍 Brand profile request received for user ID:', req.user.id);
+    const userId = BigInt(req.user.id);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -1434,10 +1410,10 @@ router.post('/create-campaign', [
   body('duration').notEmpty().withMessage('Duration is required'),
   body('requirements').notEmpty().withMessage('Requirements are required'),
   body('targetAudience').notEmpty().withMessage('Target audience is required')
-], validateRequest, authenticateToken, async (req, res) => {
+], validateRequest, authenticateJWT, async (req, res) => {
   try {
     const { title, description, budget, duration, requirements, targetAudience } = req.body;
-    const userId = BigInt(req.userId);
+    const userId = BigInt(req.user.id);
 
     // Get user to check user type
     const user = await prisma.user.findUnique({
@@ -1682,7 +1658,7 @@ router.get('/creators', async (req, res) => {
 });
 
 // Get creators by platform
-router.get('/creators/:platform', authenticateToken, async (req, res) => {
+router.get('/creators/:platform', authenticateJWT, async (req, res) => {
   try {
     const { platform } = req.params;
     
@@ -1818,7 +1794,7 @@ router.get('/creators/:platform', authenticateToken, async (req, res) => {
 });
 
 // Get individual creator profile
-router.get('/creators/:platform/:id', authenticateToken, async (req, res) => {
+router.get('/creators/:platform/:id', authenticateJWT, async (req, res) => {
   try {
     const { platform, id } = req.params;
     
@@ -2055,13 +2031,13 @@ router.get('/creators/:platform/:id', authenticateToken, async (req, res) => {
 });
 
 // Update cover image
-router.post('/update-cover-image', authenticateToken, [
+router.post('/update-cover-image', authenticateJWT, [
   body('cover_image_url').notEmpty().withMessage('Cover image URL is required'),
   body('cover_image_url').isURL().withMessage('Valid cover image URL is required'),
 ], validateRequest, async (req, res) => {
   try {
     const { cover_image_url } = req.body;
-    const userId = req.userId;
+    const userId = req.user.id;
 
     console.log('🔍 Updating cover image for user:', userId);
     console.log('🔍 Cover image URL:', cover_image_url);

@@ -37,10 +37,10 @@ import EditPackageScreen from './screens/creator/EditPackageScreen';
 import CreatePortfolioScreen from './screens/creator/CreatePortfolioScreen';
 import BrandChatScreen from './screens/brand/BrandChatScreen';
 import CreatorChatScreen from './screens/creator/CreatorChatScreen';
+import AgentDashboard from './screens/agent/AgentDashboard';
 import SplashScreen from './screens/SplashScreen';
 import { ENV } from './config/env';
-
-
+import AgentTicketView from './screens/agent/AgentTicketView';
 
 
 if (__DEV__) {
@@ -158,6 +158,8 @@ export default function App() {
               <Stack.Screen name="CreateCampaignModal" component={CreateCampaignModal} />
               <Stack.Screen name="BrandChat" component={BrandChatScreen} />
               <Stack.Screen name="CreatorChat" component={CreatorChatScreen} />
+              <Stack.Screen name="AgentDashboard" component={AgentDashboard} />
+              <Stack.Screen name="AgentTicketView" component={AgentTicketView} />
             </Stack.Navigator>
           </NavigationContainer>
         </PersistGate>

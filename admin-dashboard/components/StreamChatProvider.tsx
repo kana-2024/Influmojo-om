@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { StreamChat } from 'stream-chat';
 import { Chat } from 'stream-chat-react';
 import type { StreamChat as StreamChatType } from 'stream-chat';
@@ -32,6 +32,8 @@ interface StreamChatProviderProps {
 export default function StreamChatProvider({ children, apiKey }: StreamChatProviderProps) {
   const [client, setClient] = useState<StreamChatType | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const connectionInProgress = useRef(false);
+  const currentUserId = useRef<string | null>(null);
 
   // Initialize StreamChat client
   useEffect(() => {
@@ -42,7 +44,18 @@ export default function StreamChatProvider({ children, apiKey }: StreamChatProvi
 
     const initClient = async () => {
       try {
+        console.log('🔧 Initializing StreamChat client with API key:', apiKey ? 'Present' : 'Missing');
+        
+        if (!apiKey || apiKey.trim() === '') {
+          throw new Error('StreamChat API key is required');
+        }
+        
         const streamClient = StreamChat.getInstance(apiKey);
+        
+        if (!streamClient) {
+          throw new Error('Failed to create StreamChat client instance');
+        }
+        
         setClient(streamClient);
         console.log('✅ StreamChat client initialized');
       } catch (error) {
@@ -57,6 +70,9 @@ export default function StreamChatProvider({ children, apiKey }: StreamChatProvi
     return () => {
       if (client) {
         client.disconnectUser();
+        setIsConnected(false);
+        currentUserId.current = null;
+        connectionInProgress.current = false;
       }
     };
   }, [apiKey]);
@@ -67,7 +83,27 @@ export default function StreamChatProvider({ children, apiKey }: StreamChatProvi
       throw new Error('StreamChat client not initialized');
     }
 
+    // Prevent consecutive calls to connectUser
+    if (connectionInProgress.current) {
+      console.log('⚠️ Connection already in progress, skipping...');
+      return;
+    }
+
+    // If already connected to the same user, skip
+    if (isConnected && currentUserId.current === userId) {
+      console.log('✅ Already connected to user:', userId);
+      return;
+    }
+
+    // If connected to a different user, disconnect first
+    if (isConnected && currentUserId.current !== userId) {
+      console.log('🔄 Disconnecting from previous user before connecting to:', userId);
+      await disconnectUser();
+    }
+
     try {
+      connectionInProgress.current = true;
+      
       await client.connectUser(
         {
           id: userId,
@@ -78,21 +114,28 @@ export default function StreamChatProvider({ children, apiKey }: StreamChatProvi
       );
       
       setIsConnected(true);
+      currentUserId.current = userId;
       console.log(`✅ User ${userId} connected to StreamChat`);
       toast.success('Connected to chat');
     } catch (error) {
       console.error('❌ Error connecting user to StreamChat:', error);
       toast.error('Failed to connect to chat');
+      setIsConnected(false);
+      currentUserId.current = null;
       throw error;
+    } finally {
+      connectionInProgress.current = false;
     }
   };
 
   // Disconnect user from StreamChat
   const disconnectUser = async () => {
-    if (client) {
+    if (client && isConnected) {
       try {
         await client.disconnectUser();
         setIsConnected(false);
+        currentUserId.current = null;
+        connectionInProgress.current = false;
         console.log('✅ User disconnected from StreamChat');
       } catch (error) {
         console.error('❌ Error disconnecting user from StreamChat:', error);

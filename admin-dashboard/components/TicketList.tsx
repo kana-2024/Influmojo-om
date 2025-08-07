@@ -10,14 +10,17 @@ import { format } from 'date-fns';
 import { Eye, Clock, User, Package, DollarSign } from 'lucide-react';
 
 interface TicketListProps {
+  tickets?: Ticket[];
+  showAgentInfo?: boolean;
   onViewTicket?: (ticket: Ticket) => void;
 }
 
-export default function TicketList({ onViewTicket }: TicketListProps) {
+export default function TicketList({ tickets: propTickets, showAgentInfo = true, onViewTicket }: TicketListProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(10);
   const router = useRouter();
 
+  // Use provided tickets or fetch from API
   const {
     data: ticketsData,
     isLoading,
@@ -27,10 +30,11 @@ export default function TicketList({ onViewTicket }: TicketListProps) {
     queryKey: ['tickets', currentPage, limit],
     queryFn: () => ticketsAPI.getAllTickets(currentPage, limit),
     retry: 1,
+    enabled: !propTickets, // Only fetch if no tickets provided
   });
 
-  const tickets = ticketsData?.data?.tickets || [];
-  const total = ticketsData?.data?.total || 0;
+  const tickets = propTickets || ticketsData?.data?.tickets || [];
+  const total = propTickets ? propTickets.length : (ticketsData?.data?.total || 0);
   const totalPages = Math.ceil(total / limit);
 
   const getPriorityColor = (priority: string) => {
@@ -54,11 +58,15 @@ export default function TicketList({ onViewTicket }: TicketListProps) {
   };
 
   const handleViewTicket = (ticket: Ticket) => {
-    // Navigate to the new ticket page
-    router.push(`/ticket/${ticket.id}`);
+    if (onViewTicket) {
+      onViewTicket(ticket);
+    } else {
+      // Navigate to the new ticket page
+      router.push(`/ticket/${ticket.id}`);
+    }
   };
 
-  if (isLoading) {
+  if (isLoading && !propTickets) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -66,7 +74,7 @@ export default function TicketList({ onViewTicket }: TicketListProps) {
     );
   }
 
-  if (error) {
+  if (error && !propTickets) {
     return (
       <div className="text-center py-8">
         <p className="text-red-600">Failed to load tickets</p>
@@ -87,12 +95,14 @@ export default function TicketList({ onViewTicket }: TicketListProps) {
         <h3 className="text-lg font-semibold text-gray-900">
           Tickets ({total})
         </h3>
-        <button
-          onClick={() => refetch()}
-          className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-        >
-          Refresh
-        </button>
+        {!propTickets && (
+          <button
+            onClick={() => refetch()}
+            className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+          >
+            Refresh
+          </button>
+        )}
       </div>
 
       {/* Tickets Table */}
@@ -107,17 +117,16 @@ export default function TicketList({ onViewTicket }: TicketListProps) {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Order Details
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Brand & Creator
-                </th>
+                {showAgentInfo && (
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Assigned Agent
+                  </th>
+                )}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Priority
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Assigned Agent
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created
@@ -134,49 +143,30 @@ export default function TicketList({ onViewTicket }: TicketListProps) {
                     #{ticket.id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex items-center space-x-2">
-                      <Package className="h-4 w-4 text-gray-400" />
+                    <div className="flex items-center">
+                      <Package className="h-4 w-4 text-gray-400 mr-2" />
                       <div>
                         <div className="font-medium">
-                          {ticket.order?.package?.title || 'Package'}
+                          {ticket.order?.package?.title || 'Package Order'}
                         </div>
-                        <div className="text-gray-500">
-                          ${ticket.order?.amount || 0}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="space-y-2">
-                      {/* Brand Information */}
-                      <div className="flex items-center space-x-2 p-2 bg-blue-50 rounded-md border border-blue-200">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <User className="h-3 w-3 text-blue-500" />
-                        <div>
-                          <div className="text-xs font-medium text-blue-800">
-                            Brand: {ticket.order?.brand?.company_name || 'Unknown Brand'}
-                          </div>
-                          <div className="text-xs text-blue-600">
-                            {ticket.order?.brand?.user?.email || 'No email'}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Creator Information */}
-                      <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-md border border-green-200">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <User className="h-3 w-3 text-green-500" />
-                        <div>
-                          <div className="text-xs font-medium text-green-800">
-                            Creator: {ticket.order?.creator?.user?.name || 'Unknown Creator'}
-                          </div>
-                          <div className="text-xs text-green-600">
-                            {ticket.order?.creator?.user?.email || 'No email'}
-                          </div>
+                        <div className="text-gray-500 text-xs">
+                          {ticket.order?.brand?.company_name || 'Brand'} → {ticket.order?.creator?.user?.name || 'Creator'}
                         </div>
                       </div>
                     </div>
                   </td>
+                  {showAgentInfo && (
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {ticket.agent ? (
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 text-gray-400 mr-2" />
+                          <span>{ticket.agent.name}</span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">Unassigned</span>
+                      )}
+                    </td>
+                  )}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${getStatusColor(ticket.status)}`}>
                       {ticket.status.replace('_', ' ')}
@@ -187,23 +177,15 @@ export default function TicketList({ onViewTicket }: TicketListProps) {
                       {ticket.priority}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {ticket.agent?.name || 'Unassigned'}
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="h-3 w-3 text-gray-400" />
-                      <span>
-                        {ticket.created_at ? format(new Date(ticket.created_at), 'MMM dd, yyyy HH:mm') : 'N/A'}
-                      </span>
-                    </div>
+                    {format(new Date(ticket.created_at), 'MMM dd, yyyy')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
                       onClick={() => handleViewTicket(ticket)}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="text-blue-600 hover:text-blue-900 flex items-center"
                     >
-                      <Eye className="h-3 w-3 mr-1" />
+                      <Eye className="h-4 w-4 mr-1" />
                       View
                     </button>
                   </td>
@@ -215,7 +197,7 @@ export default function TicketList({ onViewTicket }: TicketListProps) {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!propTickets && totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-700">
             Showing {((currentPage - 1) * limit) + 1} to {Math.min(currentPage * limit, total)} of {total} results
@@ -224,17 +206,14 @@ export default function TicketList({ onViewTicket }: TicketListProps) {
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
-            <span className="px-3 py-1 text-sm text-gray-700">
-              Page {currentPage} of {totalPages}
-            </span>
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>

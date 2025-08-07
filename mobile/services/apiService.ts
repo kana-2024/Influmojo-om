@@ -518,8 +518,9 @@ export const ordersAPI = {
 // Ticket API calls
 export const ticketAPI = {
   // Get messages for a specific ticket
-  getTicketMessages: async (ticketId: string) => {
-    return await apiRequest(`${ENV.API_BASE_URL}/api/crm/tickets/${ticketId}/messages`, {
+  getTicketMessages: async (ticketId: string, loadOlderMessages: boolean = false) => {
+    const queryParams = loadOlderMessages ? '?loadOlderMessages=true' : '';
+    return await apiRequest(`${ENV.API_BASE_URL}/api/crm/tickets/${ticketId}/messages${queryParams}`, {
       method: 'GET',
     });
   },
@@ -528,6 +529,7 @@ export const ticketAPI = {
   sendTicketMessage: async (ticketId: string, messageData: {
     message_text: string;
     sender_role?: 'brand' | 'creator' | 'agent' | 'system';
+    channel_type?: 'brand_agent' | 'creator_agent';
     message_type?: 'text' | 'file' | 'system';
   }) => {
     return await apiRequest(`${ENV.API_BASE_URL}/api/crm/tickets/${ticketId}/messages`, {
@@ -548,6 +550,26 @@ export const ticketAPI = {
     return await apiRequest(`${ENV.API_BASE_URL}/api/crm/tickets/${ticketId}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
+    });
+  },
+
+  // Update agent status (online/offline)
+  updateAgentStatus: async (status: 'available' | 'busy' | 'offline' | 'away', isOnline?: boolean) => {
+    const body: any = { status };
+    if (isOnline !== undefined) {
+      body.isOnline = isOnline;
+    }
+    
+    return await apiRequest(`${ENV.API_BASE_URL}/api/crm/agent/status`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    });
+  },
+
+  // Get agent status for a specific ticket
+  getAgentStatus: async (ticketId: string) => {
+    return await apiRequest(`${ENV.API_BASE_URL}/api/crm/tickets/${ticketId}/agent-status`, {
+      method: 'GET',
     });
   },
 };

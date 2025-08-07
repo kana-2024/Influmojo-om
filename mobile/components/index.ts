@@ -32,4 +32,5 @@ export { default as CreatorSection } from './CreatorSection';
 
 // Chat Components
 export { default as ChatButton } from './ChatButton';
-export { default as OrderChatTest } from './OrderChatTest'; 
+export { default as OrderChatTest } from './OrderChatTest';
+export { default as ChatLoader } from './ChatLoader'; 

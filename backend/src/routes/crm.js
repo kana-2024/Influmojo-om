@@ -14,9 +14,16 @@ const router = express.Router();
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.error('❌ Validation failed:', {
+      body: req.body,
+      errors: errors.array(),
+      url: req.url,
+      method: req.method
+    });
     return res.status(400).json({ 
       error: 'Validation failed', 
-      details: errors.array() 
+      details: errors.array(),
+      body: req.body
     });
   }
   next();
@@ -62,15 +69,18 @@ router.post('/tickets', [
 router.get('/tickets/:ticketId/messages', asyncHandler(async (req, res) => {
   try {
     const { ticketId } = req.params;
-    const userId = req.user?.id;
-    const userType = req.user?.user_type;
+    const { loadOlderMessages = false, userId: queryUserId, userType: queryUserType, channelType: queryChannelType } = req.query;
+    
+    // Use authenticated user info first, fallback to query parameters
+    const userId = req.user?.id || queryUserId;
+    const userType = req.user?.user_type || queryUserType;
 
-    console.log('💬 Getting messages for ticket:', ticketId, 'by user:', userId, 'type:', userType);
+    console.log('💬 Getting messages for ticket:', ticketId, 'by user:', userId, 'type:', userType, 'loadOlderMessages:', loadOlderMessages, 'channelType:', queryChannelType);
 
     if (!userId) {
       return res.status(401).json({
         error: 'Authentication required',
-        message: 'User ID not found in token'
+        message: 'User ID not found in token or query parameters'
       });
     }
 
@@ -83,23 +93,24 @@ router.get('/tickets/:ticketId/messages', asyncHandler(async (req, res) => {
             brand: { include: { user: true } },
             creator: { include: { user: true } }
           }
-        }
+        },
+        agent: { select: { id: true, name: true, user_type: true } }
       }
     });
 
     if (!ticket) {
       return res.status(404).json({
         error: 'Ticket not found',
-        message: 'No ticket found with this ID'
+        message: 'The specified ticket does not exist'
       });
     }
 
     // Check if user has access to this ticket
     const hasAccess = 
-      userType === 'admin' || 
+      userType === 'agent' || 
       userType === 'super_admin' ||
-      (userType === 'brand' && ticket.order.brand.user.id === BigInt(userId)) ||
-      (userType === 'creator' && ticket.order.creator.user.id === BigInt(userId));
+      ticket.order.brand.user.id.toString() === userId.toString() ||
+      ticket.order.creator.user.id.toString() === userId.toString();
 
     if (!hasAccess) {
       return res.status(403).json({
@@ -108,43 +119,89 @@ router.get('/tickets/:ticketId/messages', asyncHandler(async (req, res) => {
       });
     }
 
-    const messages = await crmService.getTicketMessages(ticketId);
+    // Determine channel type based on user type if not provided
+    let finalChannelType = queryChannelType;
+    if (!finalChannelType) {
+      if (userType === 'brand') {
+        finalChannelType = 'brand_agent';
+      } else if (userType === 'creator') {
+        finalChannelType = 'creator_agent';
+      }
+      // For agents, don't filter by channel type - they can see all messages
+    }
+
+    // Get messages with agent status consideration and channel filtering
+    const result = await crmService.getTicketMessages(
+      ticketId, 
+      userId.toString(), 
+      userType, 
+      loadOlderMessages === 'true',
+      finalChannelType
+    );
 
     res.json({
       success: true,
-      message: 'Messages retrieved successfully',
-      data: { messages }
+      data: result
     });
 
   } catch (error) {
     console.error('❌ Error getting ticket messages:', error);
     res.status(500).json({
-      error: 'Failed to get messages',
+      error: 'Failed to get ticket messages',
       message: error.message
     });
   }
 }));
 
-// Add message to ticket (users can add messages to their own tickets)
+// Add message to ticket
 router.post('/tickets/:ticketId/messages', [
-  body('message_text').isString().withMessage('Message text is required'),
+  body('message_text').optional().isString().withMessage('Message text must be a string'),
+  body('message').optional().isString().withMessage('Message must be a string'),
   body('message_type').optional().isIn(['text', 'file', 'system']).withMessage('Valid message type is required'),
   body('file_url').optional().isString().withMessage('File URL must be a string'),
   body('file_name').optional().isString().withMessage('File name must be a string'),
-  body('sender_role').optional().isIn(['brand', 'creator', 'agent', 'system']).withMessage('Valid sender role is required')
+  body('sender_role').optional().isIn(['brand', 'creator', 'agent', 'system']).withMessage('Valid sender role is required'),
+  body('channel_type').optional().isIn(['brand_agent', 'creator_agent']).withMessage('Valid channel type is required')
 ], validateRequest, asyncHandler(async (req, res) => {
   try {
     const { ticketId } = req.params;
-    const { message_text, message_type = 'text', file_url, file_name, sender_role } = req.body;
+    const { message, message_text, message_type = 'text', file_url, file_name, sender_role, channel_type } = req.body;
     const userId = req.user?.id;
     const userType = req.user?.user_type;
 
-    console.log('💬 Adding message to ticket:', ticketId, 'with role:', sender_role, 'by user:', userId, 'type:', userType);
+    console.log('💬 Adding message to ticket:', ticketId, 'with role:', sender_role, 'channel_type:', channel_type, 'by user:', userId, 'type:', userType);
+    console.log('📝 Message data received:', { message, message_text, message_type, sender_role, channel_type });
 
     if (!userId) {
       return res.status(401).json({
         error: 'Authentication required',
         message: 'User ID not found in token'
+      });
+    }
+
+    // Get message content from either 'message' or 'message_text' field
+    const messageContent = message || message_text;
+    
+    console.log('🔍 Message content extraction:', {
+      message,
+      message_text,
+      messageContent,
+      messageContentType: typeof messageContent,
+      messageContentLength: messageContent ? messageContent.length : 0,
+      messageContentTrimmed: messageContent ? messageContent.trim().length : 0
+    });
+    
+    // Validate message content
+    if (!messageContent || typeof messageContent !== 'string' || messageContent.trim().length === 0) {
+      console.error('❌ Message validation failed:', {
+        hasMessageContent: !!messageContent,
+        messageContentType: typeof messageContent,
+        messageContentLength: messageContent ? messageContent.length : 0,
+        messageContentTrimmed: messageContent ? messageContent.trim().length : 0
+      });
+      return res.status(400).json({
+        error: 'Invalid message',
+        message: 'Message text is required and cannot be empty. Please provide either "message" or "message_text" field.'
       });
     }
 
@@ -170,7 +227,7 @@ router.post('/tickets/:ticketId/messages', [
 
     // Check if user has access to this ticket
     const hasAccess = 
-      userType === 'admin' || 
+      userType === 'agent' || 
       userType === 'super_admin' ||
       (userType === 'brand' && ticket.order.brand.user.id === BigInt(userId)) ||
       (userType === 'creator' && ticket.order.creator.user.id === BigInt(userId));
@@ -185,27 +242,43 @@ router.post('/tickets/:ticketId/messages', [
     // Determine sender role if not provided
     let finalSenderRole = sender_role;
     if (!finalSenderRole) {
-      if (userType === 'admin' || userType === 'super_admin') {
+      if (userType === 'agent' || userType === 'super_admin') {
         finalSenderRole = 'agent';
       } else {
         finalSenderRole = userType;
       }
     }
 
-    const message = await crmService.addMessage(
+    // Determine channel type if not provided
+    let finalChannelType = channel_type;
+    if (!finalChannelType) {
+      if (userType === 'brand') {
+        finalChannelType = 'brand_agent';
+      } else if (userType === 'creator') {
+        finalChannelType = 'creator_agent';
+      } else if (userType === 'agent' || userType === 'super_admin') {
+        // For agents, default to brand_agent channel
+        finalChannelType = 'brand_agent';
+      } else {
+        finalChannelType = 'brand_agent'; // Default fallback
+      }
+    }
+
+    const messageData = await crmService.addMessage(
       ticketId, 
       userId.toString(), // Use authenticated user's ID
-      message_text, 
+      messageContent.trim(), 
       message_type, 
       file_url, 
       file_name,
-      finalSenderRole
+      finalSenderRole,
+      finalChannelType
     );
 
     res.status(201).json({
       success: true,
       message: 'Message added successfully',
-      data: { message }
+      data: { message: messageData }
     });
 
   } catch (error) {
@@ -251,7 +324,7 @@ router.get('/tickets/order/:orderId', asyncHandler(async (req, res) => {
 
     // Check if user has access to this order
     const hasAccess = 
-      userType === 'admin' || 
+      userType === 'agent' || 
       userType === 'super_admin' ||
       (userType === 'brand' && order.brand.user.id === BigInt(userId)) ||
       (userType === 'creator' && order.creator.user.id === BigInt(userId));
@@ -372,6 +445,263 @@ router.get('/tickets', isAdmin, asyncHandler(async (req, res) => {
   }
 }));
 
+// Get tickets assigned to current agent
+router.get('/tickets/my', asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const userType = req.user?.user_type;
+    const { view = 'assigned' } = req.query; // 'assigned' or 'overview'
+
+    console.log('🎫 Getting tickets for user:', userId, 'type:', userType, 'view:', view);
+
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'User ID not found in token'
+      });
+    }
+
+    // Check if user is an agent or super_admin
+    if (userType !== 'agent' && userType !== 'super_admin') {
+      return res.status(403).json({
+        error: 'Access denied',
+        message: `Only agents and super admins can access this endpoint. User type: ${userType}`
+      });
+    }
+
+    // Get tickets based on user type and view preference
+    let tickets;
+    if (userType === 'super_admin') {
+      // Super admins can see all tickets
+      tickets = await prisma.ticket.findMany({
+        include: {
+          order: {
+            include: {
+              package: true,
+              brand: {
+                include: {
+                  user: true
+                }
+              },
+              creator: {
+                include: {
+                  user: true
+                }
+              }
+            }
+          },
+          agent: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              user_type: true
+            }
+          },
+          messages: {
+            include: {
+              sender: {
+                select: {
+                  id: true,
+                  name: true,
+                  user_type: true
+                }
+              }
+            },
+            orderBy: {
+              created_at: 'desc'
+            },
+            take: 1
+          }
+        },
+        orderBy: {
+          created_at: 'desc'
+        }
+      });
+    } else if (userType === 'agent') {
+      // Agents can see their assigned tickets or overview of all tickets
+      if (view === 'overview') {
+        // Show all tickets for overview
+        tickets = await prisma.ticket.findMany({
+          include: {
+            order: {
+              include: {
+                package: true,
+                brand: {
+                  include: {
+                    user: true
+                  }
+                },
+                creator: {
+                  include: {
+                    user: true
+                  }
+                }
+              }
+            },
+            agent: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                user_type: true
+              }
+            },
+            messages: {
+              include: {
+                sender: {
+                  select: {
+                    id: true,
+                    name: true,
+                    user_type: true
+                  }
+                }
+              },
+              orderBy: {
+                created_at: 'desc'
+              },
+              take: 1
+            }
+          },
+          orderBy: {
+            created_at: 'desc'
+          }
+        });
+      } else {
+        // Show only assigned tickets (default view)
+        tickets = await prisma.ticket.findMany({
+          where: {
+            agent_id: BigInt(userId)
+          },
+          include: {
+            order: {
+              include: {
+                package: true,
+                brand: {
+                  include: {
+                    user: true
+                  }
+                },
+                creator: {
+                  include: {
+                    user: true
+                  }
+                }
+              }
+            },
+            agent: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                user_type: true
+              }
+            },
+            messages: {
+              include: {
+                sender: {
+                  select: {
+                    id: true,
+                    name: true,
+                    user_type: true
+                  }
+                }
+              },
+              orderBy: {
+                created_at: 'desc'
+              },
+              take: 1
+            }
+          },
+          orderBy: {
+            created_at: 'desc'
+          }
+        });
+      }
+    }
+
+    // Transform tickets for response
+    const transformedTickets = tickets.map(ticket => ({
+      id: ticket.id.toString(),
+      order_id: ticket.order_id.toString(),
+      agent_id: ticket.agent_id.toString(),
+      stream_channel_id: ticket.stream_channel_id,
+      status: ticket.status,
+      priority: ticket.priority,
+      created_at: ticket.created_at,
+      updated_at: ticket.updated_at,
+      agent: ticket.agent ? {
+        id: ticket.agent.id.toString(),
+        name: ticket.agent.name,
+        email: ticket.agent.email,
+        user_type: ticket.agent.user_type
+      } : null,
+      order: ticket.order ? {
+        id: ticket.order.id.toString(),
+        package: ticket.order.package ? {
+          title: ticket.order.package.title,
+          description: ticket.order.package.description,
+          price: ticket.order.package.price.toString(),
+          currency: ticket.order.package.currency
+        } : null,
+        brand: ticket.order.brand ? {
+          company_name: ticket.order.brand.company_name,
+          user: ticket.order.brand.user ? {
+            id: ticket.order.brand.user.id.toString(),
+            name: ticket.order.brand.user.name,
+            email: ticket.order.brand.user.email
+          } : null
+        } : null,
+        creator: ticket.order.creator ? {
+          id: ticket.order.creator.id.toString(),
+          name: ticket.order.creator.name,
+          email: ticket.order.creator.email,
+          user: ticket.order.creator.user ? {
+            id: ticket.order.creator.user.id.toString(),
+            name: ticket.order.creator.user.name,
+            email: ticket.order.creator.user.email
+          } : null
+        } : null
+      } : null,
+      messages: ticket.messages.map(message => ({
+        id: message.id.toString(),
+        ticket_id: message.ticket_id.toString(),
+        sender_id: message.sender_id.toString(),
+        message_text: message.message_text,
+        message_type: message.message_type,
+        file_url: message.file_url,
+        file_name: message.file_name,
+        read_at: message.read_at,
+        created_at: message.created_at,
+        sender: message.sender ? {
+          id: message.sender.id.toString(),
+          name: message.sender.name,
+          user_type: message.sender.user_type
+        } : null
+      }))
+    }));
+
+    res.json({
+      success: true,
+      message: 'Tickets retrieved successfully',
+      data: { 
+        tickets: transformedTickets,
+        view: view,
+        user_type: userType,
+        total_tickets: transformedTickets.length,
+        view_type: userType === 'super_admin' ? 'all' : (view === 'overview' ? 'overview' : 'assigned')
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting tickets:', error);
+    res.status(500).json({
+      error: 'Failed to get tickets',
+      message: error.message
+    });
+  }
+}));
+
 // Get a single ticket by ID (admin only)
 router.get('/tickets/:ticketId', isAdmin, asyncHandler(async (req, res) => {
   try {
@@ -480,6 +810,84 @@ router.put('/tickets/:ticketId/priority', [
     console.error('❌ Error updating ticket priority:', error);
     res.status(500).json({
       error: 'Failed to update ticket priority',
+      message: error.message
+    });
+  }
+}));
+
+// Update agent status (online/offline)
+router.put('/agent/status', asyncHandler(async (req, res) => {
+  try {
+    const { status, isOnline } = req.body;
+    const userId = req.user?.id;
+    const userType = req.user?.user_type;
+
+    console.log('👨‍💼 Updating agent status:', { userId, userType, status, isOnline });
+
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'User ID not found in token'
+      });
+    }
+
+    if (userType !== 'agent' && userType !== 'super_admin') {
+      return res.status(403).json({
+        error: 'Access denied',
+        message: 'Only agents can update their status'
+      });
+    }
+
+    if (!status || !['available', 'busy', 'offline', 'away'].includes(status)) {
+      return res.status(400).json({
+        error: 'Invalid status',
+        message: 'Status must be one of: available, busy, offline, away'
+      });
+    }
+
+    const updatedAgent = await crmService.updateAgentStatus(userId, status, isOnline);
+
+    res.json({
+      success: true,
+      message: 'Agent status updated successfully',
+      data: updatedAgent
+    });
+
+  } catch (error) {
+    console.error('❌ Error updating agent status:', error);
+    res.status(500).json({
+      error: 'Failed to update agent status',
+      message: error.message
+    });
+  }
+}));
+
+// Get agent status for a specific ticket
+router.get('/tickets/:ticketId/agent-status', asyncHandler(async (req, res) => {
+  try {
+    const { ticketId } = req.params;
+    const userId = req.user?.id;
+
+    console.log('👨‍💼 Getting agent status for ticket:', ticketId, 'by user:', userId);
+
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'User ID not found in token'
+      });
+    }
+
+    const agentStatus = await crmService.getAgentStatus(ticketId);
+
+    res.json({
+      success: true,
+      data: agentStatus
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting agent status:', error);
+    res.status(500).json({
+      error: 'Failed to get agent status',
       message: error.message
     });
   }

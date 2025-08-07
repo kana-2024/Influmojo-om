@@ -22,6 +22,9 @@ export const COLORS = {
   // Additional colors
   error: '#EF4444',      // Red for errors
   white: '#FFFFFF',      // White
+  success: '#10B981',    // Green for success
+  warning: '#F59E0B',    // Yellow for warning
+  gray: '#6B7280',       // Gray for unknown status
   
   // Legacy colors (keeping for reference)
   legacyChipBlue: '#B1E5FC',

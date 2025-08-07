@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStreamChat } from '@/components/StreamChatProvider';
 import { streamChatAPI } from '@/lib/api';
 import { toast } from 'react-hot-toast';
@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 export const useStreamChatAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const authInProgress = useRef(false);
   
   // Try to get StreamChat context, but handle case when it's not available
   let streamChatContext;
@@ -19,24 +20,32 @@ export const useStreamChatAuth = () => {
   const { connectUser, disconnectUser, isConnected } = streamChatContext || {};
 
   // Authenticate with StreamChat
-  const authenticate = async () => {
+  const authenticate = useCallback(async () => {
     if (!streamChatContext || !connectUser) {
       console.log('⚠️ StreamChat not available - skipping authentication');
       return false;
     }
 
     if (isConnected) {
+      console.log('✅ Already connected to StreamChat');
       return true;
     }
 
+    // Prevent multiple authentication attempts
+    if (authInProgress.current) {
+      console.log('⚠️ Authentication already in progress, skipping...');
+      return false;
+    }
+
     try {
+      authInProgress.current = true;
       setIsLoading(true);
       setError(null);
 
       // Get StreamChat token from backend
       const response = await streamChatAPI.getToken();
       
-      if (!response.success) {
+      if (!response.success || !response.data) {
         throw new Error(response.message || 'Failed to get StreamChat token');
       }
 
@@ -56,11 +65,12 @@ export const useStreamChatAuth = () => {
       return false;
     } finally {
       setIsLoading(false);
+      authInProgress.current = false;
     }
-  };
+  }, [streamChatContext, connectUser, isConnected]);
 
   // Disconnect from StreamChat
-  const disconnect = async () => {
+  const disconnect = useCallback(async () => {
     if (!streamChatContext || !disconnectUser) {
       console.log('⚠️ StreamChat not available - skipping disconnect');
       return;
@@ -74,7 +84,7 @@ export const useStreamChatAuth = () => {
       console.error('❌ Error disconnecting from StreamChat:', error);
       toast.error('Failed to disconnect from StreamChat');
     }
-  };
+  }, [streamChatContext, disconnectUser]);
 
   return {
     authenticate,

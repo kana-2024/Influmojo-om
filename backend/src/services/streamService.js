@@ -1,14 +1,118 @@
 const { StreamChat } = require('stream-chat');
 
+// Check if environment variables are configured
+if (!process.env.STREAM_API_KEY) {
+  console.error('❌ STREAM_API_KEY not configured in environment variables');
+}
+
+if (!process.env.STREAM_API_SECRET) {
+  console.error('❌ STREAM_API_SECRET not configured in environment variables');
+}
+
 // Initialize StreamChat with API credentials
-const stream = StreamChat.getInstance(
-  process.env.STREAM_API_KEY,
-  process.env.STREAM_API_SECRET
-);
+let stream = null;
+try {
+  if (process.env.STREAM_API_KEY && process.env.STREAM_API_SECRET) {
+    stream = StreamChat.getInstance(
+      process.env.STREAM_API_KEY,
+      process.env.STREAM_API_SECRET
+    );
+    console.log('✅ StreamChat client initialized successfully');
+  } else {
+    console.warn('⚠️ StreamChat not initialized - missing API credentials');
+  }
+} catch (error) {
+  console.error('❌ Failed to initialize StreamChat client:', error);
+}
 
 class StreamService {
   /**
-   * Create a new ticket channel with agent assigned
+   * Create separate channels for brand-agent and creator-agent communication
+   * @param {string} ticketId - The ticket ID
+   * @param {string} agentId - The agent ID
+   * @param {string} brandId - The brand ID
+   * @param {string} creatorId - The creator ID
+   * @returns {Promise<{brandAgentChannel: string, creatorAgentChannel: string}>} Channel IDs
+   */
+  async createSeparateTicketChannels(ticketId, agentId, brandId, creatorId) {
+    try {
+      console.log(`🎫 Creating separate StreamChat channels for ticket ${ticketId}`);
+      console.log(`👥 Agent: ${agentId}, Brand: ${brandId}, Creator: ${creatorId}`);
+      
+      if (!stream) {
+        throw new Error('StreamChat client not initialized');
+      }
+
+      // Create brand-agent channel
+      const brandAgentChannelId = `ticket_${ticketId}_brand_agent`;
+      const brandAgentChannel = stream.channel('messaging', brandAgentChannelId, {
+        name: `Ticket #${ticketId} - Brand Support`,
+        members: [`agent-${agentId}`, `brand-${brandId}`],
+        created_by_id: `agent-${agentId}`,
+        data: {
+          ticket_id: ticketId,
+          order_id: ticketId,
+          agent_id: agentId,
+          brand_id: brandId,
+          status: 'open',
+          created_at: new Date().toISOString(),
+          channel_type: 'brand_agent'
+        }
+      });
+
+      // Create creator-agent channel
+      const creatorAgentChannelId = `ticket_${ticketId}_creator_agent`;
+      const creatorAgentChannel = stream.channel('messaging', creatorAgentChannelId, {
+        name: `Ticket #${ticketId} - Creator Support`,
+        members: [`agent-${agentId}`, `creator-${creatorId}`],
+        created_by_id: `agent-${agentId}`,
+        data: {
+          ticket_id: ticketId,
+          order_id: ticketId,
+          agent_id: agentId,
+          creator_id: creatorId,
+          status: 'open',
+          created_at: new Date().toISOString(),
+          channel_type: 'creator_agent'
+        }
+      });
+
+      // Create both channels
+      await Promise.all([
+        brandAgentChannel.create(),
+        creatorAgentChannel.create()
+      ]);
+
+      // Send initial system messages
+      await Promise.all([
+        brandAgentChannel.sendMessage({
+          text: `Support ticket #${ticketId} has been created. An agent will assist you shortly.`,
+          user_id: 'system',
+          type: 'system'
+        }),
+        creatorAgentChannel.sendMessage({
+          text: `Support ticket #${ticketId} has been created. An agent will assist you shortly.`,
+          user_id: 'system',
+          type: 'system'
+        })
+      ]);
+      
+      console.log(`✅ Separate StreamChat channels created:`);
+      console.log(`   - Brand-Agent: ${brandAgentChannelId}`);
+      console.log(`   - Creator-Agent: ${creatorAgentChannelId}`);
+      
+      return {
+        brandAgentChannel: brandAgentChannelId,
+        creatorAgentChannel: creatorAgentChannelId
+      };
+    } catch (error) {
+      console.error('❌ Error creating separate StreamChat channels:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new ticket channel with agent assigned (legacy method)
    * @param {string} ticketId - The ticket ID
    * @param {string} agentId - The agent ID
    * @returns {Promise<string>} Channel ID
@@ -16,6 +120,10 @@ class StreamService {
   async createTicketChannel(ticketId, agentId) {
     try {
       console.log(`🎫 Creating StreamChat channel for ticket ${ticketId} with agent ${agentId}`);
+      
+      if (!stream) {
+        throw new Error('StreamChat client not initialized');
+      }
       
       const channel = stream.channel('messaging', `ticket-${ticketId}`, {
         name: `Support Ticket #${ticketId}`,
@@ -41,7 +149,7 @@ class StreamService {
   }
 
   /**
-   * Create a unified ticket channel with brand, creator, and agent members
+   * Create a unified ticket channel with brand, creator, and agent members (legacy method)
    * @param {string} ticketId - The ticket ID
    * @param {string} agentId - The agent ID
    * @param {string} brandId - The brand ID
@@ -56,8 +164,8 @@ class StreamService {
       const channelId = `ticket_${ticketId}`;
       const channel = stream.channel('messaging', channelId, {
         name: `Ticket #${ticketId}`,
-        members: [`agent_${agentId}`, `brand_${brandId}`, `creator_${creatorId}`],
-        created_by_id: `agent_${agentId}`,
+        members: [`agent-${agentId}`, `brand-${brandId}`, `creator-${creatorId}`],
+        created_by_id: `agent-${agentId}`,
         // Set channel data for ticket management
         data: {
           ticket_id: ticketId,
@@ -97,7 +205,26 @@ class StreamService {
     try {
       console.log(`🔑 Generating StreamChat token for user: ${userId}`);
       
+      // Check if StreamChat is properly initialized
+      if (!stream) {
+        throw new Error('StreamChat client not initialized');
+      }
+      
+      // Check if API key is configured
+      if (!process.env.STREAM_API_KEY) {
+        throw new Error('STREAM_API_KEY not configured');
+      }
+      
+      // Check if API secret is configured
+      if (!process.env.STREAM_API_SECRET) {
+        throw new Error('STREAM_API_SECRET not configured');
+      }
+      
       const token = stream.createToken(userId);
+      
+      if (!token) {
+        throw new Error('Failed to generate StreamChat token');
+      }
       
       console.log(`✅ StreamChat token generated for user: ${userId}`);
       return token;

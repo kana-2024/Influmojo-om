@@ -574,4 +574,81 @@ router.get('/stats/overview', isAdmin, asyncHandler(async (req, res) => {
   }
 }));
 
+// Accept order (creators only)
+router.put('/:orderId/accept', asyncHandler(async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const userId = req.user.id;
+    const userType = req.user.user_type;
+
+    console.log(`✅ Creator ${userId} accepting order ${orderId}`);
+
+    if (userType !== 'creator') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only creators can accept orders'
+      });
+    }
+
+    // Validate orderId is a valid number
+    if (!orderId || isNaN(parseInt(orderId))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid order ID'
+      });
+    }
+
+    const updatedOrder = await orderService.acceptOrder(orderId, userId.toString());
+
+    res.json({
+      success: true,
+      message: 'Order accepted successfully',
+      data: { order: updatedOrder }
+    });
+
+  } catch (error) {
+    console.error('❌ Error accepting order:', error);
+    res.status(500).json({
+      error: 'Failed to accept order',
+      message: error.message
+    });
+  }
+}));
+
+// Reject order (creators only)
+router.put('/:orderId/reject', [
+  body('rejectionMessage').optional().isString().withMessage('Rejection message must be a string')
+], validateRequest, asyncHandler(async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { rejectionMessage } = req.body;
+    const userId = req.user.id;
+    const userType = req.user.user_type;
+
+    console.log(`❌ Creator ${userId} rejecting order ${orderId}`);
+
+    if (userType !== 'creator') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only creators can reject orders'
+      });
+    }
+
+    const updatedOrder = await orderService.rejectOrder(orderId, userId.toString(), rejectionMessage);
+
+    res.json({
+      success: true,
+      message: 'Order rejected successfully',
+      data: { order: updatedOrder }
+    });
+
+  } catch (error) {
+    console.error('❌ Error rejecting order:', error);
+    res.status(500).json({
+      error: 'Failed to reject order',
+      message: error.message
+    });
+  }
+}));
+
 module.exports = router; 

@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const agentController = require('../controllers/agentController');
 const { authenticateJWT } = require('../middlewares/auth.middleware');
-const { isSuperAdmin } = require('../middlewares/isSuperAdmin');
+const { isAdmin } = require('../middlewares/isSuperAdmin');
 const asyncHandler = require('../utils/asyncHandler');
 
 const router = express.Router();
@@ -21,12 +21,12 @@ const validateRequest = (req, res, next) => {
 
 /**
  * Admin Routes
- * All routes require super admin authentication
+ * All routes require admin authentication (agents and super_admins)
  */
 
-// Apply authentication and super admin middleware to all routes
+// Apply authentication and admin middleware to all routes
 router.use(authenticateJWT);
-router.use(isSuperAdmin);
+router.use(isAdmin);
 
 // Agent Management Routes
 

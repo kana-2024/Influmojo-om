@@ -15,8 +15,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { streamChatService } from '../../services/streamChatService';
+import { useAppSelector } from '../../store/hooks';
 import { ticketAPI } from '../../services/apiService';
+import { ChatLoader } from '../../components';
 import COLORS from '../../config/colors';
 
 interface BrandChatScreenProps {
@@ -38,11 +39,26 @@ interface Message {
   timestamp: string;
   created_at: string;
   status?: 'sending' | 'sent' | 'failed';
+  channel_type?: 'brand_agent' | 'creator_agent';
+}
+
+interface AgentStatus {
+  is_online: boolean;
+  status: 'available' | 'busy' | 'offline' | 'away';
+  last_online_at?: string;
+  agent_name?: string;
+}
+
+interface ChatResponse {
+  messages: Message[];
+  agent_status: AgentStatus;
+  has_older_messages: boolean;
 }
 
 export default function BrandChatScreen({ navigation, route }: BrandChatScreenProps) {
   const { ticketId, orderId, orderTitle } = route.params;
   const insets = useSafeAreaInsets();
+  const user = useAppSelector(state => state.auth.user);
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -50,7 +66,10 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  
+  const [agentStatus, setAgentStatus] = useState<AgentStatus | null>(null);
+  const [hasOlderMessages, setHasOlderMessages] = useState(false);
+  const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
+
   const flatListRef = useRef<FlatList>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastMessageIdRef = useRef<string | null>(null);
@@ -84,29 +103,39 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
       
       console.log(`🎫 Initializing brand chat for ticket ${ticketId}...`);
 
-      // Get ticket messages from backend
+      // Get ticket messages from backend - only brand_agent channel
       const response = await ticketAPI.getTicketMessages(ticketId);
       
       if (response.success) {
-        const fetchedMessages = response.data.messages || [];
-        setMessages(fetchedMessages);
+        const chatData: ChatResponse = response.data;
+        const fetchedMessages = chatData.messages || [];
+        
+        // Filter messages to only show brand_agent channel messages
+        const brandAgentMessages = fetchedMessages.filter(msg => 
+          msg.channel_type === 'brand_agent' || !msg.channel_type // Include legacy messages without channel_type
+        );
+        
+        setMessages(brandAgentMessages);
+        setAgentStatus(chatData.agent_status || null);
+        setHasOlderMessages(chatData.has_older_messages || false);
         
         // Store the last message ID for polling
-        if (fetchedMessages.length > 0) {
-          lastMessageIdRef.current = fetchedMessages[fetchedMessages.length - 1].id;
+        if (brandAgentMessages.length > 0) {
+          lastMessageIdRef.current = brandAgentMessages[brandAgentMessages.length - 1].id;
         }
         
         setIsConnected(true);
         console.log(`✅ Brand chat initialized for ticket ${ticketId}`);
-        
-        // Start polling for new messages
-        startPolling();
+        console.log(`👨‍💼 Agent status:`, chatData.agent_status);
+        console.log(`📜 Has older messages:`, chatData.has_older_messages);
+        console.log(`💬 Loaded ${brandAgentMessages.length} brand_agent messages`);
       } else {
-        throw new Error(response.error || 'Failed to load messages');
+        setError(response.error || 'Failed to load messages');
+        console.error('❌ Failed to initialize chat:', response.error);
       }
     } catch (error) {
-      console.error('❌ Error initializing brand chat:', error);
-      setError(error instanceof Error ? error.message : 'Failed to initialize chat');
+      console.error('❌ Error initializing chat:', error);
+      setError('Failed to initialize chat');
     } finally {
       setLoading(false);
     }
@@ -143,12 +172,17 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
       if (response.success) {
         const fetchedMessages = response.data.messages || [];
         
+        // Filter to only brand_agent channel messages
+        const brandAgentMessages = fetchedMessages.filter(msg => 
+          msg.channel_type === 'brand_agent' || !msg.channel_type
+        );
+        
         // Check if there are new messages
-        if (fetchedMessages.length > 0) {
-          const lastFetchedMessageId = fetchedMessages[fetchedMessages.length - 1].id;
+        if (brandAgentMessages.length > 0) {
+          const lastFetchedMessageId = brandAgentMessages[brandAgentMessages.length - 1].id;
           
           if (lastMessageIdRef.current !== lastFetchedMessageId) {
-            console.log('🆕 New messages detected, updating chat...');
+            console.log('🆕 New brand_agent messages detected, updating chat...');
             
             // Use functional state update to get the current messages
             setMessages(prevMessages => {
@@ -164,7 +198,7 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
               const newMessages: Message[] = [];
               const updatedMessages = prevMessages.map(existingMsg => {
                 // Check if this existing message has a corresponding fetched message by ID
-                const fetchedMsgById = fetchedMessages.find(fm => fm.id === existingMsg.id);
+                const fetchedMsgById = brandAgentMessages.find(fm => fm.id === existingMsg.id);
                 if (fetchedMsgById) {
                   // Update the existing message with server data and mark as sent
                   console.log('🔄 Updating existing message by ID:', existingMsg.id);
@@ -176,7 +210,7 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
                 }
                 
                 // Check if this existing message has a corresponding fetched message by content
-                const fetchedMsgByContent = fetchedMessages.find(fm => 
+                const fetchedMsgByContent = brandAgentMessages.find(fm => 
                   fm.text === existingMsg.text && 
                   fm.sender_name === existingMsg.sender_name &&
                   Math.abs(new Date(fm.created_at).getTime() - new Date(existingMsg.created_at).getTime()) < 10000 // Within 10 seconds
@@ -195,7 +229,7 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
               });
               
               // Add truly new messages
-              fetchedMessages.forEach(fetchedMsg => {
+              brandAgentMessages.forEach(fetchedMsg => {
                 const messageContentKey = `${fetchedMsg.text}-${fetchedMsg.sender_name}`;
                 
                 // Check if this message is already in the current state (by ID or content)
@@ -204,13 +238,13 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
                 const isPending = pendingMessageIdsRef.current.has(fetchedMsg.id) || pendingMessageIdsRef.current.has(messageContentKey);
                 
                 if (!isDuplicateById && !isDuplicateByContent && !isPending) {
-                  console.log('📝 Adding new message:', fetchedMsg.text);
+                  console.log('📝 Adding new brand_agent message:', fetchedMsg.text);
                   newMessages.push({
                     ...fetchedMsg,
                     status: 'sent' as const
                   });
                 } else {
-                  console.log('🚫 Skipping duplicate message:', fetchedMsg.text, {
+                  console.log('🚫 Skipping duplicate brand_agent message:', fetchedMsg.text, {
                     isDuplicateById,
                     isDuplicateByContent,
                     isPending,
@@ -222,7 +256,7 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
               
               if (newMessages.length > 0) {
                 // Add only new messages to existing state
-                console.log(`📝 Adding ${newMessages.length} new messages to chat`);
+                console.log(`📝 Adding ${newMessages.length} new brand_agent messages to chat`);
                 lastMessageIdRef.current = lastFetchedMessageId;
                 
                 // Auto-scroll to bottom if user is near the bottom
@@ -233,15 +267,15 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
                 return [...updatedMessages, ...newMessages];
               } else {
                 // If no new messages but we updated existing ones, return updated list
-                console.log('🔄 Updated existing messages');
+                console.log('🔄 Updated existing brand_agent messages');
                 lastMessageIdRef.current = lastFetchedMessageId;
                 return updatedMessages;
               }
             });
           }
-        } else if (fetchedMessages.length === 0 && messages.length > 0) {
+        } else if (brandAgentMessages.length === 0 && messages.length > 0) {
           // If no messages returned but we had messages before, something might be wrong
-          console.log('⚠️ No messages returned from server, but we had messages before');
+          console.log('⚠️ No brand_agent messages returned from server, but we had messages before');
         }
       }
     } catch (error) {
@@ -251,13 +285,17 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
 
   const reconnectIfNeeded = async () => {
     try {
-      console.log('🔄 Reconnecting to chat for ticket:', ticketId);
+      console.log('🔄 Reconnecting to brand chat for ticket:', ticketId);
       
       // Refresh messages when screen comes into focus
       const response = await ticketAPI.getTicketMessages(ticketId);
       if (response.success) {
         const fetchedMessages = response.data.messages || [];
-        console.log(`📥 Reconnected: received ${fetchedMessages.length} messages from server`);
+        const brandAgentMessages = fetchedMessages.filter(msg => 
+          msg.channel_type === 'brand_agent' || !msg.channel_type
+        );
+        
+        console.log(`📥 Reconnected: received ${brandAgentMessages.length} brand_agent messages from server`);
         
         // Merge fetched messages with existing messages to preserve user's own messages
         setMessages(prevMessages => {
@@ -265,7 +303,7 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
           const existingMessagesMap = new Map(prevMessages.map(msg => [msg.id, msg]));
           
           // Add or update messages from server
-          fetchedMessages.forEach(fetchedMsg => {
+          brandAgentMessages.forEach(fetchedMsg => {
             existingMessagesMap.set(fetchedMsg.id, fetchedMsg);
           });
           
@@ -273,13 +311,13 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
           const mergedMessages = Array.from(existingMessagesMap.values())
             .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
           
-          console.log(`✅ Reconnect complete: ${mergedMessages.length} total messages (${fetchedMessages.length} from server + ${prevMessages.length - fetchedMessages.length} preserved)`);
+          console.log(`✅ Reconnect complete: ${mergedMessages.length} total brand_agent messages (${brandAgentMessages.length} from server + ${prevMessages.length - brandAgentMessages.length} preserved)`);
           return mergedMessages;
         });
         
         // Update last message ID
-        if (fetchedMessages.length > 0) {
-          const lastMessage = fetchedMessages[fetchedMessages.length - 1];
+        if (brandAgentMessages.length > 0) {
+          const lastMessage = brandAgentMessages[brandAgentMessages.length - 1];
           lastMessageIdRef.current = lastMessage.id;
         }
       }
@@ -309,20 +347,24 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
       const messageData = {
         message_text: messageText,
         sender_role: 'brand' as const,
+        channel_type: 'brand_agent' as const,
         message_type: 'text' as const
       };
 
+      console.log('📤 Sending brand_agent message:', messageData);
       const response = await ticketAPI.sendTicketMessage(ticketId, messageData);
       
       if (response.success) {
+        console.log('✅ Brand_agent message sent successfully:', response.data);
         const newMsg: Message = {
-          id: response.data.message.id,
+          id: response.data?.message?.id || `temp-${Date.now()}`,
           text: messageText,
           sender_role: 'brand',
-          sender_name: 'You',
-          timestamp: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          status: 'sent' as const // Set to 'sent' immediately after successful API response
+          sender_name: user?.name || 'You',
+          timestamp: response.data?.message?.timestamp || new Date().toISOString(),
+          created_at: response.data?.message?.created_at || new Date().toISOString(),
+          status: 'sent' as const,
+          channel_type: 'brand_agent'
         };
         
         // Add message ID to pending set to prevent duplicate addition by polling
@@ -355,10 +397,11 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
           flatListRef.current?.scrollToEnd({ animated: true });
         }, 100);
       } else {
+        console.error('❌ Brand_agent message send failed:', response);
         throw new Error(response.message || 'Failed to send message');
       }
     } catch (error) {
-      console.error('❌ Error sending message:', error);
+      console.error('❌ Error sending brand_agent message:', error);
       Alert.alert('Error', 'Failed to send message. Please try again.');
       
       // Restore the message text if sending failed
@@ -366,6 +409,93 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
     } finally {
       setSending(false);
     }
+  };
+
+  const loadOlderMessages = async () => {
+    if (loadingOlderMessages || !hasOlderMessages) return;
+    
+    try {
+      setLoadingOlderMessages(true);
+      console.log('📜 Loading older brand_agent messages...');
+      
+      const response = await ticketAPI.getTicketMessages(ticketId, true);
+      
+      if (response.success) {
+        const chatData: ChatResponse = response.data;
+        const olderMessages = chatData.messages || [];
+        
+        // Filter to only brand_agent channel messages
+        const olderBrandAgentMessages = olderMessages.filter(msg => 
+          msg.channel_type === 'brand_agent' || !msg.channel_type
+        );
+        
+        // Merge older messages with existing messages
+        setMessages(prevMessages => {
+          const existingIds = new Set(prevMessages.map(msg => msg.id));
+          const newMessages = olderBrandAgentMessages.filter(msg => !existingIds.has(msg.id));
+          return [...newMessages, ...prevMessages].sort((a, b) => 
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          );
+        });
+        
+        setHasOlderMessages(chatData.has_older_messages || false);
+        console.log(`✅ Loaded ${olderBrandAgentMessages.length} older brand_agent messages`);
+      } else {
+        console.error('❌ Failed to load older brand_agent messages:', response.error);
+      }
+    } catch (error) {
+      console.error('❌ Error loading older brand_agent messages:', error);
+    } finally {
+      setLoadingOlderMessages(false);
+    }
+  };
+
+  const renderAgentStatus = () => {
+    if (!agentStatus) return null;
+
+    const getStatusColor = () => {
+      switch (agentStatus.status) {
+        case 'available': return COLORS.success;
+        case 'busy': return COLORS.warning;
+        case 'offline': return COLORS.error;
+        case 'away': return COLORS.warning;
+        default: return COLORS.gray;
+      }
+    };
+
+    const getStatusText = () => {
+      switch (agentStatus.status) {
+        case 'available': return 'Online';
+        case 'busy': return 'Busy';
+        case 'offline': return 'Offline';
+        case 'away': return 'Away';
+        default: return 'Unknown';
+      }
+    };
+
+    return (
+      <View style={styles.agentStatusContainer}>
+        <View style={styles.agentStatusRow}>
+          <View style={[styles.statusDot, { backgroundColor: getStatusColor() }]} />
+          <Text style={styles.agentStatusText}>
+            Agent {agentStatus.agent_name || 'Support'} - {getStatusText()}
+          </Text>
+        </View>
+        {agentStatus.status === 'offline' && hasOlderMessages && (
+          <TouchableOpacity 
+            style={styles.loadOlderButton}
+            onPress={loadOlderMessages}
+            disabled={loadingOlderMessages}
+          >
+            {loadingOlderMessages ? (
+              <ActivityIndicator size="small" color={COLORS.white} />
+            ) : (
+              <Text style={styles.loadOlderButtonText}>Load Older Messages</Text>
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
+    );
   };
 
   const getMessageStyle = (message: Message) => {
@@ -386,6 +516,37 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
     const isSending = item.status === 'sending';
     const isFailed = item.status === 'failed';
     
+    // Helper function to safely format timestamp
+    const formatTimestamp = (timestamp: string) => {
+      if (!timestamp) return '--:--';
+      try {
+        const date = new Date(timestamp);
+        if (isNaN(date.getTime())) {
+          console.warn('Invalid timestamp:', timestamp);
+          return '--:--';
+        }
+        
+        // Check if the timestamp is very recent (within 1 minute)
+        const now = new Date();
+        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+        
+        if (diffInSeconds < 60) {
+          return 'Just now';
+        } else if (diffInSeconds < 3600) {
+          const diffInMinutes = Math.floor(diffInSeconds / 60);
+          return `${diffInMinutes}m ago`;
+        } else {
+          return date.toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          });
+        }
+      } catch (error) {
+        console.error('Error formatting timestamp:', error);
+        return '--:--';
+      }
+    };
+    
     if (isSystem) {
       return (
         <View style={styles.systemMessageContainer}>
@@ -399,24 +560,18 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
         <View style={[messageStyle.bubble, isSending && styles.sendingMessage, isFailed && styles.failedMessage]}>
           <View style={styles.messageHeader}>
             <Text style={messageStyle.sender}>{item.sender_name}</Text>
-            {isSending && (
-              <View style={styles.sendingIndicator}>
-                <ActivityIndicator size="small" color={COLORS.secondary} />
-                <Text style={styles.sendingText}>Sending...</Text>
-              </View>
-            )}
-            {isFailed && (
-              <Text style={styles.failedText}>Failed to send</Text>
-            )}
           </View>
           <Text style={messageStyle.text}>{item.text}</Text>
           <Text style={messageStyle.time}>
-            {new Date(item.timestamp).toLocaleTimeString([], { 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })}
+            {formatTimestamp(item.timestamp)}
           </Text>
         </View>
+        {isSending && (
+          <ChatLoader type="sending" message="Sending..." />
+        )}
+        {isFailed && (
+          <ChatLoader type="error" message="Failed to send" />
+        )}
       </View>
     );
   };
@@ -426,7 +581,7 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.secondary} />
-          <Text style={styles.loadingText}>Loading chat...</Text>
+          <Text style={styles.loadingText}>Loading brand chat...</Text>
         </View>
       </SafeAreaView>
     );
@@ -460,7 +615,7 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
           <Text style={styles.headerTitle}>
             {orderTitle || `Order #${orderId || ticketId}`}
           </Text>
-          <Text style={styles.headerSubtitle}>Support Chat</Text>
+          <Text style={styles.headerSubtitle}>Brand Support Chat</Text>
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.headerButton}>
@@ -473,12 +628,13 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
       <FlatList
         ref={flatListRef}
         data={messages}
+        keyExtractor={(item) => item.id}
         renderItem={renderMessage}
-        keyExtractor={(item) => `${item.id}-${item.created_at || item.timestamp}`}
         style={styles.messagesList}
         contentContainerStyle={styles.messagesContainer}
         showsVerticalScrollIndicator={false}
         onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+        ListHeaderComponent={renderAgentStatus}
       />
 
       {/* Message Input */}
@@ -491,7 +647,7 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
             style={styles.textInput}
             value={newMessage}
             onChangeText={setNewMessage}
-            placeholder="Type your message..."
+            placeholder="Type your message to agent..."
             placeholderTextColor={COLORS.textGray}
             multiline
             maxLength={1000}
@@ -729,5 +885,41 @@ const styles = StyleSheet.create({
   failedText: {
     fontSize: 12,
     color: COLORS.error,
+  },
+  agentStatusContainer: {
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  agentStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.backgroundLight,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 8,
+  },
+  agentStatusText: {
+    fontSize: 14,
+    color: COLORS.textDark,
+    fontWeight: '500',
+  },
+  loadOlderButton: {
+    marginTop: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: COLORS.secondary,
+    borderRadius: 12,
+  },
+  loadOlderButtonText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: '600',
   },
 }); 

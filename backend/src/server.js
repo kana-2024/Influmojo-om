@@ -59,7 +59,7 @@ express.response.json = function(data) {
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // Increased from 100 to 1000 for development
   message: { error: 'Too many requests', message: 'Too many requests from this IP, please try again later.' }
 });
 
@@ -126,12 +126,17 @@ app.use((req, res, next) => {
 // Global error handler (ensure all errors are JSON)
 app.use((err, req, res, next) => {
   console.error('Error:', err);
+  
+  // Don't send error details in production
+  const errorDetails = process.env.NODE_ENV === 'production' ? undefined : err.stack;
+  
   if (res.headersSent) {
     return next(err);
   }
+  
   res.status(err.status || 500).json({
     error: err.message || 'Internal server error',
-    details: err.stack || undefined
+    details: errorDetails
   });
 });
 
@@ -155,14 +160,36 @@ async function startServer() {
 // Graceful shutdown
 process.on('SIGINT', async () => {
   console.log('\n🛑 Shutting down server...');
-  await prisma.$disconnect();
+  try {
+    await prisma.$disconnect();
+    console.log('✅ Database disconnected successfully');
+  } catch (error) {
+    console.error('❌ Error disconnecting from database:', error);
+  }
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
   console.log('\n🛑 Shutting down server...');
-  await prisma.$disconnect();
+  try {
+    await prisma.$disconnect();
+    console.log('✅ Database disconnected successfully');
+  } catch (error) {
+    console.error('❌ Error disconnecting from database:', error);
+  }
   process.exit(0);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
 
 startServer(); 

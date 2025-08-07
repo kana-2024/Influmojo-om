@@ -1,16 +1,27 @@
 export interface User {
   id: string;
   name: string;
-  email: string;
-  user_type: 'admin' | 'super_admin' | 'brand' | 'creator';
-  status: 'active' | 'inactive';
+  email?: string;
+  phone?: string;
+  user_type: 'super_admin' | 'agent' | 'brand' | 'creator';
+  profile_image_url?: string;
+  status: 'active' | 'suspended' | 'pending';
   created_at: string;
-  updated_at: string;
+  last_login_at?: string;
 }
 
-export interface Agent extends User {
+export interface Agent {
+  id: string;
+  name: string;
+  email?: string;
   phone?: string;
-  specialization?: string;
+  user_type: 'agent';
+  status: 'active' | 'suspended' | 'pending';
+  assigned_tickets_count?: number;
+  created_at: string;
+  last_login_at?: string;
+  is_online?: boolean;
+  agent_status?: 'available' | 'busy' | 'offline' | 'away';
 }
 
 export interface Ticket {
@@ -18,12 +29,37 @@ export interface Ticket {
   order_id: string;
   agent_id: string;
   stream_channel_id: string;
+  brand_agent_channel?: string;
+  creator_agent_channel?: string;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   created_at: string;
   updated_at: string;
-  order?: Order;
   agent?: Agent;
+  order?: {
+    id: string;
+    package?: {
+      title: string;
+    };
+    brand?: {
+      company_name: string;
+      phone?: string;
+      user?: {
+        name: string;
+        email?: string;
+        phone?: string;
+      };
+    };
+    creator?: {
+      user?: {
+        name: string;
+        email?: string;
+        phone?: string;
+      };
+      phone?: string;
+      bio?: string;
+    };
+  };
   messages?: Message[];
 }
 
@@ -77,41 +113,51 @@ export interface Message {
   id: string;
   ticket_id: string;
   sender_id: string;
-  sender: 'brand' | 'creator' | 'agent' | 'system';
-  sender_name: string;
-  sender_role?: 'brand' | 'creator' | 'agent' | 'system'; // For unified agent view
-  text: string;
-  timestamp: string;
+  message_text: string;
+  message_type: 'text' | 'file' | 'system';
+  file_url?: string;
+  file_name?: string;
+  read_at?: string;
   created_at: string;
+  sender?: {
+    id: string;
+    name: string;
+    user_type: string;
+  };
+  sender_role?: 'brand' | 'creator' | 'agent' | 'system';
+  channel_type?: 'brand_agent' | 'creator_agent';
+  sender_name?: string;
+  timestamp?: string;
+  text?: string; // Backend returns 'text' field for message content
 }
 
-export interface ApiResponse<T> {
+export interface ApiResponse<T = any> {
   success: boolean;
-  message: string;
-  data: T;
+  message?: string;
+  data?: T;
+  error?: string;
 }
 
 export interface PaginatedResponse<T> {
-  success: boolean;
-  message: string;
-  data: {
-    items: T[];
-    total: number;
-    limit: number;
-    offset: number;
-  };
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export interface AgentStats {
   total_agents: number;
   active_agents: number;
-  avg_tickets_per_agent: number;
   total_tickets: number;
+  open_tickets: number;
+  resolved_tickets: number;
 }
 
 export interface TicketStats {
   total_tickets: number;
   open_tickets: number;
+  in_progress_tickets: number;
   resolved_tickets: number;
-  avg_resolution_time: number;
+  closed_tickets: number;
 } 
