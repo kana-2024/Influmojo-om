@@ -6,6 +6,7 @@ declare global {
     google?: {
       accounts: {
         oauth2: {
+          initCodeClient: (config: any) => any;
           initTokenClient: (config: any) => any;
         };
         id: {
@@ -117,7 +118,8 @@ class GoogleAuthService {
     }
 
     try {
-      const client = window.google.accounts.oauth2.initTokenClient({
+      // Use initCodeClient to get authorization code
+      const client = window.google.accounts.oauth2.initCodeClient({
         client_id: ENV.GOOGLE_CLIENT_ID,
         scope: 'email profile openid',
         callback: async (response: any) => {
@@ -130,31 +132,92 @@ class GoogleAuthService {
           }
 
           try {
+            // Exchange authorization code for tokens
+            const tokenResponse = await this.exchangeCodeForTokens(response.code);
+            
+            if (!tokenResponse.success) {
+              resolve({
+                success: false,
+                error: tokenResponse.error || 'Failed to exchange code for tokens'
+              });
+              return;
+            }
+
             // Get user info using the access token
-            const userInfo = await this.getUserInfo(response.access_token);
+            const userInfo = await this.getUserInfo(tokenResponse.accessToken);
             
             resolve({
               success: true,
               user: userInfo,
-              accessToken: response.access_token,
-              idToken: response.id_token,
-              refreshToken: response.refresh_token || null
+              accessToken: tokenResponse.accessToken,
+              idToken: tokenResponse.idToken,
+              refreshToken: tokenResponse.refreshToken
             });
           } catch (error) {
+            console.error('Sign-in error:', error);
             resolve({
               success: false,
-              error: 'Failed to get user information'
+              error: 'Failed to complete sign-in process'
             });
           }
         }
       });
 
-      client.requestAccessToken();
+      client.requestCode();
     } catch (error) {
+      console.error('Google sign-in error:', error);
       resolve({
         success: false,
         error: 'Google sign-in failed'
       });
+    }
+  }
+
+  private async exchangeCodeForTokens(code: string): Promise<{
+    success: boolean;
+    accessToken?: string;
+    idToken?: string;
+    refreshToken?: string;
+    error?: string;
+  }> {
+    try {
+      const response = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          code: code,
+          client_id: ENV.GOOGLE_CLIENT_ID,
+          client_secret: ENV.GOOGLE_CLIENT_SECRET,
+          redirect_uri: window.location.origin,
+          grant_type: 'authorization_code',
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Token exchange error:', errorData);
+        return {
+          success: false,
+          error: 'Failed to exchange authorization code for tokens'
+        };
+      }
+
+      const tokenData = await response.json();
+      
+      return {
+        success: true,
+        accessToken: tokenData.access_token,
+        idToken: tokenData.id_token,
+        refreshToken: tokenData.refresh_token
+      };
+    } catch (error) {
+      console.error('Token exchange error:', error);
+      return {
+        success: false,
+        error: 'Network error during token exchange'
+      };
     }
   }
 

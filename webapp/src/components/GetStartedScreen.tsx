@@ -36,10 +36,9 @@ export default function GetStartedScreen() {
           console.log('Backend API response:', apiResult);
           
           if (apiResult.success) {
-            // New user created successfully, proceed to verification
-            console.log('Google auth successful, navigating to verification');
-            // You can redirect to a verification page or show success message
-            window.location.href = '/dashboard';
+            // New user created successfully, proceed to profile setup
+            console.log('Google auth successful, navigating to profile setup');
+            window.location.href = '/profile-setup';
           } else {
             setWarning(apiResult.error || 'Backend authentication failed. Please try again.');
           }
@@ -118,8 +117,8 @@ export default function GetStartedScreen() {
 
   const handleOtpSuccess = (user: any) => {
     setShowOtpModal(false);
-    // Redirect to dashboard or appropriate page
-    window.location.href = '/dashboard';
+    // Redirect to profile setup screen after successful signup
+    window.location.href = '/profile-setup';
   };
 
   return (
