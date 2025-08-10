@@ -130,14 +130,14 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
 
   return (
     <KeyboardAwareScrollView
-              style={{ flex: 1, backgroundColor: '#f8f4e8' }}
+              style={{ flex: 1, backgroundColor: '#ffffff' }}
       contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start' }}
       enableOnAndroid={true}
       extraScrollHeight={80}
       keyboardShouldPersistTaps="handled"
     >
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#f8f4e8' }}>
-        <StatusBar barStyle="dark-content" backgroundColor="#f8f4e8" />
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
+        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
         <View style={styles.container}>
           {/* Top Bar */}
           <View style={styles.topBar}>
@@ -208,7 +208,7 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
           {/* Verify Button */}
           <TouchableOpacity style={styles.verifyButton} onPress={handleVerify} disabled={loading}>
             <Text style={styles.verifyText}>Verify</Text>
-            <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />
+            <Ionicons name="arrow-forward" size={20} color="#ffffff" style={{ marginLeft: 8 }} />
           </TouchableOpacity>
           {loading && <ActivityIndicator size="small" color="#f37135" style={{ marginTop: 8 }} />}
           {/* Login Link */}
@@ -224,7 +224,7 @@ const OtpVerificationScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 24,
     paddingTop: 48,
   },
@@ -283,8 +283,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F5F5F5',
+    borderColor: '#20536d',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     fontSize: 22,
     textAlign: 'center',
     marginHorizontal: 4,
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   verifyText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },

@@ -1,7 +1,7 @@
 // Color constants for the app
 export const COLORS = {
   // Primary colors
-  primary: '#f8f4e8',    // Cream
+  primary: '#ffffff',    // White
   secondary: '#f37135',  // Orange
   
   // Text colors
@@ -10,7 +10,7 @@ export const COLORS = {
   
   // Border and background colors
   borderLight: '#E5E7EB',
-  backgroundLight: '#F5F5F5',
+  backgroundLight: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
   
   // Chip colors (5th and 6th colors)
   chipBlue: '#aad6f3',   // 5th color - Light blue
@@ -25,6 +25,12 @@ export const COLORS = {
   success: '#10B981',    // Green for success
   warning: '#F59E0B',    // Yellow for warning
   gray: '#6B7280',       // Gray for unknown status
+  
+  // Gradient colors for buttons
+  gradientOrange: ['rgb(254, 143, 0)', 'rgb(252, 82, 19)'] as const, // Primary orange gradient
+  
+  // Brand tertiary color
+  tertiary: '#20536d',
   
   // Legacy colors (keeping for reference)
   legacyChipBlue: '#B1E5FC',

@@ -163,7 +163,7 @@ const CreateProjectScreen: React.FC<CreateProjectScreenProps> = ({ navigation, o
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   safeArea: {
     flex: 1,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1.2, // Make the card a bit taller (was 1)
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -197,14 +197,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     position: 'relative',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#ffffff',
   },
   header: {
     flex: 2,
     fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',
-    color: '#1A1D1F',
+    color: '#ffffff',
   },
   closeBtn: {
     width: 32,
@@ -227,12 +227,12 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     padding: 16,
     fontSize: 15,
     marginBottom: 24,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
     color: '#1A1D1F',
   },
   dropdown: {
@@ -240,18 +240,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     padding: 16,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
     marginBottom: 0,
     position: 'relative',
     zIndex: 10, // Ensure dropdown container is above others
   },
   dropdownList: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     marginTop: 2,
     position: 'absolute',
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   dropdownItem: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#ffffff',
   },
   btnRow: {
     flexDirection: 'row',
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   cancelBtnText: {
     color: '#f37135',
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitBtnText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '700',
     fontSize: 16,
   },
@@ -303,9 +303,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.08)',
   },
   dropdownListModal: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

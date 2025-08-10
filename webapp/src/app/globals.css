@@ -4,13 +4,13 @@
 
 /* Custom CSS variables for design system */
 :root {
-  --color-primary: #f8f4e8;
+  --color-primary: #ffffff;
   --color-secondary: #f37135;
   --color-tertiary: #20536d;
   --color-text-dark: #1A1D1F;
   --color-text-gray: #6B7280;
   --color-border-light: #E5E7EB;
-  --color-background-light: #F5F5F5;
+  --color-background-light: #FFFFFF; /* Changed from #F5F5F5 to #FFFFFF */
   --color-chip-blue: #aad6f3;
   --color-chip-yellow: #ffd365;
   --color-placeholder: #9CA3AF;

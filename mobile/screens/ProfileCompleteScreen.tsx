@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated, Easing, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppSelector } from '../store/hooks';
 import * as NavigationBar from 'expo-navigation-bar';
 import { authAPI } from '../services/apiService';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../config/colors';
 
 // Animated Confetti Dot (pop in, fixed position)
 const ConfettiDot = ({ x, y, color, size, delay }: { x: number; y: number; color: string; size: number; delay: number }) => {
@@ -136,7 +138,7 @@ const ConfettiCheckmark = () => {
       {/* Double circle checkmark with animated inner circle */}
       <View style={styles.outerCircle}>
         <Animated.View style={[styles.innerCircle, { transform: [{ scale }] }]}> 
-          <Ionicons name="checkmark" size={36} color="#f8f4e8" style={{ fontWeight: 'bold' }} />
+          <Ionicons name="checkmark" size={36} color="#ffffff" style={{ fontWeight: 'bold' }} />
         </Animated.View>
       </View>
     </View>
@@ -205,9 +207,16 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
             : "You're now ready to explore your creator space. Start growing your presence and get discovered by the right brands."
           }
         </Text>
-        <TouchableOpacity style={styles.button} onPress={handleViewProfile}>
-          <Text style={styles.buttonText}>View Profile</Text>
-          <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />
+        <TouchableOpacity onPress={handleViewProfile}>
+          <LinearGradient
+            colors={COLORS.gradientOrange}
+            style={styles.button}
+          >
+            <View style={styles.buttonContent}>
+              <Text style={styles.buttonText}>View Profile</Text>
+              <Ionicons name="arrow-forward" size={20} color="#ffffff" style={styles.buttonArrow} />
+            </View>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -217,14 +226,14 @@ const ProfileCompleteScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   confettiContainer: {
     marginBottom: 32,
@@ -238,7 +247,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FFD1B3',
+    backgroundColor: '#FFFFFF', // Changed from '#FFD1B3' to '#FFFFFF'
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 0,
@@ -268,22 +277,28 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 14,
     paddingHorizontal: 24,
     width: '100%',
     marginTop: 8,
     elevation: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
     letterSpacing: 1,
+  },
+  buttonArrow: {
+    marginLeft: 8,
   },
   progressBarContainer: { 
     height: 8, 

@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomDropdownDefault from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
-import COLORS from '../../config/colors';
+import { COLORS } from '../../config/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const platforms = ['Instagram', 'Facebook', 'Youtube', 'Snapchat'];
 const contentTypes = ['Reel', 'Story', 'Feed post', 'Carousel Post'];
@@ -205,13 +206,18 @@ const CreatePackageScreen: React.FC<CreatePackageScreenProps> = ({ navigation, o
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.submitBtn, loading && { opacity: 0.7 }]}
+              style={[styles.submitBtnContainer, loading && { opacity: 0.7 }]}
               onPress={handleCreatePackage}
               disabled={loading}
             >
-              <Text style={styles.submitBtnText}>
-                {loading ? 'Creating...' : 'Submit'}
-              </Text>
+              <LinearGradient
+                colors={COLORS.gradientOrange}
+                style={styles.submitBtn}
+              >
+                <Text style={styles.submitBtnText}>
+                  {loading ? 'Creating...' : 'Submit'}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
@@ -227,7 +233,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1.2,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -256,7 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     textAlign: 'center',
-    color: '#1A1D1F',
+    color: '#ffffff',
   },
   headerBtn: {
     width: 32,
@@ -288,13 +294,13 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
     color: '#1A1D1F',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
   },
   durationRow: {
     flexDirection: 'row',
@@ -305,14 +311,14 @@ const styles = StyleSheet.create({
   },
   textArea: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
     color: '#1A1D1F',
     minHeight: 100,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     textAlignVertical: 'top',
   },
   btnRow: {
@@ -328,8 +334,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#f8f4e8',
+    borderColor: '#20536d',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
   },
   cancelBtnText: {
@@ -337,16 +343,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#6B7280',
   },
-  submitBtn: {
+  submitBtnContainer: {
     flex: 1,
-    backgroundColor: '#f37135',
+  },
+  submitBtn: {
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 24,
     alignItems: 'center',
   },
   submitBtnText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },

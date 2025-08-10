@@ -177,8 +177,8 @@ enum TicketPriority {
 }
 
 .priority-low { background: #e9ecef; color: #495057; }
-.priority-medium { background: #fff3cd; color: #856404; }
-.priority-high { background: #f8d7da; color: #721c24; }
+.priority-medium { background: #ffffff; color: #856404; }
+.priority-high { background: #ffffff; color: #721c24; }
 .priority-urgent { background: #dc3545; color: #ffffff; }
 ```
 
@@ -188,7 +188,7 @@ enum TicketPriority {
   height: 400px;
   border: 1px solid #eee;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
   padding: 10px;
 }
 

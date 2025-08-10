@@ -4,6 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useEffect } from 'react';
 import { FONTS } from '../config/fonts';
+import { COLORS } from '../config/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const WelcomeScreen = ({ navigation }: any) => {
   useEffect(() => {
@@ -32,10 +34,15 @@ const WelcomeScreen = ({ navigation }: any) => {
           </View>
           <View style={styles.buttonRow}>
             <TouchableOpacity
-              style={styles.signupButton}
+              style={styles.signupButtonContainer}
               onPress={() => navigation.navigate('UserRole', { mode: 'signup' })}
             >
-              <Text style={styles.signupText}>Sign up</Text>
+              <LinearGradient
+                colors={COLORS.gradientOrange}
+                style={styles.signupButton}
+              >
+                <Text style={styles.signupText}>Sign up</Text>
+              </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.loginButton}
@@ -53,11 +60,11 @@ const WelcomeScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
@@ -75,14 +82,11 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     padding: 24,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -126,18 +130,19 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     width: '100%',
-    justifyContent: 'space-between',
+    gap: 16,
+  },
+  signupButtonContainer: {
+    flex: 1,
   },
   signupButton: {
-    flex: 1,
-    backgroundColor: '#f37135',
+    width: '100%',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginRight: 8,
   },
   signupText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     fontSize: 16,
@@ -149,7 +154,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginLeft: 8,
   },
   loginText: {
     color: '#f37135',

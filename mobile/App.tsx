@@ -112,7 +112,7 @@ export default function App() {
     
     // Only set background color if edge-to-edge is not enabled
     try {
-      NavigationBar.setBackgroundColorAsync('#f8f4e8');
+      NavigationBar.setBackgroundColorAsync('#ffffff');
     } catch (error) {
       // Ignore error if edge-to-edge is enabled
       console.log('Background color setting skipped (edge-to-edge enabled)');
@@ -172,13 +172,13 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     padding: 20,
   },
   errorText: {

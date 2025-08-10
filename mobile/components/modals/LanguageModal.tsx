@@ -96,7 +96,7 @@ const LanguageModal: React.FC<LanguageModalProps> = ({
                 selectedLanguages.includes(language.id) && styles.checkboxSelected
               ]}>
                 {selectedLanguages.includes(language.id) && (
-                  <Ionicons name="checkmark" size={16} color="#f8f4e8" />
+                  <Ionicons name="checkmark" size={16} color="#ffffff" />
                 )}
               </View>
             </TouchableOpacity>
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#ffffff',
   },
   languageName: {
     fontSize: 16,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   applyButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },

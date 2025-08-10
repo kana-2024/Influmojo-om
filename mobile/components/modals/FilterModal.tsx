@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../../config/colors';
 import CategoryModal from './CategoryModal';
 import FollowerRangeModal from './FollowerRangeModal';
 import PlatformModal from './PlatformModal';
@@ -200,8 +202,13 @@ const FilterModal: React.FC<FilterModalProps> = ({
             <TouchableOpacity style={styles.clearButton} onPress={onClearAll}>
               <Text style={styles.clearButtonText}>Clear all</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.showingButton} onPress={onApplyFilters}>
-              <Text style={styles.showingButtonText}>Showing {resultCount}+</Text>
+            <TouchableOpacity style={styles.showingButtonContainer} onPress={onApplyFilters}>
+              <LinearGradient
+                colors={COLORS.gradientOrange}
+                style={styles.showingButton}
+              >
+                <Text style={styles.showingButtonText}>Showing {resultCount}+</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
@@ -283,7 +290,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -353,15 +360,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
-  showingButton: {
+  showingButtonContainer: {
     flex: 1,
+  },
+  showingButton: {
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: '#FD5D27',
     alignItems: 'center',
   },
   showingButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },

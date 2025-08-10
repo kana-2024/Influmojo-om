@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import CustomDropdownDefault from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
-import COLORS from '../../config/colors';
+import { COLORS } from '../../config/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface CreateCampaignScreenProps {
   onClose: () => void;
@@ -353,7 +354,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1.2,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -407,23 +408,23 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
     fontSize: 15,
     color: '#1A1D1F',
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#FFFFFF', // Changed from '#FAFAFA' to '#FFFFFF'
   },
   textArea: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
     fontSize: 15,
     color: '#1A1D1F',
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#FFFFFF', // Changed from '#FAFAFA' to '#FFFFFF'
     minHeight: 80,
     textAlignVertical: 'top',
   },
@@ -437,9 +438,9 @@ const styles = StyleSheet.create({
   },
   uploadBox: {
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 16,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#FFFFFF', // Changed from '#FAFAFA' to '#FFFFFF'
     alignItems: 'center',
     paddingVertical: 28,
     marginHorizontal: 24,
@@ -455,12 +456,12 @@ const styles = StyleSheet.create({
     color: '#B0B0B0',
   },
   filePreviewContainer: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     marginHorizontal: 24,
     marginBottom: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     overflow: 'hidden',
   },
   filePreviewHeader: {
@@ -469,9 +470,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#20536d',
   },
   filePreviewTitle: {
     fontSize: 14,
@@ -490,7 +491,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -538,7 +539,7 @@ const styles = StyleSheet.create({
   uploadProgressBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     padding: 12,
     marginHorizontal: 24,
@@ -591,7 +592,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   cancelBtnText: {
     color: '#f37135',
@@ -600,13 +601,12 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     flex: 1,
-    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
   },
   submitBtnText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '700',
     fontSize: 16,
   },

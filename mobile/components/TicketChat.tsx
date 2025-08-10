@@ -315,7 +315,7 @@ export default function TicketChat({ ticketId, onClose, navigation }: TicketChat
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#ffffff',
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 20,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#ffffff',
     fontSize: 16,
     minHeight: 40,
     maxHeight: 150,

@@ -167,7 +167,7 @@ const EditPackageScreen: React.FC<EditPackageScreenProps> = ({ package: pkg, onC
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   header: {
     flexDirection: 'row',
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 20,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
   },
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   textInput: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   textArea: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     gap: 12,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#E5E5E5',
   },
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   cancelButtonText: {
     color: '#f37135',
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },

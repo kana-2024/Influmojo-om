@@ -145,6 +145,26 @@ export default function AgentDashboard() {
             </div>
           </div>
         </div>
+        
+        {/* Navigation Header */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-t border-gray-200">
+            <nav className="flex space-x-8" aria-label="Tabs">
+              <button className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Contacts
+              </button>
+              <button className="border-indigo-500 text-indigo-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                My Chats
+              </button>
+              <button className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Records
+              </button>
+              <button className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Visitor Profiles
+              </button>
+            </nav>
+          </div>
+        </div>
       </header>
 
       {/* Main Content */}

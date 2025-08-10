@@ -18,6 +18,14 @@ class OrderService {
         throw new Error('Missing required order data: package_id, brand_id, creator_id, total_amount');
       }
 
+      // Debug: Log order data before creation
+      console.log('🔍 Order data before creation:', {
+        delivery_time: orderData.delivery_time,
+        additional_instructions: orderData.additional_instructions,
+        references: orderData.references,
+        references_type: typeof orderData.references
+      });
+
       // Create the order
       const order = await prisma.order.create({
         data: {
@@ -27,7 +35,10 @@ class OrderService {
           total_amount: parseFloat(total_amount),
           currency,
           quantity: orderData.quantity || 1,
-          status: 'pending' // Initial status - waiting for creator approval
+          status: 'pending', // Initial status - waiting for creator approval
+          delivery_time: orderData.delivery_time || null,
+          additional_instructions: orderData.additional_instructions || null,
+          references: orderData.references ? JSON.stringify(orderData.references) : null,
         },
         include: {
           package: {
@@ -79,6 +90,19 @@ class OrderService {
    */
   async addOrderDetailsMessage(ticketId, order) {
     try {
+      // Parse references if they exist
+      let referencesText = '';
+      if (order.references) {
+        try {
+          const references = JSON.parse(order.references);
+          if (Array.isArray(references) && references.length > 0) {
+            referencesText = `\n**References:** ${references.length} file${references.length > 1 ? 's' : ''} uploaded`;
+          }
+        } catch (e) {
+          console.log('Failed to parse references:', e);
+        }
+      }
+
       const orderDetails = `
 🎫 **New Order Support Ticket**
 
@@ -87,6 +111,8 @@ class OrderService {
 - Package: ${order.package.title}
 - Amount: ${order.currency} ${order.total_amount}
 - Status: ${order.status}
+- Quantity: ${order.quantity}
+${order.delivery_time ? `- Delivery Time: ${order.delivery_time} days` : ''}
 
 **Brand Information:**
 - Company: ${order.brand.company_name}
@@ -101,6 +127,9 @@ class OrderService {
 - Type: ${order.package.type}
 - Description: ${order.package.description || 'No description available'}
 - Price: ${order.package.currency} ${order.package.price}
+
+${order.additional_instructions ? `**Additional Instructions:**\n${order.additional_instructions}` : ''}
+${referencesText}
 
 This ticket has been automatically created to provide support for this order. Please assist the brand with any questions or issues related to this collaboration.
       `.trim();
@@ -161,6 +190,17 @@ This ticket has been automatically created to provide support for this order. Pl
           }
         }
       });
+
+      // Debug: Log order data being returned
+      if (order) {
+        console.log('🔍 Order data being returned:', {
+          id: order.id,
+          delivery_time: order.delivery_time,
+          additional_instructions: order.additional_instructions,
+          references: order.references,
+          references_type: typeof order.references
+        });
+      }
 
       return order;
     } catch (error) {
@@ -428,6 +468,11 @@ This ticket has been automatically created to provide support for this order. Pl
               user: { select: { name: true, email: true } }
             }
           },
+          brand: {
+            include: {
+              user: { select: { name: true, email: true } }
+            }
+          },
           ticket: {
             include: {
               agent: { select: { name: true, email: true } }
@@ -449,12 +494,30 @@ This ticket has been automatically created to provide support for this order. Pl
         throw new Error(`Order cannot be accepted in current status: ${order.status}`);
       }
 
+      // Calculate delivery deadline and submission deadline
+      const deliveryTimeInDays = order.delivery_time || 7; // Default to 7 days if not specified
+      const deliveryDeadline = new Date();
+      deliveryDeadline.setDate(deliveryDeadline.getDate() + deliveryTimeInDays);
+      
+      const submissionDeadline = new Date(deliveryDeadline);
+      submissionDeadline.setDate(submissionDeadline.getDate() - 1); // 24 hours before delivery
+      
+      const formatDate = (date) => {
+        return date.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+      };
+
       // Update order status to accepted
       const updatedOrder = await this.updateOrderStatus(orderId, 'accepted');
 
       // Add creator acceptance message to ticket (handle gracefully if it fails)
       if (order.ticket) {
         try {
+          // Creator acceptance message
           await crmService.addMessage(
             order.ticket.id.toString(),
             userId,
@@ -464,7 +527,30 @@ This ticket has been automatically created to provide support for this order. Pl
             null,
             'creator'
           );
-          console.log(`✅ Acceptance message added to ticket ${order.ticket.id}`);
+
+          // Add deliverable submission requirement for creator
+          await crmService.addMessage(
+            order.ticket.id.toString(),
+            userId,
+            `📋 **Deliverable Submission Requirements**\n\n⏰ **Important Deadline:**\nPlease submit your deliverables for review by **${formatDate(submissionDeadline)}** (24 hours before the delivery deadline).\n\n📅 **Delivery Deadline:** ${formatDate(deliveryDeadline)}\n\nThis gives sufficient time for review and any necessary revisions before the final delivery date.`,
+            'text',
+            null,
+            null,
+            'system'
+          );
+
+          // Add brand notification about deliverable timeline
+          await crmService.addMessage(
+            order.ticket.id.toString(),
+            order.brand.user_id.toString(),
+            `🎯 **Order Progress Update**\n\nYour order has been accepted by the creator! Here's what to expect:\n\n📋 **Review Period:** The creator will submit deliverables for your review by **${formatDate(submissionDeadline)}**\n\n📅 **Final Delivery:** ${formatDate(deliveryDeadline)}\n\nYou'll receive a notification when the deliverables are ready for your review.`,
+            'text',
+            null,
+            null,
+            'system'
+          );
+
+          console.log(`✅ Order acceptance and deliverable timeline messages added to ticket ${order.ticket.id}`);
         } catch (messageError) {
           console.error('⚠️ Failed to add acceptance message to ticket:', messageError);
           // Don't fail the entire operation if message addition fails

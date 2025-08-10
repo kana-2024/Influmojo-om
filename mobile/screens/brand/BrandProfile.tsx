@@ -168,7 +168,7 @@ const BrandProfile = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle='dark-content' backgroundColor='#f8f4e8' />
+      <StatusBar barStyle='dark-content' backgroundColor='#ffffff' />
       
       {/* Show error message for creator users */}
       {user && user.user_type === 'creator' && (
@@ -224,7 +224,7 @@ const BrandProfile = () => {
             <View style={styles.avatarWrapper}>
               <Image source={{ uri: (user && (user as any).avatarUrl) ? (user as any).avatarUrl : 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
               <TouchableOpacity style={styles.avatarEditBtn}>
-                <Ionicons name="pencil" size={12} color="#f8f4e8" />
+                <Ionicons name="pencil" size={12} color="#ffffff" />
               </TouchableOpacity>
             </View>
             
@@ -234,7 +234,7 @@ const BrandProfile = () => {
             style={styles.coverEditBtn}
             onPress={handleCoverImageUpload}
           >
-            <Ionicons name="camera" size={18} color="#f8f4e8" />
+            <Ionicons name="camera" size={18} color="#ffffff" />
           </TouchableOpacity>
           
         </View>
@@ -387,7 +387,7 @@ const BrandProfile = () => {
                             resizeMode="cover"
                           />
                           <View style={styles.videoOverlay}>
-                            <Ionicons name="play-circle" size={32} color="#f8f4e8" />
+                            <Ionicons name="play-circle" size={32} color="#ffffff" />
                           </View>
                         </View>
                       ) : (
@@ -463,14 +463,14 @@ const BrandProfile = () => {
 
       <Modal visible={showPaymentsModal} transparent animationType="slide" onRequestClose={() => setShowPaymentsModal(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ backgroundColor: '#f8f4e8', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
+          <View style={{ backgroundColor: '#ffffff', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginBottom: 16, textAlign: 'center' }}>Payments</Text>
             <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 24, textAlign: 'center' }}>Payment management features will be available soon.</Text>
             <TouchableOpacity 
               style={{ backgroundColor: '#f37135', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
               onPress={() => setShowPaymentsModal(false)}
             >
-              <Text style={{ color: '#f8f4e8', fontSize: 16, fontWeight: '600' }}>Close</Text>
+              <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '600' }}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -512,12 +512,12 @@ const BrandProfile = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f8f4e8' },
+  safeArea: { flex: 1, backgroundColor: '#ffffff' },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 16, // Will be added to insets.top in the component
@@ -542,14 +542,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   headerTitle: { fontSize: 22, fontWeight: '700', color: '#1A1D1F', textAlign: 'center' },
   coverContainer: {
@@ -579,7 +576,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     borderWidth: 3,
-    borderColor: '#f8f4e8',
+    borderColor: '#ffffff',
   },
   avatarEditBtn: {
     position: 'absolute',
@@ -592,7 +589,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#f8f4e8',
+    borderColor: '#ffffff',
   },
   coverEditBtn: {
     position: 'absolute',
@@ -630,7 +627,7 @@ const styles = StyleSheet.create({
   },
   verifiedText: {
     fontSize: 12,
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
   },
   ratingRow: {
@@ -689,7 +686,7 @@ const styles = StyleSheet.create({
     padding: 4,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: COLORS.borderLight,
+    borderColor: '#FFE5D9',
   },
   tabBtn: {
     flex: 1,
@@ -745,7 +742,7 @@ const styles = StyleSheet.create({
      borderWidth: 1,
      borderColor: '#f37135',
      borderRadius: 18,
-     backgroundColor: '#f8f4e8',
+     backgroundColor: '#ffffff',
    },
   createPackageBtnText: {
     color: '#f37135',
@@ -773,14 +770,11 @@ const styles = StyleSheet.create({
   },
   portfolioItem: {
     width: '48%', // Two items per row
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     overflow: 'hidden',
   },
   portfolioImage: {

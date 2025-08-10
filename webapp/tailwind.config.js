@@ -9,7 +9,7 @@ module.exports = {
     extend: {
       colors: {
         // Primary colors from mobile app
-        primary: '#f8f4e8',    // Cream
+        primary: '#ffffff',    // White
         secondary: '#f37135',  // Orange
         tertiary: '#20536d',   // Tertiary color for buttons and elements
         
@@ -19,7 +19,7 @@ module.exports = {
         
         // Border and background colors
         borderLight: '#E5E7EB',
-        backgroundLight: '#F5F5F5',
+        backgroundLight: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
         
         // Chip colors (5th and 6th colors)
         chipBlue: '#aad6f3',   // 5th color - Light blue

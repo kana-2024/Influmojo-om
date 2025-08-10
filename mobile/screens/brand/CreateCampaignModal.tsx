@@ -167,7 +167,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({ onClose, onBa
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   safeArea: {
     flex: 1,
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1.2,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     position: 'relative',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#20536d',
   },
   header: {
     fontSize: 18,
@@ -224,13 +224,13 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
     color: '#1A1D1F',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
   },
   btnRow: {
     flexDirection: 'row',
@@ -243,8 +243,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#f8f4e8',
+    borderColor: '#20536d',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
   },
   cancelBtnText: {
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   submitBtnText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#f8f4e8',
+    color: '#ffffff',
   },
 });
 

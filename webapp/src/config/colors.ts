@@ -1,7 +1,7 @@
 // Color constants for the webapp - matching mobile app design system
 export const COLORS = {
   // Primary colors
-  primary: '#f8f4e8',    // Cream
+  primary: '#ffffff',    // White
   secondary: '#f37135',  // Orange
   tertiary: '#20536d',   // Tertiary color for buttons and elements
   
@@ -11,7 +11,7 @@ export const COLORS = {
   
   // Border and background colors
   borderLight: '#E5E7EB',
-  backgroundLight: '#F5F5F5',
+  backgroundLight: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
   
   // Chip colors (5th and 6th colors)
   chipBlue: '#aad6f3',   // 5th color - Light blue
@@ -23,6 +23,9 @@ export const COLORS = {
   // Additional colors
   error: '#EF4444',      // Red for errors
   white: '#FFFFFF',      // White
+  
+  // Gradient colors for buttons
+  gradientOrange: 'linear-gradient(180deg, #FE8F00, #FC5213)', // Primary orange gradient
   
   // Legacy colors (keeping for reference)
   legacyChipBlue: '#B1E5FC',

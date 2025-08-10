@@ -6,7 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { profileAPI } from '../../services/apiService';
 import { CheckboxItem, SelectionModal } from '../../components';
-import COLORS from '../../config/colors';
+import { COLORS } from '../../config/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function BrandPreferencesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -261,14 +262,19 @@ export default function BrandPreferencesScreen({ navigation }: any) {
 
         {/* Next Button */}
         <TouchableOpacity
-          style={[styles.nextButton, loading && { opacity: 0.7 }]}
+          style={[styles.nextButtonContainer, loading && { opacity: 0.7 }]}
           onPress={handleSavePreferences}
           disabled={loading}
         >
-          <Text style={styles.nextButtonText}>
-            {loading ? 'Saving...' : 'Next 2 / 2'}
-          </Text>
-          {!loading && <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />}
+          <LinearGradient
+            colors={COLORS.gradientOrange}
+            style={styles.nextButton}
+          >
+            <Text style={styles.nextButtonText}>
+              {loading ? 'Saving...' : 'Next 2 / 2'}
+            </Text>
+            {!loading && <Ionicons name="arrow-forward" size={20} color="#ffffff" style={{ marginLeft: 8 }} />}
+          </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
 
@@ -295,7 +301,7 @@ export default function BrandPreferencesScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f8f4e8' },
+  safeArea: { flex: 1, backgroundColor: '#ffffff' },
   scrollContent: { paddingHorizontal: 20, paddingBottom: 32 },
   topBar: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: '15%', marginTop: 16,
@@ -316,26 +322,36 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 15, fontWeight: '600', color: '#1A1D1F', marginTop: 12, marginBottom: 2 },
   sectionSubtitle: { fontSize: 13, color: '#6B7280', marginBottom: 8 },
   industriesBox: {
-    backgroundColor: '#f8f4e8', borderRadius: 12, padding: 12, marginBottom: 12,
-    borderWidth: 1, borderColor: '#E5E7EB',
+    backgroundColor: '#ffffff', borderRadius: 12, padding: 12, marginBottom: 12,
+    borderWidth: 1, borderColor: '#20536d',
   },
   industriesRow: {
     flexDirection: 'row', flexWrap: 'wrap', gap: 8,
   },
   categoryChip: {
-    backgroundColor: '#F3F4F6', borderRadius: 16, paddingHorizontal: 14, paddingVertical: 6,
-    margin: 4, borderWidth: 1, borderColor: '#E5E7EB',
+    backgroundColor: '#ffffff', borderRadius: 16, paddingHorizontal: 14, paddingVertical: 6,
+    margin: 4, borderWidth: 1, borderColor: '#20536d',
   },
   categoryChipSelected: {
-    backgroundColor: '#FFF3E0', borderColor: '#FD5D27', borderWidth: 1,
+    backgroundColor: '#FFFFFF', // Changed from '#FFF3E0' to '#FFFFFF'
+    borderColor: '#FD5D27', 
+    borderWidth: 1,
   },
 
   categoryText: { color: '#1A1D1F', fontSize: 14 },
   categoryTextSelected: { color: '#f37135', fontWeight: '600' },
 
   aboutInput: {
-    backgroundColor: '#F5F5F5', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
-    paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, marginBottom: 8, marginTop: 12, minHeight: 48,
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
+    borderRadius: 8, 
+    borderWidth: 1, 
+    borderColor: '#20536d',
+    paddingHorizontal: 16, 
+    paddingVertical: 14, 
+    fontSize: 15, 
+    marginBottom: 8, 
+    marginTop: 12, 
+    minHeight: 48,
   },
   dateInputRow: {
     flexDirection: 'row',
@@ -344,10 +360,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   dateInput: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
@@ -356,17 +372,17 @@ const styles = StyleSheet.create({
   calendarButton: {
     width: 48,
     height: 48,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     marginLeft: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   languageBox: { 
-    backgroundColor: '#f8f4e8', 
+    backgroundColor: '#ffffff', 
     flexDirection: 'row', 
     alignItems: 'center', 
     marginBottom: 12, 
@@ -375,42 +391,45 @@ const styles = StyleSheet.create({
     paddingVertical: 8, 
     borderRadius: 8, 
     borderWidth: 1, 
-    borderColor: '#E5E7EB' 
+    borderColor: '#20536d' 
   },
   languageChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, flex: 1 },
   languageChip: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#F3F4F6',
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#ffffff',
     borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4, marginRight: 6, marginBottom: 4,
-    borderWidth: 1, borderColor: '#E5E7EB',
+    borderWidth: 1, borderColor: '#20536d',
   },
   languageText: { color: '#1A1D1F', fontSize: 14, marginRight: 2 },
   languageDropdown: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5', 
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8, 
     borderWidth: 1, 
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     paddingHorizontal: 12, 
     paddingVertical: 8, 
     marginLeft: 8,
   },
   dropdownText: { color: '#6B7280', fontSize: 14, marginRight: 8 },
   languageOptionsBox: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     marginBottom: 12,
     marginTop: 12,
     overflow: 'hidden',
   },
 
+  nextButtonContainer: {
+    marginBottom: 8,
+  },
   nextButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#f37135', borderRadius: 8, paddingVertical: 14, marginBottom: 8,
+    borderRadius: 8, paddingVertical: 14,
   },
-  nextButtonText: { color: '#f8f4e8', fontWeight: '600', fontSize: 16 },
+  nextButtonText: { color: '#ffffff', fontWeight: '600', fontSize: 16 },
   bottomRow: { alignItems: 'center', marginTop: 8 },
   bottomText: { color: '#6B7280', fontSize: 14, textAlign: 'center' },
   loginLink: { color: '#2563EB', fontWeight: '500' },

@@ -360,6 +360,9 @@ export const OrderStatus: {
   rejected: 'rejected',
   confirmed: 'confirmed',
   in_progress: 'in_progress',
+  review: 'review',
+  revision_requested: 'revision_requested',
+  price_revision_pending: 'price_revision_pending',
   completed: 'completed',
   cancelled: 'cancelled',
   refunded: 'refunded'
@@ -29263,6 +29266,8 @@ export namespace Prisma {
     creator_id: number | null
     quantity: number | null
     total_amount: Decimal | null
+    delivery_time: number | null
+    price_revision_amount: Decimal | null
   }
 
   export type OrderSumAggregateOutputType = {
@@ -29272,6 +29277,8 @@ export namespace Prisma {
     creator_id: bigint | null
     quantity: number | null
     total_amount: Decimal | null
+    delivery_time: number | null
+    price_revision_amount: Decimal | null
   }
 
   export type OrderMinAggregateOutputType = {
@@ -29286,6 +29293,10 @@ export namespace Prisma {
     order_date: Date | null
     completed_at: Date | null
     rejection_message: string | null
+    delivery_time: number | null
+    additional_instructions: string | null
+    price_revision_amount: Decimal | null
+    price_revision_reason: string | null
   }
 
   export type OrderMaxAggregateOutputType = {
@@ -29300,6 +29311,10 @@ export namespace Prisma {
     order_date: Date | null
     completed_at: Date | null
     rejection_message: string | null
+    delivery_time: number | null
+    additional_instructions: string | null
+    price_revision_amount: Decimal | null
+    price_revision_reason: string | null
   }
 
   export type OrderCountAggregateOutputType = {
@@ -29314,6 +29329,12 @@ export namespace Prisma {
     order_date: number
     completed_at: number
     rejection_message: number
+    delivery_time: number
+    additional_instructions: number
+    references: number
+    deliverables: number
+    price_revision_amount: number
+    price_revision_reason: number
     _all: number
   }
 
@@ -29325,6 +29346,8 @@ export namespace Prisma {
     creator_id?: true
     quantity?: true
     total_amount?: true
+    delivery_time?: true
+    price_revision_amount?: true
   }
 
   export type OrderSumAggregateInputType = {
@@ -29334,6 +29357,8 @@ export namespace Prisma {
     creator_id?: true
     quantity?: true
     total_amount?: true
+    delivery_time?: true
+    price_revision_amount?: true
   }
 
   export type OrderMinAggregateInputType = {
@@ -29348,6 +29373,10 @@ export namespace Prisma {
     order_date?: true
     completed_at?: true
     rejection_message?: true
+    delivery_time?: true
+    additional_instructions?: true
+    price_revision_amount?: true
+    price_revision_reason?: true
   }
 
   export type OrderMaxAggregateInputType = {
@@ -29362,6 +29391,10 @@ export namespace Prisma {
     order_date?: true
     completed_at?: true
     rejection_message?: true
+    delivery_time?: true
+    additional_instructions?: true
+    price_revision_amount?: true
+    price_revision_reason?: true
   }
 
   export type OrderCountAggregateInputType = {
@@ -29376,6 +29409,12 @@ export namespace Prisma {
     order_date?: true
     completed_at?: true
     rejection_message?: true
+    delivery_time?: true
+    additional_instructions?: true
+    references?: true
+    deliverables?: true
+    price_revision_amount?: true
+    price_revision_reason?: true
     _all?: true
   }
 
@@ -29477,6 +29516,12 @@ export namespace Prisma {
     order_date: Date
     completed_at: Date | null
     rejection_message: string | null
+    delivery_time: number | null
+    additional_instructions: string | null
+    references: JsonValue | null
+    deliverables: JsonValue | null
+    price_revision_amount: Decimal | null
+    price_revision_reason: string | null
     _count: OrderCountAggregateOutputType | null
     _avg: OrderAvgAggregateOutputType | null
     _sum: OrderSumAggregateOutputType | null
@@ -29510,6 +29555,12 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
+    delivery_time?: boolean
+    additional_instructions?: boolean
+    references?: boolean
+    deliverables?: boolean
+    price_revision_amount?: boolean
+    price_revision_reason?: boolean
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
@@ -29531,6 +29582,12 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
+    delivery_time?: boolean
+    additional_instructions?: boolean
+    references?: boolean
+    deliverables?: boolean
+    price_revision_amount?: boolean
+    price_revision_reason?: boolean
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
@@ -29548,6 +29605,12 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
+    delivery_time?: boolean
+    additional_instructions?: boolean
+    references?: boolean
+    deliverables?: boolean
+    price_revision_amount?: boolean
+    price_revision_reason?: boolean
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
     creator?: boolean | CreatorProfileDefaultArgs<ExtArgs>
@@ -29565,9 +29628,15 @@ export namespace Prisma {
     order_date?: boolean
     completed_at?: boolean
     rejection_message?: boolean
+    delivery_time?: boolean
+    additional_instructions?: boolean
+    references?: boolean
+    deliverables?: boolean
+    price_revision_amount?: boolean
+    price_revision_reason?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "package_id" | "brand_id" | "creator_id" | "quantity" | "total_amount" | "currency" | "status" | "order_date" | "completed_at" | "rejection_message", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "package_id" | "brand_id" | "creator_id" | "quantity" | "total_amount" | "currency" | "status" | "order_date" | "completed_at" | "rejection_message" | "delivery_time" | "additional_instructions" | "references" | "deliverables" | "price_revision_amount" | "price_revision_reason", ExtArgs["result"]["order"]>
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     package?: boolean | PackageDefaultArgs<ExtArgs>
     brand?: boolean | BrandProfileDefaultArgs<ExtArgs>
@@ -29610,6 +29679,12 @@ export namespace Prisma {
       order_date: Date
       completed_at: Date | null
       rejection_message: string | null
+      delivery_time: number | null
+      additional_instructions: string | null
+      references: Prisma.JsonValue | null
+      deliverables: Prisma.JsonValue | null
+      price_revision_amount: Prisma.Decimal | null
+      price_revision_reason: string | null
     }, ExtArgs["result"]["order"]>
     composites: {}
   }
@@ -30050,6 +30125,12 @@ export namespace Prisma {
     readonly order_date: FieldRef<"Order", 'DateTime'>
     readonly completed_at: FieldRef<"Order", 'DateTime'>
     readonly rejection_message: FieldRef<"Order", 'String'>
+    readonly delivery_time: FieldRef<"Order", 'Int'>
+    readonly additional_instructions: FieldRef<"Order", 'String'>
+    readonly references: FieldRef<"Order", 'Json'>
+    readonly deliverables: FieldRef<"Order", 'Json'>
+    readonly price_revision_amount: FieldRef<"Order", 'Decimal'>
+    readonly price_revision_reason: FieldRef<"Order", 'String'>
   }
     
 
@@ -35827,7 +35908,13 @@ export namespace Prisma {
     status: 'status',
     order_date: 'order_date',
     completed_at: 'completed_at',
-    rejection_message: 'rejection_message'
+    rejection_message: 'rejection_message',
+    delivery_time: 'delivery_time',
+    additional_instructions: 'additional_instructions',
+    references: 'references',
+    deliverables: 'deliverables',
+    price_revision_amount: 'price_revision_amount',
+    price_revision_reason: 'price_revision_reason'
   };
 
   export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -38463,6 +38550,12 @@ export namespace Prisma {
     order_date?: DateTimeFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableFilter<"Order"> | string | null
+    delivery_time?: IntNullableFilter<"Order"> | number | null
+    additional_instructions?: StringNullableFilter<"Order"> | string | null
+    references?: JsonNullableFilter<"Order">
+    deliverables?: JsonNullableFilter<"Order">
+    price_revision_amount?: DecimalNullableFilter<"Order"> | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: StringNullableFilter<"Order"> | string | null
     package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
     brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
     creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
@@ -38483,6 +38576,12 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrderInput | SortOrder
     rejection_message?: SortOrderInput | SortOrder
+    delivery_time?: SortOrderInput | SortOrder
+    additional_instructions?: SortOrderInput | SortOrder
+    references?: SortOrderInput | SortOrder
+    deliverables?: SortOrderInput | SortOrder
+    price_revision_amount?: SortOrderInput | SortOrder
+    price_revision_reason?: SortOrderInput | SortOrder
     package?: PackageOrderByWithRelationInput
     brand?: BrandProfileOrderByWithRelationInput
     creator?: CreatorProfileOrderByWithRelationInput
@@ -38506,6 +38605,12 @@ export namespace Prisma {
     order_date?: DateTimeFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableFilter<"Order"> | string | null
+    delivery_time?: IntNullableFilter<"Order"> | number | null
+    additional_instructions?: StringNullableFilter<"Order"> | string | null
+    references?: JsonNullableFilter<"Order">
+    deliverables?: JsonNullableFilter<"Order">
+    price_revision_amount?: DecimalNullableFilter<"Order"> | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: StringNullableFilter<"Order"> | string | null
     package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
     brand?: XOR<BrandProfileScalarRelationFilter, BrandProfileWhereInput>
     creator?: XOR<CreatorProfileScalarRelationFilter, CreatorProfileWhereInput>
@@ -38526,6 +38631,12 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrderInput | SortOrder
     rejection_message?: SortOrderInput | SortOrder
+    delivery_time?: SortOrderInput | SortOrder
+    additional_instructions?: SortOrderInput | SortOrder
+    references?: SortOrderInput | SortOrder
+    deliverables?: SortOrderInput | SortOrder
+    price_revision_amount?: SortOrderInput | SortOrder
+    price_revision_reason?: SortOrderInput | SortOrder
     _count?: OrderCountOrderByAggregateInput
     _avg?: OrderAvgOrderByAggregateInput
     _max?: OrderMaxOrderByAggregateInput
@@ -38548,6 +38659,12 @@ export namespace Prisma {
     order_date?: DateTimeWithAggregatesFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    delivery_time?: IntNullableWithAggregatesFilter<"Order"> | number | null
+    additional_instructions?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    references?: JsonNullableWithAggregatesFilter<"Order">
+    deliverables?: JsonNullableWithAggregatesFilter<"Order">
+    price_revision_amount?: DecimalNullableWithAggregatesFilter<"Order"> | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: StringNullableWithAggregatesFilter<"Order"> | string | null
   }
 
   export type PhoneVerificationWhereInput = {
@@ -41223,6 +41340,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
@@ -41243,6 +41366,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
     ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
@@ -41257,6 +41386,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
@@ -41277,6 +41412,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
     ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
@@ -41294,6 +41435,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
   }
 
   export type OrderUpdateManyMutationInput = {
@@ -41305,6 +41452,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type OrderUncheckedUpdateManyInput = {
@@ -41319,6 +41472,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PhoneVerificationCreateInput = {
@@ -43941,6 +44100,12 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrder
     rejection_message?: SortOrder
+    delivery_time?: SortOrder
+    additional_instructions?: SortOrder
+    references?: SortOrder
+    deliverables?: SortOrder
+    price_revision_amount?: SortOrder
+    price_revision_reason?: SortOrder
   }
 
   export type OrderAvgOrderByAggregateInput = {
@@ -43950,6 +44115,8 @@ export namespace Prisma {
     creator_id?: SortOrder
     quantity?: SortOrder
     total_amount?: SortOrder
+    delivery_time?: SortOrder
+    price_revision_amount?: SortOrder
   }
 
   export type OrderMaxOrderByAggregateInput = {
@@ -43964,6 +44131,10 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrder
     rejection_message?: SortOrder
+    delivery_time?: SortOrder
+    additional_instructions?: SortOrder
+    price_revision_amount?: SortOrder
+    price_revision_reason?: SortOrder
   }
 
   export type OrderMinOrderByAggregateInput = {
@@ -43978,6 +44149,10 @@ export namespace Prisma {
     order_date?: SortOrder
     completed_at?: SortOrder
     rejection_message?: SortOrder
+    delivery_time?: SortOrder
+    additional_instructions?: SortOrder
+    price_revision_amount?: SortOrder
+    price_revision_reason?: SortOrder
   }
 
   export type OrderSumOrderByAggregateInput = {
@@ -43987,6 +44162,8 @@ export namespace Prisma {
     creator_id?: SortOrder
     quantity?: SortOrder
     total_amount?: SortOrder
+    delivery_time?: SortOrder
+    price_revision_amount?: SortOrder
   }
 
   export type EnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -49138,6 +49315,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
@@ -49156,6 +49339,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
     ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
@@ -49447,6 +49636,12 @@ export namespace Prisma {
     order_date?: DateTimeFilter<"Order"> | Date | string
     completed_at?: DateTimeNullableFilter<"Order"> | Date | string | null
     rejection_message?: StringNullableFilter<"Order"> | string | null
+    delivery_time?: IntNullableFilter<"Order"> | number | null
+    additional_instructions?: StringNullableFilter<"Order"> | string | null
+    references?: JsonNullableFilter<"Order">
+    deliverables?: JsonNullableFilter<"Order">
+    price_revision_amount?: DecimalNullableFilter<"Order"> | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: StringNullableFilter<"Order"> | string | null
   }
 
   export type CampaignApplicationCreateWithoutCreatorInput = {
@@ -49834,6 +50029,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
@@ -49852,6 +50053,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
     ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
@@ -52468,6 +52675,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
@@ -52487,6 +52700,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
     ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
   }
@@ -52832,6 +53051,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
@@ -52851,6 +53076,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
     ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
   }
@@ -53162,6 +53393,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
@@ -53181,6 +53418,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
   }
@@ -53387,6 +53630,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
@@ -53406,6 +53655,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
   }
@@ -55119,6 +55374,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
@@ -55137,6 +55398,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
     ticket?: TicketUncheckedCreateNestedOneWithoutOrderInput
@@ -56560,6 +56827,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     package: PackageCreateNestedOneWithoutOrdersInput
     brand: BrandProfileCreateNestedOneWithoutOrders_placedInput
     creator: CreatorProfileCreateNestedOneWithoutOrders_receivedInput
@@ -56579,6 +56852,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutOrderInput
   }
@@ -56735,6 +57014,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
@@ -56754,6 +57039,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
   }
@@ -57742,6 +58033,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
   }
 
   export type CampaignUpdateWithoutBrandInput = {
@@ -57979,6 +58276,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
@@ -57997,6 +58300,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
     ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
@@ -58013,6 +58322,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type CampaignApplicationCreateManyCreatorInput = {
@@ -58111,6 +58426,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
   }
 
   export type CampaignApplicationUpdateWithoutCreatorInput = {
@@ -58391,6 +58712,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     package?: PackageUpdateOneRequiredWithoutOrdersNestedInput
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
@@ -58409,6 +58736,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
     ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
@@ -58425,6 +58758,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type CampaignAnalyticsCreateManyCampaignInput = {
@@ -58963,6 +59302,12 @@ export namespace Prisma {
     order_date?: Date | string
     completed_at?: Date | string | null
     rejection_message?: string | null
+    delivery_time?: number | null
+    additional_instructions?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: string | null
   }
 
   export type OrderUpdateWithoutPackageInput = {
@@ -58974,6 +59319,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     brand?: BrandProfileUpdateOneRequiredWithoutOrders_placedNestedInput
     creator?: CreatorProfileUpdateOneRequiredWithoutOrders_receivedNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
@@ -58992,6 +59343,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutOrderNestedInput
     ticket?: TicketUncheckedUpdateOneWithoutOrderNestedInput
@@ -59008,6 +59365,12 @@ export namespace Prisma {
     order_date?: DateTimeFieldUpdateOperationsInput | Date | string
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejection_message?: NullableStringFieldUpdateOperationsInput | string | null
+    delivery_time?: NullableIntFieldUpdateOperationsInput | number | null
+    additional_instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    deliverables?: NullableJsonNullValueInput | InputJsonValue
+    price_revision_amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price_revision_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PaymentCreateManyOrderInput = {

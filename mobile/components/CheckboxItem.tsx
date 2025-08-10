@@ -34,7 +34,7 @@ const CheckboxItem: React.FC<CheckboxItemProps> = ({
           <Ionicons 
             name="checkmark" 
             size={16} 
-            color={disabled ? "#9CA3AF" : "#f8f4e8"} 
+            color={disabled ? "#9CA3AF" : "#ffffff"} 
           />
         )}
       </View>
@@ -55,9 +55,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#ffffff',
   },
   disabled: {
     opacity: 0.5,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 2,
     borderColor: '#D1D5DB',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     borderColor: '#f37135',
   },
   checkboxDisabled: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#ffffff',
     borderColor: '#D1D5DB',
   },
   label: {

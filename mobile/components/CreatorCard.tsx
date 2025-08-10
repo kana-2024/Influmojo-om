@@ -123,11 +123,47 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, platform, onPress })
         />
         
         {/* Gradient Overlay */}
-        <View style={styles.imageOverlay} />
+        <View style={styles.imageOverlay}>
+          {/* Demographics and Response Time */}
+          <View style={styles.overlayContent}>
+            <View style={styles.demographicsRow}>
+              <View style={styles.demographicItem}>
+                <MaterialIcons name="person-outline" size={14} color="#ffffff" />
+                <Text style={[styles.demographicText, { color: '#ffffff' }]}>
+                  {creator.gender || 'Not specified'}
+                </Text>
+              </View>
+              <View style={styles.demographicItem}>
+                <MaterialIcons name="cake" size={14} color="#ffffff" />
+                <Text style={[styles.demographicText, { color: '#ffffff' }]}>
+                  {getAgeDisplay()}
+                </Text>
+              </View>
+              <View style={styles.demographicItem}>
+                <MaterialIcons name="schedule" size={14} color="#ffffff" />
+                <Text style={[styles.demographicText, { color: '#ffffff' }]}>
+                  {creator.average_response_time || 'Within 24h'}
+                </Text>
+              </View>
+            </View>
+
+            {/* Platform and Engagement */}
+            <View style={styles.engagementRow}>
+              {/* Removed redundant platform info since we have the badge */}
+              {creator.social_accounts?.[0]?.engagement_rate && (
+                <View style={[styles.engagementBadge, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+                  <Text style={[styles.engagementText, { color: '#ffffff' }]}>
+                    {(parseFloat(creator.social_accounts[0].engagement_rate) * 100).toFixed(1)}% engagement
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
         
         {/* Platform Badge */}
         <View style={styles.platformBadge}>
-          <Ionicons name={getPlatformIcon(platform)} size={16} color={COLORS.secondary} />
+          <Ionicons name={getPlatformIcon(platform)} size={20} color="#f37135" />
         </View>
         
         {/* Favorite Button */}
@@ -139,7 +175,7 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, platform, onPress })
           <Ionicons 
             name={isFavorite ? "heart" : "heart-outline"} 
             size={20} 
-            color={isFavorite ? COLORS.secondary : COLORS.secondary} 
+            color="#f37135"
           />
         </TouchableOpacity>
       </View>
@@ -159,46 +195,9 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, platform, onPress })
         </View>
 
         {/* Bio */}
-        <Text style={styles.bioText} numberOfLines={2}>
+        <Text style={styles.bioText} numberOfLines={1} ellipsizeMode="tail">
           {creator.bio || 'A talented creator with amazing content...'}
         </Text>
-
-        {/* Demographics and Response Time in same row */}
-        <View style={styles.demographicsRow}>
-          <View style={styles.demographicItem}>
-            <MaterialIcons name="person-outline" size={14} color={COLORS.secondary} />
-            <Text style={styles.demographicText}>
-              {creator.gender || 'Not specified'}
-            </Text>
-          </View>
-          <View style={styles.demographicItem}>
-            <MaterialIcons name="cake" size={14} color={COLORS.secondary} />
-            <Text style={styles.demographicText}>
-              {getAgeDisplay()}
-            </Text>
-          </View>
-          <View style={styles.demographicItem}>
-            <MaterialIcons name="schedule" size={14} color={COLORS.secondary} />
-            <Text style={styles.demographicText}>
-              {creator.average_response_time || 'Within 24h'}
-            </Text>
-          </View>
-        </View>
-
-        {/* Platform and Engagement */}
-        <View style={styles.engagementRow}>
-          <View style={styles.platformInfo}>
-            <Ionicons name={getPlatformIcon(platform)} size={16} color={COLORS.secondary} />
-            <Text style={styles.platformText}>{platform}</Text>
-          </View>
-          {creator.social_accounts?.[0]?.engagement_rate && (
-            <View style={styles.engagementBadge}>
-              <Text style={styles.engagementText}>
-                {(parseFloat(creator.social_accounts[0].engagement_rate) * 100).toFixed(1)}% engagement
-              </Text>
-            </View>
-          )}
-        </View>
       </View>
     </TouchableOpacity>
   );
@@ -206,40 +205,48 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, platform, onPress })
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
     width: 320,
     borderRadius: 16,
     marginRight: 16,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
   },
   imageContainer: {
     position: 'relative',
-    height: 160,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+    height: 200,
     overflow: 'hidden',
+    borderRadius: 16,
   },
   coverImage: {
     width: '100%',
     height: '100%',
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+    borderRadius: 16,
   },
   imageOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: 60,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 70,
+  },
+  overlayContent: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
   },
   platformBadge: {
     position: 'absolute',
     top: 12,
     left: 12,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgb(255, 255, 255)',
     borderRadius: 20,
     padding: 6,
   },
@@ -247,17 +254,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     right: 12,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgb(255, 255, 255)',
     borderRadius: 20,
     padding: 6,
   },
   contentContainer: {
     padding: 16,
+    paddingTop: 12,
+    backgroundColor: '#ffffff',
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 8,
   },
   creatorName: {
@@ -282,50 +291,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textGray,
     lineHeight: 20,
-    marginBottom: 12,
   },
   demographicsRow: {
     flexDirection: 'row',
-    marginBottom: 12,
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 32,
   },
   demographicItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
   },
   demographicText: {
     fontSize: 12,
-    color: COLORS.textGray,
     marginLeft: 4,
     flexShrink: 1,
   },
   engagementRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  platformInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  platformText: {
-    fontSize: 12,
-    color: COLORS.secondary,
-    fontWeight: '600',
-    marginLeft: 4,
   },
   engagementBadge: {
-    backgroundColor: COLORS.chipYellow,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 10,
   },
   engagementText: {
     fontSize: 11,
-    color: COLORS.textDark,
     fontWeight: '500',
   },
 });

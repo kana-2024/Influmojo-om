@@ -118,7 +118,7 @@ const OrderChatTest: React.FC<OrderChatTestProps> = ({ userEmail, userName }) =>
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   title: {
     fontSize: 20,
@@ -147,18 +147,18 @@ const styles = StyleSheet.create({
     borderColor: '#f37135',
   },
   testButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
   },
   testButtonEmail: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 12,
     opacity: 0.8,
   },
   instructions: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
