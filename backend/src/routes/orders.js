@@ -66,7 +66,7 @@ router.post('/checkout', authenticateJWT, asyncHandler(async (req, res) => {
 
     // Process each cart item
     for (const cartItem of cartItems) {
-      const { packageId, quantity = 1 } = cartItem;
+      const { packageId, quantity = 1, deliveryTime, additionalInstructions, references } = cartItem;
 
       // Validate package exists and is active
       const package = await prisma.package.findFirst({
@@ -126,7 +126,10 @@ router.post('/checkout', authenticateJWT, asyncHandler(async (req, res) => {
         creator_id: package.creator_id,
         total_amount: totalAmount,
         currency: package.currency,
-        quantity: quantity
+        quantity: quantity,
+        delivery_time: deliveryTime || null,
+        additional_instructions: additionalInstructions || null,
+        references: references || null,
       };
 
       const result = await orderService.createOrder(orderData);
@@ -646,6 +649,152 @@ router.put('/:orderId/reject', [
     console.error('❌ Error rejecting order:', error);
     res.status(500).json({
       error: 'Failed to reject order',
+      message: error.message
+    });
+  }
+}));
+
+// Submit deliverables for an order
+router.post('/:orderId/deliverables', [
+  body('deliverables').isArray().withMessage('Deliverables must be an array'),
+  body('deliverables.*.url').isURL().withMessage('Each deliverable must have a valid URL'),
+  body('deliverables.*.filename').notEmpty().withMessage('Each deliverable must have a filename'),
+  body('deliverables.*.type').notEmpty().withMessage('Each deliverable must have a type'),
+  validateRequest
+], asyncHandler(async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { deliverables } = req.body;
+    const userId = req.user.userId;
+
+    // Verify the order exists and belongs to the creator
+    const order = await prisma.order.findFirst({
+      where: {
+        id: BigInt(orderId),
+        creator_id: BigInt(userId)
+      }
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        error: 'Order not found or unauthorized'
+      });
+    }
+
+    // Check if order is in a state where deliverables can be submitted
+    if (!['accepted', 'in_progress'].includes(order.status)) {
+      return res.status(400).json({
+        error: 'Cannot submit deliverables for this order status',
+        currentStatus: order.status
+      });
+    }
+
+    // Update order with deliverables and change status to 'review'
+    const updatedOrder = await prisma.order.update({
+      where: {
+        id: BigInt(orderId)
+      },
+      data: {
+        deliverables: JSON.stringify(deliverables),
+        status: 'review',
+        updated_at: new Date()
+      }
+    });
+
+    // Log the deliverable submission
+    console.log(`Deliverables submitted for order ${orderId}:`, deliverables);
+
+    res.json({
+      success: true,
+      message: 'Deliverables submitted successfully',
+      order: {
+        id: updatedOrder.id.toString(),
+        status: updatedOrder.status,
+        deliverables: JSON.parse(updatedOrder.deliverables || '[]')
+      }
+    });
+
+  } catch (error) {
+    console.error('Error submitting deliverables:', error);
+    res.status(500).json({
+      error: 'Failed to submit deliverables',
+      message: error.message
+    });
+  }
+}));
+
+// Request price revision for an order
+router.post('/:orderId/price-revision', [
+  body('additionalAmount').isFloat({ min: 0.01 }).withMessage('Additional amount must be a positive number'),
+  body('reason').optional().isString().withMessage('Reason must be a string'),
+  validateRequest
+], asyncHandler(async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { additionalAmount, reason } = req.body;
+    const userId = req.user.userId;
+
+    // Verify the order exists and belongs to the creator
+    const order = await prisma.order.findFirst({
+      where: {
+        id: BigInt(orderId),
+        creator_id: BigInt(userId)
+      }
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        error: 'Order not found or unauthorized'
+      });
+    }
+
+    // Check if order is in revision_requested status
+    if (order.status !== 'revision_requested') {
+      return res.status(400).json({
+        error: 'Price revision can only be requested when revision is requested',
+        currentStatus: order.status
+      });
+    }
+
+    // Check if price revision was already requested
+    const existingPriceRevision = order.price_revision_amount;
+    if (existingPriceRevision !== null && existingPriceRevision !== undefined) {
+      return res.status(400).json({
+        error: 'Price revision has already been requested for this order'
+      });
+    }
+
+    // Update order with price revision request
+    const updatedOrder = await prisma.order.update({
+      where: {
+        id: BigInt(orderId)
+      },
+      data: {
+        price_revision_amount: additionalAmount,
+        price_revision_reason: reason || 'Additional work required for revision',
+        status: 'price_revision_pending',
+        updated_at: new Date()
+      }
+    });
+
+    // Log the price revision request
+    console.log(`Price revision requested for order ${orderId}: $${additionalAmount}`);
+
+    res.json({
+      success: true,
+      message: 'Price revision request submitted successfully',
+      order: {
+        id: updatedOrder.id.toString(),
+        status: updatedOrder.status,
+        priceRevisionAmount: parseFloat(updatedOrder.price_revision_amount?.toString() || '0'),
+        priceRevisionReason: updatedOrder.price_revision_reason
+      }
+    });
+
+  } catch (error) {
+    console.error('Error requesting price revision:', error);
+    res.status(500).json({
+      error: 'Failed to request price revision',
       message: error.message
     });
   }

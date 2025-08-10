@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, ScrollView, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../../config/colors';
 import CartService, { CartItem, CartSummary } from '../../services/cartService';
 import { ordersAPI } from '../../services/apiService';
+import CartItemEditModal from './CartItemEditModal';
 
 interface CartModalProps {
   visible: boolean;
@@ -31,6 +34,8 @@ const CartModal: React.FC<CartModalProps> = ({
   });
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [lastCheckoutTime, setLastCheckoutTime] = useState(0);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<CartItem | null>(null);
 
   useEffect(() => {
     // If using legacy items prop, use that instead of CartService
@@ -94,6 +99,27 @@ const CartModal: React.FC<CartModalProps> = ({
     } else {
       CartService.updateQuantity(itemId, quantity);
     }
+  };
+
+  const handleEditItem = (item: CartItem) => {
+    setEditingItem(item);
+    setShowEditModal(true);
+  };
+
+  const handleEditClose = () => {
+    setShowEditModal(false);
+    setEditingItem(null);
+  };
+
+  const handleEditSave = (itemId: string, formData: {
+    deliveryTime: number;
+    additionalInstructions: string;
+    references: string[];
+  }) => {
+    CartService.updateItem(itemId, formData);
+    setShowEditModal(false);
+    setEditingItem(null);
+    Alert.alert('Success', 'Item updated successfully!');
   };
 
   const handleClearCart = () => {
@@ -183,7 +209,10 @@ const CartModal: React.FC<CartModalProps> = ({
               const cartItems = cartSummary.items.map(item => ({
                 packageId: item.packageId,
                 creatorId: item.creatorId,
-                quantity: item.quantity
+                quantity: item.quantity,
+                deliveryTime: item.deliveryTime,
+                additionalInstructions: item.additionalInstructions,
+                references: item.references
               }));
 
               console.log('🔄 Starting checkout process...');
@@ -363,6 +392,35 @@ const CartModal: React.FC<CartModalProps> = ({
                             <Text style={styles.itemPlatform}>{item.platform}</Text>
                             <Text style={styles.itemDuration}>{item.packageDuration}</Text>
                           </View>
+                          
+                          {/* Form Data Display */}
+                          {item.deliveryTime && (
+                            <View style={styles.formDataRow}>
+                              <Ionicons name="time-outline" size={14} color="#6B7280" />
+                              <Text style={styles.formDataText}>
+                                Delivery: {item.deliveryTime} {item.deliveryTime === 1 ? 'Day' : 'Days'}
+                              </Text>
+                            </View>
+                          )}
+                          
+                          {item.additionalInstructions && (
+                            <View style={styles.formDataRow}>
+                              <Ionicons name="document-text-outline" size={14} color="#6B7280" />
+                              <Text style={styles.formDataText} numberOfLines={2}>
+                                Instructions: {item.additionalInstructions}
+                              </Text>
+                            </View>
+                          )}
+                          
+                          {item.references && item.references.length > 0 && (
+                            <View style={styles.formDataRow}>
+                              <Ionicons name="images-outline" size={14} color="#6B7280" />
+                              <Text style={styles.formDataText}>
+                                References: {item.references.length} file{item.references.length > 1 ? 's' : ''}
+                              </Text>
+                            </View>
+                          )}
+                          
                           <Text style={styles.itemPrice}>{formatPrice(item.packagePrice)}</Text>
                         </View>
                         <View style={styles.itemActions}>
@@ -378,6 +436,12 @@ const CartModal: React.FC<CartModalProps> = ({
                             onPress={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                           >
                             <Ionicons name="add" size={16} color="#FD5D27" />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.editButton}
+                            onPress={() => handleEditItem(item)}
+                          >
+                            <Ionicons name="pencil-outline" size={16} color="#3B82F6" />
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={styles.removeButton}
@@ -407,18 +471,31 @@ const CartModal: React.FC<CartModalProps> = ({
                 <Text style={styles.clearButtonText}>Clear Cart</Text>
               </TouchableOpacity>
               <TouchableOpacity 
-                style={[styles.checkoutButton, checkoutLoading && { opacity: 0.7 }]} 
+                style={[styles.checkoutButtonContainer, checkoutLoading && { opacity: 0.7 }]} 
                 onPress={handleCheckout}
                 disabled={checkoutLoading}
               >
-                <Text style={styles.checkoutButtonText}>
-                  {checkoutLoading ? 'Processing...' : 'Checkout'}
-                </Text>
+                <LinearGradient
+                  colors={COLORS.gradientOrange}
+                  style={styles.checkoutButton}
+                >
+                  <Text style={styles.checkoutButtonText}>
+                    {checkoutLoading ? 'Processing...' : 'Checkout'}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
         )}
       </View>
+
+      {/* Edit Modal */}
+      <CartItemEditModal
+        visible={showEditModal}
+        onClose={handleEditClose}
+        onSave={handleEditSave}
+        cartItem={editingItem}
+      />
     </Modal>
   );
 };
@@ -429,7 +506,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -500,7 +577,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   creatorInitial: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -546,7 +623,7 @@ const styles = StyleSheet.create({
   itemPlatform: {
     fontSize: 12,
     color: '#FD5D27',
-    backgroundColor: '#FEF3F2',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -574,7 +651,7 @@ const styles = StyleSheet.create({
     borderColor: '#FD5D27',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   quantityText: {
     fontSize: 16,
@@ -582,6 +659,16 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     minWidth: 24,
     textAlign: 'center',
+  },
+  editButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#3B82F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
   },
   removeButton: {
     width: 32,
@@ -591,11 +678,11 @@ const styles = StyleSheet.create({
     borderColor: '#EF4444',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   cartFooter: {
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    borderTopColor: '#ffffff',
     paddingTop: 16,
     marginTop: 16,
   },
@@ -632,17 +719,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
-  checkoutButton: {
+  checkoutButtonContainer: {
     flex: 1,
+  },
+  checkoutButton: {
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: '#FD5D27',
     alignItems: 'center',
   },
   checkoutButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  formDataRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    gap: 8,
+  },
+  formDataText: {
+    fontSize: 12,
+    color: '#6B7280',
   },
 });
 

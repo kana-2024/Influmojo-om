@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../config/colors';
+import CartService from '../services/cartService';
 import ConfirmationModal from './modals/ConfirmationModal';
 import { profileAPI } from '../services/apiService';
-import CartService from '../services/cartService';
 
 interface PackageCardProps {
   item: {
@@ -38,10 +40,10 @@ const PackageCard: React.FC<PackageCardProps> = ({
   readonly = false, 
   onAddToCart 
 }) => {
+  const [imageError, setImageError] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  
+
   const title = item.title || `${item.platform?.toUpperCase()} ${item.content_type?.toUpperCase()}`;
 
   // Get placeholder image URL based on platform
@@ -152,24 +154,39 @@ const PackageCard: React.FC<PackageCardProps> = ({
       Alert.alert('Error', 'Creator information is missing');
       return;
     }
-
-    try {
-      CartService.addToCart({
+    
+    console.log('🛒 PackageCard: handleAddToCart called');
+    console.log('🛒 PackageCard: onAddToCart prop exists =', !!onAddToCart);
+    
+    if (onAddToCart) {
+      console.log('🛒 PackageCard: Calling onAddToCart with data');
+      // Use the parent's handler
+      onAddToCart({
+        item,
         creatorId,
         creatorName,
-        creatorImage: creatorImage || '',
-        packageId: item.id,
-        packageName: item.title || `${item.platform?.toUpperCase()} ${item.content_type?.toUpperCase()}`,
-        packageDescription: item.description || `I craft eye-catching, scroll-stopping ${item.platform} ${item.content_type} designed to grab attention instantly, boost engagement, and turn viewers into loyal followers and customers.`,
-        packagePrice: parseInt(item.price?.toString() || '0'),
-        packageDuration: item.duration1 || '1-2 days',
-        platform: item.platform || 'Unknown',
+        creatorImage,
       });
-
-      Alert.alert('Success', 'Package added to cart!');
-    } catch (error) {
-      console.error('Add to cart error:', error);
-      Alert.alert('Error', 'Failed to add package to cart. Please try again.');
+    } else {
+      console.log('🛒 PackageCard: Using fallback direct cart addition');
+      // Fallback to direct cart addition (for non-readonly mode)
+      try {
+        CartService.addToCart({
+          creatorId,
+          creatorName,
+          creatorImage: creatorImage || '',
+          packageId: item.id,
+          packageName: item.title || `${item.platform?.toUpperCase()} ${item.content_type?.toUpperCase()}`,
+          packageDescription: item.description || `I craft eye-catching, scroll-stopping ${item.platform} ${item.content_type} designed to grab attention instantly, boost engagement, and turn viewers into loyal followers and customers.`,
+          packagePrice: parseInt(item.price?.toString() || '0'),
+          packageDuration: item.duration1 || '1-2 days',
+          platform: item.platform || 'Unknown',
+        });
+        Alert.alert('Success', 'Package added to cart!');
+      } catch (error) {
+        console.error('Add to cart error:', error);
+        Alert.alert('Error', 'Failed to add package to cart. Please try again.');
+      }
     }
   };
   
@@ -245,10 +262,15 @@ const PackageCard: React.FC<PackageCardProps> = ({
         {/* Add to Cart Button - Only show in readonly mode */}
         {readonly && (
           <TouchableOpacity 
-            style={styles.addToCartButton} 
+            style={styles.addToCartButtonContainer} 
             onPress={handleAddToCart}
           >
-            <Text style={styles.addToCartText}>Add to Cart</Text>
+            <LinearGradient
+              colors={COLORS.gradientOrange}
+              style={styles.addToCartButton}
+            >
+              <Text style={styles.addToCartText}>Add to Cart</Text>
+            </LinearGradient>
           </TouchableOpacity>
         )}
       </View>
@@ -267,6 +289,20 @@ const PackageCard: React.FC<PackageCardProps> = ({
         cancelText="Cancel"
         confirmColor="#FF3B30"
       />
+
+      {/* Cart Form Modal */}
+      {/* <CartFormModal
+        visible={showCartFormModal}
+        onClose={() => setShowCartFormModal(false)}
+        onConfirm={handleCartFormConfirm}
+        packageInfo={{
+          id: item.id,
+          title: title,
+          price: parseInt(item.price?.toString() || '0'),
+          platform: item.platform || 'Unknown',
+          creatorName: creatorName || 'Unknown Creator',
+        }}
+      /> */}
     </View>
   );
 };
@@ -286,12 +322,12 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 64,
     height: 64,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
   },
   platformImage: {
     width: 32,
@@ -381,19 +417,20 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 16,
   },
+  addToCartButtonContainer: {
+    marginTop: 12,
+    marginLeft: 74,
+    marginRight: 16,
+  },
   addToCartButton: {
-    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 12,
-    marginLeft: 74,
-    marginRight: 16,
   },
   addToCartText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },

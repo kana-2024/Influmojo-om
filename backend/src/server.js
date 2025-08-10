@@ -45,7 +45,17 @@ express.response.json = function(data) {
       const result = {};
       for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
-          result[key] = serializeData(obj[key]);
+          // Handle JSON string fields like references
+          if (key === 'references' && typeof obj[key] === 'string') {
+            try {
+              result[key] = JSON.parse(obj[key]);
+            } catch (e) {
+              console.warn('Failed to parse references JSON:', e);
+              result[key] = obj[key];
+            }
+          } else {
+            result[key] = serializeData(obj[key]);
+          }
         }
       }
       return result;

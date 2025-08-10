@@ -385,7 +385,7 @@ mobile/components/
 ### Color Palette
 ```typescript
 const COLORS = {
-  primary: '#f8f4e8',    // Cream background
+  primary: '#ffffff',    // White background
   secondary: '#f37135',  // Orange accent
   tertiary: '#20536d',   // Blue tertiary (for buttons)
   textDark: '#1A1D1F',   // Dark text

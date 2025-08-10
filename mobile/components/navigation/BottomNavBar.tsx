@@ -115,17 +115,12 @@ const BottomNavBar = ({ navigation, currentRoute = 'home', onCartPress }: Bottom
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
     paddingVertical: 8,
     paddingHorizontal: 16,
     paddingBottom: 20, // Extra padding for safe area
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 8,
   },
   navItem: {
     flex: 1,

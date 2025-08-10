@@ -499,7 +499,7 @@ const KycModal: React.FC<KycModalProps> = ({ onClose, onBack }) => {
 
 const styles = StyleSheet.create({
   sheet: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 0,
@@ -560,13 +560,13 @@ const styles = StyleSheet.create({
   },
   proofCard: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 20,
     marginHorizontal: 12,
     borderWidth: 1.5,
-    borderColor: '#f8f4e8',
+    borderColor: '#ffffff',
     position: 'relative',
   },
   proofCardSelected: {
@@ -574,8 +574,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#E6F0FF',
   },
   ekycCard: {
-    backgroundColor: '#F0FFF4',
-    borderColor: '#F0FFF4',
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff',
   },
   proofCardText: {
     color: '#2D5BFF',
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     top: 8,
     right: 8,
     backgroundColor: '#2DD36F',
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 10,
     fontWeight: '600',
     paddingHorizontal: 6,
@@ -610,13 +610,13 @@ const styles = StyleSheet.create({
   },
   uploadCard: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 20,
     marginHorizontal: 12,
     borderWidth: 1.5,
-    borderColor: '#f8f4e8',
+    borderColor: '#ffffff',
   },
   uploadCardUploaded: {
     borderColor: '#2DD36F',
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   ekycRedirectCard: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 16,
@@ -654,12 +654,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   ekycUploadCard: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     alignItems: 'center',
     paddingVertical: 24,
     borderWidth: 1.5,
-    borderColor: '#F3F7FF',
+    borderColor: '#ffffff',
     marginBottom: 16,
   },
   ekycUploadText: {
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   ekycDataPreview: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#FFFFFF', // Changed from '#F8F9FA' to '#FFFFFF'
     borderRadius: 8,
     padding: 16,
     borderLeftWidth: 4,
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
   },
   cancelBtn: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   submitBtnText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   guideContainer: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -822,7 +822,7 @@ const styles = StyleSheet.create({
   },
   guideCancelBtn: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
@@ -842,7 +842,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   guideStartText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },

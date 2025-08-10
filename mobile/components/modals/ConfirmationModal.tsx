@@ -71,7 +71,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               style={[styles.confirmButton, { backgroundColor: confirmColor === "#f37135" ? "#FFE5D9" : confirmColor }]}
               onPress={handleConfirm}
             >
-              <Text style={[styles.confirmButtonText, { color: confirmColor === "#f37135" ? "#f37135" : "#f8f4e8" }]}>{confirmText}</Text>
+              <Text style={[styles.confirmButtonText, { color: confirmColor === "#f37135" ? "#f37135" : "#ffffff" }]}>{confirmText}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     top: '50%',
     left: '50%',
     transform: [{ translateX: -200 }, { translateY: -200 }],
-            backgroundColor: '#f8f4e8',
+            backgroundColor: '#ffffff',
     borderRadius: 16,
     width: '90%',
     maxWidth: 400,
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-            backgroundColor: '#f8f4e8',
+            backgroundColor: '#ffffff',
   },
   cancelButtonText: {
     color: '#f37135',
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '700',
     fontSize: 16,
   },

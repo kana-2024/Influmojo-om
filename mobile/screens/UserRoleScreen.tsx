@@ -5,6 +5,8 @@ import * as NavigationBar from 'expo-navigation-bar';
 import { useAppDispatch } from '../store/hooks';
 import { setUserType } from '../store/slices/authSlice';
 import { FONTS } from '../config/fonts';
+import { COLORS } from '../config/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface UserRoleScreenProps {
   navigation: any;
@@ -53,7 +55,7 @@ const UserRoleScreen = ({ navigation, route }: UserRoleScreenProps) => {
             </TouchableOpacity>
           </View>
           <TouchableOpacity
-            style={[styles.continueButton, !selected && { opacity: 0.5 }]}
+            style={styles.continueButtonContainer}
             disabled={!selected}
             onPress={() => {
               if (selected) {
@@ -68,7 +70,12 @@ const UserRoleScreen = ({ navigation, route }: UserRoleScreenProps) => {
               }
             }}
           >
-            <Text style={styles.continueText}>Continue</Text>
+            <LinearGradient
+              colors={COLORS.gradientOrange}
+              style={[styles.continueButton, !selected && { opacity: 0.5 }]}
+            >
+              <Text style={styles.continueText}>Continue</Text>
+            </LinearGradient>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.loginRow}
@@ -95,7 +102,7 @@ const UserRoleScreen = ({ navigation, route }: UserRoleScreenProps) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   imageContainer: {
     width: '100%',
@@ -115,7 +122,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     padding: 24,
     alignItems: 'center',
     shadowColor: '#000',
@@ -168,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   radioCircleSelected: {
     borderColor: '#f37135',
@@ -186,17 +193,19 @@ const styles = StyleSheet.create({
     color: '#1A1D1F',
     fontWeight: '500',
   },
-  continueButton: {
+  continueButtonContainer: {
     width: '100%',
-    backgroundColor: '#f37135',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
     marginTop: 8,
     marginBottom: 8,
   },
+  continueButton: {
+    width: '100%',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
   continueText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     fontSize: 16,

@@ -11,6 +11,10 @@ export interface CartItem {
   platform: string;
   quantity: number;
   addedAt: Date;
+  // New form data fields
+  deliveryTime?: number;
+  additionalInstructions?: string;
+  references?: string[];
 }
 
 export interface CartSummary {
@@ -32,7 +36,11 @@ class CartService {
   }
 
   // Add item to cart
-  addToCart(item: Omit<CartItem, 'id' | 'addedAt' | 'quantity'>): CartSummary {
+  addToCart(item: Omit<CartItem, 'id' | 'addedAt' | 'quantity'> & {
+    deliveryTime?: number;
+    additionalInstructions?: string;
+    references?: string[];
+  }): CartSummary {
     const existingItemIndex = this.items.findIndex(
       cartItem => cartItem.packageId === item.packageId && cartItem.creatorId === item.creatorId
     );
@@ -40,6 +48,16 @@ class CartService {
     if (existingItemIndex >= 0) {
       // Item already exists, increase quantity
       this.items[existingItemIndex].quantity += 1;
+      // Update form data if provided
+      if (item.deliveryTime !== undefined) {
+        this.items[existingItemIndex].deliveryTime = item.deliveryTime;
+      }
+      if (item.additionalInstructions !== undefined) {
+        this.items[existingItemIndex].additionalInstructions = item.additionalInstructions;
+      }
+      if (item.references !== undefined) {
+        this.items[existingItemIndex].references = item.references;
+      }
     } else {
       // Add new item
       const newItem: CartItem = {
@@ -47,6 +65,9 @@ class CartService {
         id: `${item.creatorId}-${item.packageId}-${Date.now()}`,
         quantity: 1,
         addedAt: new Date(),
+        deliveryTime: item.deliveryTime,
+        additionalInstructions: item.additionalInstructions,
+        references: item.references || [],
       };
       this.items.push(newItem);
     }
@@ -99,6 +120,30 @@ class CartService {
     const summary = this.getCartSummary();
     this.notifyListeners(summary);
     return summary;
+  }
+
+  // Update cart item details (delivery time, instructions, references)
+  updateItem(itemId: string, updates: {
+    deliveryTime?: number;
+    additionalInstructions?: string;
+    references?: string[];
+  }): CartSummary {
+    const itemIndex = this.items.findIndex(item => item.id === itemId);
+    if (itemIndex >= 0) {
+      if (updates.deliveryTime !== undefined) {
+        this.items[itemIndex].deliveryTime = updates.deliveryTime;
+      }
+      if (updates.additionalInstructions !== undefined) {
+        this.items[itemIndex].additionalInstructions = updates.additionalInstructions;
+      }
+      if (updates.references !== undefined) {
+        this.items[itemIndex].references = updates.references;
+      }
+      const summary = this.getCartSummary();
+      this.notifyListeners(summary);
+      return summary;
+    }
+    return this.getCartSummary();
   }
 
   // Clear entire cart

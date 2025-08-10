@@ -1,30 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, SafeAreaView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ActivityIndicator,
+  Platform,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ENV, API_ENDPOINTS } from '../config/env';
 import { FONTS } from '../config/fonts';
-
-// Test backend connectivity
-const testBackendConnection = async () => {
-  try {
-    console.log('Testing backend health check...');
-    const response = await fetch(API_ENDPOINTS.HEALTH);
-    console.log('Backend health check response:', response.status);
-    return response.ok;
-  } catch (error) {
-    console.error('Backend health check failed:', error);
-    return false;
-  }
-};
+import { COLORS } from '../config/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StatusBar } from 'react-native';
 import googleAuthService from '../services/googleAuth';
 import * as apiService from '../services/apiService';
-import COLORS from '../config/colors';
+
+// Test backend connectivity
+const testBackendConnection = async () => {
+  try {
+    console.log('Testing backend connectivity...');
+    const response = await fetch(API_ENDPOINTS.LOGIN, { method: 'HEAD' });
+    console.log('Backend connectivity test response:', response.status);
+    return response.ok;
+  } catch (error) {
+    console.error('Backend connectivity test failed:', error);
+    return false;
+  }
+};
 
 const SignUpScreen = ({ navigation, route }: any) => {
   useEffect(() => {
-    // NavigationBar.setBackgroundColorAsync('#f8f4e8'); // Removed as per edit hint
+    // NavigationBar.setBackgroundColorAsync('#ffffff'); // Removed as per edit hint
     // NavigationBar.setButtonStyleAsync('dark'); // Removed as per edit hint
   }, []);
 
@@ -163,7 +173,7 @@ const SignUpScreen = ({ navigation, route }: any) => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle='light-content' backgroundColor='#000' />
       <KeyboardAwareScrollView
-        style={{ flex: 1, backgroundColor: '#f8f4e8' }}
+        style={{ flex: 1, backgroundColor: '#ffffff' }}
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start' }}
         enableOnAndroid={true}
         extraScrollHeight={80}
@@ -245,16 +255,21 @@ const SignUpScreen = ({ navigation, route }: any) => {
           <Text style={styles.infoText}>We'll send a one-time OTP to this number for verification</Text>
           {warning ? <Text style={{ color: '#FF3B30', fontSize: 14, marginBottom: 8, textAlign: 'center' }}>{warning}</Text> : null}
           {/* Button and checkbox at the end */}
-          <TouchableOpacity style={styles.createButton} onPress={handleCreateAccount}>
-            <Text style={styles.createButtonText}>Create account</Text>
-            <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />
+          <TouchableOpacity onPress={handleCreateAccount}>
+            <LinearGradient
+              colors={COLORS.gradientOrange}
+              style={styles.createButton}
+            >
+              <Text style={styles.createButtonText}>Create account</Text>
+              <Ionicons name="arrow-forward" size={20} color="#ffffff" style={{ marginLeft: 8 }} />
+            </LinearGradient>
           </TouchableOpacity>
           <View style={styles.checkboxRow}>
             <TouchableOpacity 
               style={[styles.customCheckbox, agreed && styles.customCheckboxChecked]} 
               onPress={() => setAgreed(!agreed)}
             >
-              {agreed && <Ionicons name="checkmark" size={16} color="#f8f4e8" />}
+              {agreed && <Ionicons name="checkmark" size={16} color="#ffffff" />}
             </TouchableOpacity>
             <Text style={styles.checkboxText}>
               By creating an account, you agree to <Text style={styles.brandLink}>Influmojo</Text>'s{' '}
@@ -274,11 +289,11 @@ const SignUpScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 24,
     paddingTop: 48,
     gap: 5,                                                           
@@ -314,10 +329,10 @@ const styles = StyleSheet.create({
   socialButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: 12,
@@ -360,12 +375,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 10,
     fontSize: 15,
     fontFamily: FONTS.primary.regular,
     marginBottom: 8,
@@ -377,10 +392,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   countryCodeBox: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     paddingHorizontal: 12,
     paddingVertical: 14,
     minHeight: 48,
@@ -402,14 +417,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 14,
     marginTop: 8,
     marginBottom: 16,
   },
   createButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
     fontSize: 16,
@@ -424,7 +438,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,

@@ -403,24 +403,30 @@ model Package {
 }
 
 model Order {
-  id               BigInt        @id @default(autoincrement())
-  package_id       BigInt
-  brand_id         BigInt
-  creator_id       BigInt
-  quantity         Int           @default(1)
-  total_amount     Decimal
-  currency         String        @default("USD")
-  status           OrderStatus   @default(pending)
-  order_date       DateTime      @default(now())
-  completed_at     DateTime?
-  rejection_message String?      // Appealing message when order is rejected
+  id                    BigInt        @id @default(autoincrement())
+  package_id            BigInt
+  brand_id              BigInt
+  creator_id            BigInt
+  quantity              Int           @default(1)
+  total_amount          Decimal
+  currency              String        @default("USD")
+  status                OrderStatus   @default(pending)
+  order_date            DateTime      @default(now())
+  completed_at          DateTime?
+  rejection_message     String?       // Appealing message when order is rejected
+  delivery_time         Int?          // Delivery time in days (3-14)
+  additional_instructions String?     // Additional instructions from brand
+  references            Json?         // Array of reference file URLs
+  deliverables          Json?         // Array of submitted deliverable files
+  price_revision_amount Decimal?      // Additional amount requested by creator for revision
+  price_revision_reason String?       // Reason for price revision request
 
-  package          Package       @relation(fields: [package_id], references: [id])
-  brand            BrandProfile  @relation(fields: [brand_id], references: [id], onDelete: Cascade)
-  creator          CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
-  payments         Payment[]
-  invoices         Invoice[]
-  ticket           Ticket?       // Optional if not always created
+  package               Package       @relation(fields: [package_id], references: [id])
+  brand                 BrandProfile  @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  creator               CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  payments              Payment[]
+  invoices              Invoice[]
+  ticket                Ticket?       // Optional if not always created
 
   @@index([package_id, brand_id, creator_id, status, order_date])
 }
@@ -641,6 +647,9 @@ enum OrderStatus {
   rejected
   confirmed
   in_progress
+  review
+  revision_requested
+  price_revision_pending
   completed
   cancelled
   refunded

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, TextInput, StatusBar, ScrollView, Alert
+  View, Text, StyleSheet, TouchableOpacity, TextInput, StatusBar, ScrollView, Alert, ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
@@ -12,7 +12,8 @@ import OtpModal from '../components/modals/OtpModal';
 import DatePickerModal from '../components/modals/DatePickerModal';
 import GoogleVerificationModal from '../components/modals/GoogleVerificationModal';
 import googleAuthService from '../services/googleAuth';
-import COLORS from '../config/colors';
+import { COLORS } from '../config/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ProfileSetupScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -355,7 +356,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
             <Text style={styles.sectionTitle}>Email ID</Text>
             <View style={styles.inputRow}>
               <TextInput
-                style={[styles.input, { flex: 1, backgroundColor: '#F8F9FA', color: '#6B7280' }]}
+                style={[styles.input, { flex: 1, backgroundColor: '#FFFFFF', color: '#6B7280' }]}
                 value={email}
                 editable={false}
                 selectTextOnFocus={false}
@@ -373,7 +374,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
             <Text style={styles.sectionTitle}>Phone Number</Text>
             <View style={styles.inputRow}>
               <TextInput
-                style={[styles.input, { flex: 1, backgroundColor: isPhoneVerified ? '#F8F9FA' : '#F5F5F5', color: isPhoneVerified ? '#6B7280' : '#1A1D1F', marginBottom: 0 }]} 
+                style={[styles.input, { flex: 1, backgroundColor: isPhoneVerified ? '#FFFFFF' : '#FFFFFF', color: isPhoneVerified ? '#6B7280' : '#1A1D1F', marginBottom: 0 }]} 
                 placeholder="Enter 10-digit mobile number"
                 placeholderTextColor={COLORS.placeholder}
                 value={phone}
@@ -481,14 +482,18 @@ export default function ProfileSetupScreen({ navigation }: any) {
 
         {/* Next Button */}
         <TouchableOpacity
-          style={[styles.nextButton, (loading || profileLoading) && { opacity: 0.7 }]}
           onPress={handleSaveBasicInfo}
           disabled={loading || profileLoading}
         >
-          <Text style={styles.nextButtonText}>
-            {loading ? 'Saving...' : profileLoading ? 'Loading...' : 'Next 1 / 2'}
-          </Text>
-          {!loading && !profileLoading && <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />}
+          <LinearGradient
+            colors={COLORS.gradientOrange}
+            style={[styles.nextButton, (loading || profileLoading) && { opacity: 0.7 }]}
+          >
+            <Text style={styles.nextButtonText}>
+              {loading ? 'Saving...' : profileLoading ? 'Loading...' : 'Next 1 / 2'}
+            </Text>
+            {!loading && !profileLoading && <Ionicons name="arrow-forward" size={20} color="#ffffff" style={{ marginLeft: 8 }} />}
+          </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
 
@@ -543,7 +548,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f8f4e8' },
+  safeArea: { flex: 1, backgroundColor: '#ffffff' },
   scrollContent: { paddingHorizontal: 20, paddingBottom: 32 },
   progressBarContainer: { height: 8, width: '100%', marginTop: 8, marginBottom: 4, position: 'relative' },
   progressBarBg: {
@@ -565,8 +570,15 @@ const styles = StyleSheet.create({
   radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#f37135' },
   radioLabel: { fontSize: 15, color: '#1A1D1F', fontWeight: '400' },
   input: {
-    backgroundColor: '#F5F5F5', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB',
-    paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, marginBottom: 8, minHeight: 48,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#20536d',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontSize: 15,
+    marginBottom: 8,
+    minHeight: 48,
   },
   inputRow: { flexDirection: 'row', alignItems: 'center', position: 'relative', marginBottom: 8, gap: 8 },
   calendarIcon: { position: 'absolute', right: 12, top: 12 },
@@ -581,7 +593,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   verifyButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -590,23 +602,25 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   emailWarningBox: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8F9FA',
-    borderRadius: 8, padding: 8, marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8, 
+    padding: 8, 
+    marginBottom: 2,
   },
   emailWarningText: { color: '#FF9900', fontSize: 13, flex: 1, flexWrap: 'wrap' },
   errorText: { color: '#FF3B30', fontSize: 13, marginBottom: 8 },
   nextButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#f37135', borderRadius: 8, paddingVertical: 14, marginTop: 16, marginBottom: 8,
+    borderRadius: 8, paddingVertical: 14, marginTop: 16, marginBottom: 8,
   },
-  nextButtonText: { color: '#f8f4e8', fontWeight: '600', fontSize: 16 },
+  nextButtonText: { color: '#ffffff', fontWeight: '600', fontSize: 16 },
   dropdownList: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: '#20536d',
     marginTop: -8,
     marginBottom: 8,
     maxHeight: 150,
@@ -616,7 +630,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#ffffff',
   },
   dropdownItemText: {
     fontSize: 15,
@@ -633,7 +647,7 @@ const styles = StyleSheet.create({
   },
 
   ageContainer: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -649,10 +663,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: '#20536d',
     paddingHorizontal: 16,
     paddingVertical: 14,
     marginBottom: 8,

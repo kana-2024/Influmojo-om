@@ -15,10 +15,11 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../../config/colors';
 import { useAppSelector } from '../../store/hooks';
 import { ticketAPI } from '../../services/apiService';
 import { ChatLoader } from '../../components';
-import COLORS from '../../config/colors';
 
 interface BrandChatScreenProps {
   navigation: any;
@@ -483,15 +484,19 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
         </View>
         {agentStatus.status === 'offline' && hasOlderMessages && (
           <TouchableOpacity 
-            style={styles.loadOlderButton}
             onPress={loadOlderMessages}
             disabled={loadingOlderMessages}
           >
-            {loadingOlderMessages ? (
-              <ActivityIndicator size="small" color={COLORS.white} />
-            ) : (
-              <Text style={styles.loadOlderButtonText}>Load Older Messages</Text>
-            )}
+            <LinearGradient
+              colors={COLORS.gradientOrange}
+              style={styles.loadOlderButton}
+            >
+              {loadingOlderMessages ? (
+                <ActivityIndicator size="small" color={COLORS.white} />
+              ) : (
+                <Text style={styles.loadOlderButtonText}>Load Older Messages</Text>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
         )}
       </View>
@@ -512,6 +517,7 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
 
   const renderMessage = ({ item }: { item: Message }) => {
     const messageStyle = getMessageStyle(item);
+    const isOwnMessage = item.sender_role === 'brand';
     const isSystem = item.sender_role === 'system';
     const isSending = item.status === 'sending';
     const isFailed = item.status === 'failed';
@@ -557,15 +563,30 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
 
     return (
       <View style={messageStyle.container}>
-        <View style={[messageStyle.bubble, isSending && styles.sendingMessage, isFailed && styles.failedMessage]}>
-          <View style={styles.messageHeader}>
-            <Text style={messageStyle.sender}>{item.sender_name}</Text>
+        {isOwnMessage ? (
+          <LinearGradient
+            colors={COLORS.gradientOrange}
+            style={[styles.ownMessageBubble, isSending && styles.sendingMessage, isFailed && styles.failedMessage]}
+          >
+            <View style={styles.messageHeader}>
+              <Text style={messageStyle.sender}>{item.sender_name}</Text>
+            </View>
+            <Text style={messageStyle.text}>{item.text}</Text>
+            <Text style={messageStyle.time}>
+              {formatTimestamp(item.timestamp)}
+            </Text>
+          </LinearGradient>
+        ) : (
+          <View style={[messageStyle.bubble, isSending && styles.sendingMessage, isFailed && styles.failedMessage]}>
+            <View style={styles.messageHeader}>
+              <Text style={messageStyle.sender}>{item.sender_name}</Text>
+            </View>
+            <Text style={messageStyle.text}>{item.text}</Text>
+            <Text style={messageStyle.time}>
+              {formatTimestamp(item.timestamp)}
+            </Text>
           </View>
-          <Text style={messageStyle.text}>{item.text}</Text>
-          <Text style={messageStyle.time}>
-            {formatTimestamp(item.timestamp)}
-          </Text>
-        </View>
+        )}
         {isSending && (
           <ChatLoader type="sending" message="Sending..." />
         )}
@@ -593,8 +614,13 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={48} color={COLORS.error} />
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={initializeChat}>
-            <Text style={styles.retryButtonText}>Retry</Text>
+          <TouchableOpacity onPress={initializeChat}>
+            <LinearGradient
+              colors={COLORS.gradientOrange}
+              style={styles.retryButton}
+            >
+              <Text style={styles.retryButtonText}>Retry</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -653,15 +679,19 @@ export default function BrandChatScreen({ navigation, route }: BrandChatScreenPr
             maxLength={1000}
           />
           <TouchableOpacity
-            style={[styles.sendButton, (!newMessage.trim() || sending) && styles.sendButtonDisabled]}
             onPress={handleSendMessage}
             disabled={!newMessage.trim() || sending}
           >
-            {sending ? (
-              <ActivityIndicator size="small" color={COLORS.primary} />
-            ) : (
-              <Ionicons name="send" size={20} color={COLORS.primary} />
-            )}
+            <LinearGradient
+              colors={COLORS.gradientOrange}
+              style={[styles.sendButton, (!newMessage.trim() || sending) && styles.sendButtonDisabled]}
+            >
+              {sending ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Ionicons name="send" size={20} color={COLORS.primary} />
+              )}
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -702,7 +732,6 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: COLORS.secondary,
     borderRadius: 8,
   },
   retryButtonText: {
@@ -758,7 +787,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   ownMessageBubble: {
-    backgroundColor: COLORS.secondary,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 18,
@@ -845,7 +873,6 @@ const styles = StyleSheet.create({
     color: COLORS.textDark,
   },
   sendButton: {
-    backgroundColor: COLORS.secondary,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -914,7 +941,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: COLORS.secondary,
     borderRadius: 12,
   },
   loadOlderButtonText: {

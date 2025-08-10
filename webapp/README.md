@@ -8,7 +8,7 @@ This webapp follows the same design system as the mobile app:
 
 ### Colors
 
-- **Primary**: `#f8f4e8` (Cream)
+- **Primary**: `#ffffff` (White)
 - **Secondary**: `#f37135` (Orange)
 - **Tertiary**: `#20536d` (Dark Blue)
 - **Text Dark**: `#1A1D1F`

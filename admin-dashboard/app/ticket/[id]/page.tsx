@@ -30,6 +30,7 @@ import {
   Globe,
   Briefcase
 } from 'lucide-react';
+import TicketTimeline from '@/components/TicketTimeline';
 
 export default function TicketPage() {
   const params = useParams();
@@ -450,7 +451,7 @@ export default function TicketPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Left Sidebar - Profile Details */}
           <div className="lg:col-span-1 space-y-6">
             {/* Order Details */}
@@ -551,6 +552,11 @@ export default function TicketPage() {
                 <p className="text-gray-500">No creator information available</p>
               )}
             </div>
+          </div>
+
+          {/* Middle - Timeline */}
+          <div className="lg:col-span-1">
+            <TicketTimeline ticket={ticket} messages={allMessages} />
           </div>
 
           {/* Right Side - Chat */}

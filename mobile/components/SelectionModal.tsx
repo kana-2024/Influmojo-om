@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../config/colors';
 import CheckboxItem from './CheckboxItem';
 
 interface SelectionModalProps {
@@ -61,8 +63,13 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
 
         {/* Footer */}
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.doneButton} onPress={onClose}>
-            <Text style={styles.doneButtonText}>Done</Text>
+          <TouchableOpacity style={styles.doneButtonContainer} onPress={onClose}>
+            <LinearGradient
+              colors={COLORS.gradientOrange}
+              style={styles.doneButton}
+            >
+              <Text style={styles.doneButtonText}>Done</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </View>
@@ -76,7 +83,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -112,23 +119,24 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   optionsContainer: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     overflow: 'hidden',
   },
   footer: {
     paddingTop: 16,
   },
+  doneButtonContainer: {
+  },
   doneButton: {
-    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
   },
   doneButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },

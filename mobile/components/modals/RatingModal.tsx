@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -174,11 +174,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#f8f4e8',
+    borderColor: '#20536d',
+    backgroundColor: '#ffffff',
   },
   ratingOptionSelected: {
-    backgroundColor: '#FEF3F2',
+    backgroundColor: '#ffffff',
     borderColor: '#FD5D27',
   },
   starsContainer: {
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   applyButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },

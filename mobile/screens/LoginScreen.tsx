@@ -18,7 +18,8 @@ import OtpModal from '../components/modals/OtpModal';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loginSuccess, setUserType } from '../store/slices/authSlice';
 import { FONTS } from '../config/fonts';
-import COLORS from '../config/colors';
+import { COLORS } from '../config/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function LoginScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -127,7 +128,7 @@ export default function LoginScreen({ navigation }: any) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle='dark-content' backgroundColor='#f8f4e8' />
+      <StatusBar barStyle='dark-content' backgroundColor='#ffffff' />
       
       {/* Header with back button */}
       <View style={styles.header}>
@@ -192,18 +193,22 @@ export default function LoginScreen({ navigation }: any) {
 
         {/* Login Button */}
         <TouchableOpacity
-          style={[styles.loginButton, loading && { opacity: 0.7 }]}
           onPress={handlePhoneLogin}
           disabled={loading}
         >
-          {loading ? (
-            <ActivityIndicator color="#f8f4e8" size="small" />
-          ) : (
-            <>
-              <Text style={styles.loginButtonText}>Log In</Text>
-              <Ionicons name="arrow-forward" size={20} color="#f8f4e8" />
-            </>
-          )}
+          <LinearGradient
+            colors={COLORS.gradientOrange}
+            style={[styles.loginButton, loading && { opacity: 0.7 }]}
+          >
+            {loading ? (
+              <ActivityIndicator color="#ffffff" size="small" />
+            ) : (
+              <>
+                <Text style={styles.loginButtonText}>Log In</Text>
+                <Ionicons name="arrow-forward" size={20} color="#ffffff" />
+              </>
+            )}
+          </LinearGradient>
         </TouchableOpacity>
 
         {/* Divider */}
@@ -264,7 +269,7 @@ export default function LoginScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   header: {
     paddingHorizontal: 20,
@@ -289,13 +294,13 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 10,
   },
   illustrationHighlighted: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderWidth: 2,
     borderColor: '#f37135',
   },
@@ -335,12 +340,12 @@ const styles = StyleSheet.create({
   phoneInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 4,
     marginBottom: 8,
   },
   countryCode: {
@@ -375,7 +380,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   loginButton: {
-    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 16,
     flexDirection: 'row',
@@ -384,7 +388,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   loginButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 16,
     fontFamily: FONTS.primary.semiBold,
     fontWeight: '600',
@@ -416,10 +420,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     paddingVertical: 12,
     marginHorizontal: 6,
   },

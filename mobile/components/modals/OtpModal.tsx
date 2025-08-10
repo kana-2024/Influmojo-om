@@ -134,7 +134,7 @@ const OtpModal: React.FC<OtpModalProps> = ({ visible, onClose, onSuccess, phone 
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator size="small" color="#f8f4e8" />
+                <ActivityIndicator size="small" color="#ffffff" />
               ) : (
                 <Text style={styles.verifyButtonText}>Verify</Text>
               )}
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     top: '50%',
     left: '50%',
     transform: [{ translateX: -200 }, { translateY: -200 }],
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     width: '90%',
     maxWidth: 400,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#20536d',
   },
   title: {
     fontSize: 18,
@@ -189,10 +189,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   otpInput: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   verifyButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },

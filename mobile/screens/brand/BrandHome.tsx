@@ -130,7 +130,7 @@ const BrandHome = ({ navigation, route }: any) => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f8f4e8' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
       {loading && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: insets.top + 16 }}>
           <ActivityIndicator size="large" color="#FD5D27" />
@@ -145,14 +145,14 @@ const BrandHome = ({ navigation, route }: any) => {
             style={{ backgroundColor: '#FD5D27', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}
             onPress={fetchCreators}
           >
-            <Text style={{ color: '#f8f4e8', fontWeight: '600' }}>Retry</Text>
+            <Text style={{ color: '#ffffff', fontWeight: '600' }}>Retry</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {!loading && !error && (
         <ScrollView 
-          style={{ flex: 1, paddingHorizontal: 16, paddingTop: insets.top + 16, backgroundColor: '#f8f4e8' }} 
+          style={{ flex: 1, paddingHorizontal: 16, paddingTop: insets.top + 16, backgroundColor: '#ffffff' }} 
           showsVerticalScrollIndicator={false}
           nestedScrollEnabled={true}
           scrollEventThrottle={16}
@@ -178,34 +178,42 @@ const BrandHome = ({ navigation, route }: any) => {
         </View>
 
         {/* Search + Filter */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+        <View style={{ 
+          flexDirection: 'row', 
+          alignItems: 'center', 
+          marginBottom: 24,
+          paddingHorizontal: 10,
+        }}>
           <View style={{ 
-            flex: 1, 
-            backgroundColor: '#F5F5F5', 
+            flex: 1,
+            backgroundColor: '#FFFFFF', 
             flexDirection: 'row', 
             alignItems: 'center', 
-            paddingHorizontal: 16, 
-            paddingVertical: 8, 
+            paddingHorizontal: 16,  
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: '#E5E7EB',
+            borderColor: '#f37135',
+            marginRight: 12,
           }}>
-            <Feather name="search" size={16} color="#C6C6C6" />
-                         <TextInput
-               placeholder="Search Creators"
-                               placeholderTextColor={COLORS.placeholder}
-               style={{ marginLeft: 8, flex: 1, fontSize: 14, color: '#000' }}
-             />
+            <Feather name="search" size={16} color="#f37135" />
+            <TextInput
+              placeholder="Search Creators"
+              placeholderTextColor={COLORS.placeholder}
+              style={{ marginLeft: 8, flex: 1, fontSize: 14, color: '#000' }}
+            />
           </View>
           <TouchableOpacity 
             style={{ 
               backgroundColor: '#FD5D27', 
-              padding: 8, 
-              borderRadius: 12 
+              borderRadius: 8,
+              width: 42,
+              height: 42,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onPress={() => setShowFilters(true)}
           >
-            <Ionicons name="filter" size={20} color="white" />
+            <Ionicons name="filter" size={22} color="white" />
           </TouchableOpacity>
         </View>
 
@@ -254,7 +262,7 @@ const BrandHome = ({ navigation, route }: any) => {
                   borderRadius: 12, 
                   borderWidth: 1, 
                   borderColor: '#E9E9E9', 
-                  backgroundColor: '#f8f4e8',
+                  backgroundColor: '#ffffff',
                   marginBottom: 6,
                   overflow: 'hidden'
                 }}>

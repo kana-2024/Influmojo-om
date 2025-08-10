@@ -1,8 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../config/colors';
 import * as NavigationBar from 'expo-navigation-bar';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import * as apiService from '../services/apiService';
 
 const GoogleVerifiedScreen = ({ navigation }: any) => {
@@ -63,12 +66,16 @@ const GoogleVerifiedScreen = ({ navigation }: any) => {
       </Text>
       {/* Next Button */}
       <TouchableOpacity 
-        style={[styles.nextButton, loading && { opacity: 0.7 }]} 
         onPress={handleNext}
         disabled={loading}
       >
-        <Text style={styles.nextText}>{loading ? 'Loading...' : 'Next'}</Text>
-        {!loading && <Ionicons name="arrow-forward" size={20} color="#f8f4e8" style={{ marginLeft: 8 }} />}
+        <LinearGradient
+          colors={COLORS.gradientOrange}
+          style={[styles.nextButton, loading && { opacity: 0.7 }]}
+        >
+          <Text style={styles.nextText}>{loading ? 'Loading...' : 'Next'}</Text>
+          {!loading && <Ionicons name="arrow-forward" size={20} color="#ffffff" style={{ marginLeft: 8 }} />}
+        </LinearGradient>
       </TouchableOpacity>
     </View>
   );
@@ -77,7 +84,7 @@ const GoogleVerifiedScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 24,
     paddingTop: 48,
     alignItems: 'center',
@@ -122,14 +129,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f37135',
     borderRadius: 8,
     paddingVertical: 14,
     paddingHorizontal: 32,
     marginBottom: 8,
   },
   nextText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },

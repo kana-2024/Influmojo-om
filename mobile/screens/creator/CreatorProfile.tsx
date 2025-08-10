@@ -5,7 +5,7 @@ import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { updateUser } from '../../store/slices/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
-import { BottomNavBar, KycModal, AccountModal, PackageCard, CartModal } from '../../components';
+import { BottomNavBar, KycModal, AccountModal, PackageCard, CartModal, CartFormModal } from '../../components';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CreatePackageScreen from './CreatePackageScreen';
 import EditPackageScreen from './EditPackageScreen';
@@ -15,6 +15,7 @@ import CustomDropdown from '../../components/CustomDropdown';
 import { profileAPI } from '../../services/apiService';
 import { imageService } from '../../services/imageService';
 import { setShowCreatePortfolio, setShowKycModal, setShowCreatePackage, setShowEditPackage, resetModals } from '../../store/slices/modalSlice';
+import CartService from '../../services/cartService';
 
 const categories = ['Technology', 'Science', 'Training'];
 const languages = ['English', 'Hindi', 'Telugu', 'Marathi'];
@@ -125,14 +126,11 @@ const CreatorProfile = () => {
   const [editingPackage, setEditingPackage] = useState<any>(null);
   const [showDeleteOverlay, setShowDeleteOverlay] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
+  const [showCartFormModal, setShowCartFormModal] = useState(false);
+  const [cartFormData, setCartFormData] = useState<any>(null);
   const [coverImageKey, setCoverImageKey] = useState(0); // Cache-busting for cover image
 
-  console.log('🔍 CreatorProfile component loaded');
-  console.log('🔍 Current user:', user);
-  console.log('🔍 Route params:', route.params);
-  console.log('🔍 Creator profile state:', creatorProfile);
-  console.log('🔍 Creator profile gender:', creatorProfile?.gender);
-  console.log('🔍 Creator profile date_of_birth:', creatorProfile?.date_of_birth);
+
 
   // Open modals only if navigation param is set
   useEffect(() => {
@@ -151,18 +149,12 @@ const CreatorProfile = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 Loading creator profile for brand view, creator ID:', creatorId, 'platform:', platform);
       
       // Use the API to get a specific creator's profile
       const response = await profileAPI.getCreatorProfileById(creatorId, platform);
-      console.log('✅ Creator profile for brand response:', response);
       
       if (response.success) {
         const profile = response.data;
-        console.log('🔍 Creator profile for brand data received:', profile);
-        console.log('🔍 Packages from API (brand view):', profile.packages);
-        console.log('🔍 Gender from API (brand view):', profile.gender);
-        console.log('🔍 Date of birth from API (brand view):', profile.date_of_birth);
         const profileData = {
           ...profile,
           languages: safeParseArray(profile.languages),
@@ -172,13 +164,8 @@ const CreatorProfile = () => {
           date_of_birth: profile.date_of_birth,
           gender: profile.gender,
         };
-        console.log('🔍 Setting creator profile state (brand view):', profileData);
-        console.log('🔍 Packages in state (brand view):', profileData.packages);
-        console.log('🔍 Gender in state (brand view):', profileData.gender);
-        console.log('🔍 Date of birth in state (brand view):', profileData.date_of_birth);
         setCreatorProfile(profileData);
       } else {
-        console.error('❌ Creator profile for brand failed:', response.error);
         setError(response.error || 'Failed to load creator profile');
       }
     } catch (error) {
@@ -192,7 +179,6 @@ const CreatorProfile = () => {
   const loadCreatorProfile = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('🔍 Loading creator profile...');
       
       // Check if user is a brand user and prevent API call
       if (user && (user.user_type === 'brand' || (user as any).userType === 'brand')) {
@@ -379,6 +365,45 @@ const CreatorProfile = () => {
     setShowPaymentsModal(true);
   };
 
+  // CartFormModal handlers
+  const handleShowCartFormModal = (packageData: any) => {
+    setCartFormData(packageData);
+    setShowCartFormModal(true);
+  };
+
+  const handleCartFormClose = () => {
+    setShowCartFormModal(false);
+    setCartFormData(null);
+  };
+
+  const handleCartFormConfirm = (formData: any) => {
+    if (cartFormData) {
+      try {
+        CartService.addToCart({
+          creatorId: cartFormData.creatorId,
+          creatorName: cartFormData.creatorName,
+          creatorImage: cartFormData.creatorImage || '',
+          packageId: cartFormData.item.id,
+          packageName: cartFormData.item.title || `${cartFormData.item.platform?.toUpperCase()} ${cartFormData.item.content_type?.toUpperCase()}`,
+          packageDescription: cartFormData.item.description || `I craft eye-catching, scroll-stopping ${cartFormData.item.platform} ${cartFormData.item.content_type} designed to grab attention instantly, boost engagement, and turn viewers into loyal followers and customers.`,
+          packagePrice: parseInt(cartFormData.item.price?.toString() || '0'),
+          packageDuration: cartFormData.item.duration1 || '1-2 days',
+          platform: cartFormData.item.platform || 'Unknown',
+          deliveryTime: formData.deliveryTime,
+          additionalInstructions: formData.additionalInstructions,
+          references: formData.references,
+        });
+        Alert.alert('Success', 'Package added to cart!');
+      } catch (error) {
+        console.error('Add to cart error:', error);
+        Alert.alert('Error', 'Failed to add package to cart. Please try again.');
+      }
+    }
+    
+    setShowCartFormModal(false);
+    setCartFormData(null);
+  };
+
   // Handle cover image upload
   const handleCoverImageUpload = async () => {
     try {
@@ -407,7 +432,7 @@ const CreatorProfile = () => {
 
   return (
           <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle='dark-content' backgroundColor='#f8f4e8' />
+      <StatusBar barStyle='dark-content' backgroundColor='#ffffff' />
       
       {/* Show error message for brand users (only when not in readonly mode) */}
       {user && (user.user_type === 'brand' || (user as any).userType === 'brand') && !readonly && (
@@ -430,14 +455,14 @@ const CreatorProfile = () => {
         <>
           {/* Show loading state while fetching creator profile data */}
           {loading && readonly ? (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f4e8' }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
               <ActivityIndicator size="large" color="#f37135" />
               <Text style={{ marginTop: 16, fontSize: 16, color: '#6B7280' }}>
                 Loading creator profile...
               </Text>
             </View>
           ) : error && readonly ? (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f4e8', padding: 20 }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff', padding: 20 }}>
               <Ionicons name="alert-circle" size={64} color="#f37135" />
               <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
                 Failed to Load Profile
@@ -454,11 +479,11 @@ const CreatorProfile = () => {
                   }
                 }}
               >
-                <Text style={{ color: '#f8f4e8', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
+                <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
               </TouchableOpacity>
             </View>
           ) : !creatorProfile && readonly ? (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f4e8' }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
               <ActivityIndicator size="large" color="#f37135" />
               <Text style={{ marginTop: 16, fontSize: 16, color: '#6B7280' }}>
                 Loading creator profile...
@@ -466,7 +491,7 @@ const CreatorProfile = () => {
             </View>
           ) : error && !readonly ? (
             // Show authentication error for non-readonly mode
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f4e8', padding: 20 }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff', padding: 20 }}>
               <Ionicons name="lock-closed" size={64} color="#f37135" />
               <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginTop: 16, textAlign: 'center' }}>
                 Authentication Required
@@ -481,7 +506,7 @@ const CreatorProfile = () => {
                   loadCreatorProfile();
                 }}
               >
-                <Text style={{ color: '#f8f4e8', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
+                <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 style={{ marginTop: 12, paddingHorizontal: 20, paddingVertical: 12, backgroundColor: 'transparent', borderRadius: 8, borderWidth: 1, borderColor: '#f37135' }}
@@ -531,7 +556,7 @@ const CreatorProfile = () => {
                       <Image source={{ uri: creatorProfile?.profile_image_url || creatorProfile?.user?.profile_image_url || 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatarImg} />
                       {!readonly && (
                         <TouchableOpacity style={styles.avatarEditBtn}>
-                          <Ionicons name="pencil" size={12} color="#f8f4e8" />
+                          <Ionicons name="pencil" size={12} color="#ffffff" />
                         </TouchableOpacity>
                       )}
                     </View>
@@ -542,7 +567,7 @@ const CreatorProfile = () => {
                       style={styles.coverEditBtn}
                       onPress={handleCoverImageUpload}
                     >
-                      <Ionicons name="camera" size={18} color="#f8f4e8" />
+                      <Ionicons name="camera" size={18} color="#ffffff" />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -722,6 +747,7 @@ const CreatorProfile = () => {
                               onDelete={loadCreatorProfile} 
                               onShowOverlay={setShowDeleteOverlay}
                               readonly={readonly}
+                              onAddToCart={readonly ? handleShowCartFormModal : undefined}
                             />
                           ))}
                         </ScrollView>
@@ -771,7 +797,7 @@ const CreatorProfile = () => {
                                     resizeMode="cover"
                                   />
                                   <View style={styles.videoOverlay}>
-                                    <Ionicons name="play-circle" size={32} color="#f8f4e8" />
+                                    <Ionicons name="play-circle" size={32} color="#ffffff" />
                                   </View>
                                 </View>
                               ) : (
@@ -874,14 +900,14 @@ const CreatorProfile = () => {
 
               <Modal visible={showPaymentsModal} transparent animationType="slide" onRequestClose={() => setShowPaymentsModal(false)}>
                 <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#f8f4e8', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
+                  <View style={{ backgroundColor: '#ffffff', borderRadius: 16, padding: 24, margin: 20, width: '90%' }}>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1D1F', marginBottom: 16, textAlign: 'center' }}>Payments</Text>
                     <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 24, textAlign: 'center' }}>Payment management features will be available soon.</Text>
                     <TouchableOpacity 
                       style={{ backgroundColor: '#f37135', paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
                       onPress={() => setShowPaymentsModal(false)}
                     >
-                      <Text style={{ color: '#f8f4e8', fontSize: 16, fontWeight: '600' }}>Close</Text>
+                      <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '600' }}>Close</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -950,17 +976,31 @@ const CreatorProfile = () => {
           )}
         </>
       )}
+
+      {/* Cart Form Modal - moved to top level */}
+      <CartFormModal
+        visible={showCartFormModal}
+        onClose={handleCartFormClose}
+        onConfirm={handleCartFormConfirm}
+        packageInfo={cartFormData ? {
+          id: cartFormData.item.id,
+          title: cartFormData.item.title || `${cartFormData.item.platform?.toUpperCase()} ${cartFormData.item.content_type?.toUpperCase()}`,
+          price: parseInt(cartFormData.item.price?.toString() || '0'),
+          platform: cartFormData.item.platform || 'Unknown',
+          creatorName: cartFormData.creatorName || 'Unknown Creator',
+        } : undefined}
+      />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f8f4e8' },
+  safeArea: { flex: 1, backgroundColor: '#ffffff' },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 16, // Will be added to insets.top in the component
@@ -990,19 +1030,16 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   // --- Profile Card Styles ---
-  profileCard: { marginTop: 8, backgroundColor: '#f8f4e8', borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  profileCard: { marginTop: 8, backgroundColor: '#ffffff', borderRadius: 16, borderWidth: 1, borderColor: '#E5E7EB' },
   coverBlock: { height: 90, backgroundColor: '#f37135', borderTopLeftRadius: 16, borderTopRightRadius: 16, justifyContent: 'flex-end', alignItems: 'flex-end', padding: 8, position: 'relative' },
-  coverCameraBtn: { backgroundColor: '#f8f4e8', borderRadius: 16, padding: 4, zIndex: 1 },
+  coverCameraBtn: { backgroundColor: '#ffffff', borderRadius: 16, padding: 4, zIndex: 1 },
   avatarRow: { flexDirection: 'row', alignItems: 'flex-end', marginTop: -40, paddingHorizontal: 16 },
   avatarOuterWrapper: { position: 'relative' },
   avatarSpacer: { flex: 1 },
@@ -1052,7 +1089,7 @@ const styles = StyleSheet.create({
     padding: 4,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: COLORS.borderLight,
+    borderColor: '#FFE5D9',
   },
   tabBtn: {
     flex: 1,
@@ -1108,7 +1145,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f37135',
     borderRadius: 18,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   createPackageBtnText: {
     color: '#f37135',
@@ -1145,14 +1182,11 @@ const styles = StyleSheet.create({
   },
   portfolioItem: {
     width: '48%', // Two items per row
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     overflow: 'hidden',
   },
   portfolioImage: {
@@ -1210,11 +1244,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F9EB',
     borderRadius: 12,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     overflow: 'hidden',
   },
   placeholderContent: {
@@ -1231,14 +1262,14 @@ const styles = StyleSheet.create({
   socialPlatformCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginRight: 8,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
   },
   platformIconContainer: {
     width: 32,
@@ -1286,7 +1317,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     borderWidth: 3,
-    borderColor: '#f8f4e8',
+    borderColor: '#ffffff',
   },
   avatarEditBtn: {
     position: 'absolute',
@@ -1299,7 +1330,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#f8f4e8',
+    borderColor: '#ffffff',
   },
   coverEditBtn: {
     position: 'absolute',
@@ -1343,6 +1374,16 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#E5E7EB',
     marginBottom: 24,
+  },
+  platformChip: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginRight: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#20536d',
   },
 });
 

@@ -373,6 +373,24 @@ const AgentDashboard = () => {
         </TouchableOpacity>
       </View>
 
+      {/* Navigation Header */}
+      <View style={styles.navigationHeader}>
+        <View style={styles.navigationContainer}>
+          <TouchableOpacity style={styles.navButton}>
+            <Text style={styles.navButtonText}>Contacts</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.navButton, styles.activeNavButton]}>
+            <Text style={[styles.navButtonText, styles.activeNavButtonText]}>My Chats</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navButton}>
+            <Text style={styles.navButtonText}>Records</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navButton}>
+            <Text style={styles.navButtonText}>Visitor Profiles</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Status Card */}
         {renderStatusCard()}
@@ -644,6 +662,37 @@ const styles = StyleSheet.create({
   copyButtonText: {
     color: COLORS.white,
     fontSize: 16,
+    fontWeight: '600',
+  },
+  navigationHeader: {
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  navigationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  navButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
+  activeNavButton: {
+    backgroundColor: '#20536d', // Using tertiary color from memory
+    borderRadius: 8,
+  },
+  navButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.textGray,
+    textAlign: 'center',
+  },
+  activeNavButtonText: {
+    color: COLORS.white,
     fontWeight: '600',
   },
 });

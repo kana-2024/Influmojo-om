@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { authAPI } from '@/services/apiService';
+import { COLORS } from '@/config/colors';
 
 interface OtpVerificationModalProps {
   isOpen: boolean;
@@ -177,7 +178,7 @@ export default function OtpVerificationModal({
           onClick={handleVerifyOtp}
           disabled={loading || otp.join('').length !== 4}
           className="w-full py-3 text-white text-sm font-poppins-semibold rounded-lg flex justify-center items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ background: 'linear-gradient(180deg, #FE8F00, #FC5213)' }}
+          style={{ background: COLORS.gradientOrange }}
         >
           {loading ? (
             <>

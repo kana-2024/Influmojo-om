@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
-  Modal,
   SafeAreaView,
   ScrollView,
 } from 'react-native';
@@ -99,13 +98,7 @@ const OrdersScreen = ({ navigation }: any) => {
   const [showChat, setShowChat] = useState(false);
   const [currentOrderChat, setCurrentOrderChat] = useState<any>(null);
   const [chatLoading, setChatLoading] = useState(false);
-  
-  // New state for order details modal
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [showOrderDetails, setShowOrderDetails] = useState(false);
-  
   const userType = useAppSelector(state => state.auth.userType);
-  const user = useAppSelector(state => state.auth.user);
   const userId = useAppSelector(state => state.auth.user?.id);
 
   const fetchOrders = async () => {
@@ -161,16 +154,21 @@ const OrdersScreen = ({ navigation }: any) => {
   };
 
   const getStatusDisplayText = (status: string, rejectionMessage?: string) => {
+    const isBrand = userType === 'brand';
+    const isCreator = userType === 'creator';
+    
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'Waiting for Creator Approval';
+        return isBrand ? 'Waiting for Creator Approval' : 'Waiting for Your Approval';
       case 'accepted':
-        return 'Accepted by Creator';
+        return isBrand ? 'Accepted by Creator' : 'Accepted by You';
       case 'rejected':
         if (rejectionMessage) {
           return `Rejected: ${rejectionMessage}`;
         }
-        return 'Rejected by Creator - Sorry couldn\'t process the order due to unavailability of the creator';
+        return isBrand 
+          ? 'Rejected by Creator - Sorry couldn\'t process the order due to unavailability of the creator'
+          : 'Rejected by You';
       case 'in_progress':
         return 'In Progress';
       case 'review':
@@ -304,219 +302,6 @@ const OrdersScreen = ({ navigation }: any) => {
     );
   };
 
-  // Render order details modal
-  const renderOrderDetailsModal = () => {
-    if (!selectedOrder) return null;
-
-    const isCreator = userType === 'creator';
-    const otherParty = isCreator ? selectedOrder.brand : selectedOrder.creator;
-    const otherPartyName = isCreator 
-      ? (otherParty as any)?.company_name 
-      : (otherParty as any)?.user?.name;
-    const otherPartyLocation = isCreator 
-      ? `${(otherParty as any)?.location_city || ''} ${(otherParty as any)?.location_state || ''}`.trim()
-      : `${(otherParty as any)?.location_city || ''} ${(otherParty as any)?.location_state || ''}`.trim();
-
-    // Extract package type from the package title or use a default
-    const packageType = getPackageType(selectedOrder.package.title);
-
-    return (
-      <Modal
-        visible={showOrderDetails}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={handleCloseOrderDetails}
-      >
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Order Details</Text>
-            <TouchableOpacity onPress={handleCloseOrderDetails} style={styles.modalCloseButton}>
-              <Ionicons name="close" size={24} color={COLORS.textDark} />
-            </TouchableOpacity>
-          </View>
-
-            <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
-              {/* Order Header */}
-              <View style={styles.modalOrderHeader}>
-                <View style={styles.modalOrderTypeContainer}>
-                  <View style={styles.modalOrderTypeIcon}>
-                    <Ionicons name="film-outline" size={20} color="#E4405F" />
-                  </View>
-                  <Text style={styles.modalOrderTypeText}>{packageType}</Text>
-                </View>
-                <Text style={styles.modalOrderId}>Order ID: #{selectedOrder.id.slice(-6)}</Text>
-              </View>
-
-              {/* Order Title */}
-              <Text style={styles.modalOrderTitle}>{selectedOrder.package.title}</Text>
-
-              {/* Order Details */}
-              <View style={styles.modalOrderDetails}>
-                <View style={styles.modalDetailRow}>
-                  <Text style={styles.modalDetailLabel}>Created at:</Text>
-                  <Text style={styles.modalDetailValue}>{formatDate(selectedOrder.created_at)}</Text>
-                </View>
-                <View style={styles.modalDetailRow}>
-                  <Text style={styles.modalDetailLabel}>Duration:</Text>
-                  <Text style={styles.modalDetailValue}>1 Min</Text>
-                </View>
-                <View style={styles.modalDetailRow}>
-                  <Text style={styles.modalDetailLabel}>Quantity:</Text>
-                  <Text style={styles.modalDetailValue}>{selectedOrder.quantity}</Text>
-                </View>
-                <View style={styles.modalDetailRow}>
-                  <Text style={styles.modalDetailLabel}>Revisions:</Text>
-                  <Text style={styles.modalDetailValue}>1</Text>
-                </View>
-                <View style={styles.modalDetailRow}>
-                  <Text style={styles.modalDetailLabel}>Status:</Text>
-                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(selectedOrder.status) }]}>
-                    <Text style={styles.statusText}>{getStatusDisplayText(selectedOrder.status, selectedOrder.rejection_message)}</Text>
-                  </View>
-                </View>
-                <View style={styles.modalDetailRow}>
-                  <Text style={styles.modalDetailLabel}>Payment Status:</Text>
-                  <View style={styles.paymentStatusBadge}>
-                    <Text style={styles.paymentStatusText}>Paid</Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* Description */}
-              <View style={styles.modalDescriptionContainer}>
-                <Text style={styles.modalDescriptionLabel}>Description:</Text>
-                <Text style={styles.modalDescriptionText}>{selectedOrder.package.description}</Text>
-              </View>
-
-              {/* Price */}
-              <View style={styles.modalPriceContainer}>
-                <Text style={styles.modalPriceText}>{formatPrice(selectedOrder.total_amount)}</Text>
-              </View>
-
-              {/* Other Party Details */}
-              {otherParty && (
-                <View style={styles.modalOtherPartyContainer}>
-                  <Text style={styles.modalOtherPartyTitle}>
-                    {isCreator ? 'BRAND DETAILS:' : 'CREATOR DETAILS:'}
-                  </Text>
-                  <View style={styles.modalOtherPartyInfoRow}>
-                    <Text style={styles.modalOtherPartyInfoLabel}>Name:</Text>
-                    <Text style={styles.modalOtherPartyInfoValue}>{otherPartyName || 'N/A'}</Text>
-                  </View>
-                  {isCreator && otherPartyLocation && (
-                    <View style={styles.modalOtherPartyInfoRow}>
-                      <Text style={styles.modalOtherPartyInfoLabel}>Location:</Text>
-                      <Text style={styles.modalOtherPartyInfoValue}>{otherPartyLocation}</Text>
-                    </View>
-                  )}
-                  {!isCreator && (otherParty as any)?.user?.email && (
-                    <View style={styles.modalOtherPartyInfoRow}>
-                      <Text style={styles.modalOtherPartyInfoLabel}>Email:</Text>
-                      <Text style={styles.modalOtherPartyInfoValue}>{(otherParty as any).user.email}</Text>
-                    </View>
-                  )}
-                </View>
-              )}
-
-              {/* Action buttons for creators on pending orders */}
-              {isCreator && selectedOrder.status.toLowerCase() === 'pending' && (
-                <View style={styles.modalActionButtons}>
-                  <TouchableOpacity 
-                    style={styles.modalRejectButton}
-                    onPress={() => handleRejectOrder(selectedOrder.id)}
-                  >
-                    <Ionicons name="close" size={20} color="#f8f4e8" />
-                    <Text style={styles.modalRejectButtonText}>Reject</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={styles.modalAcceptButton}
-                    onPress={() => handleAcceptOrder(selectedOrder.id)}
-                  >
-                    <Ionicons name="checkmark" size={20} color="#f8f4e8" />
-                    <Text style={styles.modalAcceptButtonText}>Accept</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {/* Contact Support button for creators on ongoing orders */}
-              {isCreator && (selectedOrder.status.toLowerCase() === 'accepted' || selectedOrder.status.toLowerCase() === 'in_progress' || selectedOrder.status.toLowerCase() === 'review') && (
-                <View style={styles.modalBrandActionsContainer}>
-                  <TouchableOpacity 
-                    style={[
-                      styles.modalChatButton,
-                      chatLoading && styles.modalChatButtonDisabled
-                    ]}
-                    onPress={() => handleChatPressFromDetails(selectedOrder)}
-                    disabled={chatLoading}
-                  >
-                    <Ionicons 
-                      name="chatbubble-ellipses-outline" 
-                      size={20} 
-                      color={chatLoading ? "#999" : "#20536d"} 
-                    />
-                    <Text style={[
-                      styles.modalChatButtonText,
-                      chatLoading && styles.modalChatButtonTextDisabled
-                    ]}>
-                      {chatLoading ? 'Opening Chat...' : 'Contact Support'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {/* Chat button for brand users */}
-              {!isCreator && (
-                <View style={styles.modalBrandActionsContainer}>
-                  <TouchableOpacity 
-                    style={[
-                      styles.modalChatButton,
-                      chatLoading && styles.modalChatButtonDisabled
-                    ]}
-                    onPress={() => handleChatPressFromDetails(selectedOrder)}
-                    disabled={chatLoading}
-                  >
-                    <Ionicons 
-                      name="chatbubble-ellipses-outline" 
-                      size={20} 
-                      color={chatLoading ? "#999" : "#20536d"} 
-                    />
-                    <Text style={[
-                      styles.modalChatButtonText,
-                      chatLoading && styles.modalChatButtonTextDisabled
-                    ]}>
-                      {chatLoading ? 'Opening Chat...' : 'Chat with Support'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {/* Browse Creators button for brands on rejected orders */}
-              {!isCreator && selectedOrder.status.toLowerCase() === 'rejected' && (
-                <View style={styles.modalBrandActionsContainer}>
-                  <TouchableOpacity 
-                    style={styles.modalBrowseCreatorsButton}
-                    onPress={() => {
-                      setShowOrderDetails(false);
-                      navigation.navigate('BrandHome');
-                    }}
-                  >
-                    <Ionicons 
-                      name="people-outline" 
-                      size={20} 
-                      color="#f8f4e8" 
-                    />
-                    <Text style={styles.modalBrowseCreatorsButtonText}>
-                      Browse Creators
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </ScrollView>
-          </View>
-        </Modal>
-    );
-  };
-
   // Chat handling functions
   const handleChatPress = async (order: Order) => {
     if (userType !== 'brand' && userType !== 'creator') {
@@ -574,62 +359,8 @@ const OrdersScreen = ({ navigation }: any) => {
 
   // Handle order card click to show details
   const handleOrderCardPress = (order: Order) => {
-    setSelectedOrder(order);
-    setShowOrderDetails(true);
-  };
-
-  // Handle chat button press from order details modal
-  const handleChatPressFromDetails = async (order: Order) => {
-    if (userType !== 'brand' && userType !== 'creator') {
-      Alert.alert('Info', 'Chat is only available for brand and creator users');
-      return;
-    }
-
-    if (!userId) {
-      Alert.alert('Error', 'User ID not found. Please log in again.');
-      return;
-    }
-
-    setChatLoading(true);
-    try {
-      // Get ticket by order ID (tickets are only created when orders are created)
-      const ticketResponse = await ticketAPI.getTicketByOrderId(order.id);
-      
-      if (ticketResponse.success && ticketResponse.data.ticket) {
-        const ticket = ticketResponse.data.ticket;
-        
-        // Navigate to appropriate chat screen based on user type
-        if (userType === 'brand') {
-          navigation.navigate('BrandChat', {
-            ticketId: ticket.id,
-            orderId: order.id,
-            orderTitle: order.package.title
-          });
-        } else if (userType === 'creator') {
-          navigation.navigate('CreatorChat', {
-            ticketId: ticket.id,
-            orderId: order.id,
-            orderTitle: order.package.title
-          });
-        }
-        
-        // Close the order details modal when opening chat
-        setShowOrderDetails(false);
-      } else {
-        Alert.alert('Error', 'No support ticket found for this order. Support tickets are created automatically when orders are placed.');
-      }
-    } catch (error) {
-      console.error('Error handling order-specific chat:', error);
-      Alert.alert('Error', 'Failed to open order chat. Please try again.');
-    } finally {
-      setChatLoading(false);
-    }
-  };
-
-  // Close order details modal
-  const handleCloseOrderDetails = () => {
-    setShowOrderDetails(false);
-    setSelectedOrder(null);
+    // Navigate to the separate OrderDetailsScreen
+    navigation.navigate('OrderDetails', { orderId: order.id });
   };
 
   const renderOrderCard = (order: Order) => {
@@ -707,31 +438,7 @@ const OrdersScreen = ({ navigation }: any) => {
           </View>
         </View>
 
-        {/* Action buttons for creators on pending orders */}
-        {isCreator && order.status.toLowerCase() === 'pending' && (
-          <View style={styles.orderCardActions}>
-            <TouchableOpacity 
-              style={styles.orderCardRejectButton}
-              onPress={(e) => {
-                e.stopPropagation();
-                handleRejectOrder(order.id);
-              }}
-            >
-              <Ionicons name="close" size={16} color="#f8f4e8" />
-              <Text style={styles.orderCardRejectText}>Reject</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.orderCardAcceptButton}
-              onPress={(e) => {
-                e.stopPropagation();
-                handleAcceptOrder(order.id);
-              }}
-            >
-              <Ionicons name="checkmark" size={16} color="#f8f4e8" />
-              <Text style={styles.orderCardAcceptText}>Accept</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+
 
         {/* Contact Support button for creators on ongoing orders */}
         {isCreator && (order.status.toLowerCase() === 'accepted' || order.status.toLowerCase() === 'in_progress' || order.status.toLowerCase() === 'review') && (
@@ -743,7 +450,7 @@ const OrdersScreen = ({ navigation }: any) => {
                 handleChatPress(order);
               }}
             >
-              <Ionicons name="chatbubble-ellipses-outline" size={16} color="#f8f4e8" />
+              <Ionicons name="chatbubble-ellipses-outline" size={16} color="#ffffff" />
               <Text style={styles.orderCardContactSupportText}>Contact Support</Text>
             </TouchableOpacity>
           </View>
@@ -759,7 +466,7 @@ const OrdersScreen = ({ navigation }: any) => {
                 navigation.navigate('BrandHome');
               }}
             >
-              <Ionicons name="people-outline" size={16} color="#f8f4e8" />
+              <Ionicons name="people-outline" size={16} color="#ffffff" />
               <Text style={styles.orderCardBrowseCreatorsText}>Browse Creators</Text>
             </TouchableOpacity>
           </View>
@@ -846,16 +553,6 @@ const OrdersScreen = ({ navigation }: any) => {
         navigation={navigation} 
         currentRoute="orders"
       />
-
-
-
-      {/* Order Details Modal */}
-      {renderOrderDetailsModal()}
-
-      {/* Overlay for order details modal */}
-      {showOrderDetails && (
-        <View style={styles.modalOverlay} />
-      )}
     </SafeAreaView>
   );
 };
@@ -863,10 +560,10 @@ const OrdersScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   header: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
@@ -892,7 +589,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: COLORS.borderLight,
+    borderColor: '#FFE5D9',
   },
   tabBtn: {
     flex: 1,
@@ -926,7 +623,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
   },
   loadingText: {
     marginTop: 16,
@@ -958,18 +655,12 @@ const styles = StyleSheet.create({
   },
   // New order card styles
   orderCard: {
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#FFE5D9',
   },
   orderCardHeader: {
     flexDirection: 'row',
@@ -1052,7 +743,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#f8f4e8',
+    color: '#ffffff',
   },
   orderCardFooter: {
     flexDirection: 'row',
@@ -1081,7 +772,7 @@ const styles = StyleSheet.create({
   orderCardStatusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -1113,7 +804,7 @@ const styles = StyleSheet.create({
   paymentStatusText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#f8f4e8',
+    color: '#ffffff',
   },
   orderCardActions: {
     flexDirection: 'row',
@@ -1132,7 +823,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   orderCardRejectText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1148,7 +839,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   orderCardAcceptText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1164,7 +855,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   orderCardContactSupportText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1180,7 +871,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   orderCardBrowseCreatorsText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1195,212 +886,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#20536d',
     fontWeight: '500',
-  },
-  // Modal styles
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    zIndex: 1,
-  },
-  modalContent: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#f8f4e8',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: '90%',
-    zIndex: 2,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  modalCloseButton: {
-    padding: 4,
-  },
-  modalScrollView: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  modalOrderHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-    marginTop: 16,
-  },
-  modalOrderTypeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  modalOrderTypeIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#E4405F20',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  modalOrderTypeText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  modalOrderId: {
-    fontSize: 14,
-    color: '#666',
-  },
-  modalOrderTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-    marginBottom: 16,
-  },
-  modalOrderDetails: {
-    marginBottom: 16,
-  },
-  modalDetailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  modalDetailLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  modalDetailValue: {
-    fontSize: 14,
-    color: '#1A1A1A',
-    fontWeight: '500',
-  },
-  modalDescriptionContainer: {
-    marginBottom: 16,
-  },
-  modalDescriptionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 8,
-  },
-  modalDescriptionText: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-  },
-  modalPriceContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  modalPriceText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-  },
-  modalOtherPartyContainer: {
-    marginBottom: 16,
-    padding: 16,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 8,
-  },
-  modalOtherPartyTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 12,
-  },
-  modalOtherPartyInfoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  modalOtherPartyInfoLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  modalOtherPartyInfoValue: {
-    fontSize: 14,
-    color: '#1A1A1A',
-    fontWeight: '500',
-  },
-  modalActionButtons: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  modalRejectButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F44336', // Red for reject
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    gap: 8,
-  },
-  modalRejectButtonText: {
-    color: '#f8f4e8',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  modalAcceptButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#4CAF50', // Green for accept
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    gap: 8,
-  },
-  modalAcceptButtonText: {
-    color: '#f8f4e8',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  modalBrandActionsContainer: {
-    marginBottom: 16,
-  },
-  modalChatButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#20536d',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    gap: 8,
-  },
-  modalChatButtonDisabled: {
-    backgroundColor: '#999',
-  },
-  modalChatButtonText: {
-    color: '#f8f4e8',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  modalChatButtonTextDisabled: {
-    color: '#CCC',
   },
   // New styles for chat button
   brandActionsContainer: {
@@ -1443,21 +928,6 @@ const styles = StyleSheet.create({
   orderCardViewDetails: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  modalBrowseCreatorsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#20536d', // Dark blue for browse creators
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    gap: 8,
-  },
-  modalBrowseCreatorsButtonText: {
-    color: '#f8f4e8',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
 

@@ -183,7 +183,7 @@ const RegionModal: React.FC<RegionModalProps> = ({
                         selectedStates.includes(state) && styles.checkboxSelected
                       ]}>
                         {selectedStates.includes(state) && (
-                          <Ionicons name="checkmark" size={16} color="#f8f4e8" />
+                          <Ionicons name="checkmark" size={16} color="#ffffff" />
                         )}
                       </View>
                     </TouchableOpacity>
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -270,10 +270,10 @@ const styles = StyleSheet.create({
   },
   sectionContainer: {
     marginBottom: 16,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   },
   sectionContent: {
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: '#20536d',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -297,8 +297,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F5F5F5',
+    borderColor: '#20536d',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     borderRadius: 8,
   },
   searchInput: {
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#ffffff',
   },
   optionText: {
     fontSize: 14,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   applyButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },

@@ -439,7 +439,13 @@ exports.Prisma.OrderScalarFieldEnum = {
   status: 'status',
   order_date: 'order_date',
   completed_at: 'completed_at',
-  rejection_message: 'rejection_message'
+  rejection_message: 'rejection_message',
+  delivery_time: 'delivery_time',
+  additional_instructions: 'additional_instructions',
+  references: 'references',
+  deliverables: 'deliverables',
+  price_revision_amount: 'price_revision_amount',
+  price_revision_reason: 'price_revision_reason'
 };
 
 exports.Prisma.PhoneVerificationScalarFieldEnum = {
@@ -670,6 +676,9 @@ exports.OrderStatus = exports.$Enums.OrderStatus = {
   rejected: 'rejected',
   confirmed: 'confirmed',
   in_progress: 'in_progress',
+  review: 'review',
+  revision_requested: 'revision_requested',
+  price_revision_pending: 'price_revision_pending',
   completed: 'completed',
   cancelled: 'cancelled',
   refunded: 'refunded'

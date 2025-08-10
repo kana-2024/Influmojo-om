@@ -92,11 +92,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
     marginBottom: 0,
   },
   dropdownContainer: {
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   dropdownList: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     maxHeight: 200,
   },
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#ffffff',
     backgroundColor: '#FFFFFF',
   },
   optionText: {

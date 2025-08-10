@@ -1,18 +1,18 @@
 import Constants from 'expo-constants';
 // Environment configuration for frontend
 const extra = Constants.expoConfig?.extra || {};
+
+// Force the correct API URL - this ensures we always use the ngrok URL
+const FORCE_API_URL = 'https://fair-legal-gar.ngrok-free.app';
+
 export const ENV = {
-  // API Configuration
-  
-  API_BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'https://fair-legal-gar.ngrok-free.app',
+  // API Configuration - Force the correct URL
+  API_BASE_URL: FORCE_API_URL || process.env.EXPO_PUBLIC_API_URL || 'https://fair-legal-gar.ngrok-free.app',
   GOOGLE_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '',
   GOOGLE_CLIENT_ID_ANDROID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '',
   GOOGLE_CLIENT_ID_IOS: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || '',
   // Google OAuth
- 
   GOOGLE_CLIENT_SECRET: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || '',
-  
-
   
   // App Configuration
   APP_NAME: 'Influ Mojo',
@@ -63,17 +63,26 @@ export const API_ENDPOINTS = {
   // Creator endpoints
   GET_CREATORS: `${ENV.API_BASE_URL}/api/profile/creators`,
   GET_CREATOR_PROFILE_BY_ID: `${ENV.API_BASE_URL}/api/profile/creators`,
-
-
 };
 
 // Debug environment variables (only in development)
 if (__DEV__) {
   console.log('=== Environment Variables Debug ===');
+  console.log('FORCE_API_URL:', FORCE_API_URL);
   console.log('EXPO_PUBLIC_API_URL:', process.env.EXPO_PUBLIC_API_URL);
   console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID exists:', !!process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID);
   console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID length:', process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID?.length || 0);
   console.log('ENV.GOOGLE_CLIENT_ID:', ENV.GOOGLE_CLIENT_ID);
   console.log('ENV.API_BASE_URL:', ENV.API_BASE_URL);
+  console.log('API_ENDPOINTS.GOOGLE_AUTH:', API_ENDPOINTS.GOOGLE_AUTH);
   console.log('API_ENDPOINTS.SEND_OTP:', API_ENDPOINTS.SEND_OTP);
+  
+  // Validate that we're using the correct URL
+  if (!ENV.API_BASE_URL.includes('fair-legal-gar.ngrok-free.app')) {
+    console.error('❌ WARNING: API_BASE_URL is not using the correct ngrok URL!');
+    console.error('Current URL:', ENV.API_BASE_URL);
+    console.error('Expected URL: https://fair-legal-gar.ngrok-free.app');
+  } else {
+    console.log('✅ API_BASE_URL is correctly configured');
+  }
 } 

@@ -9,6 +9,8 @@ export { default as DatePickerModal } from './modals/DatePickerModal';
 export { default as CityModal } from './modals/CityModal';
 export { default as RoleModal } from './modals/RoleModal';
 export { default as CartModal } from './modals/CartModal';
+export { default as CartFormModal } from './modals/CartFormModal';
+export { default as CartItemEditModal } from './modals/CartItemEditModal';
 export { default as FilterModal } from './modals/FilterModal';
 export { default as CategoryModal } from './modals/CategoryModal';
 export { default as FollowerRangeModal } from './modals/FollowerRangeModal';

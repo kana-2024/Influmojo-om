@@ -113,6 +113,24 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
 
     return data;
   } catch (error) {
+    // Enhanced error logging for network issues
+    if (error.message === 'Network request failed') {
+      console.error('[apiService] Network request failed:', {
+        url: endpoint,
+        error: error.message,
+        config: { method: config.method, hasAuth: !!token },
+        possibleIssues: [
+          'Check if the backend server is running',
+          'Verify the API_BASE_URL is correct',
+          'Check network connectivity',
+          'Ensure ngrok tunnel is active if using ngrok'
+        ]
+      });
+      
+      // Provide more specific error message
+      throw new Error(`Network request failed. Please check your internet connection and try again. If the problem persists, contact support.`);
+    }
+    
     console.error('[apiService] Request failed:', {
       url: endpoint,
       error: error.message,

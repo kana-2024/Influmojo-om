@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { authAPI } from '@/services/apiService';
+import { COLORS } from '@/config/colors';
 import { googleAuthService } from '@/services/googleAuth';
 import OtpVerificationModal from './OtpVerificationModal';
 
@@ -362,7 +363,7 @@ export default function GetStartedScreen() {
                 onClick={handleCreateAccount}
                 disabled={loading}
                 className="w-full py-2.5 text-white text-sm font-poppins-semibold rounded-lg flex justify-center items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: 'linear-gradient(180deg, #FE8F00, #FC5213)' }}
+                style={{ background: COLORS.gradientOrange }}
               >
                 {loading ? (
                   <>

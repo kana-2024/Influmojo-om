@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#f8f4e8',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -264,13 +264,13 @@ const styles = StyleSheet.create({
   inputField: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#20536d',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
     textAlign: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF', // Changed from '#F5F5F5' to '#FFFFFF'
   },
   inputSeparator: {
     fontSize: 16,
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   applyButtonText: {
-    color: '#f8f4e8',
+    color: '#ffffff',
     fontWeight: '600',
     fontSize: 16,
   },
