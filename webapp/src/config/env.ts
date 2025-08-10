@@ -1,9 +1,8 @@
 // Environment configuration for webapp
 export const ENV = {
   // API Configuration
-  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://fair-legal-gar.ngrok-free.app',
+  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://51.21.152.83:3001',
   GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
-  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
   
   // App Configuration
   APP_NAME: 'Influ Mojo',

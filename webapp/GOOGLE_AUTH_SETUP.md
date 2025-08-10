@@ -32,12 +32,14 @@ This document explains how to set up Google authentication for the Influmojo web
 Create or update your `.env.local` file in the `webapp` directory:
 
 ```env
-# Google OAuth Configuration
+# Google OAuth Configuration (Client-side flow)
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id-here
 
 # API Configuration
 NEXT_PUBLIC_API_URL=https://your-api-url.com
 ```
+
+**Important Security Note**: This implementation uses Google's client-side authentication flow, which is secure for frontend applications. We do NOT use `GOOGLE_CLIENT_SECRET` in the frontend as it would be a security vulnerability.
 
 ### 3. Implementation Details
 

@@ -29,6 +29,8 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Alice:ital,wght@0,400;1,400;1,600&display=swap"
           rel="stylesheet"
         />
+        {/* Google Identity Services */}
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
       </head>
       <body className={`${poppins.variable} font-poppins`}>
         <Providers>

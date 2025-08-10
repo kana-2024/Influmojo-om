@@ -6,13 +6,16 @@ declare global {
     google?: {
       accounts: {
         oauth2: {
-          initCodeClient: (config: any) => any;
           initTokenClient: (config: any) => any;
+          initCodeClient: (config: any) => any;
+          hasGrantedAllScopes: (tokenResponse: any, ...scopes: string[]) => boolean;
+          hasGrantedAnyScope: (tokenResponse: any, ...scopes: string[]) => boolean;
         };
         id: {
           initialize: (config: any) => void;
           renderButton: (element: HTMLElement, config: any) => void;
-          prompt: () => void;
+          prompt: (momentListener?: (promptMomentNotification: any) => void) => void;
+          disableAutoSelect: () => void;
         };
       };
     };
@@ -31,15 +34,11 @@ export interface GoogleUser {
 export interface AuthResult {
   success: boolean;
   user?: GoogleUser;
-  accessToken?: string;
   idToken?: string;
-  refreshToken?: string;
   error?: string;
 }
 
 class GoogleAuthService {
-  private accessToken: string | null = null;
-  private refreshToken: string | null = null;
   private isInitialized = false;
 
   constructor() {
@@ -109,7 +108,7 @@ class GoogleAuthService {
   }
 
   private performSignIn(resolve: (result: AuthResult) => void) {
-    if (!window.google) {
+    if (!window.google || !window.google.accounts || !window.google.accounts.id) {
       resolve({
         success: false,
         error: 'Google Identity Services not available'
@@ -118,52 +117,58 @@ class GoogleAuthService {
     }
 
     try {
-      // Use initCodeClient to get authorization code
-      const client = window.google.accounts.oauth2.initCodeClient({
+      // Initialize Google Identity Services with proper ID token flow
+      window.google.accounts.id.initialize({
         client_id: ENV.GOOGLE_CLIENT_ID,
-        scope: 'email profile openid',
-        callback: async (response: any) => {
-          if (response.error) {
-            resolve({
-              success: false,
-              error: response.error
-            });
-            return;
-          }
-
-          try {
-            // Exchange authorization code for tokens
-            const tokenResponse = await this.exchangeCodeForTokens(response.code);
-            
-            if (!tokenResponse.success) {
-              resolve({
-                success: false,
-                error: tokenResponse.error || 'Failed to exchange code for tokens'
-              });
-              return;
-            }
-
-            // Get user info using the access token
-            const userInfo = await this.getUserInfo(tokenResponse.accessToken);
-            
-            resolve({
-              success: true,
-              user: userInfo,
-              accessToken: tokenResponse.accessToken,
-              idToken: tokenResponse.idToken,
-              refreshToken: tokenResponse.refreshToken
-            });
-          } catch (error) {
-            console.error('Sign-in error:', error);
-            resolve({
-              success: false,
-              error: 'Failed to complete sign-in process'
-            });
-          }
-        }
+        callback: (response: any) => {
+          this.handleCredentialResponse(response, resolve);
+        },
+        auto_select: false,
+        cancel_on_tap_outside: false,
+        use_fedcm_for_prompt: false // Disable FedCM to avoid CORS issues
       });
 
-      client.requestCode();
+      // Use renderButton approach for better reliability
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'fixed';
+      tempContainer.style.top = '-1000px';
+      tempContainer.style.left = '-1000px';
+      tempContainer.style.visibility = 'hidden';
+      document.body.appendChild(tempContainer);
+
+      window.google.accounts.id.renderButton(tempContainer, {
+        theme: 'outline',
+        size: 'large',
+        type: 'standard',
+        width: 250,
+        logo_alignment: 'left'
+      });
+
+      // Trigger the button click after a short delay
+      setTimeout(() => {
+        const button = tempContainer.querySelector('div[role="button"]') as HTMLElement;
+        if (button) {
+          button.click();
+        } else {
+          // Fallback to prompt method without FedCM
+          window.google?.accounts.id.prompt((notification: any) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+              resolve({
+                success: false,
+                error: 'Google sign-in was not displayed or was skipped'
+              });
+            }
+          });
+        }
+
+        // Clean up the temporary container after a delay
+        setTimeout(() => {
+          if (document.body.contains(tempContainer)) {
+            document.body.removeChild(tempContainer);
+          }
+        }, 5000);
+      }, 100);
+
     } catch (error) {
       console.error('Google sign-in error:', error);
       resolve({
@@ -173,82 +178,67 @@ class GoogleAuthService {
     }
   }
 
-  private async exchangeCodeForTokens(code: string): Promise<{
-    success: boolean;
-    accessToken?: string;
-    idToken?: string;
-    refreshToken?: string;
-    error?: string;
-  }> {
-    try {
-      const response = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          code: code,
-          client_id: ENV.GOOGLE_CLIENT_ID,
-          client_secret: ENV.GOOGLE_CLIENT_SECRET,
-          redirect_uri: window.location.origin,
-          grant_type: 'authorization_code',
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Token exchange error:', errorData);
-        return {
-          success: false,
-          error: 'Failed to exchange authorization code for tokens'
-        };
-      }
-
-      const tokenData = await response.json();
-      
-      return {
-        success: true,
-        accessToken: tokenData.access_token,
-        idToken: tokenData.id_token,
-        refreshToken: tokenData.refresh_token
-      };
-    } catch (error) {
-      console.error('Token exchange error:', error);
-      return {
+  private handleCredentialResponse(response: any, resolve: (result: AuthResult) => void) {
+    if (response.error) {
+      resolve({
         success: false,
-        error: 'Network error during token exchange'
+        error: response.error
+      });
+      return;
+    }
+
+    if (!response.credential) {
+      resolve({
+        success: false,
+        error: 'No credential received from Google'
+      });
+      return;
+    }
+
+    try {
+      // Parse the real Google ID token to get user info
+      const idToken = response.credential;
+      const payload = this.parseJwt(idToken);
+      
+      const user: GoogleUser = {
+        id: payload.sub,
+        email: payload.email,
+        name: payload.name,
+        picture: payload.picture,
+        given_name: payload.given_name,
+        family_name: payload.family_name
       };
+
+      resolve({
+        success: true,
+        user: user,
+        idToken: idToken // Use the real Google ID token
+      });
+    } catch (error) {
+      console.error('Error parsing credential response:', error);
+      resolve({
+        success: false,
+        error: 'Failed to process Google sign-in response'
+      });
     }
   }
 
-  private async getUserInfo(accessToken: string): Promise<GoogleUser> {
-    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get user info');
+  private parseJwt(token: string): any {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error('Failed to parse JWT:', error);
+      throw new Error('Invalid token format');
     }
-
-    const userData = await response.json();
-    return {
-      id: userData.id,
-      email: userData.email,
-      name: userData.name,
-      picture: userData.picture,
-      given_name: userData.given_name,
-      family_name: userData.family_name
-    };
   }
 
-  async signOut(): Promise<void> {
-    if (window.google && window.google.accounts) {
-      // Google Identity Services handles sign out automatically
-      this.accessToken = null;
-      this.refreshToken = null;
-    }
+  signOut(): void {
+    // Google Identity Services handles sign-out automatically
   }
 }
 
