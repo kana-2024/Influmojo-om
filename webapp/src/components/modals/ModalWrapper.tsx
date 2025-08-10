@@ -64,7 +64,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            {(title || onClose) && (
+            {(title || typeof onClose === 'function') && (
               <div className="flex items-center justify-between p-6 border-b border-borderLight">
                 {title && (
                   <h2 className="text-lg font-poppins-semibold text-textDark">

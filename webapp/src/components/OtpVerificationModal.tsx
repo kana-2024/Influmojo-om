@@ -21,7 +21,7 @@ export default function OtpVerificationModal({
   fullName,
   userType = 'creator'
 }: OtpVerificationModalProps) {
-  const [otp, setOtp] = useState(['', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']); // Changed to 6 digits
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [resendLoading, setResendLoading] = useState(false);
@@ -30,7 +30,7 @@ export default function OtpVerificationModal({
 
   useEffect(() => {
     if (isOpen) {
-      setOtp(['', '', '', '']);
+      setOtp(['', '', '', '', '', '']); // Reset to 6 empty strings
       setError('');
       setCountdown(60);
       // Focus first input
@@ -56,7 +56,7 @@ export default function OtpVerificationModal({
     setOtp(newOtp);
 
     // Move to next input if value is entered
-    if (value && index < 3) {
+    if (value && index < 5) { // Changed from 3 to 5 for 6 digits
       inputRefs.current[index + 1]?.focus();
     }
 
@@ -74,8 +74,8 @@ export default function OtpVerificationModal({
 
   const handleVerifyOtp = async () => {
     const otpString = otp.join('');
-    if (otpString.length !== 4) {
-      setError('Please enter a valid 4-digit OTP');
+    if (otpString.length !== 6) { // Changed from 4 to 6
+      setError('Please enter a valid 6-digit OTP');
       return;
     }
 
@@ -108,8 +108,13 @@ export default function OtpVerificationModal({
       const result = await authAPI.sendOTP(phone);
       if (result.success) {
         setCountdown(60);
-        setOtp(['', '', '', '']);
+        setOtp(['', '', '', '', '', '']); // Reset to 6 empty strings
         setError('');
+        
+        // Show OTP in development mode like mobile
+        if (process.env.NODE_ENV === 'development' && result.otp) {
+          alert(`OTP: ${result.otp}\n\nThis is shown only in development mode.`);
+        }
       } else {
         setError(result.error || 'Failed to resend OTP');
       }
@@ -149,21 +154,23 @@ export default function OtpVerificationModal({
 
         <div className="mb-6">
           <label className="block text-sm font-poppins-semibold text-textDark mb-3">
-            Enter 4-digit code
+            Enter 6-digit code
           </label>
           <div className="flex gap-3 justify-center">
             {otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
-                type="text"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-12 h-12 text-center border border-gray-300 rounded-lg text-lg font-poppins-semibold focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
-                placeholder=""
-              />
+                              <input
+                  key={index}
+                  ref={(el) => {
+                    inputRefs.current[index] = el;
+                  }}
+                  type="text"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  className="w-12 h-12 text-center border border-gray-300 rounded-lg text-lg font-poppins-semibold focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
+                  placeholder=""
+                />
             ))}
           </div>
         </div>
@@ -176,7 +183,7 @@ export default function OtpVerificationModal({
 
         <button
           onClick={handleVerifyOtp}
-          disabled={loading || otp.join('').length !== 4}
+          disabled={loading || otp.join('').length !== 6} // Changed from 4 to 6
           className="w-full py-3 text-white text-sm font-poppins-semibold rounded-lg flex justify-center items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ background: COLORS.gradientOrange }}
         >

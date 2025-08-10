@@ -133,15 +133,11 @@ export const authAPI = {
 
   // Send OTP
   sendOTP: async (phone: string) => {
-    const headers = {
-      'Content-Type': 'application/json',
-      // Add bypass header in development
-      ...(process.env.NODE_ENV !== 'production' && { 'x-bypass-rate-limit': 'true' })
-    };
+    // Note: Removed x-bypass-rate-limit header to avoid CORS issues in webapp
+    // Mobile app can still use this header since it doesn't have CORS restrictions
     
     return await apiRequest(API_ENDPOINTS.SEND_OTP, {
       method: 'POST',
-      headers,
       body: JSON.stringify({ phone }),
     });
   },
@@ -181,6 +177,10 @@ export const authAPI = {
   },
 
   getProfile: async () => {
+    return await apiRequest(API_ENDPOINTS.USER_PROFILE);
+  },
+
+  getUserProfile: async () => {
     return await apiRequest(API_ENDPOINTS.USER_PROFILE);
   },
 };

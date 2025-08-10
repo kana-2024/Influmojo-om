@@ -3,11 +3,11 @@ import Constants from 'expo-constants';
 const extra = Constants.expoConfig?.extra || {};
 
 // Force the correct API URL - this ensures we always use the ngrok URL
-const FORCE_API_URL = 'https://fair-legal-gar.ngrok-free.app';
+const FORCE_API_URL = 'https://modest-properly-orca.ngrok-free.app';
 
 export const ENV = {
   // API Configuration - Force the correct URL
-  API_BASE_URL: FORCE_API_URL || process.env.EXPO_PUBLIC_API_URL || 'https://fair-legal-gar.ngrok-free.app',
+  API_BASE_URL: FORCE_API_URL || process.env.EXPO_PUBLIC_API_URL || 'https://modest-properly-orca.ngrok-free.app',
   GOOGLE_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '',
   GOOGLE_CLIENT_ID_ANDROID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '',
   GOOGLE_CLIENT_ID_IOS: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || '',
@@ -78,10 +78,10 @@ if (__DEV__) {
   console.log('API_ENDPOINTS.SEND_OTP:', API_ENDPOINTS.SEND_OTP);
   
   // Validate that we're using the correct URL
-  if (!ENV.API_BASE_URL.includes('fair-legal-gar.ngrok-free.app')) {
+  if (!ENV.API_BASE_URL.includes('https://modest-properly-orca.ngrok-free.app')) {
     console.error('❌ WARNING: API_BASE_URL is not using the correct ngrok URL!');
     console.error('Current URL:', ENV.API_BASE_URL);
-    console.error('Expected URL: https://fair-legal-gar.ngrok-free.app');
+    console.error('Expected URL: https://modest-properly-orca.ngrok-free.app');
   } else {
     console.log('✅ API_BASE_URL is correctly configured');
   }

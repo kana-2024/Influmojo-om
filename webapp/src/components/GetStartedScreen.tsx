@@ -37,15 +37,25 @@ export default function GetStartedScreen() {
           console.log('Backend API response:', apiResult);
           
           if (apiResult.success) {
-            // New user created successfully, proceed to profile setup
-            console.log('Google auth successful, navigating to profile setup');
-            window.location.href = '/profile-setup';
+            // New user created successfully, proceed to Google verification screen
+            console.log('Google auth successful, navigating to Google verification screen');
+            window.location.href = '/google-verified';
           } else {
             setWarning(apiResult.error || 'Backend authentication failed. Please try again.');
           }
-        } catch (apiError) {
+        } catch (apiError: any) {
           console.error('Backend API error:', apiError);
-          setWarning('Backend authentication failed. Please try again.');
+          
+          // Handle specific error cases
+          if (apiError.message?.includes('409') || apiError.status === 409) {
+            // User already exists - redirect to login
+            setWarning('An account with this Google account already exists. Redirecting to login...');
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 2000);
+          } else {
+            setWarning('Backend authentication failed. Please try again.');
+          }
         }
       } else {
         setWarning(result.error || 'Google sign-in failed. Please try again.');

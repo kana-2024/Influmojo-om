@@ -50,12 +50,14 @@ class GoogleAuthService {
 
     // Check if Google Client ID is configured
     if (!ENV.GOOGLE_CLIENT_ID || ENV.GOOGLE_CLIENT_ID === '') {
-      console.error('Google Client ID is not configured. Please add NEXT_PUBLIC_GOOGLE_CLIENT_ID to your environment variables.');
+      console.error('❌ Google Client ID is not configured. Please add NEXT_PUBLIC_GOOGLE_CLIENT_ID to your environment variables.');
       console.error('Current ENV.GOOGLE_CLIENT_ID:', ENV.GOOGLE_CLIENT_ID);
+      console.error('Please check your .env.local file and restart the development server.');
       return;
     }
 
     console.log('✅ Google Client ID configured:', ENV.GOOGLE_CLIENT_ID);
+    console.log('🌐 Current origin:', window.location.origin);
 
     // Load Google Identity Services script
     const script = document.createElement('script');
@@ -171,10 +173,19 @@ class GoogleAuthService {
 
     } catch (error) {
       console.error('Google sign-in error:', error);
-      resolve({
-        success: false,
-        error: 'Google sign-in failed'
-      });
+      
+      // Check for specific origin-related errors
+      if (error instanceof Error && error.message.includes('origin')) {
+        resolve({
+          success: false,
+          error: 'Google sign-in failed: Origin not allowed. Please check your Google OAuth configuration.'
+        });
+      } else {
+        resolve({
+          success: false,
+          error: 'Google sign-in failed'
+        });
+      }
     }
   }
 

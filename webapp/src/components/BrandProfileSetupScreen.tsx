@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { authAPI } from '@/services/apiService';
 import OtpVerificationModal from './OtpVerificationModal';
 
-export default function ProfileSetupScreen() {
+export default function BrandProfileSetupScreen() {
   const [gender, setGender] = useState('Male');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -77,7 +77,7 @@ export default function ProfileSetupScreen() {
       
       // Show OTP in development mode like mobile
       if (process.env.NODE_ENV === 'development' && result.otp) {
-        alert(`OTP: ${result.otp}\n\nThis is shown only in development mode.`);
+        alert(`OTP: ${result.OTP || result.otp}\n\nThis is shown only in development mode.`);
       }
       
       setOtpLoading(false);
@@ -128,13 +128,13 @@ export default function ProfileSetupScreen() {
     
     try {
       // TODO: Save basic profile data to backend
-      console.log('Saving basic profile data:', { gender, email, phone, dob, city });
+      console.log('Saving basic brand profile data:', { gender, email, phone, dob, city });
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Navigate to preferences step
-      window.location.href = '/creator-preferences';
+      // Navigate to brand preferences step
+      window.location.href = '/brand-preferences';
     } catch (error) {
       console.error('Error saving profile:', error);
       alert('Failed to save profile. Please try again.');
@@ -184,10 +184,10 @@ export default function ProfileSetupScreen() {
           <Link href="/pricing" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Pricing
           </Link>
-          <Link href="/signup-brand" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
+          <Link href="/signup-brand" className="text-secondary font-poppins-medium hover:text-opacity-80 transition-colors text-xs lg:text-sm">
             Sign up as brand
           </Link>
-          <Link href="/signup-creator" className="text-secondary font-poppins-medium hover:text-opacity-80 transition-colors text-xs lg:text-sm">
+          <Link href="/signup-creator" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Sign up as Creator
           </Link>
           <Link href="/login" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
@@ -280,7 +280,7 @@ export default function ProfileSetupScreen() {
               
               <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white overflow-hidden bg-gray-300 flex-shrink-0">
                 <Image 
-                  src="/images/profile4.svg" 
+                  src="/images/profile3.svg" 
                   alt="Profile 4" 
                   width={32} 
                   height={32} 
@@ -319,7 +319,7 @@ export default function ProfileSetupScreen() {
                 You're almost there!
               </h2>
               <p className="text-xs sm:text-sm text-textGray font-poppins-regular">
-                Just a few more details to complete your creator profile. This helps us personalize your experience and keep your account secure.
+                Just a few more details to complete your brand profile. This helps us personalize your experience and keep your account secure.
               </p>
             </div>
 
@@ -519,7 +519,7 @@ export default function ProfileSetupScreen() {
           onSuccess={handleOtpSuccess}
           phone={`+91${phone}`}
           fullName=""
-          userType="creator"
+          userType="brand"
         />
       )}
     </div>
@@ -541,4 +541,4 @@ const Feature = ({ title, description }: { title: string; description: string })
       <p className="text-xs sm:text-sm lg:text-base font-poppins-regular text-textLight leading-relaxed">{description}</p>
     </div>
   </div>
-); 
+);

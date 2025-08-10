@@ -64,11 +64,11 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator, platform, onPress })
   };
 
   const getAgeDisplay = () => {
-    if (creator.age !== undefined && creator.age !== null && creator.age !== '') {
+    if (creator.age !== undefined && creator.age !== null) {
       return `${creator.age} years old`;
     }
     
-    const dateOfBirth = creator.date_of_birth || creator.dateOfBirth || creator.dob;
+    const dateOfBirth = creator.date_of_birth;
     if (dateOfBirth) {
       return calculateAge(dateOfBirth);
     }
