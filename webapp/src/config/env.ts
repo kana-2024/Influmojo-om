@@ -3,7 +3,7 @@ export const ENV = {
   // API Configuration
   API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://fair-legal-gar.ngrok-free.app',
   GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
-  GOOGLE_CLIENT_SECRET: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET || '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
   
   // App Configuration
   APP_NAME: 'Influ Mojo',
