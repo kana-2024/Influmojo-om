@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { authAPI } from '@/services/apiService';
 import { COLORS } from '@/config/colors';
 import { googleAuthService } from '@/services/googleAuth';
 import OtpVerificationModal from './OtpVerificationModal';
 
 export default function GetStartedScreen() {
+  const router = useRouter();
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,42 +18,88 @@ export default function GetStartedScreen() {
   const [error, setError] = useState('');
   const [warning, setWarning] = useState('');
   const [showOtpModal, setShowOtpModal] = useState(false);
-  const [userType, setUserType] = useState('creator');
+  const [selectedUserType, setSelectedUserType] = useState<'creator' | 'brand' | null>(null);
+
+  // Store selectedUserType in sessionStorage whenever it changes
+  useEffect(() => {
+    if (selectedUserType) {
+      sessionStorage.setItem('selectedUserType', selectedUserType);
+    }
+  }, [selectedUserType]);
+
+  // Load selectedUserType from sessionStorage on component mount
+  useEffect(() => {
+    const storedUserType = sessionStorage.getItem('selectedUserType') as 'creator' | 'brand' | null;
+    if (storedUserType) {
+      setSelectedUserType(storedUserType);
+    }
+  }, []);
 
   const handleGoogleSignUp = async () => {
+    if (!selectedUserType) {
+      setError('Please select whether you are signing up as a Creator or Brand');
+      return;
+    }
+
     setWarning('');
     setGoogleLoading(true);
     setError('');
 
     try {
-      console.log('Starting Google sign-in process...');
       const result = await googleAuthService.signIn();
-      console.log('Google sign-in result:', result);
       
       if (result.success && result.user && result.idToken) {
-        console.log('Google sign-in successful, calling backend API...');
+        console.log('✅ Google OAuth successful:', result.user);
+        console.log('🔑 Google ID token received:', result.idToken ? 'Yes' : 'No');
         
         try {
+          console.log('🔄 Calling backend Google auth API...');
           // Call backend API with Google ID token for signup
-          const apiResult = await authAPI.googleAuth(result.idToken, true, userType);
-          console.log('Backend API response:', apiResult);
+          const apiResult = await authAPI.googleAuth(result.idToken, true, selectedUserType || 'creator');
+          
+          console.log('📡 Backend Google auth response:', apiResult);
           
           if (apiResult.success) {
-            // New user created successfully, proceed to Google verification screen
-            console.log('Google auth successful, navigating to Google verification screen');
-            window.location.href = '/google-verified';
+            console.log('✅ Backend Google auth successful');
+            console.log('👤 User exists:', apiResult.userExists);
+            console.log('🆕 Is new user:', apiResult.isNewUser);
+            
+            // New user created successfully, ensure profiles are created
+            try {
+              console.log('🔄 Creating missing profiles...');
+              await authAPI.createMissingProfiles();
+              console.log('✅ Profiles created successfully');
+            } catch (profileErr) {
+              console.error('❌ Profile creation failed:', profileErr);
+              console.warn('⚠️ Profile creation warning - user may not have complete profile setup');
+              // Don't block the flow if profile creation fails
+            }
+            
+            // Store Google user information in sessionStorage like mobile app
+            sessionStorage.setItem('fromGoogle', 'true');
+            sessionStorage.setItem('userEmail', result.user.email);
+            sessionStorage.setItem('authProvider', 'google');
+            sessionStorage.setItem('selectedUserType', selectedUserType || 'creator');
+            sessionStorage.setItem('googleToken', result.idToken);
+            
+            console.log('💾 Google user data stored in sessionStorage');
+            
+            // Proceed to Google verification screen
+            router.push('/google-verified');
           } else {
+            console.error('❌ Backend Google auth failed:', apiResult.error);
             setWarning(apiResult.error || 'Backend authentication failed. Please try again.');
           }
         } catch (apiError: any) {
-          console.error('Backend API error:', apiError);
+          console.error('❌ Backend API error:', apiError);
           
           // Handle specific error cases
           if (apiError.message?.includes('409') || apiError.status === 409) {
             // User already exists - redirect to login
+            console.log('⚠️ User already exists, redirecting to login');
             setWarning('An account with this Google account already exists. Redirecting to login...');
             setTimeout(() => {
-              window.location.href = '/login';
+              router.push('/login');
             }, 2000);
           } else {
             setWarning('Backend authentication failed. Please try again.');
@@ -76,6 +124,12 @@ export default function GetStartedScreen() {
     setError('');
 
     // Validate inputs
+    if (!selectedUserType) {
+      setError('Please select whether you are signing up as a Creator or Brand');
+      setLoading(false);
+      return;
+    }
+
     if (!fullName.trim()) {
       setError('Please enter your full name');
       setLoading(false);
@@ -94,9 +148,23 @@ export default function GetStartedScreen() {
       return;
     }
 
+    // Clear any Google-related sessionStorage data since user is choosing mobile signup
+    sessionStorage.removeItem('fromGoogle');
+    sessionStorage.removeItem('userEmail');
+    sessionStorage.removeItem('googleToken');
+    sessionStorage.removeItem('authProvider');
+    
+    // Clear any old phone data from previous sessions
+    sessionStorage.removeItem('verifiedPhone');
+    sessionStorage.removeItem('userData');
+    
+    // Set mobile signup indicator
+    sessionStorage.setItem('authProvider', 'mobile');
+    sessionStorage.setItem('selectedUserType', selectedUserType);
+    
+    console.log('📱 GetStartedScreen - Mobile signup chosen, cleared Google data and old phone data, set authProvider=mobile');
+
     try {
-      console.log('Sending OTP request for:', `+91${phone}`);
-      
       // Check if user already exists
       const checkResult = await authAPI.checkUserExists(`+91${phone}`);
       
@@ -108,7 +176,6 @@ export default function GetStartedScreen() {
       
       // User doesn't exist, proceed with OTP
       const result = await authAPI.sendOTP(`+91${phone}`);
-      console.log('OTP sent successfully');
       
       setLoading(false);
       setShowOtpModal(true);
@@ -128,8 +195,33 @@ export default function GetStartedScreen() {
 
   const handleOtpSuccess = (user: any) => {
     setShowOtpModal(false);
-    // Redirect to profile setup screen after successful signup
-    window.location.href = '/profile-setup';
+    
+    // Store user data in sessionStorage for the next screen
+    if (user) {
+      console.log('💾 GetStartedScreen - Storing user data in sessionStorage:', user);
+      console.log('📱 GetStartedScreen - User phone number:', user.phone);
+      console.log('📱 GetStartedScreen - Current phone state:', phone);
+      
+      sessionStorage.setItem('userData', JSON.stringify(user));
+      
+      // Also store the phone number separately for easy access
+      if (user.phone) {
+        sessionStorage.setItem('verifiedPhone', user.phone);
+        console.log('📱 GetStartedScreen - Stored verified phone:', user.phone);
+      } else {
+        console.log('⚠️ GetStartedScreen - No phone number in user object, using current phone state');
+        // Fallback: store the phone number that was used for OTP
+        sessionStorage.setItem('verifiedPhone', `+91${phone}`);
+      }
+    }
+    
+    // Navigate directly to the appropriate profile setup screen based on selected user type
+    const userType = selectedUserType || 'creator';
+    if (userType === 'brand') {
+      router.push('/brand-profile-setup');
+    } else {
+      router.push('/profile-setup');
+    }
   };
 
   return (
@@ -168,12 +260,27 @@ export default function GetStartedScreen() {
           <Link href="/pricing" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Pricing
           </Link>
-          <Link href="/signup-brand" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
-            Sign up as brand
-          </Link>
-          <Link href="/signup-creator" className="text-secondary font-poppins-medium hover:text-opacity-80 transition-colors text-xs lg:text-sm">
+          {/* Only show signup options if user hasn't completed signup yet */}
+          <button 
+            onClick={() => setSelectedUserType('creator')}
+            className={`font-poppins-medium transition-colors text-xs lg:text-sm ${
+              selectedUserType === 'creator' 
+                ? 'text-secondary' 
+                : 'text-textDark hover:text-secondary'
+            }`}
+          >
             Sign up as Creator
-          </Link>
+          </button>
+          <button 
+            onClick={() => setSelectedUserType('brand')}
+            className={`font-poppins-medium transition-colors text-xs lg:text-sm ${
+              selectedUserType === 'brand' 
+                ? 'text-secondary' 
+                : 'text-textDark hover:text-secondary'
+            }`}
+          >
+            Sign up as Brand
+          </button>
           <Link href="/login" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Login
           </Link>
@@ -192,6 +299,24 @@ export default function GetStartedScreen() {
           </svg>
         </button>
       </header>
+
+      {/* User Type Selection Message */}
+      {selectedUserType && (
+        <div className="bg-blue-50 border-l-4 border-secondary p-4 mx-4 mt-4 rounded">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-secondary" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-secondary font-poppins-medium">
+                You're signing up as a <span className="font-poppins-semibold">{selectedUserType === 'brand' ? 'Brand' : 'Creator'}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row flex-1 w-full bg-white">
@@ -322,10 +447,10 @@ export default function GetStartedScreen() {
             {/* Social Buttons */}
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 sm:mb-4 w-full">
               <div className="flex-1 w-full min-w-0">
-                <GoogleButton onClick={handleGoogleSignUp} loading={googleLoading} />
+                <GoogleButton onClick={handleGoogleSignUp} loading={googleLoading} disabled={!selectedUserType} />
               </div>
               <div className="flex-1 w-full min-w-0">
-                <FacebookButton />
+                <FacebookButton disabled={!selectedUserType} />
               </div>
             </div>
 
@@ -340,7 +465,7 @@ export default function GetStartedScreen() {
             <div className="space-y-3 w-full">
               <InputField
                 label="Full Name*"
-                placeholder="e.g. John Doe"
+                placeholder={selectedUserType === 'brand' ? "e.g. Company Name" : "e.g. John Doe"}
                 value={fullName}
                 onChange={setFullName}
               />
@@ -370,7 +495,7 @@ export default function GetStartedScreen() {
               </div>
               <button
                 onClick={handleCreateAccount}
-                disabled={loading}
+                disabled={loading || !selectedUserType}
                 className="w-full py-2.5 text-white text-sm font-poppins-semibold rounded-lg flex justify-center items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: COLORS.gradientOrange }}
               >
@@ -406,7 +531,7 @@ export default function GetStartedScreen() {
         onSuccess={handleOtpSuccess}
         phone={`+91${phone}`}
         fullName={fullName.trim()}
-        userType={userType}
+        userType={selectedUserType || 'creator'}
       />
     </div>
   );
@@ -429,11 +554,11 @@ const Feature = ({ title, description }: { title: string; description: string })
   </div>
 );
 
-function GoogleButton({ onClick, loading }: { onClick: () => void; loading: boolean }) {
+function GoogleButton({ onClick, loading, disabled }: { onClick: () => void; loading: boolean; disabled?: boolean }) {
   return (
     <button 
       onClick={onClick}
-      disabled={loading}
+      disabled={loading || disabled}
       className="flex items-center justify-center border border-gray-300 rounded-lg px-3 sm:px-4 py-2.5 hover:bg-gray-50 transition-colors bg-white w-full disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {loading ? (
@@ -461,9 +586,12 @@ function GoogleButton({ onClick, loading }: { onClick: () => void; loading: bool
   );
 }
 
-function FacebookButton() {
+function FacebookButton({ disabled }: { disabled?: boolean }) {
   return (
-    <button className="flex items-center justify-center border border-gray-300 rounded-lg px-3 sm:px-4 py-2.5 hover:bg-gray-50 transition-colors bg-white w-full">
+    <button 
+      disabled={disabled}
+      className="flex items-center justify-center border border-gray-300 rounded-lg px-3 sm:px-4 py-2.5 hover:bg-gray-50 transition-colors bg-white w-full disabled:opacity-50 disabled:cursor-not-allowed"
+    >
       {/* Facebook Logo - Blue square with white 'f' */}
       <div className="mr-2 flex-shrink-0">
         <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">

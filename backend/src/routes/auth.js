@@ -37,6 +37,53 @@ const generateToken = (userId, userType = 'creator') => {
   );
 };
 
+// Helper function to create initial profiles for new users
+const createInitialProfile = async (userId, userType) => {
+  try {
+    if (userType === 'brand') {
+      // Create initial BrandProfile
+      const brandProfile = await prisma.brandProfile.create({
+        data: {
+          user_id: userId,
+          company_name: 'Company Name', // Will be updated during onboarding
+          industry: 'General', // Will be updated during onboarding
+          industries: ['General'], // Will be updated during onboarding
+          description: '', // Will be updated during onboarding
+          languages: [], // Will be updated during onboarding
+          verified: false,
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+      });
+      console.log(`✅ Created initial BrandProfile for user ${userId}:`, brandProfile.id.toString());
+      return brandProfile;
+    } else if (userType === 'creator') {
+      // Create initial CreatorProfile
+      const creatorProfile = await prisma.creatorProfile.create({
+        data: {
+          user_id: userId,
+          bio: '', // Will be updated during onboarding
+          content_categories: [], // Will be updated during onboarding
+          languages: [], // Will be updated during onboarding
+          availability_status: 'available',
+          verified: false,
+          featured: false,
+          rating: 0.00,
+          total_collaborations: 0,
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+      });
+      console.log(`✅ Created initial CreatorProfile for user ${userId}:`, creatorProfile.id.toString());
+      return creatorProfile;
+    }
+  } catch (error) {
+    console.error(`❌ Failed to create initial profile for user ${userId}:`, error);
+    // Don't throw error - profile creation failure shouldn't break user creation
+    return null;
+  }
+};
+
 // Email/Password login endpoint
 router.post('/login', [
   body('email').isEmail().withMessage('Valid email is required'),
@@ -194,6 +241,23 @@ router.post('/google-mobile', [
             }
           });
           isNewUser = false;
+          
+          // Check if profile exists, if not create one
+          if (user.user_type === 'brand') {
+            const existingBrandProfile = await prisma.brandProfile.findFirst({
+              where: { user_id: user.id }
+            });
+            if (!existingBrandProfile) {
+              await createInitialProfile(user.id, user.user_type);
+            }
+          } else if (user.user_type === 'creator') {
+            const existingCreatorProfile = await prisma.creatorProfile.findFirst({
+              where: { user_id: user.id }
+            });
+            if (!existingCreatorProfile) {
+              await createInitialProfile(user.id, user.user_type);
+            }
+          }
         } else {
           // Login - update the existing user
           user = await prisma.user.update({
@@ -223,6 +287,9 @@ router.post('/google-mobile', [
             }
           });
           isNewUser = true;
+          
+          // Create initial profile for new user
+          await createInitialProfile(user.id, userType);
         } else {
           // User doesn't exist but this is a login attempt
           return res.status(404).json({
@@ -327,7 +394,7 @@ router.post('/google', [
       if (existingUserWithDifferentProvider) {
         // User exists with different auth provider (e.g., phone)
         if (isSignup) {
-          // Update the existing user to use Google auth provider
+                    // Update the existing user to use Google auth provider
           user = await prisma.user.update({
             where: { id: existingUserWithDifferentProvider.id },
             data: {
@@ -338,6 +405,23 @@ router.post('/google', [
             }
           });
           isNewUser = false;
+          
+          // Check if profile exists, if not create one
+          if (user.user_type === 'brand') {
+            const existingBrandProfile = await prisma.brandProfile.findFirst({
+              where: { user_id: user.id }
+            });
+            if (!existingBrandProfile) {
+              await createInitialProfile(user.id, user.user_type);
+            }
+          } else if (user.user_type === 'creator') {
+            const existingCreatorProfile = await prisma.creatorProfile.findFirst({
+              where: { user_id: user.id }
+            });
+            if (!existingCreatorProfile) {
+              await createInitialProfile(user.id, user.user_type);
+            }
+          }
         } else {
           // Login - update the existing user
           user = await prisma.user.update({
@@ -367,6 +451,9 @@ router.post('/google', [
             }
           });
           isNewUser = true;
+          
+          // Create initial profile for new user
+          await createInitialProfile(user.id, userType);
         } else {
           // User doesn't exist but this is a login attempt
           return res.status(404).json({
@@ -392,7 +479,7 @@ router.post('/google', [
           data: {
             last_login_at: new Date(),
             profile_image_url: picture,
-            email_verified: true
+              email_verified: true
           }
         });
         isNewUser = false;
@@ -759,6 +846,9 @@ router.post('/verify-phone-code', [
           }
         });
         console.log('[verify-phone-code] Created new user ID:', user.id);
+        
+        // Create initial profile for new user
+        await createInitialProfile(user.id, userType);
       } else {
         // If authenticated, update the current user with the phone number
         // If another user already has this phone, handle the conflict
@@ -790,6 +880,9 @@ router.post('/verify-phone-code', [
         }
       });
       console.log('[verify-phone-code] Created new user ID:', user.id);
+      
+      // Create initial profile for new user
+      await createInitialProfile(user.id, userType);
     } else {
       console.log('[verify-phone-code] Updating existing phone user ID:', userWithPhone.id);
       // Update existing user (phone login)
@@ -1481,6 +1574,66 @@ router.post('/super-admin-login', [
       success: false,
       error: 'Login failed',
       message: error.message
+    });
+  }
+}));
+
+// Endpoint to create missing profiles for existing users
+router.post('/create-missing-profiles', asyncHandler(async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    let createdProfiles = [];
+
+    if (user.user_type === 'brand') {
+      const existingBrandProfile = await prisma.brandProfile.findFirst({
+        where: { user_id: user.id }
+      });
+      
+      if (!existingBrandProfile) {
+        const brandProfile = await createInitialProfile(user.id, user.user_type);
+        if (brandProfile) {
+          createdProfiles.push('BrandProfile');
+        }
+      }
+    } else if (user.user_type === 'creator') {
+      const existingCreatorProfile = await prisma.creatorProfile.findFirst({
+        where: { user_id: user.id }
+      });
+      
+      if (!existingCreatorProfile) {
+        const creatorProfile = await createInitialProfile(user.id, user.user_type);
+        if (creatorProfile) {
+          createdProfiles.push('CreatorProfile');
+        }
+      }
+    }
+
+    res.json({
+      success: true,
+      message: createdProfiles.length > 0 ? `Created missing profiles: ${createdProfiles.join(', ')}` : 'All profiles already exist',
+      createdProfiles,
+      user_type: user.user_type
+    });
+
+  } catch (error) {
+    console.error('Create missing profiles error:', error);
+    res.status(500).json({ 
+      error: 'Failed to create missing profiles',
+      message: error.message 
     });
   }
 }));

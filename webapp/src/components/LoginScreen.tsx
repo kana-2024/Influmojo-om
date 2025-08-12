@@ -66,22 +66,23 @@ export default function LoginScreen() {
     setError('');
 
     try {
-      console.log('Starting Google sign-in process...');
       const result = await googleAuthService.signIn();
-      console.log('Google sign-in result:', result);
       
       if (result.success && result.user && result.idToken) {
-        console.log('Google sign-in successful, calling backend API...');
-        
         try {
           // Call backend API with Google ID token for login
           const apiResult = await authAPI.googleAuth(result.idToken, false);
-          console.log('Backend API response:', apiResult);
           
           if (apiResult.success) {
-            // User logged in successfully, redirect to dashboard or profile
-            console.log('Google login successful, redirecting...');
-            window.location.href = '/profile-setup';
+            // User logged in successfully, redirect to appropriate profile setup based on user type
+            const userType = apiResult.user?.userType || apiResult.user?.user_type || 'creator';
+            sessionStorage.setItem('selectedUserType', userType);
+            
+            if (userType === 'brand') {
+              window.location.href = '/brand-profile-setup';
+            } else {
+              window.location.href = '/profile-setup';
+            }
           } else {
             setWarning(apiResult.error || 'Backend authentication failed. Please try again.');
           }
@@ -108,8 +109,15 @@ export default function LoginScreen() {
 
   const handleOtpSuccess = (user: any) => {
     setShowOtpModal(false);
-    // Redirect to profile setup or dashboard after successful login
-    window.location.href = '/profile-setup';
+    // Redirect to appropriate profile setup based on user type
+    const userType = user?.userType || user?.user_type || 'creator';
+    sessionStorage.setItem('selectedUserType', userType);
+    
+    if (userType === 'brand') {
+      window.location.href = '/brand-profile-setup';
+    } else {
+      window.location.href = '/profile-setup';
+    }
   };
 
   return (

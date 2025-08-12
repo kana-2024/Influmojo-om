@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
   UPDATE_NAME: `${ENV.API_BASE_URL}/api/auth/update-name`,
   USER_PROFILE: `${ENV.API_BASE_URL}/api/auth/profile`,
   CHECK_USER_EXISTS: `${ENV.API_BASE_URL}/api/auth/check-user-exists`,
+  CREATE_MISSING_PROFILES: `${ENV.API_BASE_URL}/api/auth/create-missing-profiles`,
 
   // Profile endpoints
   GET_PROFILE: `${ENV.API_BASE_URL}/api/profile`,

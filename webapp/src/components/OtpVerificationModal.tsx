@@ -85,7 +85,27 @@ export default function OtpVerificationModal({
     try {
       const result = await authAPI.verifyOTP(phone, otpString, fullName, userType);
       
+      console.log('📡 OTP verification API response:', result);
+      
       if (result.success) {
+        console.log('✅ OTP verification successful, user data:', result.user);
+        console.log('🔑 Token received:', result.token ? 'Yes' : 'No');
+        
+        // Ensure profiles are created for new users
+        // Add a small delay to ensure token is properly stored in localStorage
+        try {
+          console.log('🔄 Waiting for token to be stored...');
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          console.log('🔄 Creating missing profiles...');
+          const profileResult = await authAPI.createMissingProfiles();
+          console.log('✅ Profile creation result:', profileResult);
+        } catch (profileErr) {
+          console.error('❌ Profile creation failed:', profileErr);
+          console.warn('⚠️ Profile creation warning - user may not have complete profile setup');
+          // Don't block the flow if profile creation fails
+        }
+        
         onSuccess(result.user || result);
       } else {
         setError(result.error || 'OTP verification failed');

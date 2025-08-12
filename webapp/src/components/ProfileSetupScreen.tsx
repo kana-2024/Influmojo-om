@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { authAPI } from '@/services/apiService';
+import { useRouter } from 'next/navigation';
+import { authAPI, profileAPI } from '@/services/apiService';
+import { googleAuthService } from '@/services/googleAuth';
 import OtpVerificationModal from './OtpVerificationModal';
 
 export default function ProfileSetupScreen() {
+  const router = useRouter();
   const [gender, setGender] = useState('Male');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -21,6 +24,9 @@ export default function ProfileSetupScreen() {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
+  
+  // Google email verification state
+  const [googleVerifying, setGoogleVerifying] = useState(false);
 
   const cities = [
     'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune', 'Ahmedabad', 'Jaipur', 'Surat',
@@ -28,22 +34,96 @@ export default function ProfileSetupScreen() {
   ];
 
   useEffect(() => {
-    // Check if user is Google user (this would come from auth context or localStorage)
+    // Check if user is Google user or mobile user
     const checkGoogleUser = () => {
-      // For now, assume Google user if coming from Google verification
       const fromGoogle = sessionStorage.getItem('fromGoogle');
-      if (fromGoogle) {
+      const authProvider = sessionStorage.getItem('authProvider');
+      const userEmail = sessionStorage.getItem('userEmail');
+      
+      console.log('🔍 ProfileSetupScreen - SessionStorage check:', {
+        fromGoogle,
+        authProvider,
+        userEmail,
+        userData: sessionStorage.getItem('userData')
+      });
+      
+      // User is Google user if they have fromGoogle flag OR authProvider is 'google'
+      if (fromGoogle || authProvider === 'google') {
+        console.log('✅ ProfileSetupScreen - User is Google user');
         setIsGoogleUser(true);
         // Pre-fill email if available
-        const userEmail = sessionStorage.getItem('userEmail');
         if (userEmail) {
           setEmail(userEmail);
         }
+      } else if (authProvider === 'mobile') {
+        console.log('📱 ProfileSetupScreen - User is mobile user');
+        // User is mobile user - clear any Google-related data
+        setIsGoogleUser(false);
+        // Pre-fill phone if available (this would come from OTP verification)
+        const userData = sessionStorage.getItem('userData');
+        const verifiedPhone = sessionStorage.getItem('verifiedPhone');
+        
+        if (userData) {
+          try {
+            const parsedData = JSON.parse(userData);
+            if (parsedData.phone) {
+              setPhone(parsedData.phone.replace('+91', ''));
+              setIsPhoneVerified(true);
+              console.log('✅ ProfileSetupScreen - Phone set from userData:', parsedData.phone);
+            }
+          } catch (error) {
+            console.error('Error parsing user data:', error);
+          }
+        }
+        
+        // Fallback to verifiedPhone if userData doesn't have phone
+        if (!phone && verifiedPhone) {
+          setPhone(verifiedPhone.replace('+91', ''));
+          setIsPhoneVerified(true);
+          console.log('✅ ProfileSetupScreen - Phone set from verifiedPhone fallback:', verifiedPhone);
+        }
+        
+        // Debug: Log final phone state
+        console.log('📱 ProfileSetupScreen - Final phone state:', {
+          phone,
+          isPhoneVerified,
+          userData: sessionStorage.getItem('userData'),
+          verifiedPhone: sessionStorage.getItem('verifiedPhone')
+        });
+      } else {
+        console.log('❓ ProfileSetupScreen - Unknown user type, defaulting to mobile');
+        setIsGoogleUser(false);
       }
     };
     
+    // Check user type and redirect if necessary
+    const checkUserType = () => {
+      const storedUserType = sessionStorage.getItem('selectedUserType');
+      if (storedUserType === 'brand') {
+        console.log('Creator ProfileSetupScreen: User is brand, redirecting to brand profile setup');
+        router.push('/brand-profile-setup');
+        return;
+      }
+    };
+    
+    checkUserType();
     checkGoogleUser();
-  }, []);
+    
+    // Check if email was already verified in this session
+    const emailVerified = sessionStorage.getItem('emailVerified');
+    if (emailVerified === 'true') {
+      console.log('✅ ProfileSetupScreen - Email already verified in this session');
+    }
+  }, [router]);
+  
+  // Monitor email changes and clear verification if email is cleared
+  useEffect(() => {
+    if (!email.trim() && sessionStorage.getItem('emailVerified') === 'true') {
+      console.log('🗑️ ProfileSetupScreen - Email cleared, removing verification status');
+      sessionStorage.removeItem('emailVerified');
+      sessionStorage.removeItem('verifiedEmail');
+    }
+  }, [email]);
 
   const handleSendOtp = async () => {
     if (!phone.trim()) {
@@ -102,50 +182,183 @@ export default function ProfileSetupScreen() {
     // Store user data if needed
     if (user) {
       sessionStorage.setItem('userData', JSON.stringify(user));
+      // Also store phone number for mobile users
+      if (user.phone) {
+        setPhone(user.phone.replace('+91', ''));
+      }
     }
   };
 
   const handleNextStep = async () => {
     if (loading) return;
     
-    // Validation
-    if (!phone.trim()) {
-      alert('Please enter your phone number');
-      return;
+    // Debug logging
+    console.log('handleNextStep called with state:', {
+      phone: phone.trim(),
+      city: city.trim(),
+      isPhoneVerified,
+      gender,
+      email: email.trim(),
+      dob
+    });
+    
+    // Validation - different for Google vs phone users
+    if (isGoogleUser) {
+      // Google user validation
+      console.log('Validation check for Google user - phone:', phone.trim(), 'city:', city.trim(), 'isPhoneVerified:', isPhoneVerified);
+      
+      if (!phone.trim()) {
+        console.log('Validation failed: phone is empty');
+        alert('Please enter your phone number');
+        return;
+      }
+      
+      if (!isPhoneVerified) {
+        console.log('Validation failed: phone not verified');
+        alert('Please verify your phone number first');
+        return;
+      }
+    } else {
+      // Phone user validation
+      console.log('Validation check for Phone user - email:', email.trim(), 'city:', city.trim());
+      
+      if (!email.trim()) {
+        console.log('Validation failed: email is empty');
+        alert('Please enter your email address');
+        return;
+      }
+      
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        console.log('Validation failed: invalid email format');
+        alert('Please enter a valid email address');
+        return;
+      }
+      
+      // Check if email is verified for phone users
+      const emailVerified = sessionStorage.getItem('emailVerified');
+      if (emailVerified !== 'true' || !email.trim()) {
+        console.log('Validation failed: email not verified or empty');
+        alert('Please enter and verify your email address with Google before continuing');
+        return;
+      }
     }
     
     if (!city.trim()) {
+      console.log('Validation failed: city is empty');
       alert('Please select your city');
       return;
     }
-
-    if (!isPhoneVerified) {
-      alert('Please verify your phone number first');
-      return;
-    }
+    
+    console.log('Validation passed successfully');
     
     setLoading(true);
     
     try {
-      // TODO: Save basic profile data to backend
-      console.log('Saving basic profile data:', { gender, email, phone, dob, city });
+      // Prepare basic profile data - different for Google vs phone users
+      const profileData: any = {
+        gender,
+        dob: dob,
+        state: 'Maharashtra', // Default state - can be made configurable later
+        city: city.trim(),
+        pincode: '400001' // Default pincode - can be made configurable later
+      };
+
+      // Add email/phone based on user type
+      if (isGoogleUser) {
+        // Google user: email is already verified, phone needs verification
+        profileData.email = email.trim();
+        profileData.phone = `+91${phone.trim()}`;
+      } else {
+        // Phone user: phone is already verified, email needs verification
+        profileData.phone = `+91${phone.trim()}`;
+        profileData.email = email.trim();
+      }
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Preparing basic profile data:', profileData);
       
-      // Navigate to preferences step
-      window.location.href = '/creator-preferences';
+      // Save basic profile data to the database
+      console.log('Saving basic profile data to database:', profileData);
+      
+      try {
+        const basicInfoResponse = await profileAPI.updateBasicInfo(profileData);
+        console.log('Basic profile saved to database:', basicInfoResponse);
+        
+        if (basicInfoResponse.success) {
+          // Also store in sessionStorage for the preferences step
+          sessionStorage.setItem('basicProfileData', JSON.stringify(profileData));
+          console.log('Basic profile data also stored in sessionStorage');
+          
+          // Navigate to preferences step using Next.js router
+          router.push('/creator-preferences');
+        } else {
+          throw new Error(basicInfoResponse.message || 'Failed to save basic profile');
+        }
+      } catch (saveError) {
+        console.error('Failed to save basic profile to database:', saveError);
+        
+        // Even if saving fails, store in sessionStorage and continue
+        // The preferences step can try to save it again
+        sessionStorage.setItem('basicProfileData', JSON.stringify(profileData));
+        console.log('Basic profile data stored in sessionStorage despite save failure');
+        
+        // Navigate to preferences step using Next.js router
+        router.push('/creator-preferences');
+      }
     } catch (error) {
-      console.error('Error saving profile:', error);
-      alert('Failed to save profile. Please try again.');
+      console.error('Unexpected error in handleNextStep:', error);
+      alert('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleCitySelect = (selectedCity: string) => {
+    console.log('City selected:', selectedCity);
     setCity(selectedCity);
     setShowCityModal(false);
+  };
+
+  const handleGoogleEmailVerification = async () => {
+    if (!email.trim()) {
+      alert('Please enter your email address first');
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    setGoogleVerifying(true);
+    
+    try {
+      console.log('🔍 Starting Google email verification...');
+      
+      // Use the actual Google OAuth service like mobile app
+      const result = await googleAuthService.signIn();
+      
+      if (result.success && result.user && result.user.email) {
+        console.log('✅ Google email verification successful:', result.user.email);
+        
+        // Update the email field with the verified Google email
+        setEmail(result.user.email);
+        
+        // Show success message like mobile app
+        alert('Google account verified! Your email has been updated.');
+        
+        // Store the verification status
+        sessionStorage.setItem('emailVerified', 'true');
+        sessionStorage.setItem('verifiedEmail', result.user.email);
+      } else {
+        console.error('❌ Google email verification failed:', result.error);
+        alert(result.error || 'Google sign-in failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Google email verification error:', error);
+      alert('Failed to verify email with Google. Please try again.');
+    } finally {
+      setGoogleVerifying(false);
+    }
   };
 
   return (
@@ -349,8 +562,9 @@ export default function ProfileSetupScreen() {
               </div>
             </div>
 
-            {/* Email Field (for Google users) */}
-            {isGoogleUser && (
+            {/* Email Field - Dynamic based on signup method */}
+            {isGoogleUser ? (
+              // Email for Google users (already verified)
               <div className="space-y-2">
                 <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Email ID</label>
                 <div className="flex items-center gap-2">
@@ -358,7 +572,7 @@ export default function ProfileSetupScreen() {
                     type="email"
                     value={email}
                     disabled
-                    className="flex-1 py-2.5 px-3 border border-gray-300 rounded-lg text-xs sm:text-sm font-poppins-regular text-textGray bg-gray-50"
+                    className="flex-1 py-2.5 px-3 border border-green-500 rounded-lg text-xs sm:text-sm font-poppins-regular text-textGray bg-white"
                   />
                   <div className="w-5 h-5 text-green-600">
                     <svg fill="currentColor" viewBox="0 0 20 20">
@@ -373,67 +587,165 @@ export default function ProfileSetupScreen() {
                   <span className="text-xs text-green-700 font-poppins-regular">Your email is verified via Google</span>
                 </div>
               </div>
+            ) : (
+              // Email for Phone users (verify via Google)
+              <div className="space-y-2">
+                <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Email ID</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    className={`flex-1 py-2.5 px-3 border rounded-lg text-xs sm:text-sm font-poppins-regular bg-white focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent ${
+                      sessionStorage.getItem('emailVerified') === 'true' && email.trim() !== ''
+                        ? 'border-green-500 text-textGray' 
+                        : 'border-gray-300 text-textDark'
+                    }`}
+                    disabled={sessionStorage.getItem('emailVerified') === 'true' && email.trim() !== ''}
+                  />
+                  {sessionStorage.getItem('emailVerified') === 'true' && email.trim() !== '' ? (
+                    <div className="w-5 h-5 text-green-600">
+                      <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleGoogleEmailVerification}
+                      disabled={googleVerifying}
+                      className="px-4 py-2.5 bg-[#20536d] text-white text-xs font-poppins-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {googleVerifying ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Verifying...
+                        </>
+                      ) : (
+                        'Verify Email'
+                      )}
+                    </button>
+                  )}
+                </div>
+                {sessionStorage.getItem('emailVerified') === 'true' && email.trim() !== '' ? (
+                  <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-xs text-green-700 font-poppins-regular">Your email is verified via Google</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-xs text-blue-700 font-poppins-regular">Please verify your email address with Google</span>
+                  </div>
+                )}
+              </div>
             )}
 
-            {/* Phone Number Field */}
-            <div className="space-y-2">
-              <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Phone Number</label>
-              <div className="flex items-center gap-2">
-                <div className="flex border border-gray-300 rounded-lg items-center px-3 bg-white flex-1">
-                  <span className="text-xs sm:text-sm font-poppins-medium text-textDark pr-2">+91</span>
-                  <div className="w-px h-5 bg-gray-300 mr-2" />
-                  <input
-                    type="tel"
-                    placeholder="Enter 10-digit mobile number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    disabled={isPhoneVerified}
-                    className="flex-1 py-2.5 bg-transparent border-none outline-none text-xs sm:text-sm font-poppins-regular text-textDark"
-                    maxLength={10}
-                  />
+            {/* Phone Number Field - Dynamic based on signup method */}
+            {isGoogleUser ? (
+              // Phone for Google users (needs verification)
+              <div className="space-y-2">
+                <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Phone Number</label>
+                <div className="flex items-center gap-2">
+                  <div className="flex border border-gray-300 rounded-lg items-center px-3 bg-white flex-1">
+                    <span className="text-xs sm:text-sm font-poppins-medium text-textDark pr-2">+91</span>
+                    <div className="w-px h-5 bg-gray-300 mr-2" />
+                    <input
+                      type="tel"
+                      placeholder="Enter 10-digit mobile number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      disabled={isPhoneVerified}
+                      className="flex-1 py-2.5 bg-transparent border-none outline-none text-xs sm:text-sm font-poppins-regular text-textDark"
+                      maxLength={10}
+                    />
+                  </div>
+                  {isPhoneVerified ? (
+                    <div className="w-5 h-5 text-green-600">
+                      <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleSendOtp}
+                      disabled={otpLoading || !phone.trim() || phone.length !== 10}
+                      className="px-4 py-2.5 bg-[#20536d] text-white text-xs font-poppins-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {otpLoading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Sending...
+                        </>
+                      ) : (
+                        'Send OTP'
+                      )}
+                    </button>
+                  )}
                 </div>
-                {isPhoneVerified ? (
+                {/* Phone verification status messages for Google users */}
+                {!isPhoneVerified && (
+                  <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-xs text-blue-700 font-poppins-regular">Please verify your phone number to continue</span>
+                  </div>
+                )}
+                
+                {/* Phone verification success message for Google users */}
+                {isPhoneVerified && (
+                  <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-xs text-green-700 font-poppins-regular">Your phone number is verified</span>
+                  </div>
+                )}
+                
+                {/* OTP Error Display */}
+                {otpError && (
+                  <div className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                    <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-xs text-red-700 font-poppins-regular">{otpError}</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Phone for Phone users (already verified)
+              <div className="space-y-2">
+                <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Phone Number</label>
+                <div className="flex items-center gap-2">
+                  <div className="flex border border-green-500 rounded-lg items-center px-3 bg-white flex-1">
+                    <span className="text-xs sm:text-sm font-poppins-medium text-textDark pr-2">+91</span>
+                    <div className="w-px h-5 bg-green-500 mr-2" />
+                    <input
+                      type="tel"
+                      value={phone}
+                      disabled
+                      className="flex-1 py-2.5 bg-transparent border-none outline-none text-xs sm:text-sm font-poppins-regular text-textGray"
+                    />
+                  </div>
                   <div className="w-5 h-5 text-green-600">
                     <svg fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   </div>
-                ) : (
-                  <button
-                    onClick={handleSendOtp}
-                    disabled={otpLoading || !phone.trim() || phone.length !== 10}
-                    className="px-4 py-2.5 bg-[#20536d] text-white text-xs font-poppins-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {otpLoading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Sending...
-                      </>
-                    ) : (
-                      'Send OTP'
-                    )}
-                  </button>
-                )}
+                </div>
+                <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-xs text-green-700 font-poppins-regular">Your phone number is verified</span>
+                </div>
               </div>
-              {!isPhoneVerified && (
-                <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-xs text-blue-700 font-poppins-regular">Please verify your phone number to continue</span>
-                </div>
-              )}
-              
-              {/* OTP Error Display */}
-              {otpError && (
-                <div className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg">
-                  <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-xs text-red-700 font-poppins-regular">{otpError}</span>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Date of Birth */}
             <div className="space-y-2">
@@ -452,7 +764,10 @@ export default function ProfileSetupScreen() {
               <div className="relative">
                 <button
                   type="button"
-                  onClick={() => setShowCityModal(!showCityModal)}
+                  onClick={() => {
+                    console.log('City modal toggle clicked, current state:', showCityModal);
+                    setShowCityModal(!showCityModal);
+                  }}
                   className="w-full py-2.5 px-3 border border-gray-300 rounded-lg text-xs sm:text-sm font-poppins-regular text-left bg-white focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex items-center justify-between"
                 >
                   <span className={city ? 'text-textDark' : 'text-gray-500'}>
@@ -483,9 +798,10 @@ export default function ProfileSetupScreen() {
             {/* Next Step Button */}
             <button
               onClick={handleNextStep}
-              disabled={loading || !phone.trim() || !city.trim() || !isPhoneVerified}
+              disabled={loading || !city.trim() || (isGoogleUser ? (!phone.trim() || !isPhoneVerified) : (!email.trim() || sessionStorage.getItem('emailVerified') !== 'true'))}
               className="w-full py-2.5 text-white text-sm font-poppins-semibold rounded-lg flex justify-center items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed mt-6"
               style={{ background: 'linear-gradient(180deg, #FE8F00, #FC5213)' }}
+              title={`Button state: loading=${loading}, city=${city.trim()}, ${isGoogleUser ? `phone=${phone.trim()}, verified=${isPhoneVerified}` : `email=${email.trim()}, verified=${sessionStorage.getItem('emailVerified')}`}`}
             >
               {loading ? (
                 <>

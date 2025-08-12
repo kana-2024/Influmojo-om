@@ -12,7 +12,8 @@
     "db:push": "dotenv -e .env -- prisma db push",
     "db:migrate": "dotenv -e .env -- prisma migrate dev",
     "db:studio": "dotenv -e .env -- prisma studio",
-    "setup:env": "cp .env.example .env || echo 'Please create .env file manually'"
+    "setup:env": "cp .env.example .env || echo 'Please create .env file manually'",
+    "create-profiles": "node create-missing-profiles.js"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",

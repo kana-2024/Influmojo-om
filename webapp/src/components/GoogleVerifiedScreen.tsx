@@ -13,25 +13,38 @@ export default function GoogleVerifiedScreen() {
   const handleNext = async () => {
     setLoading(true);
     try {
-      // Get user profile to determine user type like mobile
-      const profile = await authAPI.getUserProfile();
-      const userType = profile.user?.userType || profile.user?.user_type || 'creator';
+      // Get the selected user type from sessionStorage (set during Google signup)
+      const selectedUserType = sessionStorage.getItem('selectedUserType');
+      console.log('Selected user type from sessionStorage:', selectedUserType);
       
-      console.log('🔍 GoogleVerifiedScreen: User profile loaded:', {
-        userType: userType,
-        user: profile.user
-      });
-      
-      // Navigate to appropriate profile setup screen like mobile
-      if (userType === 'brand') {
+      // Navigate directly to the appropriate profile setup screen based on selected user type
+      if (selectedUserType === 'brand') {
+        console.log('Navigating to brand profile setup');
         router.push('/brand-profile-setup');
       } else {
+        // Default to creator profile setup
+        console.log('Navigating to creator profile setup');
         router.push('/profile-setup');
       }
     } catch (error) {
-      console.error('Error getting user profile:', error);
-      // Default to creator profile setup like mobile
-      router.push('/profile-setup');
+      console.error('Error in handleNext:', error);
+      // Fallback: try to get user type from backend
+      try {
+        const profile = await authAPI.getUserProfile();
+        const userType = profile.user?.userType || profile.user?.user_type || 'creator';
+        console.log('User type from backend:', userType);
+        
+        if (userType === 'brand') {
+          router.push('/brand-profile-setup');
+        } else {
+          router.push('/profile-setup');
+        }
+      } catch (backendError) {
+        console.error('Backend fallback also failed:', backendError);
+        // Final fallback: default to creator
+        sessionStorage.setItem('selectedUserType', 'creator');
+        router.push('/profile-setup');
+      }
     } finally {
       setLoading(false);
     }
@@ -73,10 +86,11 @@ export default function GoogleVerifiedScreen() {
           <Link href="/pricing" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Pricing
           </Link>
+          {/* Only show signup options if user hasn't completed signup yet */}
           <Link href="/signup-brand" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Sign up as brand
           </Link>
-          <Link href="/signup-creator" className="text-secondary font-poppins-medium hover:text-opacity-80 transition-colors text-xs lg:text-sm">
+          <Link href="/signup-creator" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Sign up as Creator
           </Link>
           <Link href="/login" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">

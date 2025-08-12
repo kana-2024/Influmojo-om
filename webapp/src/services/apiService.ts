@@ -119,22 +119,57 @@ export const authAPI = {
 
   // Google OAuth
   googleAuth: async (idToken: string, isSignup: boolean = false, userType: string = 'creator') => {
-    const response = await apiRequest(API_ENDPOINTS.GOOGLE_AUTH, {
-      method: 'POST',
-      body: JSON.stringify({ idToken, isSignup, userType }),
-    });
+    console.log('🔄 Google auth API called with:', { isSignup, userType });
+    console.log('🔑 ID token preview:', idToken.substring(0, 50) + '...');
     
-    if (response.token) {
-      setToken(response.token);
+    // Use a simple request format that should work with the backend
+    try {
+      const requestBody = { idToken, isSignup, userType };
+      console.log('📤 Request body:', requestBody);
+      console.log('🌐 API endpoint:', API_ENDPOINTS.GOOGLE_AUTH);
+      
+      const response = await fetch(API_ENDPOINTS.GOOGLE_AUTH, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+      
+      console.log('🔍 Google auth response status:', response.status);
+      console.log('🔍 Google auth response headers:', response.headers);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ Google auth failed:', errorData);
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Google auth successful:', data);
+      
+      if (data.token) {
+        console.log('🔑 Storing JWT token from Google auth');
+        setToken(data.token);
+        
+        // Verify token was stored
+        const storedToken = localStorage.getItem('token');
+        console.log('🔍 Token stored successfully:', storedToken ? 'Yes' : 'No');
+      } else {
+        console.warn('⚠️ No token received in Google auth response');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('❌ Google auth request failed:', error);
+      throw error;
     }
-    
-    return response;
   },
 
   // Send OTP
   sendOTP: async (phone: string) => {
-    // Note: Removed x-bypass-rate-limit header to avoid CORS issues in webapp
-    // Mobile app can still use this header since it doesn't have CORS restrictions
+    // Note: Cannot use x-bypass-rate-limit header due to CORS restrictions in webapp
+    // Mobile app can use this header since it doesn't have CORS restrictions
     
     return await apiRequest(API_ENDPOINTS.SEND_OTP, {
       method: 'POST',
@@ -150,7 +185,17 @@ export const authAPI = {
     });
     
     if (response.token) {
+      console.log('🔑 Storing token in localStorage:', response.token.substring(0, 20) + '...');
       setToken(response.token);
+      
+      // Verify token was stored
+      const storedToken = localStorage.getItem('token');
+      console.log('🔍 Token stored successfully:', storedToken ? 'Yes' : 'No');
+      if (storedToken) {
+        console.log('🔍 Stored token preview:', storedToken.substring(0, 20) + '...');
+      }
+    } else {
+      console.warn('⚠️ No token received in OTP verification response');
     }
     
     return response;
@@ -183,6 +228,22 @@ export const authAPI = {
   getUserProfile: async () => {
     return await apiRequest(API_ENDPOINTS.USER_PROFILE);
   },
+
+  // Create missing profiles for existing users
+  createMissingProfiles: async () => {
+    console.log('🔄 createMissingProfiles called');
+    
+    // Check if token is available
+    const token = localStorage.getItem('token');
+    console.log('🔍 Token available for createMissingProfiles:', token ? 'Yes' : 'No');
+    if (token) {
+      console.log('🔍 Token preview:', token.substring(0, 20) + '...');
+    }
+    
+    return await apiRequest(API_ENDPOINTS.CREATE_MISSING_PROFILES, {
+      method: 'POST',
+    });
+  },
 };
 
 // Profile API
@@ -195,6 +256,46 @@ export const profileAPI = {
     return await apiRequest(API_ENDPOINTS.UPDATE_PROFILE, {
       method: 'PUT',
       body: JSON.stringify(profileData),
+    });
+  },
+
+  // Get available industries (same as mobile)
+  getIndustries: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_INDUSTRIES, {
+      method: 'GET',
+    });
+  },
+
+  // Update basic info (same as mobile)
+  updateBasicInfo: async (data: {
+    gender: string;
+    email?: string;
+    phone?: string;
+    dob: string;
+    state: string;
+    city: string;
+    pincode: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.UPDATE_BASIC_INFO, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Update preferences (same as mobile)
+  updatePreferences: async (data: {
+    categories: string[];
+    about: string;
+    languages: string[];
+    platform?: string[];
+    company_name?: string;
+    role_in_organization?: string;
+    business_type?: string;
+    website_url?: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.UPDATE_PREFERENCES, {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 

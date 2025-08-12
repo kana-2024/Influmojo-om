@@ -1,27 +1,68 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { profileAPI } from '@/services/apiService';
 
 export default function BrandPreferencesScreen() {
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [about, setAbout] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
-  const [showPlatformModal, setShowPlatformModal] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState<'creator' | 'brand' | null>(null);
+  const [industries, setIndustries] = useState<string[]>([]);
+  const [industriesLoading, setIndustriesLoading] = useState(true);
 
-  const industries = [
-    'Fashion & Beauty', 'Food & Beverage', 'Technology', 'Healthcare', 'Education',
-    'Travel & Tourism', 'Automotive', 'Finance', 'Real Estate', 'Entertainment',
-    'Sports & Fitness', 'Home & Lifestyle', 'Pet Care', 'Gaming', 'E-commerce',
-    'Professional Services', 'Non-profit', 'Government'
+  // Fallback industries (same as mobile)
+  const FALLBACK_INDUSTRIES = [
+    'IT & Technology', 'Entertainment', 'Fashion & Beauty', 'Food & Beverage', 
+    'Healthcare', 'Education', 'Finance & Banking', 'Travel & Tourism',
+    'Sports & Fitness', 'Automotive', 'Real Estate', 'E-commerce',
+    'Manufacturing', 'Media & Advertising', 'Consulting', 'Non-Profit'
   ];
 
   const availableLanguages = ['Hindi', 'English', 'Telugu', 'Bengali', 'Marathi', 'Gujarati', 'Kannada', 'Malayalam', 'Punjabi', 'Tamil'];
-  const availablePlatforms = ['Instagram', 'YouTube', 'Facebook', 'TikTok', 'Twitter', 'LinkedIn', 'Snapchat'];
+
+  // Load industries from API (same as mobile)
+  const loadIndustries = async () => {
+    try {
+      setIndustriesLoading(true);
+      const response = await profileAPI.getIndustries();
+      
+      if (response.success && response.data) {
+        setIndustries(response.data.industries || []);
+      } else {
+        console.warn('Failed to load industries, using fallback');
+        // Fallback to default industries if API fails
+        setIndustries(FALLBACK_INDUSTRIES);
+      }
+    } catch (error) {
+      console.error('Error loading industries:', error);
+      // Fallback to default industries if API fails
+      setIndustries(FALLBACK_INDUSTRIES);
+    } finally {
+      setIndustriesLoading(false);
+    }
+  };
+
+  // Load industries on component mount
+  useEffect(() => {
+    loadIndustries();
+    
+    // Load selectedUserType from sessionStorage
+    const storedUserType = sessionStorage.getItem('selectedUserType') as 'creator' | 'brand' | null;
+    if (storedUserType) {
+      setSelectedUserType(storedUserType);
+      
+      // If user is a creator, redirect them to creator preferences since this screen is for brands only
+      if (storedUserType === 'creator') {
+        window.location.href = '/creator-preferences';
+        return;
+      }
+    }
+  }, []);
 
   // Industry selection logic
   const toggleIndustry = (industry: string) => {
@@ -41,16 +82,11 @@ export default function BrandPreferencesScreen() {
     }
   };
 
-  // Platform selection logic
-  const togglePlatform = (platform: string) => {
-    if (selectedPlatforms.includes(platform)) {
-      setSelectedPlatforms(selectedPlatforms.filter(p => p !== platform));
-    } else {
-      setSelectedPlatforms([...selectedPlatforms, platform]);
-    }
-  };
 
-  // Save preferences to database
+
+
+
+  // Save preferences to database (same as mobile)
   const handleSavePreferences = async () => {
     if (selectedIndustries.length === 0) {
       alert('Please select at least one industry');
@@ -67,25 +103,16 @@ export default function BrandPreferencesScreen() {
       return;
     }
 
-    if (selectedPlatforms.length === 0) {
-      alert('Please select at least one platform');
-      return;
-    }
-
     setLoading(true);
     try {
-      // TODO: Save preferences to backend
-      console.log('Saving brand preferences:', {
-        industries: selectedIndustries,
+      // Call the same API as mobile with same data structure
+      await profileAPI.updatePreferences({
+        categories: selectedIndustries, // Same as mobile
         about: about.trim(),
         languages: selectedLanguages,
-        platforms: selectedPlatforms
       });
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      console.log('✅ Brand preferences saved successfully!');
       // Navigate to profile complete
       window.location.href = '/profile-complete';
     } catch (error) {
@@ -95,6 +122,14 @@ export default function BrandPreferencesScreen() {
       setLoading(false);
     }
   };
+
+  // Load selectedUserType from sessionStorage on component mount
+  useEffect(() => {
+    const storedUserType = sessionStorage.getItem('selectedUserType') as 'creator' | 'brand' | null;
+    if (storedUserType) {
+      setSelectedUserType(storedUserType);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-white font-poppins-regular flex flex-col">
@@ -132,12 +167,10 @@ export default function BrandPreferencesScreen() {
           <Link href="/pricing" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Pricing
           </Link>
-          <Link href="/signup-brand" className="text-secondary font-poppins-medium hover:text-opacity-80 transition-colors text-xs lg:text-sm">
-            Sign up as brand
-          </Link>
-          <Link href="/signup-creator" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
-            Sign up as Creator
-          </Link>
+          {/* Show only brand signup option since this is a brand screen */}
+          <span className="font-poppins-medium text-xs lg:text-sm text-secondary cursor-default">
+            Sign up as Brand
+          </span>
           <Link href="/login" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Login
           </Link>
@@ -261,106 +294,145 @@ export default function BrandPreferencesScreen() {
         {/* Right Side - Brand Preferences Form */}
         <div className="w-full lg:w-1/2 px-3 sm:px-6 lg:pl-3 lg:pr-12 xl:pl-6 xl:pr-16 py-12 sm:py-16 lg:py-24 flex flex-col justify-center items-center lg:items-center">
           <div className="max-w-sm lg:max-w-md xl:max-w-lg w-full space-y-4 sm:space-y-6">
+            {/* Step Indicator */}
+            <div className="text-center">
+              <span className="text-lg font-poppins-medium text-textDark">Step 1</span>
+            </div>
+
             {/* Main Heading */}
             <div className="space-y-2">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-poppins-semibold text-textDark mb-2 sm:mb-3 text-left w-full tracking-wide lg:tracking-wider">
-                Tell us about your brand
+                Welcome to the brand community!
               </h2>
               <p className="text-xs sm:text-sm text-textGray font-poppins-regular">
-                Help us understand your brand better so we can connect you with the right creators for your campaigns.
+                We'll just collect a few essential details for now. You can complete your full profile anytime later.
               </p>
             </div>
 
             {/* Progress Bar */}
             <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-              <div className="bg-secondary h-2 rounded-full transition-all duration-300" style={{ width: '75%' }}></div>
+              <div className="bg-secondary h-2 rounded-full transition-all duration-300" style={{ width: '100%' }}></div>
             </div>
-            <p className="text-xs text-textGray font-poppins-regular text-center">75%</p>
+            <p className="text-xs text-textGray font-poppins-regular text-center">100%</p>
 
             {/* Industry Selection */}
             <div className="space-y-3">
-              <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">
-                Industry (Select up to 5)
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {industries.map((industry) => (
-                  <button
-                    key={industry}
-                    onClick={() => toggleIndustry(industry)}
-                    className={`p-3 text-xs sm:text-sm font-poppins-regular rounded-lg border transition-all ${
-                      selectedIndustries.includes(industry)
-                        ? 'border-secondary bg-secondary text-white'
-                        : 'border-gray-300 bg-white text-textDark hover:border-secondary hover:bg-secondary hover:text-white'
-                    }`}
-                  >
-                    {industry}
-                  </button>
-                ))}
+              <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Select Industry</label>
+              <p className="text-xs text-textGray font-poppins-regular">
+                Minimum one industry and maximum five you can select.
+              </p>
+              <div className="border border-[#20536d] rounded-xl p-3">
+                {industriesLoading ? (
+                  <div className="flex justify-center items-center py-4">
+                    <div className="w-4 h-4 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
+                    <span className="ml-2 text-sm text-textGray">Loading industries...</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {industries.map((industry) => (
+                      <button
+                        key={industry}
+                        onClick={() => toggleIndustry(industry)}
+                        className={`px-3.5 py-1.5 rounded-[25px] text-sm font-poppins-regular transition-colors border ${
+                          selectedIndustries.includes(industry)
+                            ? 'bg-white border-[#FD5D27] text-[#f37135] font-poppins-semibold'
+                            : 'bg-white border-[#20536d] text-textDark hover:border-[#FD5D27]'
+                        }`}
+                      >
+                        {industry}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* About Brand */}
             <div className="space-y-2">
-              <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">
-                About your brand
-              </label>
+              <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">About</label>
               <textarea
                 value={about}
                 onChange={(e) => setAbout(e.target.value)}
-                placeholder="Tell us about your brand, products, and what you're looking for in creators..."
+                placeholder="Brief about your brand so that it will help creators to connect with you easily."
                 rows={4}
-                className="w-full py-2.5 px-3 border border-gray-300 rounded-lg text-xs sm:text-sm font-poppins-regular text-textDark bg-white focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent resize-none"
+                className="w-full py-2.5 px-3 border border-[#20536d] rounded-lg text-xs sm:text-sm font-poppins-regular text-textDark bg-white focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent resize-none"
               />
             </div>
 
             {/* Language Selection */}
             <div className="space-y-3">
-              <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">
-                Languages (Select all that apply)
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {availableLanguages.map((language) => (
-                  <button
-                    key={language}
-                    onClick={() => toggleLanguage(language)}
-                    className={`p-3 text-xs sm:text-sm font-poppins-regular rounded-lg border transition-all ${
-                      selectedLanguages.includes(language)
-                        ? 'border-secondary bg-secondary text-white'
-                        : 'border-gray-300 bg-white text-textDark hover:border-secondary hover:bg-secondary hover:text-white'
-                    }`}
+              <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Languages</label>
+              <p className="text-xs text-textGray font-poppins-regular">
+                Select the languages you want to work with creators in.
+              </p>
+              <div className="border border-[#20536d] rounded-lg p-2 flex items-center">
+                <div className="flex flex-wrap gap-2 flex-1">
+                  {selectedLanguages.map((language) => (
+                    <div
+                      key={language}
+                      className="flex items-center gap-1 bg-gray-100 px-2.5 py-1 rounded-lg border border-[#20536d]"
+                    >
+                      <span className="text-sm font-poppins-regular text-textDark">{language}</span>
+                      <button
+                        onClick={() => toggleLanguage(language)}
+                        className="text-gray-500 hover:text-gray-700 transition-colors ml-1"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setShowLanguageModal(!showLanguageModal)}
+                  className="flex items-center gap-2 bg-white border border-[#20536d] rounded-lg px-3 py-2 ml-2 hover:bg-gray-50 transition-colors"
+                >
+                  <span className="text-sm text-textGray font-poppins-regular">
+                    {selectedLanguages.length === 0 ? 'Select Languages' : `${selectedLanguages.length} selected`}
+                  </span>
+                  <svg 
+                    className={`w-4 h-4 text-textGray transition-transform ${showLanguageModal ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
                   >
-                    {language}
-                  </button>
-                ))}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
               </div>
-            </div>
-
-            {/* Platform Selection */}
-            <div className="space-y-3">
-              <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">
-                Platforms (Select all that apply)
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {availablePlatforms.map((platform) => (
-                  <button
-                    key={platform}
-                    onClick={() => togglePlatform(platform)}
-                    className={`p-3 text-xs sm:text-sm font-poppins-regular rounded-lg border transition-all ${
-                      selectedPlatforms.includes(platform)
-                        ? 'border-secondary bg-secondary text-white'
-                        : 'border-gray-300 bg-white text-textDark hover:border-secondary hover:bg-secondary hover:text-white'
-                    }`}
-                  >
-                    {platform}
-                  </button>
-                ))}
-              </div>
+              
+              {/* Language Dropdown */}
+              {showLanguageModal && (
+                <div className="border border-gray-200 rounded-lg bg-white shadow-lg overflow-hidden z-50 relative">
+                  <div className="p-4 border-b border-gray-100">
+                    <h4 className="text-sm font-poppins-semibold text-textDark">Select Languages</h4>
+                    <p className="text-xs text-textGray font-poppins-regular mt-1">Choose the languages you want to work with creators in.</p>
+                  </div>
+                  <div className="max-h-48 overflow-y-auto">
+                    {availableLanguages.map((language) => (
+                      <label
+                        key={language}
+                        className="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedLanguages.includes(language)}
+                          onChange={() => toggleLanguage(language)}
+                          className="w-4 h-4 text-secondary border-gray-300 rounded focus:ring-secondary focus:ring-2"
+                        />
+                        <span className="text-sm font-poppins-regular text-textDark">{language}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Save Preferences Button */}
             <button
               onClick={handleSavePreferences}
-              disabled={loading || selectedIndustries.length === 0 || !about.trim() || selectedLanguages.length === 0 || selectedPlatforms.length === 0}
+              disabled={loading || selectedIndustries.length === 0 || !about.trim() || selectedLanguages.length === 0}
               className="w-full py-2.5 text-white text-sm font-poppins-semibold rounded-lg flex justify-center items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed mt-6"
               style={{ background: 'linear-gradient(180deg, #FE8F00, #FC5213)' }}
             >
@@ -371,7 +443,7 @@ export default function BrandPreferencesScreen() {
                 </>
               ) : (
                 <>
-                  Save Preferences
+                  Next 2 / 2
                   <Image src="/icons/arrow.svg" alt="arrow" width={14} height={14} />
                 </>
               )}
@@ -379,6 +451,18 @@ export default function BrandPreferencesScreen() {
           </div>
         </div>
       </div>
+
+
+
+      {/* Modal Overlays */}
+      {showLanguageModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-30"
+          onClick={() => setShowLanguageModal(false)}
+        />
+      )}
+      
+
     </div>
   );
 }

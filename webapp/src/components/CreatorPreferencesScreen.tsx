@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { profileAPI } from '@/services/apiService';
 
 export default function CreatorPreferencesScreen() {
+  const router = useRouter();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [about, setAbout] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -12,6 +15,7 @@ export default function CreatorPreferencesScreen() {
   const [loading, setLoading] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showPlatformModal, setShowPlatformModal] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState<'creator' | 'brand' | null>(null);
 
   const categories = [
     'Gaming', 'Travel', 'Food', 'Education', 'Pet', 'Beauty',
@@ -74,20 +78,64 @@ export default function CreatorPreferencesScreen() {
 
     setLoading(true);
     try {
-      // TODO: Save preferences to backend
-      console.log('Saving preferences:', {
+      // Get basic profile data from sessionStorage
+      const basicProfileDataStr = sessionStorage.getItem('basicProfileData');
+      let basicProfileData = {};
+      
+      if (basicProfileDataStr) {
+        try {
+          basicProfileData = JSON.parse(basicProfileDataStr);
+        } catch (e) {
+          console.warn('Failed to parse basic profile data:', e);
+        }
+      }
+
+      // Prepare the complete profile data
+      const profileData = {
+        // Basic profile info
+        ...basicProfileData,
+        
+        // Preferences
         categories: selectedCategories,
         about: about.trim(),
         languages: selectedLanguages,
         platform: selectedPlatforms
-      });
+      };
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Saving complete creator profile:', profileData);
 
-      console.log('✅ Preferences saved successfully!');
-      // Navigate to profile complete
-      window.location.href = '/profile-complete';
+      // Save basic profile info first using updateBasicInfo
+      if (Object.keys(basicProfileData).length > 0) {
+        try {
+          const basicInfoResponse = await profileAPI.updateBasicInfo(basicProfileData);
+          console.log('Basic info saved:', basicInfoResponse);
+        } catch (basicError) {
+          console.warn('Failed to save basic info:', basicError);
+          // Continue with preferences even if basic info fails
+        }
+      }
+
+      // Save preferences
+      const preferencesData = {
+        categories: selectedCategories,
+        about: about.trim(),
+        languages: selectedLanguages,
+        platform: selectedPlatforms
+      };
+
+      const preferencesResponse = await profileAPI.updatePreferences(preferencesData);
+      
+      if (preferencesResponse.success) {
+        console.log('Preferences saved successfully:', preferencesResponse);
+        
+        // Clear stored data
+        sessionStorage.removeItem('basicProfileData');
+        
+        // Navigate to profile complete
+        router.push('/profile-complete');
+      } else {
+        throw new Error(preferencesResponse.message || 'Failed to save preferences');
+      }
     } catch (error) {
       console.error('Error saving preferences:', error);
       alert('Failed to save preferences. Please try again.');
@@ -95,6 +143,20 @@ export default function CreatorPreferencesScreen() {
       setLoading(false);
     }
   };
+
+  // Load selectedUserType from sessionStorage on component mount
+  useEffect(() => {
+    const storedUserType = sessionStorage.getItem('selectedUserType') as 'creator' | 'brand' | null;
+    if (storedUserType) {
+      setSelectedUserType(storedUserType);
+      
+      // If user is a brand, redirect them to brand preferences since this screen is for creators only
+      if (storedUserType === 'brand') {
+        router.push('/brand-preferences');
+        return;
+      }
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-white font-poppins-regular flex flex-col">
@@ -132,10 +194,18 @@ export default function CreatorPreferencesScreen() {
           <Link href="/pricing" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
             Pricing
           </Link>
-          <Link href="/signup-brand" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
+          <Link href="/signup-brand" className={`font-poppins-medium transition-colors text-xs lg:text-sm ${
+            selectedUserType === 'brand'
+              ? 'text-secondary'
+              : 'text-textDark hover:text-secondary'
+          }`}>
             Sign up as brand
           </Link>
-          <Link href="/signup-creator" className="text-secondary font-poppins-medium hover:text-opacity-80 transition-colors text-xs lg:text-sm">
+          <Link href="/signup-creator" className={`font-poppins-medium transition-colors text-xs lg:text-sm ${
+            selectedUserType === 'creator'
+              ? 'text-secondary'
+              : 'text-textDark hover:text-opacity-80'
+          }`}>
             Sign up as Creator
           </Link>
           <Link href="/login" className="text-textDark font-poppins-medium hover:text-secondary transition-colors text-xs lg:text-sm">
