@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 export default function HomePage() {
-  const [activeDot, setActiveDot] = useState(0);
+  const [activeDot] = useState(0);
 
   return (
     <div className="min-h-screen bg-primary relative overflow-hidden">

@@ -6,15 +6,15 @@ declare global {
     google?: {
       accounts: {
         oauth2: {
-          initTokenClient: (config: any) => any;
-          initCodeClient: (config: any) => any;
-          hasGrantedAllScopes: (tokenResponse: any, ...scopes: string[]) => boolean;
-          hasGrantedAnyScope: (tokenResponse: any, ...scopes: string[]) => boolean;
+          initTokenClient: (config: unknown) => unknown;
+          initCodeClient: (config: unknown) => unknown;
+          hasGrantedAllScopes: (tokenResponse: unknown, ...scopes: string[]) => boolean;
+          hasGrantedAnyScope: (tokenResponse: unknown, ...scopes: string[]) => boolean;
         };
         id: {
-          initialize: (config: any) => void;
-          renderButton: (element: HTMLElement, config: any) => void;
-          prompt: (momentListener?: (promptMomentNotification: any) => void) => void;
+          initialize: (config: unknown) => void;
+          renderButton: (element: HTMLElement, config: unknown) => void;
+          prompt: (momentListener?: (promptMomentNotification: unknown) => void) => void;
           disableAutoSelect: () => void;
         };
       };
@@ -122,7 +122,7 @@ class GoogleAuthService {
       // Initialize Google Identity Services with proper ID token flow
       window.google.accounts.id.initialize({
         client_id: ENV.GOOGLE_CLIENT_ID,
-        callback: (response: any) => {
+        callback: (response: { credential?: string; error?: string }) => {
           this.handleCredentialResponse(response, resolve);
         },
         auto_select: false,
@@ -153,8 +153,9 @@ class GoogleAuthService {
           button.click();
         } else {
           // Fallback to prompt method without FedCM
-          window.google?.accounts.id.prompt((notification: any) => {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          window.google?.accounts.id.prompt((notification: unknown) => {
+            const notif = notification as { isDisplayMoment: () => boolean; isNotDisplayed: () => boolean; isSkippedMoment: () => boolean; getMomentType: () => string };
+            if (notif.isNotDisplayed() || notif.isSkippedMoment()) {
               resolve({
                 success: false,
                 error: 'Google sign-in was not displayed or was skipped'
@@ -189,7 +190,7 @@ class GoogleAuthService {
     }
   }
 
-  private handleCredentialResponse(response: any, resolve: (result: AuthResult) => void) {
+  private handleCredentialResponse(response: { credential?: string; error?: string }, resolve: (result: AuthResult) => void) {
     if (response.error) {
       resolve({
         success: false,
@@ -234,7 +235,14 @@ class GoogleAuthService {
     }
   }
 
-  private parseJwt(token: string): any {
+  private parseJwt(token: string): {
+    sub: string;
+    email: string;
+    name: string;
+    picture?: string;
+    given_name?: string;
+    family_name?: string;
+  } {
     try {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');

@@ -18,9 +18,10 @@ export default function BrandProfileSetupScreen() {
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
-  const [selectedUserType, setSelectedUserType] = useState<'creator' | 'brand' | null>(null);
+
   
   // Additional fields for brand profile setup
+  const [companyName, setCompanyName] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [role, setRole] = useState('');
@@ -120,11 +121,9 @@ export default function BrandProfileSetupScreen() {
       }
     };
     
-    // Load selectedUserType from sessionStorage
+    // Check if user is creator and redirect if needed
     const storedUserType = sessionStorage.getItem('selectedUserType') as 'creator' | 'brand' | null;
     if (storedUserType) {
-      setSelectedUserType(storedUserType);
-      
       // If user is a creator, redirect them to profile setup since this screen is for brands only
       if (storedUserType === 'creator') {
         router.push('/profile-setup');
@@ -248,23 +247,38 @@ export default function BrandProfileSetupScreen() {
       
       setOtpLoading(false);
       setShowOtpModal(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ OTP request failed:', err);
+      
+      // Create a proper error interface
+      interface ApiError {
+        message?: string;
+        status?: string;
+        error?: string;
+        response?: unknown;
+        stack?: string;
+        timeRemaining?: number;
+        retryAfter?: number;
+      }
+      
+      const apiError = err as ApiError;
       console.error('🔍 Error details:', {
-        message: err.message,
-        status: err.status,
-        error: err.error,
-        response: err.response,
-        stack: err.stack
+        message: apiError?.message,
+        status: apiError?.status,
+        error: apiError?.error,
+        response: apiError?.response,
+        stack: apiError?.stack
       });
       
       // Handle specific error cases
-      if (err.message?.includes('400')) {
+      const errorMessage = apiError?.message || '';
+      const errorError = apiError?.error;
+      if (errorMessage.includes('400')) {
         setOtpError('Invalid phone number format. Please check your phone number.');
-      } else if (err.message?.includes('429') || err.error === 'Rate limit exceeded') {
-        const timeRemaining = err.timeRemaining || err.retryAfter || 60;
+      } else if (errorMessage.includes('429') || errorError === 'Rate limit exceeded') {
+        const timeRemaining = apiError?.timeRemaining || apiError?.retryAfter || 60;
         setOtpError(`Please wait ${timeRemaining} seconds before requesting another code.`);
-      } else if (err.message?.includes('409')) {
+      } else if (errorMessage.includes('409')) {
         setOtpError('An account with this phone number already exists. Please log in instead.');
       } else {
         setOtpError('Network error. Please check your connection and try again.');
@@ -273,15 +287,16 @@ export default function BrandProfileSetupScreen() {
     }
   };
 
-  const handleOtpSuccess = (user: any) => {
+  const handleOtpSuccess = (user: unknown) => {
     setShowOtpModal(false);
     setIsPhoneVerified(true);
     // Store user data if needed
-    if (user) {
+    if (user && typeof user === 'object' && user !== null) {
+      const userObj = user as { phone?: string };
       sessionStorage.setItem('userData', JSON.stringify(user));
       // Also store phone number for mobile users
-      if (user.phone) {
-        setPhone(user.phone.replace('+91', ''));
+      if (userObj.phone) {
+        setPhone(userObj.phone.replace('+91', ''));
       }
     }
   };
@@ -380,6 +395,11 @@ export default function BrandProfileSetupScreen() {
       return;
     }
 
+    if (!companyName.trim()) {
+      alert('Please enter your company or brand name');
+      return;
+    }
+
     if (!businessType) {
       alert('Please select your business type');
       return;
@@ -400,9 +420,20 @@ export default function BrandProfileSetupScreen() {
     try {
       // Follow mobile app approach: send all data to updateBasicInfo only
       // This matches the mobile implementation exactly
-      const basicProfileData: any = {
+      const basicProfileData: {
+        gender: string;
+        city: string;
+        company_name: string;
+        business_type: string;
+        role: string;
+        website_url?: string;
+        phone?: string;
+        email?: string;
+        about?: string;
+      } = {
         gender,
         city: city.trim(),
+        company_name: companyName.trim(),
         business_type: businessType,
         role: role
       };
@@ -438,25 +469,42 @@ export default function BrandProfileSetupScreen() {
       console.log('Sending complete brand profile data to updateBasicInfo (following mobile app):', basicProfileData);
 
       try {
-        // Send all data to updateBasicInfo like mobile app does
+        // First, ensure the brand profile exists by calling createMissingProfiles
+        console.log('🔄 Creating missing brand profile first...');
+        const createProfileResponse = await authAPI.createMissingProfiles();
+        console.log('✅ Profile creation response:', createProfileResponse);
+        
+        // Now send all data to updateBasicInfo like mobile app does
         console.log('Sending brand profile data to updateBasicInfo:', basicProfileData);
         const response = await profileAPI.updateBasicInfo(basicProfileData);
         console.log('Brand profile saved successfully:', response);
         
+        // Store userType in localStorage for profile completion page
+        localStorage.setItem('userType', 'brand');
+        
         // Navigate to brand preferences
         router.push('/brand-preferences');
-      } catch (error: any) {
+      } catch (error: unknown) {
+        // Create a proper error interface for API errors
+        interface ApiError {
+          message?: string;
+          status?: string;
+          response?: { json: () => Promise<unknown> };
+          data?: unknown;
+        }
+        
+        const apiError = error as ApiError;
         console.error('Error details:', {
-          message: error.message,
-          status: error.status,
-          response: error.response,
-          data: error.data
+          message: apiError?.message,
+          status: apiError?.status,
+          response: apiError?.response,
+          data: apiError?.data
         });
         
         // Try to get more details from the error response
-        if (error.response) {
+        if (apiError?.response) {
           try {
-            const errorData = await error.response.json();
+            const errorData = await apiError.response.json();
             console.error('Error response data:', errorData);
           } catch (parseError) {
             console.error('Could not parse error response:', parseError);
@@ -640,10 +688,10 @@ export default function BrandProfileSetupScreen() {
             {/* Main Heading */}
             <div className="space-y-2">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-poppins-semibold text-textDark mb-2 sm:mb-3 text-left w-full tracking-wide lg:tracking-wider">
-                You're almost there!
+                You&apos;re almost there!
               </h2>
               <p className="text-xs sm:text-sm text-textGray font-poppins-regular">
-                Just a few more details to complete your {selectedUserType === 'brand' ? 'brand' : 'creator'} profile. This helps us personalize your experience and keep your account secure.
+                Just a few more details to complete your brand profile. This helps us personalize your experience and keep your account secure.
               </p>
             </div>
 
@@ -903,6 +951,18 @@ export default function BrandProfileSetupScreen() {
               </div>
             </div>
 
+            {/* Company Name */}
+            <div className="space-y-2">
+              <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Company/Brand Name</label>
+              <input
+                type="text"
+                placeholder="Enter your company or brand name"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="w-full py-2.5 px-3 border border-gray-300 rounded-lg text-xs sm:text-sm font-poppins-regular text-textDark bg-white focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
+              />
+            </div>
+
             {/* Business Type */}
             <div className="space-y-2">
               <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Business Type</label>
@@ -992,6 +1052,7 @@ export default function BrandProfileSetupScreen() {
                 !isPhoneVerified || 
                 !email.trim() || 
                 !city.trim() || 
+                !companyName.trim() ||
                 !businessType || 
                 !role ||
                 !about.trim()}

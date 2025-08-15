@@ -6,7 +6,29 @@ interface User {
   email: string;
   phone?: string;
   role?: 'brand' | 'creator';
-  profile?: any;
+  profile?: {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    userType?: string;
+    gender?: string;
+    city?: string;
+    business_type?: string;
+    role?: string;
+    website_url?: string;
+    about?: string;
+    dob?: string;
+    state?: string;
+    pincode?: string;
+    content_categories?: string[];
+    languages?: string[];
+    industries?: string[];
+    target_audience?: string[];
+    collaboration_types?: string[];
+    budget_range?: string;
+    campaign_duration?: string;
+  };
 }
 
 interface AuthState {

@@ -1,10 +1,10 @@
 // Environment configuration for webapp
-// Force the correct API URL - this ensures we always use the ngrok URL like mobile
-const FORCE_API_URL = 'https://modest-properly-orca.ngrok-free.app';
+// Force the correct API URL - this ensures we always use the local backend server
+const FORCE_API_URL = 'http://localhost:3002';
 
 export const ENV = {
   // API Configuration - Force the correct URL like mobile
-  API_BASE_URL: FORCE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://modest-properly-orca.ngrok-free.app',
+  API_BASE_URL: FORCE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002',
   GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
   
   // App Configuration
@@ -12,7 +12,7 @@ export const ENV = {
   APP_VERSION: '1.0.0',
 };
 
-// API endpoints
+// API endpoints - matching mobile app exactly
 export const API_ENDPOINTS = {
   // Auth endpoints
   LOGIN: `${ENV.API_BASE_URL}/api/auth/login`,
@@ -57,10 +57,16 @@ export const API_ENDPOINTS = {
   // Creator endpoints
   GET_CREATORS: `${ENV.API_BASE_URL}/api/profile/creators`,
   GET_CREATOR_PROFILE_BY_ID: `${ENV.API_BASE_URL}/api/profile/creators`,
-}; 
+
+  // Cart endpoints
+  ADD_TO_CART: `${ENV.API_BASE_URL}/api/cart/add`,
+  GET_CART: `${ENV.API_BASE_URL}/api/cart`,
+  REMOVE_FROM_CART: `${ENV.API_BASE_URL}/api/cart/remove`,
+  UPDATE_CART_ITEM: `${ENV.API_BASE_URL}/api/cart/update`,
+};
 
 // Debug environment variables (only in development)
-if (process.env.NODE_ENV === 'development') {
+if (typeof window !== 'undefined') {
   console.log('=== Environment Variables Debug ===');
   console.log('FORCE_API_URL:', FORCE_API_URL);
   console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
@@ -69,10 +75,10 @@ if (process.env.NODE_ENV === 'development') {
   console.log('API_ENDPOINTS.SEND_OTP:', API_ENDPOINTS.SEND_OTP);
   
   // Validate that we're using the correct URL
-  if (!ENV.API_BASE_URL.includes('modest-properly-orca.ngrok-free.app')) {
-    console.error('❌ WARNING: API_BASE_URL is not using the correct ngrok URL!');
+  if (!ENV.API_BASE_URL.includes('localhost:3002')) {
+    console.error('❌ WARNING: API_BASE_URL is not using the correct local backend URL!');
     console.error('Current URL:', ENV.API_BASE_URL);
-    console.error('Expected URL: https://modest-properly-orca.ngrok-free.app');
+    console.error('Expected URL: http://localhost:3002');
   } else {
     console.log('✅ API_BASE_URL is correctly configured');
   }

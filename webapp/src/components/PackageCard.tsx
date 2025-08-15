@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+
 import { Edit, Trash2, ShoppingCart } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -17,20 +17,14 @@ interface PackageCardProps {
     revisions?: number;
     price?: number;
   };
-  creatorId?: string;
-  creatorName?: string;
-  creatorImage?: string;
-  onEdit?: (item: any) => void;
+  onEdit?: (item: PackageCardProps['item']) => void;
   onDelete?: () => void;
   readonly?: boolean;
-  onAddToCart?: (item: any) => void;
+  onAddToCart?: (item: PackageCardProps['item']) => void;
 }
 
 const PackageCard: React.FC<PackageCardProps> = ({ 
   item, 
-  creatorId, 
-  creatorName, 
-  creatorImage, 
   onEdit, 
   onDelete, 
   readonly = false, 
@@ -38,28 +32,11 @@ const PackageCard: React.FC<PackageCardProps> = ({
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [imageError, setImageError] = useState(false);
+
   
   const title = item.title || `${item.platform?.toUpperCase()} ${item.content_type?.toUpperCase()}`;
 
-  const getPlaceholderImageUrl = (platform?: string) => {
-    switch (platform?.toLowerCase()) {
-      case 'instagram':
-        return 'https://img.icons8.com/color/96/instagram-new.png';
-      case 'facebook':
-        return 'https://img.icons8.com/color/96/facebook-new.png';
-      case 'youtube':
-        return 'https://img.icons8.com/color/96/youtube-play.png';
-      case 'tiktok':
-        return 'https://img.icons8.com/color/96/tiktok.png';
-      case 'twitter':
-        return 'https://img.icons8.com/color/96/twitter.png';
-      case 'linkedin':
-        return 'https://img.icons8.com/color/96/linkedin.png';
-      default:
-        return 'https://img.icons8.com/color/96/social-network.png';
-    }
-  };
+
 
   const getPlatformIcon = (platform?: string) => {
     switch (platform?.toLowerCase()) {

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authAPI } from '@/services/apiService';
@@ -35,14 +34,19 @@ export default function GoogleVerifiedScreen() {
         console.log('User type from backend:', userType);
         
         if (userType === 'brand') {
+          // Store userType in localStorage for profile completion page
+          localStorage.setItem('userType', 'brand');
           router.push('/brand-profile-setup');
         } else {
+          // Store userType in localStorage for profile completion page
+          localStorage.setItem('userType', 'creator');
           router.push('/profile-setup');
         }
       } catch (backendError) {
         console.error('Backend fallback also failed:', backendError);
         // Final fallback: default to creator
         sessionStorage.setItem('selectedUserType', 'creator');
+        localStorage.setItem('userType', 'creator');
         router.push('/profile-setup');
       }
     } finally {

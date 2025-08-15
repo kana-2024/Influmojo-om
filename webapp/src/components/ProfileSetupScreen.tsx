@@ -162,12 +162,22 @@ export default function ProfileSetupScreen() {
       
       setOtpLoading(false);
       setShowOtpModal(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ OTP request failed:', err);
-      if (err.message?.includes('429') || err.error === 'Rate limit exceeded') {
-        const timeRemaining = err.timeRemaining || err.retryAfter || 60;
+      // Create a proper error interface
+      interface ApiError {
+        message?: string;
+        error?: string;
+        timeRemaining?: number;
+        retryAfter?: number;
+      }
+      const apiError = err as ApiError;
+      const errorMessage = apiError?.message || '';
+      const errorError = apiError?.error;
+      if (errorMessage.includes('429') || errorError === 'Rate limit exceeded') {
+        const timeRemaining = apiError?.timeRemaining || apiError?.retryAfter || 60;
         setOtpError(`Please wait ${timeRemaining} seconds before requesting another code.`);
-      } else if (err.message?.includes('409')) {
+      } else if (errorMessage.includes('409')) {
         setOtpError('An account with this phone number already exists. Please log in instead.');
       } else {
         setOtpError('Network error. Please check your connection and try again.');
@@ -176,15 +186,16 @@ export default function ProfileSetupScreen() {
     }
   };
 
-  const handleOtpSuccess = (user: any) => {
+  const handleOtpSuccess = (user: unknown) => {
     setShowOtpModal(false);
     setIsPhoneVerified(true);
     // Store user data if needed
-    if (user) {
+    if (user && typeof user === 'object' && user !== null) {
+      const userObj = user as { phone?: string };
       sessionStorage.setItem('userData', JSON.stringify(user));
       // Also store phone number for mobile users
-      if (user.phone) {
-        setPhone(user.phone.replace('+91', ''));
+      if (userObj.phone) {
+        setPhone(userObj.phone.replace('+91', ''));
       }
     }
   };
@@ -255,13 +266,32 @@ export default function ProfileSetupScreen() {
     
     try {
       // Prepare basic profile data - different for Google vs phone users
-      const profileData: any = {
+      const profileData: {
+        gender: string;
+        dob: string;
+        state: string;
+        city: string;
+        pincode: string;
+        email?: string;
+        phone?: string;
+      } = {
         gender,
         dob: dob,
         state: 'Maharashtra', // Default state - can be made configurable later
         city: city.trim(),
         pincode: '400001' // Default pincode - can be made configurable later
       };
+
+      // Add email/phone based on user type
+      if (isGoogleUser) {
+        // Google user: email is already verified, phone needs verification
+        profileData.email = email.trim();
+        profileData.phone = `+91${phone.trim()}`;
+      } else {
+        // Phone user: phone is already verified, email needs verification
+        profileData.phone = `+91${phone.trim()}`;
+        profileData.email = email.trim();
+      }
 
       // Add email/phone based on user type
       if (isGoogleUser) {
@@ -280,6 +310,11 @@ export default function ProfileSetupScreen() {
       console.log('Saving basic profile data to database:', profileData);
       
       try {
+        // First, ensure the creator profile exists by calling createMissingProfiles
+        console.log('🔄 Creating missing creator profile first...');
+        const createProfileResponse = await authAPI.createMissingProfiles();
+        console.log('✅ Profile creation response:', createProfileResponse);
+        
         const basicInfoResponse = await profileAPI.updateBasicInfo(profileData);
         console.log('Basic profile saved to database:', basicInfoResponse);
         
@@ -287,6 +322,9 @@ export default function ProfileSetupScreen() {
           // Also store in sessionStorage for the preferences step
           sessionStorage.setItem('basicProfileData', JSON.stringify(profileData));
           console.log('Basic profile data also stored in sessionStorage');
+          
+          // Store userType in localStorage for profile completion page
+          localStorage.setItem('userType', 'creator');
           
           // Navigate to preferences step using Next.js router
           router.push('/creator-preferences');
@@ -300,6 +338,9 @@ export default function ProfileSetupScreen() {
         // The preferences step can try to save it again
         sessionStorage.setItem('basicProfileData', JSON.stringify(profileData));
         console.log('Basic profile data stored in sessionStorage despite save failure');
+        
+        // Store userType in localStorage for profile completion page
+        localStorage.setItem('userType', 'creator');
         
         // Navigate to preferences step using Next.js router
         router.push('/creator-preferences');
@@ -529,7 +570,7 @@ export default function ProfileSetupScreen() {
             {/* Main Heading */}
             <div className="space-y-2">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-poppins-semibold text-textDark mb-2 sm:mb-3 text-left w-full tracking-wide lg:tracking-wider">
-                You're almost there!
+                You&apos;re almost there!
               </h2>
               <p className="text-xs sm:text-sm text-textGray font-poppins-regular">
                 Just a few more details to complete your creator profile. This helps us personalize your experience and keep your account secure.

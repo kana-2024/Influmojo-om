@@ -2,11 +2,66 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { authAPI } from '@/services/apiService';
+
+import { authAPI, profileAPI } from '@/services/apiService';
 import { COLORS } from '@/config/colors';
 import { googleAuthService } from '@/services/googleAuth';
 import OtpVerificationModal from './OtpVerificationModal';
+
+// Helper function to check if user has completed onboarding
+const checkOnboardingCompletion = async (userType: string): Promise<boolean> => {
+  try {
+    if (userType === 'brand') {
+      const brandProfile = await profileAPI.getBrandProfile();
+      if (brandProfile.success && brandProfile.data) {
+        // Check if brand has completed basic onboarding
+        const profile = brandProfile.data;
+        
+        // Check for company name (not placeholder), bio/about, and categories/industries
+        // Be more lenient - only require company name and at least one other field
+        const hasCompanyName = profile.company_name && profile.company_name !== 'Company Name';
+        const hasBio = profile.bio || profile.about || profile.description;
+        const hasCategories = profile.categories && profile.categories.length > 0 || 
+                            profile.industries && profile.industries.length > 0;
+        const hasBusinessType = profile.business_type || profile.businessType;
+        const hasRole = profile.role_in_organization || profile.role;
+        
+        console.log('🔍 Brand onboarding check:', {
+          hasCompanyName,
+          hasBio,
+          hasCategories,
+          hasBusinessType,
+          hasRole,
+          company_name: profile.company_name,
+          bio: profile.bio,
+          about: profile.about,
+          description: profile.description,
+          categories: profile.categories,
+          industries: profile.industries,
+          business_type: profile.business_type,
+          businessType: profile.businessType,
+          role_in_organization: profile.role_in_organization,
+          role: profile.role
+        });
+        
+        // Brand has completed onboarding if they have company name AND at least 2 other fields
+        const completedFields = [hasBio, hasCategories, hasBusinessType, hasRole].filter(Boolean).length;
+        return hasCompanyName && completedFields >= 2;
+      }
+    } else {
+      const creatorProfile = await profileAPI.getCreatorProfile();
+      if (creatorProfile.success && creatorProfile.data) {
+        // Check if creator has completed basic onboarding (has bio, categories, etc.)
+        const profile = creatorProfile.data;
+        return !!(profile.bio && profile.content_categories && profile.content_categories.length > 0);
+      }
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking onboarding completion:', error);
+    return false;
+  }
+};
 
 export default function LoginScreen() {
   const [phone, setPhone] = useState('');
@@ -47,10 +102,10 @@ export default function LoginScreen() {
         // User doesn't exist, show signup option
         setWarning('No account found with this phone number. Would you like to create a new account?');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Phone login error:', error);
-      if (error.message?.includes('429') || error.error === 'Rate limit exceeded') {
-        const timeRemaining = error.timeRemaining || error.retryAfter || 60;
+      if (typeof error === 'object' && error && 'message' in error && typeof error.message === 'string' && error.message.includes('429')) {
+        const timeRemaining = (error as { timeRemaining?: number; retryAfter?: number }).timeRemaining || (error as { timeRemaining?: number; retryAfter?: number }).retryAfter || 60;
         setError(`Please wait ${timeRemaining} seconds before requesting another code.`);
       } else {
         setError('Failed to verify phone number. Please try again.');
@@ -74,23 +129,89 @@ export default function LoginScreen() {
           const apiResult = await authAPI.googleAuth(result.idToken, false);
           
           if (apiResult.success) {
-            // User logged in successfully, redirect to appropriate profile setup based on user type
-            const userType = apiResult.user?.userType || apiResult.user?.user_type || 'creator';
-            sessionStorage.setItem('selectedUserType', userType);
+            // User logged in successfully, store user data in localStorage (same as mobile app)
+            console.log('✅ Google login successful, storing user data:', apiResult);
             
-            if (userType === 'brand') {
-              window.location.href = '/brand-profile-setup';
-            } else {
-              window.location.href = '/profile-setup';
+            if (apiResult.token) {
+              localStorage.setItem('token', apiResult.token);
+              console.log('🔑 Token stored in localStorage');
+            }
+            
+            if (apiResult.user?.name || apiResult.user?.fullName) {
+              localStorage.setItem('fullName', apiResult.user.name || apiResult.user.fullName);
+              console.log('👤 Full name stored in localStorage:', apiResult.user.name || apiResult.user.fullName);
+            }
+            
+            if (apiResult.user?.email) {
+              localStorage.setItem('email', apiResult.user.email);
+              console.log('📧 Email stored in localStorage:', apiResult.user.email);
+            }
+            
+            if (apiResult.user?.phone) {
+              localStorage.setItem('phone', apiResult.user.phone);
+              console.log('📱 Phone stored in localStorage:', apiResult.user.phone);
+            }
+            
+            // Store user type
+            const userType = apiResult.user?.userType || apiResult.user?.user_type || 'creator';
+            localStorage.setItem('userType', userType);
+            sessionStorage.setItem('selectedUserType', userType);
+            console.log('🏷️ User type stored:', userType);
+            
+            // Check if user has completed onboarding by checking their profile
+            try {
+              // For brands, try to get their profile first
+              if (userType === 'brand') {
+                try {
+                  const brandProfile = await profileAPI.getBrandProfile();
+                  if (brandProfile.success && brandProfile.data) {
+                    // If we can successfully get the brand profile, assume onboarding is complete
+                    console.log('✅ Brand profile exists, redirecting to brand dashboard');
+                    window.location.href = '/dashboard/brand';
+                    return;
+                  }
+                } catch (profileError) {
+                  console.log('⚠️ Could not fetch brand profile, user may need to complete onboarding');
+                }
+              }
+              
+              // Fallback to the detailed onboarding completion check
+              const hasCompletedOnboarding = await checkOnboardingCompletion(userType);
+              
+              if (hasCompletedOnboarding) {
+                // Redirect to dashboard
+                console.log('✅ User has completed onboarding, redirecting to dashboard');
+                if (userType === 'brand') {
+                  window.location.href = '/dashboard/brand';
+                } else {
+                  window.location.href = '/dashboard/creator';
+                }
+              } else {
+                // Redirect to profile setup to complete onboarding
+                console.log('⚠️ User has not completed onboarding, redirecting to profile setup');
+                if (userType === 'brand') {
+                  window.location.href = '/brand-profile-setup';
+                } else {
+                  window.location.href = '/profile-setup';
+                }
+              }
+            } catch (error) {
+              console.error('❌ Error checking profile completion:', error);
+              // Fallback to profile setup
+              if (userType === 'brand') {
+                window.location.href = '/brand-profile-setup';
+              } else {
+                window.location.href = '/profile-setup';
+              }
             }
           } else {
             setWarning(apiResult.error || 'Backend authentication failed. Please try again.');
           }
-        } catch (apiError: any) {
+        } catch (apiError: unknown) {
           console.error('Backend API error:', apiError);
           
           // Handle specific error cases
-          if (apiError.message?.includes('404') || apiError.status === 404) {
+          if (typeof apiError === 'object' && apiError && 'message' in apiError && typeof apiError.message === 'string' && apiError.message.includes('404')) {
             setWarning('No account found with this Google account. Please sign up first.');
           } else {
             setWarning('Backend authentication failed. Please try again.');
@@ -107,16 +228,88 @@ export default function LoginScreen() {
     }
   };
 
-  const handleOtpSuccess = (user: any) => {
+  const handleOtpSuccess = async (user: unknown) => {
     setShowOtpModal(false);
-    // Redirect to appropriate profile setup based on user type
-    const userType = user?.userType || user?.user_type || 'creator';
-    sessionStorage.setItem('selectedUserType', userType);
     
-    if (userType === 'brand') {
-      window.location.href = '/brand-profile-setup';
-    } else {
-      window.location.href = '/profile-setup';
+    console.log('✅ OTP verification successful, storing user data:', user);
+    
+    // Store user data in localStorage (same as mobile app)
+    if (user && typeof user === 'object' && user !== null && 'token' in user) {
+      const userObj = user as { token?: string; name?: string; fullName?: string; email?: string; phone?: string; userType?: string; user_type?: string };
+      
+      if (userObj.token) {
+        localStorage.setItem('token', userObj.token);
+        console.log('🔑 Token stored in localStorage');
+      }
+      
+      if (userObj.name || userObj.fullName) {
+        const fullName = userObj.name || userObj.fullName || 'User';
+        localStorage.setItem('fullName', fullName);
+        console.log('👤 Full name stored in localStorage:', fullName);
+      }
+      
+      if (userObj.email) {
+        localStorage.setItem('email', userObj.email);
+        console.log('📧 Email stored in localStorage:', userObj.email);
+      }
+      
+      if (userObj.phone) {
+        localStorage.setItem('phone', userObj.phone);
+        console.log('📱 Phone stored in localStorage:', userObj.phone);
+      }
+      
+      // Store user type
+      const userType = userObj.userType || userObj.user_type || 'creator';
+      localStorage.setItem('userType', userType);
+      sessionStorage.setItem('selectedUserType', userType);
+      console.log('🏷️ User type stored:', userType);
+      
+      // Check if user has completed onboarding by checking their profile
+      try {
+        // For brands, try to get their profile first
+        if (userType === 'brand') {
+          try {
+            const brandProfile = await profileAPI.getBrandProfile();
+            if (brandProfile.success && brandProfile.data) {
+              // If we can successfully get the brand profile, assume onboarding is complete
+              console.log('✅ Brand profile exists, redirecting to brand dashboard');
+              window.location.href = '/dashboard/brand';
+              return;
+            }
+          } catch (profileError) {
+            console.log('⚠️ Could not fetch brand profile, user may need to complete onboarding');
+          }
+        }
+        
+        // Fallback to the detailed onboarding completion check
+        const hasCompletedOnboarding = await checkOnboardingCompletion(userType);
+        
+        if (hasCompletedOnboarding) {
+          // Redirect to dashboard
+          console.log('✅ User has completed onboarding, redirecting to dashboard');
+          if (userType === 'brand') {
+            window.location.href = '/dashboard/brand';
+          } else {
+            window.location.href = '/dashboard/creator';
+          }
+        } else {
+          // Redirect to profile setup to complete onboarding
+          console.log('⚠️ User has not completed onboarding, redirecting to profile setup');
+          if (userType === 'brand') {
+            window.location.href = '/brand-profile-setup';
+          } else {
+            window.location.href = '/profile-setup';
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error checking profile completion:', error);
+        // Fallback to profile setup
+        if (userType === 'brand') {
+          window.location.href = '/brand-profile-setup';
+        } else {
+          window.location.href = '/profile-setup';
+        }
+      }
     }
   };
 
@@ -201,7 +394,7 @@ export default function LoginScreen() {
                 />
               </div>
               <p className="text-xs text-textGray mt-1">
-                We'll send a one-time OTP to this number for verification
+                We&apos;ll send a one-time OTP to this number for verification
               </p>
             </div>
 
@@ -280,7 +473,7 @@ export default function LoginScreen() {
           {/* Sign Up Link */}
           <div className="text-center">
             <p className="text-sm text-textGray">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/get-started" className="text-secondary font-poppins-medium hover:underline">
                 Sign up
               </Link>

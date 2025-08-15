@@ -9,8 +9,16 @@ export default function ProfileCompleteScreen() {
 
   const handleGetStarted = () => {
     setLoading(true);
-    // Navigate to dashboard or main app
-    window.location.href = '/dashboard';
+    // Navigate directly to role-specific dashboard
+    const userType = localStorage.getItem('userType');
+    if (userType === 'creator') {
+      window.location.href = '/dashboard/creator';
+    } else if (userType === 'brand') {
+      window.location.href = '/dashboard/brand';
+    } else {
+      // Fallback to creator dashboard if user type is not set
+      window.location.href = '/dashboard/creator';
+    }
   };
 
   return (
@@ -192,7 +200,7 @@ export default function ProfileCompleteScreen() {
             
             {/* Success Message */}
             <p className="text-sm sm:text-base text-textGray font-poppins-regular leading-relaxed">
-              Congratulations! Your creator profile has been successfully created. You're now ready to start connecting with brands and growing your influence.
+              Congratulations! Your creator profile has been successfully created. You&apos;re now ready to start connecting with brands and growing your influence.
             </p>
 
             {/* Progress Bar */}
@@ -203,7 +211,7 @@ export default function ProfileCompleteScreen() {
 
             {/* What's Next Section */}
             <div className="bg-gray-50 rounded-lg p-4 mt-6">
-              <h3 className="text-sm font-poppins-semibold text-textDark mb-3">What's next?</h3>
+              <h3 className="text-sm font-poppins-semibold text-textDark mb-3">What&apos;s next?</h3>
               <ul className="text-xs text-textGray font-poppins-regular space-y-2 text-left">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 bg-secondary rounded-full mt-2 flex-shrink-0"></span>

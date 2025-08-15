@@ -12,7 +12,7 @@ export default function ForgotPasswordScreen() {
   const [error, setError] = useState('');
   const [warning, setWarning] = useState('');
   const [showOtpModal, setShowOtpModal] = useState(false);
-  const [isResetMode, setIsResetMode] = useState(false);
+
 
   const handleSendOtp = async () => {
     if (!phone.trim()) {
@@ -37,7 +37,6 @@ export default function ForgotPasswordScreen() {
         // User exists, send OTP for password reset
         const result = await authAPI.sendOTP(formattedPhone);
         if (result.success) {
-          setIsResetMode(true);
           setShowOtpModal(true);
         } else {
           setError('Failed to send OTP. Please try again.');
@@ -46,10 +45,10 @@ export default function ForgotPasswordScreen() {
         // User doesn't exist, show signup option
         setWarning('No account found with this phone number. Would you like to create a new account?');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Password reset error:', error);
-      if (error.message?.includes('429') || error.error === 'Rate limit exceeded') {
-        const timeRemaining = error.timeRemaining || error.retryAfter || 60;
+      if (typeof error === 'object' && error && 'message' in error && typeof error.message === 'string' && error.message.includes('429')) {
+        const timeRemaining = (error as { timeRemaining?: number; retryAfter?: number }).timeRemaining || (error as { timeRemaining?: number; retryAfter?: number }).retryAfter || 60;
         setError(`Please wait ${timeRemaining} seconds before requesting another code.`);
       } else {
         setError('Failed to verify phone number. Please try again.');
@@ -59,7 +58,7 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  const handleOtpSuccess = (user: any) => {
+  const handleOtpSuccess = () => {
     setShowOtpModal(false);
     // Redirect to password reset form or show success message
     setWarning('OTP verified successfully! You can now reset your password.');
@@ -148,7 +147,7 @@ export default function ForgotPasswordScreen() {
                 />
               </div>
               <p className="text-xs text-textGray mt-1">
-                We'll send a one-time OTP to this number for verification
+                We&apos;ll send a one-time OTP to this number for verification
               </p>
             </div>
 

@@ -90,11 +90,11 @@ export default function GetStartedScreen() {
             console.error('❌ Backend Google auth failed:', apiResult.error);
             setWarning(apiResult.error || 'Backend authentication failed. Please try again.');
           }
-        } catch (apiError: any) {
+        } catch (apiError: unknown) {
           console.error('❌ Backend API error:', apiError);
           
           // Handle specific error cases
-          if (apiError.message?.includes('409') || apiError.status === 409) {
+          if (typeof apiError === 'object' && apiError && 'message' in apiError && typeof apiError.message === 'string' && apiError.message.includes('409')) {
             // User already exists - redirect to login
             console.log('⚠️ User already exists, redirecting to login');
             setWarning('An account with this Google account already exists. Redirecting to login...');
@@ -175,16 +175,16 @@ export default function GetStartedScreen() {
       }
       
       // User doesn't exist, proceed with OTP
-      const result = await authAPI.sendOTP(`+91${phone}`);
+      await authAPI.sendOTP(`+91${phone}`);
       
       setLoading(false);
       setShowOtpModal(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('OTP request failed:', err);
-      if (err.message?.includes('429') || err.error === 'Rate limit exceeded') {
-        const timeRemaining = err.timeRemaining || err.retryAfter || 60;
+      if (typeof err === 'object' && err && 'message' in err && typeof err.message === 'string' && err.message.includes('429')) {
+        const timeRemaining = (err as { timeRemaining?: number; retryAfter?: number }).timeRemaining || (err as { timeRemaining?: number; retryAfter?: number }).retryAfter || 60;
         setWarning(`Please wait ${timeRemaining} seconds before requesting another code.`);
-      } else if (err.message?.includes('409')) {
+      } else if (typeof err === 'object' && err && 'message' in err && typeof err.message === 'string' && err.message.includes('409')) {
         setWarning('An account with this phone number already exists. Please log in instead.');
       } else {
         setWarning('Network error. Please check your connection and try again.');
@@ -193,21 +193,22 @@ export default function GetStartedScreen() {
     }
   };
 
-  const handleOtpSuccess = (user: any) => {
+  const handleOtpSuccess = (user: unknown) => {
     setShowOtpModal(false);
     
     // Store user data in sessionStorage for the next screen
-    if (user) {
+    if (user && typeof user === 'object' && user !== null && 'phone' in user) {
+      const userObj = user as { phone?: string };
       console.log('💾 GetStartedScreen - Storing user data in sessionStorage:', user);
-      console.log('📱 GetStartedScreen - User phone number:', user.phone);
+      console.log('📱 GetStartedScreen - User phone number:', userObj.phone);
       console.log('📱 GetStartedScreen - Current phone state:', phone);
       
       sessionStorage.setItem('userData', JSON.stringify(user));
       
       // Also store the phone number separately for easy access
-      if (user.phone) {
-        sessionStorage.setItem('verifiedPhone', user.phone);
-        console.log('📱 GetStartedScreen - Stored verified phone:', user.phone);
+      if (userObj.phone) {
+        sessionStorage.setItem('verifiedPhone', userObj.phone);
+        console.log('📱 GetStartedScreen - Stored verified phone:', userObj.phone);
       } else {
         console.log('⚠️ GetStartedScreen - No phone number in user object, using current phone state');
         // Fallback: store the phone number that was used for OTP
@@ -311,7 +312,7 @@ export default function GetStartedScreen() {
             </div>
             <div className="ml-3">
               <p className="text-sm text-secondary font-poppins-medium">
-                You're signing up as a <span className="font-poppins-semibold">{selectedUserType === 'brand' ? 'Brand' : 'Creator'}</span>
+                You&apos;re signing up as a <span className="font-poppins-semibold">{selectedUserType === 'brand' ? 'Brand' : 'Creator'}</span>
               </p>
             </div>
           </div>
@@ -430,7 +431,7 @@ export default function GetStartedScreen() {
             <h2 className="text-lg sm:text-xl lg:text-2xl font-poppins-semibold text-textDark mb-3 sm:mb-4 text-left w-full tracking-wide lg:tracking-wider" style={{ 
               wordSpacing: 'clamp(0.1em, 2vw, 0.2em)',
               letterSpacing: '0.05em'
-            }}>Let's Get You Started with InfluMojo</h2>
+            }}>Let&apos;s Get You Started with InfluMojo</h2>
 
             {/* Error and Warning Messages */}
             {error && (
@@ -482,7 +483,7 @@ export default function GetStartedScreen() {
               <div className="flex items-start gap-1 text-xs text-textGray w-full">
                 <input type="checkbox" className="mt-0.5 w-3 h-3 text-secondary border-gray-300 rounded focus:ring-secondary flex-shrink-0" />
                 <span className="flex-1 min-w-0 font-poppins-regular">
-                  By creating an account, you agree to Influmojo's{' '}
+                  By creating an account, you agree to Influmojo&apos;s{' '}
                   <Link href="#" className="text-blue-600 underline font-poppins-medium">
                     Terms
                   </Link>{' '}

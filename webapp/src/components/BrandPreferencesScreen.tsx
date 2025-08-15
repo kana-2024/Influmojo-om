@@ -11,7 +11,7 @@ export default function BrandPreferencesScreen() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
-  const [selectedUserType, setSelectedUserType] = useState<'creator' | 'brand' | null>(null);
+
   const [industries, setIndustries] = useState<string[]>([]);
   const [industriesLoading, setIndustriesLoading] = useState(true);
 
@@ -51,16 +51,11 @@ export default function BrandPreferencesScreen() {
   useEffect(() => {
     loadIndustries();
     
-    // Load selectedUserType from sessionStorage
+    // Check if user is a creator and redirect them to creator preferences since this screen is for brands only
     const storedUserType = sessionStorage.getItem('selectedUserType') as 'creator' | 'brand' | null;
-    if (storedUserType) {
-      setSelectedUserType(storedUserType);
-      
-      // If user is a creator, redirect them to creator preferences since this screen is for brands only
-      if (storedUserType === 'creator') {
-        window.location.href = '/creator-preferences';
-        return;
-      }
+    if (storedUserType === 'creator') {
+      window.location.href = '/creator-preferences';
+      return;
     }
   }, []);
 
@@ -105,31 +100,42 @@ export default function BrandPreferencesScreen() {
 
     setLoading(true);
     try {
-      // Call the same API as mobile with same data structure
-      await profileAPI.updatePreferences({
-        categories: selectedIndustries, // Same as mobile
-        about: about.trim(),
+      // Debug: Log what we're sending
+      const preferencesData = {
+        categories: selectedIndustries, // Backend expects 'categories', not 'industries'
+        about: about.trim(),            // Backend requires 'about' field for brands
         languages: selectedLanguages,
-      });
+      };
+      console.log('🔍 Sending preferences data:', preferencesData);
+      console.log('🔍 selectedIndustries (as categories):', selectedIndustries);
+      console.log('🔍 about:', about.trim());
+      console.log('🔍 selectedLanguages:', selectedLanguages);
+      
+      // Call the same API as mobile with same data structure
+      // Backend expects: categories, about, languages (exactly like mobile app)
+      await profileAPI.updatePreferences(preferencesData);
 
 
       // Navigate to profile complete
       window.location.href = '/profile-complete';
     } catch (error) {
       console.error('Error saving brand preferences:', error);
+      
+      // Log more detailed error information
+      if (error && typeof error === 'object' && 'message' in error) {
+        console.error('Error message:', error.message);
+      }
+      if (error && typeof error === 'object' && 'response' in error) {
+        console.error('Error response:', error.response);
+      }
+      
       alert('Failed to save preferences. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Load selectedUserType from sessionStorage on component mount
-  useEffect(() => {
-    const storedUserType = sessionStorage.getItem('selectedUserType') as 'creator' | 'brand' | null;
-    if (storedUserType) {
-      setSelectedUserType(storedUserType);
-    }
-  }, []);
+
 
   return (
     <div className="min-h-screen bg-white font-poppins-regular flex flex-col">
@@ -197,7 +203,7 @@ export default function BrandPreferencesScreen() {
           <div className="max-w-sm lg:max-w-md xl:max-w-lg w-full space-y-4 sm:space-y-6">
             <Feature
               title="Connect with the Right Creators"
-              description="Find influencers that match your brand's industry and target audience."
+              description="Find influencers that match your brand&apos;s industry and target audience."
             />
             <Feature
               title="Campaign Management"
@@ -305,7 +311,7 @@ export default function BrandPreferencesScreen() {
                 Welcome to the brand community!
               </h2>
               <p className="text-xs sm:text-sm text-textGray font-poppins-regular">
-                We'll just collect a few essential details for now. You can complete your full profile anytime later.
+                We&apos;ll just collect a few essential details for now. You can complete your full profile anytime later.
               </p>
             </div>
 

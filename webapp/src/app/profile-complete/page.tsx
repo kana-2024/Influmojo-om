@@ -1,17 +1,54 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { COLORS } from '../../config/colors';
+import { useSearchParams } from 'next/navigation';
+
 
 export default function ProfileCompletePage() {
   const [loading, setLoading] = useState(false);
 
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Try to get user type from various sources
+    const userType = searchParams.get('userType') || 
+                    localStorage.getItem('userType') || 
+                    'creator'; // default to creator
+    
+    // Store user type for dashboard access
+    localStorage.setItem('userType', userType);
+    
+    // Also try to get other user info from localStorage
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Try to extract user info from token or localStorage
+      const fullName = localStorage.getItem('fullName') || 'User';
+      const email = localStorage.getItem('email') || '';
+      const phone = localStorage.getItem('phone') || '';
+      
+      localStorage.setItem('fullName', fullName);
+      localStorage.setItem('email', email);
+      localStorage.setItem('phone', phone);
+    }
+    
+    // Store user type for dashboard access
+    console.log('User type stored:', userType);
+  }, [searchParams]);
+
   const handleViewProfile = () => {
     setLoading(true);
-    // Navigate to profile page
-    window.location.href = '/profile';
+    // Navigate directly to role-specific dashboard
+    const userType = localStorage.getItem('userType');
+    if (userType === 'creator') {
+      window.location.href = '/dashboard/creator';
+    } else if (userType === 'brand') {
+      window.location.href = '/dashboard/brand';
+    } else {
+      // Fallback to creator dashboard if user type is not set
+      window.location.href = '/dashboard/creator';
+    }
   };
 
   return (
@@ -207,7 +244,10 @@ export default function ProfileCompletePage() {
               textAlign: 'center',
               marginBottom: '32px' 
             }}>
-              You're now ready to explore your creator space. Start growing your presence and get discovered by the right brands.
+              {localStorage.getItem('userType') === 'brand' 
+                ? "You're now ready to explore your brand space. Start connecting with creators and building meaningful partnerships."
+                : "You're now ready to explore your creator space. Start growing your presence and get discovered by the right brands."
+              }
             </p>
 
             {/* View Profile Button - EXACTLY like React Native: 4px radius, 12px vertical padding */}

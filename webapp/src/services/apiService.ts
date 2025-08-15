@@ -1,7 +1,7 @@
-import { API_ENDPOINTS, ENV } from '@/config/env';
+import { API_ENDPOINTS } from '@/config/env';
 
 // JSON validation helper
-const isJson = (str: any): boolean => {
+const isJson = (str: unknown): boolean => {
   if (typeof str !== 'string') return false;
   try {
     const result = JSON.parse(str);
@@ -12,13 +12,13 @@ const isJson = (str: any): boolean => {
 };
 
 // Safe JSON parse helper
-const safeJsonParse = (str: any, fallback: any = null) => {
+const safeJsonParse = (str: unknown, fallback: unknown = null) => {
   if (!str) return fallback;
-  if (typeof str === 'object') return str;
+  if (typeof str === 'object' && str !== null) return str;
   if (!isJson(str)) return fallback;
   
   try {
-    return JSON.parse(str);
+    return JSON.parse(str as string);
   } catch (e) {
     console.warn('Failed to parse JSON:', str);
     return fallback;
@@ -104,7 +104,13 @@ export const authAPI = {
     return response;
   },
 
-  signup: async (userData: any) => {
+  signup: async (userData: {
+    email: string;
+    password: string;
+    fullName: string;
+    userType: string;
+    phone?: string;
+  }) => {
     const response = await apiRequest(API_ENDPOINTS.SIGNUP, {
       method: 'POST',
       body: JSON.stringify(userData),
@@ -248,33 +254,258 @@ export const authAPI = {
 
 // Profile API
 export const profileAPI = {
+  // Get full profile
   getProfile: async () => {
-    return await apiRequest(API_ENDPOINTS.GET_PROFILE);
-  },
-
-  updateProfile: async (profileData: any) => {
-    return await apiRequest(API_ENDPOINTS.UPDATE_PROFILE, {
-      method: 'PUT',
-      body: JSON.stringify(profileData),
-    });
-  },
-
-  // Get available industries (same as mobile)
-  getIndustries: async () => {
-    return await apiRequest(API_ENDPOINTS.GET_INDUSTRIES, {
+    return await apiRequest(API_ENDPOINTS.GET_PROFILE, {
       method: 'GET',
     });
   },
 
-  // Update basic info (same as mobile)
+  // Get creator profile
+  getCreatorProfile: async () => {
+    const response = await apiRequest(API_ENDPOINTS.GET_CREATOR_PROFILE, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      response.data.languages = safeJsonParse(response.data.languages, []);
+      response.data.content_categories = safeJsonParse(response.data.content_categories, []);
+      response.data.social_media_accounts = safeJsonParse(response.data.social_media_accounts, []);
+      response.data.portfolio_items = safeJsonParse(response.data.portfolio_items, []);
+    }
+    
+    return response;
+  },
+
+  // Get brand profile
+  getBrandProfile: async () => {
+    const response = await apiRequest(`${API_ENDPOINTS.GET_BRAND_PROFILE}?_t=${Date.now()}`, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      response.data.industries = safeJsonParse(response.data.industries, []);
+      response.data.languages = safeJsonParse(response.data.languages, []);
+      response.data.campaigns = safeJsonParse(response.data.campaigns, []);
+      response.data.collaborations = safeJsonParse(response.data.collaborations, []);
+      response.data.portfolio_items = safeJsonParse(response.data.portfolio_items, []);
+    }
+    
+    return response;
+  },
+
+  // Get all creators for brand home screen
+  getCreators: async () => {
+    const response = await apiRequest(API_ENDPOINTS.GET_CREATORS, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      Object.keys(response.data).forEach(platform => {
+        if (response.data[platform] && Array.isArray(response.data[platform])) {
+          response.data[platform].forEach((creator: {
+          id: string;
+          name: string;
+          profile_image?: string;
+          rating?: number;
+          followers?: string;
+          engagement_rate?: number;
+          categories?: string[];
+          city?: string;
+          state?: string;
+          age?: number;
+          date_of_birth?: string;
+          languages?: unknown;
+          content_categories?: unknown;
+          social_media_accounts?: unknown;
+          portfolio_items?: unknown;
+          user?: {
+            age?: number;
+            date_of_birth?: string;
+          };
+        }) => {
+            creator.languages = safeJsonParse(creator.languages, []);
+            creator.content_categories = safeJsonParse(creator.content_categories, []);
+            creator.social_media_accounts = safeJsonParse(creator.social_media_accounts, []);
+            creator.portfolio_items = safeJsonParse(creator.portfolio_items, []);
+          });
+        }
+      });
+    }
+    
+    return response;
+  },
+
+  // Get creator profile by ID
+  getCreatorProfileById: async (creatorId: string, platform?: string) => {
+    const endpoint = platform 
+      ? `${API_ENDPOINTS.GET_CREATOR_PROFILE_BY_ID}/${platform}/${creatorId}`
+      : `${API_ENDPOINTS.GET_CREATOR_PROFILE_BY_ID}/${creatorId}`;
+    
+    const response = await apiRequest(endpoint, {
+      method: 'GET',
+    });
+    
+    // Safely parse JSON fields if they exist
+    if (response.success && response.data) {
+      response.data.languages = safeJsonParse(response.data.languages, []);
+      response.data.content_categories = safeJsonParse(response.data.content_categories, []);
+      response.data.social_media_accounts = safeJsonParse(response.data.social_media_accounts, []);
+      response.data.portfolio_items = safeJsonParse(response.data.portfolio_items, []);
+    }
+    
+    return response;
+  },
+
+  // Cart Management
+  addToCart: async (packageId: string, creatorId: string, quantity: number = 1) => {
+    return await apiRequest(API_ENDPOINTS.ADD_TO_CART, {
+      method: 'POST',
+      body: JSON.stringify({
+        package_id: packageId,
+        creator_id: creatorId,
+        quantity: quantity
+      }),
+    });
+  },
+
+  getCart: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_CART);
+  },
+
+  removeFromCart: async (cartItemId: string) => {
+    return await apiRequest(API_ENDPOINTS.REMOVE_FROM_CART, {
+      method: 'DELETE',
+      body: JSON.stringify({ cart_item_id: cartItemId }),
+    });
+  },
+
+  updateCartItemQuantity: async (cartItemId: string, quantity: number) => {
+    return await apiRequest(API_ENDPOINTS.UPDATE_CART_ITEM, {
+      method: 'PUT',
+      body: JSON.stringify({
+        cart_item_id: cartItemId,
+        quantity: quantity
+      }),
+    });
+  },
+
+  // Get packages
+  getPackages: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_PACKAGES, {
+      method: 'GET',
+    });
+  },
+
+  // Create package
+  createPackage: async (data: {
+    platform: string;
+    contentType: string;
+    quantity: number;
+    revisions: number;
+    duration1: string;
+    duration2: string;
+    price: number;
+    description?: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.CREATE_PACKAGE, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Update package
+  updatePackage: async (packageId: string, data: {
+    platform?: string;
+    content_type?: string; // Changed from contentType to match backend
+    quantity?: string;
+    revisions?: string;
+    duration1?: string;
+    duration2?: string;
+    price?: string;
+    description?: string;
+  }) => {
+    // Include the package ID in the request body as expected by the backend
+    const requestData = {
+      id: packageId,
+      ...data
+    };
+    
+    return await apiRequest(API_ENDPOINTS.UPDATE_PACKAGE, {
+      method: 'PUT',
+      body: JSON.stringify(requestData),
+    });
+  },
+
+  // Delete package
+  deletePackage: async (packageId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.DELETE_PACKAGE}/${packageId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // Create portfolio item
+  createPortfolio: async (data: {
+    mediaUrl: string;
+    mediaType: string;
+    fileName: string;
+    fileSize: number;
+    mimeType?: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.CREATE_PORTFOLIO, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Create campaign
+  createCampaign: async (data: {
+    title: string;
+    description: string;
+    budget: string;
+    duration: string;
+    requirements: string;
+    targetAudience: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.CREATE_CAMPAIGN, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Submit KYC
+  submitKYC: async (data: {
+    documentType: string;
+    frontImageUrl?: string;
+    backImageUrl?: string;
+    aadhaarData?: {
+    aadhaarNumber: string;
+    aadhaarImage?: string;
+  };
+    verificationMethod?: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.SUBMIT_KYC, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Update basic info
   updateBasicInfo: async (data: {
-    gender: string;
-    email?: string;
+    gender?: string;
+    city?: string;
+    business_type?: string;
+    role?: string;
+    website_url?: string;
     phone?: string;
-    dob: string;
-    state: string;
-    city: string;
-    pincode: string;
+    email?: string;
+    about?: string;
+    dob?: string;
+    state?: string;
+    pincode?: string;
   }) => {
     return await apiRequest(API_ENDPOINTS.UPDATE_BASIC_INFO, {
       method: 'POST',
@@ -282,16 +513,17 @@ export const profileAPI = {
     });
   },
 
-  // Update preferences (same as mobile)
+  // Update preferences
   updatePreferences: async (data: {
-    categories: string[];
-    about: string;
-    languages: string[];
-    platform?: string[];
-    company_name?: string;
-    role_in_organization?: string;
-    business_type?: string;
-    website_url?: string;
+    content_categories?: string[];
+    languages?: string[];
+    categories?: string[];        // Backend expects 'categories' for brands
+    industries?: string[];        // Keep for backward compatibility
+    about?: string;               // Backend requires 'about' for brands
+    target_audience?: string[];
+    collaboration_types?: string[];
+    budget_range?: string;
+    campaign_duration?: string;
   }) => {
     return await apiRequest(API_ENDPOINTS.UPDATE_PREFERENCES, {
       method: 'POST',
@@ -299,41 +531,11 @@ export const profileAPI = {
     });
   },
 
-  getBrandProfile: async () => {
-    return await apiRequest(API_ENDPOINTS.GET_BRAND_PROFILE);
-  },
-
-  getCreatorProfile: async () => {
-    return await apiRequest(API_ENDPOINTS.GET_CREATOR_PROFILE);
-  },
-
-  getCreators: async (params?: any) => {
-    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
-    return await apiRequest(`${API_ENDPOINTS.GET_CREATORS}${queryString}`);
-  },
-
-  getCreatorById: async (id: string) => {
-    return await apiRequest(`${API_ENDPOINTS.GET_CREATOR_PROFILE_BY_ID}/${id}`);
-  },
-
-  uploadImage: async (file: File) => {
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    const token = getToken();
-    const response = await fetch(API_ENDPOINTS.UPLOAD_IMAGE, {
-      method: 'POST',
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: formData,
+  // Get industries
+  getIndustries: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_INDUSTRIES, {
+      method: 'GET',
     });
-    
-    if (!response.ok) {
-      throw new Error('Upload failed');
-    }
-    
-    return await response.json();
   },
 };
 
@@ -343,14 +545,32 @@ export const packageAPI = {
     return await apiRequest(API_ENDPOINTS.GET_PACKAGES);
   },
 
-  createPackage: async (packageData: any) => {
+  createPackage: async (packageData: {
+    platform: string;
+    contentType: string;
+    quantity: string;
+    revisions: string;
+    duration1: string;
+    duration2: string;
+    price: string;
+    description: string;
+  }) => {
     return await apiRequest(API_ENDPOINTS.CREATE_PACKAGE, {
       method: 'POST',
       body: JSON.stringify(packageData),
     });
   },
 
-  updatePackage: async (id: string, packageData: any) => {
+  updatePackage: async (id: string, packageData: {
+    platform?: string;
+    contentType?: string;
+    quantity?: string;
+    revisions?: string;
+    duration1?: string;
+    duration2?: string;
+    price?: string;
+    description?: string;
+  }) => {
     return await apiRequest(`${API_ENDPOINTS.UPDATE_PACKAGE}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(packageData),
@@ -370,7 +590,13 @@ export const orderAPI = {
     return await apiRequest(API_ENDPOINTS.GET_ORDERS);
   },
 
-  createOrder: async (orderData: any) => {
+  createOrder: async (orderData: {
+    creatorId: string;
+    packageId: string;
+    quantity: number;
+    totalAmount: number;
+    requirements?: string;
+  }) => {
     return await apiRequest(API_ENDPOINTS.CREATE_ORDER, {
       method: 'POST',
       body: JSON.stringify(orderData),
@@ -389,9 +615,11 @@ export const orderAPI = {
   },
 };
 
-export default {
+const apiService = {
   authAPI,
   profileAPI,
   packageAPI,
   orderAPI,
-}; 
+};
+
+export default apiService; 

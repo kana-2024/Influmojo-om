@@ -7,7 +7,7 @@ import { COLORS } from '@/config/colors';
 interface OtpVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (user: any) => void;
+  onSuccess: (user: unknown) => void;
   phone: string;
   fullName: string;
   userType?: string;
@@ -110,9 +110,14 @@ export default function OtpVerificationModal({
       } else {
         setError(result.error || 'OTP verification failed');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('OTP verification error:', err);
-      setError(err.message || 'OTP verification failed. Please try again.');
+      // Create a proper error interface
+      interface ApiError {
+        message?: string;
+      }
+      const apiError = err as ApiError;
+      setError(apiError?.message || 'OTP verification failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -138,9 +143,14 @@ export default function OtpVerificationModal({
       } else {
         setError(result.error || 'Failed to resend OTP');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Resend OTP error:', err);
-      setError(err.message || 'Failed to resend OTP. Please try again.');
+      // Create a proper error interface
+      interface ApiError {
+        message?: string;
+      }
+      const apiError = err as ApiError;
+      setError(apiError?.message || 'Failed to resend OTP. Please try again.');
     } finally {
       setResendLoading(false);
     }
@@ -165,7 +175,7 @@ export default function OtpVerificationModal({
 
         <div className="mb-6">
           <p className="text-sm text-textGray mb-2">
-            We've sent a verification code to:
+            We&apos;ve sent a verification code to:
           </p>
           <p className="text-base font-poppins-medium text-textDark">
             {phone}
@@ -219,7 +229,7 @@ export default function OtpVerificationModal({
 
         <div className="mt-4 text-center">
           <p className="text-sm text-textGray">
-            Didn't receive the code?{' '}
+            Didn&apos;t receive the code?{' '}
             {countdown > 0 ? (
               <span className="text-textDark">
                 Resend in {countdown}s
