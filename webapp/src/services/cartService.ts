@@ -1,0 +1,260 @@
+export interface CartItem {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  creatorImage?: string;
+  packageId: string;
+  packageName: string;
+  packageDescription: string;
+  packagePrice: number;
+  packageDuration: string;
+  platform: string;
+  quantity: number;
+  addedAt: Date;
+  // Form data fields
+  deliveryTime?: number;
+  additionalInstructions?: string;
+  references?: string[];
+}
+
+export interface CartSummary {
+  totalItems: number;
+  totalPrice: number;
+  items: CartItem[];
+}
+
+class CartService {
+  private static instance: CartService;
+  private items: CartItem[] = [];
+  private listeners: ((cart: CartSummary) => void)[] = [];
+
+  static getInstance(): CartService {
+    if (!CartService.instance) {
+      CartService.instance = new CartService();
+    }
+    return CartService.instance;
+  }
+
+  // Add item to cart
+  addToCart(item: Omit<CartItem, 'id' | 'addedAt' | 'quantity'> & {
+    deliveryTime?: number;
+    additionalInstructions?: string;
+    references?: string[];
+  }): CartSummary {
+    const existingItemIndex = this.items.findIndex(
+      cartItem => cartItem.packageId === item.packageId && cartItem.creatorId === item.creatorId
+    );
+
+    if (existingItemIndex >= 0) {
+      // Item already exists, increase quantity
+      this.items[existingItemIndex].quantity += 1;
+      // Update form data if provided
+      if (item.deliveryTime !== undefined) {
+        this.items[existingItemIndex].deliveryTime = item.deliveryTime;
+      }
+      if (item.additionalInstructions !== undefined) {
+        this.items[existingItemIndex].additionalInstructions = item.additionalInstructions;
+      }
+      if (item.references !== undefined) {
+        this.items[existingItemIndex].references = item.references;
+      }
+    } else {
+      // Add new item
+      const newItem: CartItem = {
+        ...item,
+        id: `${item.creatorId}-${item.packageId}-${Date.now()}`,
+        quantity: 1,
+        addedAt: new Date(),
+        deliveryTime: item.deliveryTime,
+        additionalInstructions: item.additionalInstructions,
+        references: item.references || [],
+      };
+      this.items.push(newItem);
+    }
+
+    const summary = this.getCartSummary();
+    this.notifyListeners(summary);
+    this.saveToLocalStorage();
+    return summary;
+  }
+
+  // Add multiple packages from same creator
+  addMultiplePackages(creatorId: string, creatorName: string, creatorImage: string, packages: Array<{
+    packageId: string;
+    packageName: string;
+    packageDescription: string;
+    packagePrice: number;
+    packageDuration: string;
+    platform: string;
+  }>): CartSummary {
+    packages.forEach(pkg => {
+      this.addToCart({
+        creatorId,
+        creatorName,
+        creatorImage,
+        ...pkg,
+      });
+    });
+
+    return this.getCartSummary();
+  }
+
+  // Remove item from cart
+  removeFromCart(itemId: string): CartSummary {
+    this.items = this.items.filter(item => item.id !== itemId);
+    const summary = this.getCartSummary();
+    this.notifyListeners(summary);
+    this.saveToLocalStorage();
+    return summary;
+  }
+
+  // Update item quantity
+  updateQuantity(itemId: string, quantity: number): CartSummary {
+    const itemIndex = this.items.findIndex(item => item.id === itemId);
+    if (itemIndex >= 0) {
+      if (quantity <= 0) {
+        // Remove item if quantity is 0 or negative
+        this.items.splice(itemIndex, 1);
+      } else {
+        this.items[itemIndex].quantity = quantity;
+      }
+    }
+    const summary = this.getCartSummary();
+    this.notifyListeners(summary);
+    this.saveToLocalStorage();
+    return summary;
+  }
+
+  // Update cart item details (delivery time, instructions, references)
+  updateItem(itemId: string, updates: {
+    deliveryTime?: number;
+    additionalInstructions?: string;
+    references?: string[];
+  }): CartSummary {
+    const itemIndex = this.items.findIndex(item => item.id === itemId);
+    if (itemIndex >= 0) {
+      if (updates.deliveryTime !== undefined) {
+        this.items[itemIndex].deliveryTime = updates.deliveryTime;
+      }
+      if (updates.additionalInstructions !== undefined) {
+        this.items[itemIndex].additionalInstructions = updates.additionalInstructions;
+      }
+      if (updates.references !== undefined) {
+        this.items[itemIndex].references = updates.references;
+      }
+      const summary = this.getCartSummary();
+      this.notifyListeners(summary);
+      this.saveToLocalStorage();
+      return summary;
+    }
+    return this.getCartSummary();
+  }
+
+  // Clear entire cart
+  clearCart(): CartSummary {
+    this.items = [];
+    const summary = this.getCartSummary();
+    this.notifyListeners(summary);
+    this.saveToLocalStorage();
+    return summary;
+  }
+
+  // Clear items from specific creator
+  clearCreatorItems(creatorId: string): CartSummary {
+    this.items = this.items.filter(item => item.creatorId !== creatorId);
+    const summary = this.getCartSummary();
+    this.notifyListeners(summary);
+    this.saveToLocalStorage();
+    return summary;
+  }
+
+  // Get cart summary
+  getCartSummary(): CartSummary {
+    const totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = this.items.reduce((sum, item) => sum + (item.packagePrice * item.quantity), 0);
+    
+    return {
+      totalItems,
+      totalPrice,
+      items: [...this.items],
+    };
+  }
+
+  // Get items by creator
+  getItemsByCreator(creatorId: string): CartItem[] {
+    return this.items.filter(item => item.creatorId === creatorId);
+  }
+
+  // Check if item is in cart
+  isItemInCart(packageId: string, creatorId: string): boolean {
+    return this.items.some(item => item.packageId === packageId && item.creatorId === creatorId);
+  }
+
+  // Get item quantity
+  getItemQuantity(packageId: string, creatorId: string): number {
+    const item = this.items.find(item => item.packageId === packageId && item.creatorId === creatorId);
+    return item ? item.quantity : 0;
+  }
+
+  // Subscribe to cart changes
+  subscribe(listener: (cart: CartSummary) => void): () => void {
+    this.listeners.push(listener);
+    
+    // Return unsubscribe function
+    return () => {
+      const index = this.listeners.indexOf(listener);
+      if (index > -1) {
+        this.listeners.splice(index, 1);
+      }
+    };
+  }
+
+  // Notify all listeners
+  private notifyListeners(cart: CartSummary): void {
+    this.listeners.forEach(listener => listener(cart));
+  }
+
+  // Get cart state (for persistence)
+  getCartState(): CartItem[] {
+    return [...this.items];
+  }
+
+  // Restore cart state (for persistence)
+  restoreCartState(items: CartItem[]): void {
+    this.items = items.map(item => ({
+      ...item,
+      addedAt: new Date(item.addedAt),
+    }));
+    const summary = this.getCartSummary();
+    this.notifyListeners(summary);
+  }
+
+  // Save cart to localStorage
+  private saveToLocalStorage(): void {
+    try {
+      localStorage.setItem('influmojo_cart', JSON.stringify(this.items));
+    } catch (error) {
+      console.error('Failed to save cart to localStorage:', error);
+    }
+  }
+
+  // Load cart from localStorage
+  loadFromLocalStorage(): void {
+    try {
+      const savedCart = localStorage.getItem('influmojo_cart');
+      if (savedCart) {
+        const items = JSON.parse(savedCart);
+        this.restoreCartState(items);
+      }
+    } catch (error) {
+      console.error('Failed to load cart from localStorage:', error);
+    }
+  }
+
+  // Initialize cart service
+  init(): void {
+    this.loadFromLocalStorage();
+  }
+}
+
+export default CartService.getInstance();

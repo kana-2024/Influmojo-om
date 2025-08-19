@@ -360,6 +360,27 @@ export const profileAPI = {
     return response;
   },
 
+  // Update profile
+  updateProfile: async (profileData: {
+    fullName?: string;
+    gender?: string;
+    state?: string;
+    city?: string;
+    pincode?: string;
+    languages?: string[];
+    email?: string;
+    phone?: string;
+    bio?: string;
+    content_categories?: string[];
+    coverImage?: string;
+    profilePicture?: string;
+  }) => {
+    return await apiRequest(API_ENDPOINTS.UPDATE_PROFILE, {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  },
+
   // Cart Management
   addToCart: async (packageId: string, creatorId: string, quantity: number = 1) => {
     return await apiRequest(API_ENDPOINTS.ADD_TO_CART, {
@@ -534,6 +555,140 @@ export const profileAPI = {
   // Get industries
   getIndustries: async () => {
     return await apiRequest(API_ENDPOINTS.GET_INDUSTRIES, {
+      method: 'GET',
+    });
+  },
+};
+
+// Orders API calls
+export const ordersAPI = {
+  // Get all orders
+  getOrders: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_ORDERS);
+  },
+
+  // Get specific order details
+  getOrderDetails: async (orderId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDER_DETAILS}/${orderId}`);
+  },
+
+  // Checkout orders from cart
+  checkoutOrders: async (cartItems: any[]) => {
+    return await apiRequest(API_ENDPOINTS.CHECKOUT_ORDERS, {
+      method: 'POST',
+      body: JSON.stringify({ cartItems }),
+    });
+  },
+
+  // Accept order (creators only)
+  acceptOrder: async (orderId: string) => {
+    if (!orderId || orderId === 'undefined' || orderId === 'null') {
+      throw new Error('Invalid order ID provided');
+    }
+
+    try {
+      const response = await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/accept`, {
+        method: 'PUT',
+      });
+
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to accept order');
+      }
+
+      return response;
+    } catch (error) {
+      console.error('[apiService] Error accepting order:', error);
+      throw new Error(error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Failed to accept order. Please try again.');
+    }
+  },
+
+  // Reject order (creators only)
+  rejectOrder: async (orderId: string, rejectionMessage?: string) => {
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/reject`, {
+      method: 'PUT',
+      body: JSON.stringify({ rejectionMessage }),
+    });
+  },
+
+  // Get chat information for an order
+  getOrderChat: async (orderId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/chat`, {
+      method: 'GET',
+    });
+  },
+
+  // Enable chat for an existing order
+  enableOrderChat: async (orderId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/enable-chat`, {
+      method: 'POST',
+    });
+  },
+
+  // Get brand orders
+  getBrandOrders: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_BRAND_ORDERS);
+  },
+
+  // Get creator orders
+  getCreatorOrders: async () => {
+    return await apiRequest(API_ENDPOINTS.GET_CREATOR_ORDERS);
+  },
+};
+
+// Ticket API calls
+export const ticketAPI = {
+  // Get messages for a specific ticket
+  getTicketMessages: async (ticketId: string, loadOlderMessages: boolean = false) => {
+    const queryParams = loadOlderMessages ? '?loadOlderMessages=true' : '';
+    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/${ticketId}/messages${queryParams}`, {
+      method: 'GET',
+    });
+  },
+
+  // Send message to a ticket
+  sendTicketMessage: async (ticketId: string, messageData: {
+    message_text: string;
+    sender_role?: 'brand' | 'creator' | 'agent' | 'system';
+    channel_type?: 'brand_agent' | 'creator_agent';
+    message_type?: 'text' | 'file' | 'system';
+  }) => {
+    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/${ticketId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify(messageData),
+    });
+  },
+
+  // Get ticket by order ID
+  getTicketByOrderId: async (orderId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/order/${orderId}`, {
+      method: 'GET',
+    });
+  },
+
+  // Update ticket status
+  updateTicketStatus: async (ticketId: string, status: string) => {
+    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/${ticketId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  },
+
+  // Update agent status (online/offline)
+  updateAgentStatus: async (status: 'available' | 'busy' | 'offline' | 'away', isOnline?: boolean) => {
+    const body: any = { status };
+    if (isOnline !== undefined) {
+      body.isOnline = isOnline;
+    }
+    
+    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/agent/status`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    });
+  },
+
+  // Get agent status for a specific ticket
+  getAgentStatus: async (ticketId: string) => {
+    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/${ticketId}/agent-status`, {
       method: 'GET',
     });
   },

@@ -26,10 +26,14 @@ import {
   BuildingOfficeIcon,
   UserGroupIcon,
   GlobeAltIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
 import { FaFacebook, FaYoutube, FaLinkedin, FaInstagram } from 'react-icons/fa';
-import { profileAPI } from '@/services/apiService';
+import { profileAPI, ordersAPI } from '@/services/apiService';
 import CreatorDiscovery from '@/components/CreatorDiscovery';
+import CartModal from '@/components/modals/CartModal';
+import CreatorProfileModal from '@/components/modals/CreatorProfileModal';
+import CartService from '@/services/cartService';
 
 interface NavigationItem {
   id: string;
@@ -87,6 +91,7 @@ interface BrandProfile {
   social_media_accounts: SocialMediaAccount[];
   portfolio_items: PortfolioItem[];
   packages: Package[];
+  recentOrders?: any[]; // Recent orders for dashboard preview
   kyc_status?: string;
   verification_status?: string;
   rating?: number;
@@ -190,6 +195,21 @@ export default function BrandDashboard() {
   const [profile, setProfile] = useState<BrandProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [selectedCreatorId, setSelectedCreatorId] = useState<string | null>(null);
+  const [selectedCreator, setSelectedCreator] = useState<any>(null);
+  const [cartItemCount, setCartItemCount] = useState(0);
+  const [showCreatorProfileModal, setShowCreatorProfileModal] = useState(false);
+
+  // Initialize cart service and subscribe to changes
+  useEffect(() => {
+    CartService.init();
+    const unsubscribe = CartService.subscribe((summary) => {
+      setCartItemCount(summary.totalItems);
+    });
+    setCartItemCount(CartService.getCartSummary().totalItems);
+    return unsubscribe;
+  }, []);
 
   // Fetch brand profile on component mount
   useEffect(() => {
@@ -208,19 +228,31 @@ export default function BrandDashboard() {
         console.log('🔍 Token preview:', token.substring(0, 20) + '...');
       }
       
-      const response = await profileAPI.getBrandProfile();
-      console.log('🔍 Raw API response:', response);
+      // Fetch both profile and orders
+      const [profileResponse, ordersResponse] = await Promise.all([
+        profileAPI.getBrandProfile(),
+        ordersAPI.getBrandOrders()
+      ]);
       
-      if (response.success && response.data) {
-        console.log('✅ Brand profile fetched successfully:', response.data);
-        const transformedProfile = transformBackendData(response.data);
-        console.log('🔍 Transformed profile data:', transformedProfile);
+      console.log('🔍 Raw profile response:', profileResponse);
+      console.log('🔍 Raw orders response:', ordersResponse);
+      
+      if (profileResponse.success && profileResponse.data) {
+        console.log('✅ Brand profile fetched successfully:', profileResponse.data);
+        const transformedProfile = transformBackendData(profileResponse.data);
         
+        // Add recent orders to the profile
+        if (ordersResponse.success && ordersResponse.orders) {
+          transformedProfile.recentOrders = ordersResponse.orders.slice(0, 5); // Get last 5 orders
+          console.log('✅ Orders fetched successfully:', ordersResponse.orders);
+        }
+        
+        console.log('🔍 Transformed profile data:', transformedProfile);
         setProfile(transformedProfile);
       } else {
-        console.error('❌ Failed to fetch brand profile:', response.error);
-        console.error('❌ Response details:', response);
-        setError(response.error || 'Failed to fetch profile');
+        console.error('❌ Failed to fetch brand profile:', profileResponse.error);
+        console.error('❌ Response details:', profileResponse);
+        setError(profileResponse.error || 'Failed to fetch profile');
       }
     } catch (err) {
       console.error('❌ Error loading brand profile:', err);
@@ -243,15 +275,80 @@ export default function BrandDashboard() {
   const renderMainContent = () => {
     if (activeTab === 'home') {
       return (
+        <div className="space-y-6">
+            {/* Welcome Section - NEW ADDITION */}
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+                  <UserGroupIcon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    Welcome back, {profile?.fullName || 'Brand'}! 👋
+                  </h2>
+                  <p className="text-gray-700">
+                    Discover amazing creators to collaborate with and grow your brand presence across all platforms.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Stats - NEW ADDITION */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Available Creators</p>
+                    <p className="text-2xl font-bold text-gray-900">150+</p>
+                  </div>
+                  <UserGroupIcon className="w-8 h-8 text-blue-500" />
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Active Platforms</p>
+                    <p className="text-2xl font-bold text-gray-900">6</p>
+                  </div>
+                  <GlobeAltIcon className="w-8 h-8 text-green-500" />
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-purple-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Categories</p>
+                    <p className="text-2xl font-bold text-gray-900">12+</p>
+                  </div>
+                  <CubeIcon className="w-8 h-8 text-purple-500" />
+                </div>
+              </div>
+            </div>
+
+            {/* Creator Discovery Section - ENHANCED WITH PLATFORM GROUPING */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Discover Creators</h3>
+                  <p className="text-gray-600">Find the perfect creators for your next campaign</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Filter by platform, category, and more</span>
+                </div>
+              </div>
+              
         <CreatorDiscovery
-          onViewCreatorProfile={(creatorId) => {
-            // Navigate to creator profile view
-            console.log('Viewing creator profile:', creatorId);
-            // TODO: Implement navigation to creator profile
-            alert(`Viewing creator profile: ${creatorId}`);
-          }}
-          showAddToCart={true}
-        />
+                onViewCreatorProfile={(creatorId, creatorData) => {
+                  // Open creator profile modal with existing data
+                  setSelectedCreatorId(creatorId);
+                  setSelectedCreator(creatorData);
+                  setShowCreatorProfileModal(true);
+                }}
+                showAddToCart={true}
+              />
+            </div>
+          </div>
       );
     }
 
@@ -354,6 +451,67 @@ export default function BrandDashboard() {
               </button>
             </div>
           )}
+        </div>
+      );
+    }
+
+    if (activeTab === 'orders') {
+      return (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">My Orders</h3>
+            <button 
+              onClick={() => router.push('/dashboard/brand/orders')}
+              className="bg-orange-500 text-white px-4 py-2 rounded-md text-sm hover:bg-orange-600 transition-colors flex items-center gap-2"
+            >
+              View All Orders
+            </button>
+          </div>
+          
+          {/* Recent Orders Preview */}
+          <div className="space-y-4">
+            {profile?.recentOrders && profile.recentOrders.length > 0 ? (
+              profile.recentOrders.slice(0, 3).map((order: any) => (
+                <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <ClockIcon className="w-6 h-6 text-orange-600" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">
+                          {order.package?.title || 'Package Order'}
+                        </h4>
+                        <p className="text-xs text-gray-500">
+                          Order #{order.id.slice(-6)} • {order.status}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-orange-600">
+                        ₹{order.total_amount || order.package?.price || 0}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(order.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <ListBulletIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Orders Yet</h3>
+                <p className="text-gray-500 mb-4">Start by purchasing packages from creators</p>
+                <button 
+                  onClick={() => setActiveTab('home')}
+                  className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors"
+                >
+                  Browse Creators
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       );
     }
@@ -761,8 +919,16 @@ export default function BrandDashboard() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Brand Dashboard</h1>
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
+            <button 
+              onClick={() => setShowCartModal(true)}
+              className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
               <ShoppingCartIcon className="w-6 h-6" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartItemCount > 99 ? '99+' : cartItemCount}
+                </span>
+              )}
             </button>
             <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
               <BellIcon className="w-6 h-6" />
@@ -838,6 +1004,19 @@ export default function BrandDashboard() {
           {renderMainContent()}
         </div>
       </div>
+
+      {/* Cart Modal */}
+      <CartModal
+        isOpen={showCartModal}
+        onClose={() => setShowCartModal(false)}
+      />
+
+      {/* Creator Profile Modal */}
+      <CreatorProfileModal
+        isOpen={showCreatorProfileModal}
+        onClose={() => setShowCreatorProfileModal(false)}
+        creator={selectedCreator}
+      />
     </div>
   );
 }

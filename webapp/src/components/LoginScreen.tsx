@@ -160,7 +160,6 @@ export default function LoginScreen() {
             
             // Check if user has completed onboarding by checking their profile
             try {
-              // For brands, try to get their profile first
               if (userType === 'brand') {
                 try {
                   const brandProfile = await profileAPI.getBrandProfile();
@@ -172,27 +171,23 @@ export default function LoginScreen() {
                   }
                 } catch (profileError) {
                   console.log('⚠️ Could not fetch brand profile, user may need to complete onboarding');
-                }
-              }
-              
-              // Fallback to the detailed onboarding completion check
-              const hasCompletedOnboarding = await checkOnboardingCompletion(userType);
-              
-              if (hasCompletedOnboarding) {
-                // Redirect to dashboard
-                console.log('✅ User has completed onboarding, redirecting to dashboard');
-                if (userType === 'brand') {
-                  window.location.href = '/dashboard/brand';
-                } else {
-                  window.location.href = '/dashboard/creator';
+                  window.location.href = '/brand-profile-setup';
+                  return;
                 }
               } else {
-                // Redirect to profile setup to complete onboarding
-                console.log('⚠️ User has not completed onboarding, redirecting to profile setup');
-                if (userType === 'brand') {
-                  window.location.href = '/brand-profile-setup';
-                } else {
+                // For creators, try to get their profile first
+                try {
+                  const creatorProfile = await profileAPI.getCreatorProfile();
+                  if (creatorProfile.success && creatorProfile.data) {
+                    // If we can successfully get the creator profile, redirect to dashboard
+                    console.log('✅ Creator profile exists, redirecting to creator dashboard');
+                    window.location.href = '/dashboard/creator';
+                    return;
+                  }
+                } catch (profileError) {
+                  console.log('⚠️ Could not fetch creator profile, user may need to complete onboarding');
                   window.location.href = '/profile-setup';
+                  return;
                 }
               }
             } catch (error) {
@@ -266,7 +261,6 @@ export default function LoginScreen() {
       
       // Check if user has completed onboarding by checking their profile
       try {
-        // For brands, try to get their profile first
         if (userType === 'brand') {
           try {
             const brandProfile = await profileAPI.getBrandProfile();
@@ -278,27 +272,23 @@ export default function LoginScreen() {
             }
           } catch (profileError) {
             console.log('⚠️ Could not fetch brand profile, user may need to complete onboarding');
-          }
-        }
-        
-        // Fallback to the detailed onboarding completion check
-        const hasCompletedOnboarding = await checkOnboardingCompletion(userType);
-        
-        if (hasCompletedOnboarding) {
-          // Redirect to dashboard
-          console.log('✅ User has completed onboarding, redirecting to dashboard');
-          if (userType === 'brand') {
-            window.location.href = '/dashboard/brand';
-          } else {
-            window.location.href = '/dashboard/creator';
+            window.location.href = '/brand-profile-setup';
+            return;
           }
         } else {
-          // Redirect to profile setup to complete onboarding
-          console.log('⚠️ User has not completed onboarding, redirecting to profile setup');
-          if (userType === 'brand') {
-            window.location.href = '/brand-profile-setup';
-          } else {
+          // For creators, try to get their profile first
+          try {
+            const creatorProfile = await profileAPI.getCreatorProfile();
+            if (creatorProfile.success && creatorProfile.data) {
+              // If we can successfully get the creator profile, redirect to dashboard
+              console.log('✅ Creator profile exists, redirecting to creator dashboard');
+              window.location.href = '/dashboard/creator';
+              return;
+            }
+          } catch (profileError) {
+            console.log('⚠️ Could not fetch creator profile, user may need to complete onboarding');
             window.location.href = '/profile-setup';
+            return;
           }
         }
       } catch (error) {

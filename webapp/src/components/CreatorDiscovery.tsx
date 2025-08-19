@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import CreatorCard from './CreatorCard';
+import PlatformCreatorSection from './PlatformCreatorSection';
 import FilterModal, { CreatorFilters } from './FilterModal';
 import { profileAPI } from '@/services/apiService';
 import { toast } from 'react-hot-toast';
+import CartService from '@/services/cartService';
 
 interface Creator {
   id: string;
@@ -41,10 +42,11 @@ interface Creator {
       duration2: string;
     };
   }>;
+  platform?: string;
 }
 
 interface CreatorDiscoveryProps {
-  onViewCreatorProfile: (creatorId: string) => void;
+  onViewCreatorProfile: (creatorId: string, creatorData: Creator) => void;
   onAddToCart?: (packageId: string, creatorId: string) => void;
   showAddToCart?: boolean;
 }
@@ -54,8 +56,8 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
   onAddToCart,
   showAddToCart = false,
 }) => {
-  const [creators, setCreators] = useState<Creator[]>([]);
-  const [filteredCreators, setFilteredCreators] = useState<Creator[]>([]);
+  const [creators, setCreators] = useState<Record<string, Creator[]>>({});
+  const [filteredCreators, setFilteredCreators] = useState<Record<string, Creator[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,19 +92,26 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
       
       if (response.success && response.data) {
         console.log('✅ Creators fetched successfully:', response.data);
+        console.log('🔍 Raw backend response structure:', Object.keys(response.data));
         
-        // Transform the data to match our Creator interface
-        const transformedCreators: Creator[] = [];
+        // We need to re-group creators by their actual package platforms
+        // instead of using the backend's social media preference grouping
+        const platformGroups: Record<string, Creator[]> = {};
         
-        // Process each platform's creators
-        Object.entries(response.data).forEach(([platform, platformCreators]) => {
+        // First, collect all creators and their packages
+        const allCreators: Creator[] = [];
+        
+        Object.entries(response.data).forEach(([backendPlatform, platformCreators]) => {
+          console.log(`🔍 Processing backend platform group: ${backendPlatform}`);
+          console.log(`🔍 Creators in this group:`, platformCreators);
+          
           if (Array.isArray(platformCreators)) {
             platformCreators.forEach((creator: any) => {
-              // Add platform info to social accounts if not present
+              // Process creator data
               const socialAccounts = creator.social_accounts || [];
               if (socialAccounts.length === 0 && creator.social_account) {
                 socialAccounts.push({
-                  platform: platform,
+                  platform: backendPlatform,
                   username: creator.social_account.username || '',
                   follower_count: creator.social_account.follower_count || 0,
                   engagement_rate: creator.social_account.engagement_rate || 0,
@@ -110,7 +119,90 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
                 });
               }
               
-              transformedCreators.push({
+              if (socialAccounts.length === 0) {
+                socialAccounts.push({
+                  platform: backendPlatform,
+                  username: creator.username || creator.handle || '',
+                  follower_count: creator.follower_count || creator.subscribers || 0,
+                  engagement_rate: creator.engagement_rate || 0,
+                  verified: creator.verified || false,
+                });
+              }
+              
+              // Process packages and ensure they have platform info
+              const packages = creator.packages || [];
+              console.log(`🔍 Processing packages for creator ${creator.name}:`, packages);
+              
+              packages.forEach((pkg: any) => {
+                // Extract the actual package platform from the package data
+                let packagePlatform = '';
+                
+                console.log(`🔍 Processing package:`, pkg);
+                console.log(`🔍 Package title: "${pkg.title}"`);
+                console.log(`🔍 Package content_type: "${pkg.content_type}"`);
+                console.log(`🔍 Package deliverables:`, pkg.deliverables);
+                console.log(`🔍 Package platform field: "${pkg.platform}"`);
+                
+                // Check multiple possible sources for package platform
+                if (pkg.deliverables && pkg.deliverables.platform) {
+                  packagePlatform = pkg.deliverables.platform;
+                  console.log(`✅ Found platform in deliverables: ${packagePlatform}`);
+                } else if (pkg.platform) {
+                  packagePlatform = pkg.platform;
+                  console.log(`✅ Found platform in package: ${packagePlatform}`);
+                } else if (pkg.content_type && pkg.content_type.toLowerCase().includes('instagram')) {
+                  packagePlatform = 'instagram';
+                  console.log(`✅ Detected Instagram from content_type: ${pkg.content_type}`);
+                } else if (pkg.content_type && pkg.content_type.toLowerCase().includes('youtube')) {
+                  packagePlatform = 'youtube';
+                  console.log(`✅ Detected YouTube from content_type: ${pkg.content_type}`);
+                } else if (pkg.title && pkg.title.toLowerCase().includes('instagram')) {
+                  packagePlatform = 'instagram';
+                  console.log(`✅ Detected Instagram from title: ${pkg.title}`);
+                } else if (pkg.title && pkg.title.toLowerCase().includes('youtube')) {
+                  packagePlatform = 'youtube';
+                  console.log(`✅ Detected YouTube from title: ${pkg.title}`);
+                } else if (pkg.title && pkg.title.toLowerCase().includes('reel')) {
+                  // If it's a reel, check if we can infer platform from other context
+                  if (backendPlatform.toLowerCase() === 'instagram') {
+                    packagePlatform = 'instagram';
+                    console.log(`✅ Detected Instagram from reel + backend context`);
+                  } else if (backendPlatform.toLowerCase() === 'youtube') {
+                    packagePlatform = 'youtube';
+                    console.log(`✅ Detected YouTube from reel + backend context`);
+                  } else {
+                    packagePlatform = 'instagram'; // Default for reels
+                    console.log(`✅ Defaulting reel to Instagram`);
+                  }
+                } else {
+                  // Fallback to backend platform if no package-specific platform found
+                  packagePlatform = backendPlatform;
+                  console.log(`⚠️ Using fallback backend platform: ${packagePlatform}`);
+                }
+                
+                console.log(`🎯 Final package platform: ${packagePlatform}`);
+                
+                // Ensure deliverables structure exists and has correct platform
+                if (!pkg.deliverables) {
+                  pkg.deliverables = {
+                    platform: packagePlatform,
+                    content_type: pkg.content_type || pkg.type || 'content',
+                    quantity: pkg.quantity || 1,
+                    revisions: pkg.revisions || 1,
+                    duration1: pkg.duration1 || '1-2 days',
+                    duration2: pkg.duration2 || '3-5 days'
+                  };
+                  console.log(`🔧 Created deliverables structure:`, pkg.deliverables);
+                } else if (!pkg.deliverables.platform) {
+                  pkg.deliverables.platform = packagePlatform;
+                  console.log(`🔧 Updated deliverables platform: ${packagePlatform}`);
+                }
+                
+                // Ensure other required fields
+                if (!pkg.currency) pkg.currency = 'INR';
+              });
+              
+              const processedCreator: Creator = {
                 id: creator.id,
                 name: creator.name || creator.fullName || 'Unknown Creator',
                 email: creator.email || '',
@@ -124,14 +216,69 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
                 content_categories: creator.content_categories || creator.categories || [],
                 languages: creator.languages || [],
                 social_accounts: socialAccounts,
-                packages: creator.packages || [],
-              });
+                packages: packages,
+                platform: backendPlatform, // Keep original platform for reference
+              };
+              
+              allCreators.push(processedCreator);
             });
           }
         });
         
-        console.log('🔍 Transformed creators:', transformedCreators);
-        setCreators(transformedCreators);
+        console.log('🔍 All creators collected:', allCreators.length);
+        
+        // Debug: Log package data for each creator
+        allCreators.forEach((creator, index) => {
+          console.log(`🔍 Creator ${index + 1}: ${creator.name}`);
+          if (creator.packages && creator.packages.length > 0) {
+            creator.packages.forEach((pkg, pkgIndex) => {
+              console.log(`  📦 Package ${pkgIndex + 1}:`, {
+                title: pkg.title,
+                price: pkg.price,
+                platform: pkg.deliverables?.platform,
+                content_type: pkg.deliverables?.content_type,
+                quantity: pkg.deliverables?.quantity,
+                revisions: pkg.deliverables?.revisions,
+                duration1: pkg.deliverables?.duration1,
+                duration2: pkg.deliverables?.duration2,
+                raw_package: pkg
+              });
+            });
+          } else {
+            console.log(`  ❌ No packages found`);
+          }
+        });
+        
+        // Now group creators by their actual package platforms
+        allCreators.forEach((creator) => {
+          if (creator.packages && creator.packages.length > 0) {
+            // Create separate creator instances for each package platform
+            creator.packages.forEach((pkg) => {
+              const packagePlatform = pkg.deliverables?.platform?.toLowerCase() || 'other';
+              
+              if (!platformGroups[packagePlatform]) {
+                platformGroups[packagePlatform] = [];
+              }
+              
+              // Create a new creator instance with only the packages for this platform
+              const platformSpecificCreator: Creator = {
+                ...creator,
+                packages: [pkg], // Only include packages for this specific platform
+              };
+              
+              // Check if creator is already in this platform group
+              const existingCreator = platformGroups[packagePlatform].find(c => c.id === creator.id);
+              if (!existingCreator) {
+                platformGroups[packagePlatform].push(platformSpecificCreator);
+              }
+            });
+          }
+        });
+        
+        console.log('🔍 Final platform groups:', Object.keys(platformGroups).map(p => `${p}: ${platformGroups[p].length}`));
+        
+        // Store the platform groups for display
+        setCreators(platformGroups);
       } else {
         console.error('❌ Failed to fetch creators:', response.error);
         setError(response.error || 'Failed to fetch creators');
@@ -145,96 +292,94 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
   };
 
   const applyFiltersAndSearch = () => {
-    let filtered = [...creators];
-
-    // Apply search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(creator =>
-        creator.name.toLowerCase().includes(query) ||
-        creator.bio?.toLowerCase().includes(query) ||
-        creator.content_categories?.some(cat => cat.toLowerCase().includes(query)) ||
-        creator.city?.toLowerCase().includes(query) ||
-        creator.state?.toLowerCase().includes(query)
-      );
-    }
-
-    // Apply platform filters
-    if (filters.platforms.length > 0) {
-      filtered = filtered.filter(creator =>
-        creator.social_accounts?.some(acc => 
-          filters.platforms.includes(acc.platform.toLowerCase())
-        )
-      );
-    }
-
-    // Apply category filters
-    if (filters.categories.length > 0) {
-      filtered = filtered.filter(creator =>
-        creator.content_categories?.some(cat => 
-          filters.categories.includes(cat)
-        )
-      );
-    }
-
-    // Apply follower range filters
-    if (filters.followerRange.min > 0 || filters.followerRange.max < 10000000) {
-      filtered = filtered.filter(creator => {
-        const maxFollowers = Math.max(...(creator.social_accounts?.map(acc => acc.follower_count) || [0]));
-        return maxFollowers >= filters.followerRange.min && maxFollowers <= filters.followerRange.max;
-      });
-    }
-
-    // Apply price range filters
-    if (filters.priceRange !== 'all') {
-      filtered = filtered.filter(creator => {
-        if (!creator.packages || creator.packages.length === 0) return false;
-        
-        const packagePrices = creator.packages.map(pkg => pkg.price);
-        const minPrice = Math.min(...packagePrices);
-        const maxPrice = Math.max(...packagePrices);
-        
-        switch (filters.priceRange) {
-          case '0-1000':
-            return maxPrice <= 1000;
-          case '1000-5000':
-            return minPrice >= 1000 && maxPrice <= 5000;
-          case '5000-10000':
-            return minPrice >= 5000 && maxPrice <= 10000;
-          case '10000-50000':
-            return minPrice >= 10000 && maxPrice <= 50000;
-          case '50000+':
-            return minPrice >= 50000;
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Apply location filter
-    if (filters.location.trim()) {
-      const location = filters.location.toLowerCase();
-      filtered = filtered.filter(creator =>
-        creator.city?.toLowerCase().includes(location) ||
-        creator.state?.toLowerCase().includes(location)
-      );
-    }
-
-    // Apply verified filter
-    if (filters.verifiedOnly) {
-      filtered = filtered.filter(creator =>
-        creator.social_accounts?.some(acc => acc.verified)
-      );
-    }
-
-    // Apply has packages filter
-    if (filters.hasPackages) {
-      filtered = filtered.filter(creator =>
-        creator.packages && creator.packages.length > 0
-      );
-    }
-
-    setFilteredCreators(filtered);
+    if (!creators || typeof creators !== 'object') return;
+    
+    const filteredGroups: Record<string, Creator[]> = {};
+    
+    Object.entries(creators).forEach(([platform, platformCreators]) => {
+      let filtered = [...platformCreators];
+      
+      // Apply search query
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(creator => 
+          creator.name.toLowerCase().includes(query) ||
+          creator.bio?.toLowerCase().includes(query) ||
+          creator.content_categories?.some((cat: string) => cat.toLowerCase().includes(query)) ||
+          creator.city?.toLowerCase().includes(query) ||
+          creator.state?.toLowerCase().includes(query)
+        );
+      }
+      
+      // Apply platform filters
+      if (filters.platforms.length > 0) {
+        filtered = filtered.filter(creator => 
+          creator.social_accounts?.some((acc: any) => filters.platforms.includes(acc.platform.toLowerCase()))
+        );
+      }
+      
+      // Apply category filters
+      if (filters.categories.length > 0) {
+        filtered = filtered.filter(creator => 
+          creator.content_categories?.some((cat: string) => filters.categories.includes(cat))
+        );
+      }
+      
+      // Apply follower range filters
+      if (filters.followerRange.min > 0 || filters.followerRange.max < 10000000) {
+        filtered = filtered.filter(creator => {
+          const maxFollowers = Math.max(...(creator.social_accounts?.map((acc: any) => acc.follower_count) || [0]));
+          return maxFollowers >= filters.followerRange.min && maxFollowers <= filters.followerRange.max;
+        });
+      }
+      
+      // Apply price range filters
+      if (filters.priceRange !== 'all') {
+        filtered = filtered.filter(creator => {
+          if (!creator.packages || creator.packages.length === 0) return false;
+          const packagePrices = creator.packages.map((pkg: any) => pkg.price);
+          const minPrice = Math.min(...packagePrices);
+          const maxPrice = Math.max(...packagePrices);
+          
+          switch (filters.priceRange) {
+            case '0-1000': return maxPrice <= 1000;
+            case '1000-5000': return minPrice >= 1000 && maxPrice <= 5000;
+            case '5000-10000': return minPrice >= 5000 && maxPrice <= 10000;
+            case '10000+': return minPrice >= 10000;
+            default: return true;
+          }
+        });
+      }
+      
+      // Apply location filter
+      if (filters.location) {
+        const location = filters.location.toLowerCase();
+        filtered = filtered.filter(creator => 
+          creator.city?.toLowerCase().includes(location) ||
+          creator.state?.toLowerCase().includes(location)
+        );
+      }
+      
+      // Apply verified only filter
+      if (filters.verifiedOnly) {
+        filtered = filtered.filter(creator => 
+          creator.social_accounts?.some((acc: any) => acc.verified)
+        );
+      }
+      
+      // Apply has packages filter
+      if (filters.hasPackages) {
+        filtered = filtered.filter(creator => 
+          creator.packages && creator.packages.length > 0
+        );
+      }
+      
+      if (filtered.length > 0) {
+        filteredGroups[platform] = filtered;
+      }
+    });
+    
+    setFilteredCreators(filteredGroups);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -383,27 +528,58 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
       {/* Results Summary */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
-          {filteredCreators.length} Creator{filteredCreators.length !== 1 ? 's' : ''} Found
+          {Object.values(filteredCreators).flat().length} Creator{Object.values(filteredCreators).flat().length !== 1 ? 's' : ''} Found
         </h2>
-        {filteredCreators.length > 0 && (
-          <p className="text-sm text-gray-500">
-            Showing {Math.min(filteredCreators.length, 20)} of {filteredCreators.length}
-          </p>
-        )}
+        <div className="flex items-center gap-4">
+          {Object.values(filteredCreators).flat().length > 0 && (
+            <p className="text-sm text-gray-500">
+              Showing {Math.min(Object.values(filteredCreators).flat().length, 20)} of {Object.values(filteredCreators).flat().length}
+            </p>
+          )}
+          {/* Test Add to Cart Button */}
+          <button
+            onClick={() => {
+              // Add a test package to cart
+              CartService.addToCart({
+                creatorId: 'test-creator-1',
+                creatorName: 'Test Creator',
+                creatorImage: '',
+                packageId: 'test-package-1',
+                packageName: 'Instagram Reel Package',
+                packageDescription: 'Professional Instagram reel creation with trending music and effects',
+                packagePrice: 2500,
+                packageDuration: '3-5 days',
+                platform: 'instagram',
+                deliveryTime: 7,
+                additionalInstructions: 'Make it trendy and engaging',
+                references: ['brand-guidelines.pdf']
+              });
+              toast.success('Test package added to cart!');
+            }}
+            className="px-4 py-2 bg-orange-500 text-white rounded-md text-sm font-medium hover:bg-orange-600 transition-colors"
+          >
+            🧪 Test Add to Cart
+          </button>
+        </div>
       </div>
 
       {/* Creators Grid */}
-      {filteredCreators.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filteredCreators.slice(0, 20).map((creator) => (
-              <CreatorCard
-                key={creator.id}
-                creator={creator}
-                onViewProfile={onViewCreatorProfile}
-                onAddToCart={handleAddToCart}
-                showAddToCart={showAddToCart}
-              />
-            ))}
+      {Object.values(filteredCreators).flat().length > 0 ? (
+        <div className="space-y-8">
+          {/* Display creators by platform using the grouped data directly */}
+          {Object.entries(filteredCreators).map(([platform, platformCreators]) => (
+            <PlatformCreatorSection
+              key={platform}
+              platform={platform}
+              creators={platformCreators}
+              onCreatorPress={(creator) => onViewCreatorProfile(creator.id, creator)}
+              onViewAllPress={() => {
+                // TODO: Navigate to platform-specific view all screen
+                console.log(`View all ${platform} creators`);
+              }}
+              showAddToCart={showAddToCart}
+            />
+          ))}
         </div>
       ) : (
         <div className="text-center py-12 bg-white rounded-lg shadow-sm">
@@ -436,15 +612,6 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
               Clear All
             </button>
           )}
-        </div>
-      )}
-
-      {/* Load More Button */}
-      {filteredCreators.length > 20 && (
-        <div className="text-center">
-          <button className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors">
-            Load More Creators
-          </button>
         </div>
       )}
 

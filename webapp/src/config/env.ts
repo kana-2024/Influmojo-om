@@ -53,10 +53,12 @@ export const API_ENDPOINTS = {
   GET_ORDERS: `${ENV.API_BASE_URL}/api/orders`,
   GET_ORDER_DETAILS: `${ENV.API_BASE_URL}/api/orders/details`,
   CHECKOUT_ORDERS: `${ENV.API_BASE_URL}/api/orders/checkout`,
+  GET_BRAND_ORDERS: `${ENV.API_BASE_URL}/api/orders`,
+  GET_CREATOR_ORDERS: `${ENV.API_BASE_URL}/api/orders`,
+  UPDATE_ORDER_STATUS: `${ENV.API_BASE_URL}/api/orders/status`,
 
   // Creator endpoints
   GET_CREATORS: `${ENV.API_BASE_URL}/api/profile/creators`,
-  GET_CREATOR_PROFILE_BY_ID: `${ENV.API_BASE_URL}/api/profile/creators`,
 
   // Cart endpoints
   ADD_TO_CART: `${ENV.API_BASE_URL}/api/cart/add`,
