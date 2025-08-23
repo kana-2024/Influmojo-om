@@ -564,12 +564,16 @@ export const profileAPI = {
 export const ordersAPI = {
   // Get all orders
   getOrders: async () => {
-    return await apiRequest(API_ENDPOINTS.GET_ORDERS);
+    return await apiRequest(API_ENDPOINTS.GET_ORDERS, {
+      method: 'GET',
+    });
   },
 
   // Get specific order details
   getOrderDetails: async (orderId: string) => {
-    return await apiRequest(`${API_ENDPOINTS.GET_ORDER_DETAILS}/${orderId}`);
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDER_DETAILS}/${orderId}`, {
+      method: 'GET',
+    });
   },
 
   // Checkout orders from cart
@@ -577,6 +581,14 @@ export const ordersAPI = {
     return await apiRequest(API_ENDPOINTS.CHECKOUT_ORDERS, {
       method: 'POST',
       body: JSON.stringify({ cartItems }),
+    });
+  },
+
+  // Submit deliverables for an order (creators only)
+  submitDeliverables: async (orderId: string, deliverables: any[]) => {
+    return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/deliverables`, {
+      method: 'POST',
+      body: JSON.stringify({ deliverables }),
     });
   },
 
@@ -640,7 +652,7 @@ export const ticketAPI = {
   // Get messages for a specific ticket
   getTicketMessages: async (ticketId: string, loadOlderMessages: boolean = false) => {
     const queryParams = loadOlderMessages ? '?loadOlderMessages=true' : '';
-    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/${ticketId}/messages${queryParams}`, {
+    return await apiRequest(`${API_ENDPOINTS.GET_TICKET_MESSAGES}/${ticketId}/messages${queryParams}`, {
       method: 'GET',
     });
   },
@@ -652,7 +664,7 @@ export const ticketAPI = {
     channel_type?: 'brand_agent' | 'creator_agent';
     message_type?: 'text' | 'file' | 'system';
   }) => {
-    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/${ticketId}/messages`, {
+    return await apiRequest(`${API_ENDPOINTS.SEND_TICKET_MESSAGE}/${ticketId}/messages`, {
       method: 'POST',
       body: JSON.stringify(messageData),
     });
@@ -660,14 +672,14 @@ export const ticketAPI = {
 
   // Get ticket by order ID
   getTicketByOrderId: async (orderId: string) => {
-    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/order/${orderId}`, {
+    return await apiRequest(`${API_ENDPOINTS.GET_TICKET_BY_ORDER}/${orderId}`, {
       method: 'GET',
     });
   },
 
   // Update ticket status
   updateTicketStatus: async (ticketId: string, status: string) => {
-    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/${ticketId}/status`, {
+    return await apiRequest(`${API_ENDPOINTS.UPDATE_TICKET_STATUS}/${ticketId}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
     });
@@ -680,7 +692,7 @@ export const ticketAPI = {
       body.isOnline = isOnline;
     }
     
-    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/agent/status`, {
+    return await apiRequest(`${API_ENDPOINTS.UPDATE_AGENT_STATUS}`, {
       method: 'PUT',
       body: JSON.stringify(body),
     });
@@ -688,7 +700,7 @@ export const ticketAPI = {
 
   // Get agent status for a specific ticket
   getAgentStatus: async (ticketId: string) => {
-    return await apiRequest(`${API_ENDPOINTS.API_BASE_URL}/api/crm/tickets/${ticketId}/agent-status`, {
+    return await apiRequest(`${API_ENDPOINTS.GET_AGENT_STATUS}/${ticketId}/agent-status`, {
       method: 'GET',
     });
   },

@@ -137,12 +137,12 @@ export default function CreatePackageModal({ isOpen, onClose, onPackageCreated }
             <div>
               <h2 className="text-lg font-bold text-gray-900">Create Package</h2>
             </div>
-            <button
-              onClick={onClose}
+          <button
+            onClick={onClose}
               className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-            >
+          >
               <XMarkIcon className="w-5 h-5" />
-            </button>
+          </button>
           </div>
         </div>
 
@@ -172,34 +172,34 @@ export default function CreatePackageModal({ isOpen, onClose, onPackageCreated }
           </div>
 
           {/* Quantity */}
-          <div>
+            <div>
             <label className="text-base font-semibold text-gray-900 mb-2 block">
               Quantity<span className="text-red-500">*</span>
-            </label>
+              </label>
             <Dropdown
-              value={quantity}
+                  value={quantity}
               onChange={setQuantity}
               options={quantities}
             />
-          </div>
+            </div>
 
           {/* Revisions */}
-          <div>
+            <div>
             <label className="text-base font-semibold text-gray-900 mb-2 block">
-              Revisions
-            </label>
+                Revisions
+              </label>
             <Dropdown
-              value={revisions}
+                  value={revisions}
               onChange={setRevisions}
               options={revisionOptions}
             />
           </div>
 
           {/* Duration */}
-          <div>
+            <div>
             <label className="text-base font-semibold text-gray-900 mb-2 block">
               Duration<span className="text-red-500">*</span>
-            </label>
+              </label>
             <div className="grid grid-cols-2 gap-3">
               <Dropdown
                 value={duration1}

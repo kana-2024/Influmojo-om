@@ -174,14 +174,14 @@ export default function LoginScreen() {
                   window.location.href = '/brand-profile-setup';
                   return;
                 }
-              } else {
+                } else {
                 // For creators, try to get their profile first
                 try {
                   const creatorProfile = await profileAPI.getCreatorProfile();
                   if (creatorProfile.success && creatorProfile.data) {
                     // If we can successfully get the creator profile, redirect to dashboard
                     console.log('✅ Creator profile exists, redirecting to creator dashboard');
-                    window.location.href = '/dashboard/creator';
+                  window.location.href = '/dashboard/creator';
                     return;
                   }
                 } catch (profileError) {
@@ -275,14 +275,14 @@ export default function LoginScreen() {
             window.location.href = '/brand-profile-setup';
             return;
           }
-        } else {
+          } else {
           // For creators, try to get their profile first
           try {
             const creatorProfile = await profileAPI.getCreatorProfile();
             if (creatorProfile.success && creatorProfile.data) {
               // If we can successfully get the creator profile, redirect to dashboard
               console.log('✅ Creator profile exists, redirecting to creator dashboard');
-              window.location.href = '/dashboard/creator';
+            window.location.href = '/dashboard/creator';
               return;
             }
           } catch (profileError) {
