@@ -12,6 +12,8 @@ package-lock.json
 .env.test.local
 .env.production.local
 .env.*.local
+.env.public
+.env.import
 
 # API Keys and Secrets
 *.key
