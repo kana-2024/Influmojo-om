@@ -88,7 +88,7 @@ class StreamChatService {
     try {
       console.log('🔑 Getting StreamChat token from backend...');
 
-      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/token`, {
+      const response = await fetch(`${process.env.API_BASE_URL || process.env.EXPO_PUBLIC_API_URL || 'https://api.influmojo.com'}/api/chat/token`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ class StreamChatService {
 
       console.log(`🎫 Joining ticket channel for ticket ${ticketId}...`);
 
-      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/tickets/${ticketId}/join`, {
+      const response = await fetch(`${process.env.API_BASE_URL || process.env.EXPO_PUBLIC_API_URL || 'https://api.influmojo.com'}/api/chat/tickets/${ticketId}/join`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ class StreamChatService {
     try {
       console.log(`👋 Leaving ticket channel for ticket ${ticketId}...`);
 
-      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/tickets/${ticketId}/leave`, {
+      const response = await fetch(`${process.env.API_BASE_URL || process.env.EXPO_PUBLIC_API_URL || 'https://api.influmojo.com'}/api/chat/tickets/${ticketId}/leave`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ class StreamChatService {
 
       console.log('📋 Getting user channels...');
 
-      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/channels`, {
+      const response = await fetch(`${process.env.API_BASE_URL || process.env.EXPO_PUBLIC_API_URL || 'https://api.influmojo.com'}/api/chat/channels`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -240,7 +240,7 @@ class StreamChatService {
 
       console.log(`📊 Getting channel info for ${channelId}...`);
 
-      const response = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3000'}/api/chat/channels/${channelId}`, {
+      const response = await fetch(`${process.env.API_BASE_URL || process.env.EXPO_PUBLIC_API_URL || 'https://api.influmojo.com'}/api/chat/channels/${channelId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

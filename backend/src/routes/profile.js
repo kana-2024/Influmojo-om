@@ -71,6 +71,7 @@ router.post('/update-basic-info', [
   }),
   body('dob').optional(),
   body('city').notEmpty().withMessage('City is required'),
+  body('company_name').optional,
   body('business_type').optional().isIn(['SME', 'Startup', 'Enterprise']).withMessage('Valid business type is required'),
   body('website_url').optional().custom((value) => {
     if (value && value.trim() !== '') {
@@ -89,7 +90,7 @@ router.post('/update-basic-info', [
   body('role').optional()
 ], validateRequest, authenticateJWT, async (req, res) => {
   try {
-    const { gender, email, phone, dob, state, city, business_type, website_url, role } = req.body;
+    const { gender, email, phone, dob, state, city, company_name, business_type, website_url, role } = req.body;
     const userId = BigInt(req.user.id);
 
     // Get user to check user type
@@ -259,6 +260,7 @@ router.post('/update-basic-info', [
         brandProfile = await prisma.brandProfile.update({
           where: { id: existingProfile[0].id },
           data: {
+            company_name: company_name || existingProfile[0].company_name, // Update company name if provided
             gender,
             location_city: city,
             business_type: business_type,
@@ -271,6 +273,7 @@ router.post('/update-basic-info', [
         brandProfile = await prisma.brandProfile.create({
           data: {
             user_id: userId,
+            company_name: company_name || user.name, // Use provided company name or fallback to user name
             company_name: user.name, // Use user name as default company name
             gender,
             location_city: city,

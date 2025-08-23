@@ -42,7 +42,7 @@ if (fs.existsSync(envPath)) {
 } else {
   console.log('❌ .env file missing');
   console.log('💡 Create a .env file with:');
-  console.log('   EXPO_PUBLIC_API_URL=https://fair-legal-gar.ngrok-free.app');
+  console.log('   EXPO_PUBLIC_API_URL=https://api.influmojo.com');
 }
 
 console.log('\n🧪 Testing API connectivity...');
@@ -51,7 +51,7 @@ console.log('\n🧪 Testing API connectivity...');
 const testApiConnection = async () => {
   try {
     const https = require('https');
-    const url = 'https://fair-legal-gar.ngrok-free.app/api/health';
+    const url = 'https://api.influmojo.com/api/health';
     
     return new Promise((resolve, reject) => {
       const req = https.get(url, (res) => {

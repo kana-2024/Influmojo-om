@@ -8,9 +8,9 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://fair-legal-gar.ngrok-free.app",
+        "EXPO_PUBLIC_API_URL": "https://api.influmojo.com",
         "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com",
-        "EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID": "401925027822-8vnuv8dfjbjnc265fkihkk61qsoofnot.apps.googleusercontent.com"
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID": "401925027822-8vnuv8dfjbjnc265fkihkk61qsoof3fd59.apps.googleusercontent.com"
       },
       "android": {
         "buildType": "apk",
@@ -23,9 +23,9 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://fair-legal-gar.ngrok-free.app",
+        "EXPO_PUBLIC_API_URL": "https://api.influmojo.com",
         "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com",
-        "EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID": "401925027822-8vnuv8dfjbjnc265fkihkk61qsoofnot.apps.googleusercontent.com"
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID": "401925027822-8vnuv8dfjbjnc265fkihkk61qsoof3fd59.apps.googleusercontent.com"
       },
       "android": {
         "buildType": "apk"
@@ -36,7 +36,7 @@
     },
     "production": {
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://fair-legal-gar.ngrok-free.app",
+        "EXPO_PUBLIC_API_URL": "https://api.influmojo.com",
         "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com",
         "EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID": "401925027822-8vnuv8dfjbjnc265fkihkk61qsoofnot.apps.googleusercontent.com"
       },

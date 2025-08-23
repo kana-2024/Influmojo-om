@@ -3,9 +3,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-// Load environment variables
+const AWS = require('aws-sdk');
+
+// Load environment variables from root .env
 try {
-  require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+  require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 } catch (error) {
   console.log('dotenv not available, using default values');
 }
@@ -23,6 +25,10 @@ const chatRoutes = require('./routes/chat');
 
 const app = express();
 const prisma = new PrismaClient();
+
+// Import AWS Parameter Store utility
+const awsParameterStore = require('./utils/awsParameterStore');
+
 const PORT = process.env.PORT || 3001;
 
 // Global BigInt and Date serializer for JSON responses
@@ -110,11 +116,71 @@ app.options('*', cors());
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  const healthData = {
+    status: 'OK',
     message: 'Influ Mojo API is running',
-    timestamp: new Date().toISOString()
-  });
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    awsParameterStore: {
+      enabled: process.env.NODE_ENV === 'production',
+      status: 'operational'
+    }
+  };
+
+  // Add AWS Parameter Store cache info if available
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      const cacheStats = awsParameterStore.getCacheStats();
+      healthData.awsParameterStore.cache = cacheStats;
+    } catch (error) {
+      healthData.awsParameterStore.cache = { error: error.message };
+    }
+  }
+
+  res.json(healthData);
+});
+
+// AWS Parameter Store management endpoint (admin only)
+app.post('/api/admin/aws-params/clear-cache', (req, res) => {
+  if (process.env.NODE_ENV !== 'production') {
+    return res.status(400).json({ 
+      error: 'Not available in development mode' 
+    });
+  }
+
+  try {
+    awsParameterStore.clearCache();
+    res.json({ 
+      message: 'AWS Parameter Store cache cleared successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: 'Failed to clear cache',
+      message: error.message 
+    });
+  }
+});
+
+app.get('/api/admin/aws-params/cache-stats', (req, res) => {
+  if (process.env.NODE_ENV !== 'production') {
+    return res.status(400).json({ 
+      error: 'Not available in development mode' 
+    });
+  }
+
+  try {
+    const stats = awsParameterStore.getCacheStats();
+    res.json({ 
+      cache: stats,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: 'Failed to get cache stats',
+      message: error.message 
+    });
+  }
 });
 
 // Routes
@@ -154,6 +220,17 @@ app.use((err, req, res, next) => {
 // Database connection and server start
 async function startServer() {
   try {
+    // Load environment variables from AWS Parameter Store first
+    await awsParameterStore.loadProductionEnvVars();
+    
+    // Validate critical environment variables
+    const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
+    if (!awsParameterStore.validateRequiredVars(requiredEnvVars)) {
+      process.exit(1);
+    }
+    
+    console.log('✅ Environment variables loaded successfully');
+    
     await prisma.$connect();
     console.log('✅ Database connected successfully');
     
@@ -161,6 +238,8 @@ async function startServer() {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📱 Health check: http://localhost:${PORT}/api/health`);
       console.log(`📱 Network access: http://192.168.31.57:${PORT}/api/health`);
+      console.log(`🔐 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🔐 AWS Parameter Store: ${process.env.NODE_ENV === 'production' ? 'Enabled' : 'Disabled'}`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

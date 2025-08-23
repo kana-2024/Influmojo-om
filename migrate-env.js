@@ -99,7 +99,34 @@ function migrateDirectory(dirPath) {
 }
 
 function createEnvImportFile(dirPath) {
-  const importContent = `# This file imports environment variables from the root .env file
+  let importContent = '';
+  
+  if (dirPath === 'mobile') {
+    // Mobile-specific import file
+    importContent = `# ========================================
+# INFLUMOJO MOBILE ENVIRONMENT IMPORT
+# ========================================
+# This file imports environment variables from the root .env file
+# For AWS deployment, use the consolidated approach instead
+#
+# To regenerate this file, run: node mobile-env-loader.js
+#
+# Import from root (if using symlinks)
+# source ../.env
+#
+# Or copy the relevant variables here
+# Example:
+# EXPO_PUBLIC_API_URL=\${EXPO_PUBLIC_API_URL}
+# EXPO_PUBLIC_GOOGLE_CLIENT_ID=\${EXPO_PUBLIC_GOOGLE_CLIENT_ID}
+#
+# Mobile-specific variables:
+# MOBILE_APP_NAME=\${MOBILE_APP_NAME}
+# MOBILE_APP_VERSION=\${MOBILE_APP_VERSION}
+# MOBILE_BUILD_NUMBER=\${MOBILE_BUILD_NUMBER}
+`;
+  } else {
+    // General import file
+    importContent = `# This file imports environment variables from the root .env file
 # For AWS deployment, use the consolidated approach instead
 
 # Import from root (if using symlinks)
@@ -110,6 +137,7 @@ function createEnvImportFile(dirPath) {
 # API_URL=\${API_URL}
 # GOOGLE_CLIENT_ID=\${GOOGLE_CLIENT_ID}
 `;
+  }
 
   const importPath = path.join(dirPath, '.env.import');
   fs.writeFileSync(importPath, importContent);

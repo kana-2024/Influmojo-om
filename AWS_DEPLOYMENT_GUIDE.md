@@ -62,7 +62,8 @@ Influmojo-om/
 ### Public Variables (.env.public)
 - Server configuration
 - Public OAuth client IDs
-- URLs and endpoints
+- Web application URLs and endpoints
+- Mobile app configuration
 - AWS region
 
 ## 🛠️ Integration Steps

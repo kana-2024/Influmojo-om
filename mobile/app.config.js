@@ -1,8 +1,14 @@
+import 'dotenv/config';
+
+// Load environment variables from the mobile directory
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env.mobile') });
+
 export default {
   expo: {
-    name: "Influ Mojo",
+    name: process.env.MOBILE_APP_NAME || "Influ Mojo",
     slug: "influmojo-mobile",
-    version: "1.0.0",
+    version: process.env.MOBILE_APP_VERSION || "1.0.0",
     orientation: "portrait",
     icon: "./assets/Asset37.png",
     userInterfaceStyle: "light",
@@ -38,16 +44,16 @@ export default {
     ],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.influmojo.mobile",
-      buildNumber: "1"
+      bundleIdentifier: process.env.MOBILE_BUNDLE_ID || "com.influmojo.mobile",
+      buildNumber: process.env.MOBILE_BUILD_NUMBER || "1"
     },
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/Asset37.png",
         backgroundColor: "#FC5213"
       },
-      package: "com.influmojo.mobile",
-      versionCode: 1,
+      package: process.env.MOBILE_BUNDLE_ID || "com.influmojo.mobile",
+      versionCode: parseInt(process.env.MOBILE_BUILD_NUMBER) || 1,
       permissions: [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
@@ -65,7 +71,10 @@ export default {
         projectId: "67d33b3a-4f6c-4440-be38-ab9129e33700"
       },
       apiBaseUrl: process.env.EXPO_PUBLIC_API_URL,
-      googleClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID
+      googleClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+      googleClientIdAndroid: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID,
+      googleClientIdIos: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS,
+      streamChatApiKey: process.env.EXPO_PUBLIC_STREAMCHAT_API_KEY
     }
   }
 }; 

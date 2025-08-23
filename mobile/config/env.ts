@@ -1,22 +1,33 @@
 import Constants from 'expo-constants';
-// Environment configuration for frontend
+
+// Load environment variables from local mobile environment file
+import 'dotenv/config';
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env.mobile') });
+
+// Environment configuration for mobile app
+// Load from local mobile environment file
 const extra = Constants.expoConfig?.extra || {};
 
-// Force the correct API URL - this ensures we always use the ngrok URL
-const FORCE_API_URL = 'https://modest-properly-orca.ngrok-free.app';
-
 export const ENV = {
-  // API Configuration - Force the correct URL
-  API_BASE_URL: FORCE_API_URL || process.env.EXPO_PUBLIC_API_URL || 'https://modest-properly-orca.ngrok-free.app',
-  GOOGLE_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '',
-  GOOGLE_CLIENT_ID_ANDROID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '',
-  GOOGLE_CLIENT_ID_IOS: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || '',
-  // Google OAuth
-  GOOGLE_CLIENT_SECRET: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || '',
+  // API Configuration - Loaded from local mobile .env.mobile file
+  API_BASE_URL: process.env.EXPO_PUBLIC_API_URL || extra.apiBaseUrl || 'https://api.influmojo.com',
+  GOOGLE_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || extra.googleClientId || '',
+  GOOGLE_CLIENT_ID_ANDROID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || extra.googleClientIdAndroid || '',
+  GOOGLE_CLIENT_ID_IOS: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || extra.googleClientIdIos || '',
+  STREAMCHAT_API_KEY: process.env.EXPO_PUBLIC_STREAMCHAT_API_KEY || extra.streamChatApiKey || '',
   
-  // App Configuration
-  APP_NAME: 'Influ Mojo',
-  APP_VERSION: '1.0.0',
+  // App Configuration - Loaded from local mobile environment
+  APP_NAME: process.env.MOBILE_APP_NAME || 'Influ Mojo',
+  APP_VERSION: process.env.MOBILE_APP_VERSION || '1.0.0',
+  APP_BUILD_NUMBER: process.env.MOBILE_BUILD_NUMBER || '1',
+  BUNDLE_ID: process.env.MOBILE_BUNDLE_ID || 'com.influmojo.mobile',
+  
+  // Mobile-specific configuration
+  API_TIMEOUT: parseInt(process.env.MOBILE_API_TIMEOUT) || 30000,
+  CACHE_DURATION: parseInt(process.env.MOBILE_CACHE_DURATION) || 3600000,
+  GOOGLE_REDIRECT_URI: process.env.MOBILE_GOOGLE_REDIRECT_URI || 'com.influmojo.mobile:/oauth2redirect',
+  FACEBOOK_REDIRECT_URI: process.env.MOBILE_FACEBOOK_REDIRECT_URI || 'com.influmojo.mobile://authorize',
 };
 
 // API endpoints
@@ -67,22 +78,21 @@ export const API_ENDPOINTS = {
 
 // Debug environment variables (only in development)
 if (__DEV__) {
-  console.log('=== Environment Variables Debug ===');
-  console.log('FORCE_API_URL:', FORCE_API_URL);
+  console.log('=== Mobile Environment Variables Debug ===');
+  console.log('Environment file loaded from:', path.join(__dirname, '../.env.mobile'));
   console.log('EXPO_PUBLIC_API_URL:', process.env.EXPO_PUBLIC_API_URL);
-  console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID exists:', !!process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID);
-  console.log('EXPO_PUBLIC_GOOGLE_CLIENT_ID length:', process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID?.length || 0);
-  console.log('ENV.GOOGLE_CLIENT_ID:', ENV.GOOGLE_CLIENT_ID);
   console.log('ENV.API_BASE_URL:', ENV.API_BASE_URL);
-  console.log('API_ENDPOINTS.GOOGLE_AUTH:', API_ENDPOINTS.GOOGLE_AUTH);
-  console.log('API_ENDPOINTS.SEND_OTP:', API_ENDPOINTS.SEND_OTP);
+  console.log('ENV.APP_NAME:', ENV.APP_NAME);
+  console.log('ENV.APP_VERSION:', ENV.APP_VERSION);
+  console.log('ENV.BUNDLE_ID:', ENV.BUNDLE_ID);
+  console.log('API_ENDPOINTS.LOGIN:', API_ENDPOINTS.LOGIN);
   
-  // Validate that we're using the correct URL
-  if (!ENV.API_BASE_URL.includes('https://modest-properly-orca.ngrok-free.app')) {
-    console.error('❌ WARNING: API_BASE_URL is not using the correct ngrok URL!');
-    console.error('Current URL:', ENV.API_BASE_URL);
-    console.error('Expected URL: https://modest-properly-orca.ngrok-free.app');
+  // Validate that we're using the correct API URL
+  if (ENV.API_BASE_URL === 'https://api.influmojo.com') {
+    console.log('✅ API_BASE_URL is correctly configured for production');
+  } else if (ENV.API_BASE_URL === 'http://localhost:3002') {
+    console.log('✅ API_BASE_URL is correctly configured for development');
   } else {
-    console.log('✅ API_BASE_URL is correctly configured');
+    console.log('⚠️  API_BASE_URL is using fallback URL:', ENV.API_BASE_URL);
   }
 } 

@@ -71,13 +71,13 @@ const PUBLIC_PARAMS = {
   STREAM_API_KEY: 'v8bkzb3hh26z',
   
   // URLs
-  FRONTEND_URL: 'https://your-aws-domain.com',
-  NEXT_PUBLIC_API_URL: 'https://your-aws-domain.com',
-  GOOGLE_CALLBACK_URL: 'https://your-aws-domain.com/api/auth/google/callback',
-  FACEBOOK_CALLBACK_URL: 'https://your-aws-domain.com/api/auth/facebook/callback',
+  WEBAPP_URL: 'https://influmojo.com',
+  NEXT_PUBLIC_API_URL: 'https://api.influmojo.com',
+  GOOGLE_CALLBACK_URL: 'https://api.influmojo.com/api/auth/google/callback',
+  FACEBOOK_CALLBACK_URL: 'https://api.influmojo.com/api/auth/facebook/callback',
   
   // Mobile/Web Public
-  EXPO_PUBLIC_API_URL: 'https://your-aws-domain.com',
+  EXPO_PUBLIC_API_URL: 'https://api.influmojo.com',
   EXPO_PUBLIC_GOOGLE_CLIENT_ID: '401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com',
   EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID: '401925027822-br2fn6ohtatmpckjlgfl8eqivb5ernrg.apps.googleusercontent.com',
   EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS: '401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com',

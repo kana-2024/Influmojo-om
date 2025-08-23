@@ -77,7 +77,7 @@ Enable debug logging by setting `__DEV__` to true in the app.
 ## API Configuration
 
 The app uses the following API endpoints:
-- Base URL: `https://fair-legal-gar.ngrok-free.app`
+- Base URL: `https://api.influmojo.com`
 - Authentication: JWT tokens stored in AsyncStorage
 - Error Handling: Comprehensive error handling for network issues
 
