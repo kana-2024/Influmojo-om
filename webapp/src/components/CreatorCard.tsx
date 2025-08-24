@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { StarIcon, MapPinIcon, ClockIcon, UserIcon } from '@heroicons/react/24/solid';
-import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline';
+import { StarIcon, MapPinIcon, UserIcon } from '@heroicons/react/24/solid';
+import Image from 'next/image';
 import CartService from '@/services/cartService';
 import CartFormModal from './modals/CartFormModal';
 
@@ -118,6 +118,7 @@ const CreatorCard: React.FC<CreatorCardProps> = ({
         packageName: selectedPackage.title,
         packageDescription: `${selectedPackage.deliverables.content_type} for ${selectedPackage.deliverables.platform}`,
         packagePrice: selectedPackage.price,
+        packageCurrency: selectedPackage.currency,
         packageDuration: `${selectedPackage.deliverables.duration1} ${selectedPackage.deliverables.duration2}`,
         platform: selectedPackage.deliverables.platform,
         deliveryTime: formData.deliveryTime,
@@ -141,10 +142,11 @@ const CreatorCard: React.FC<CreatorCardProps> = ({
           <div className="absolute bottom-0 left-4 transform translate-y-1/2">
             <div className="w-16 h-16 bg-gray-300 rounded-full border-4 border-white flex items-center justify-center overflow-hidden">
               {creator.profile_image_url ? (
-                <img 
+                <Image 
                   src={creator.profile_image_url} 
                   alt={creator.name} 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               ) : (
                 <UserIcon className="w-8 h-8 text-gray-600" />

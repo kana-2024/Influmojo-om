@@ -107,8 +107,8 @@ const CartModal: React.FC<CartModalProps> = ({
         const { profileAPI } = await import('@/services/apiService');
         try {
           await profileAPI.getBrandProfile();
-        } catch (profileError: any) {
-          const message: string = profileError?.message || '';
+        } catch (profileError: unknown) {
+          const message: string = (profileError as { message?: string })?.message || '';
           if (message.includes('not found') || message.includes('404')) {
             if (confirm('Please complete your brand profile setup before checkout. Go to Profile now?')) {
               onClose();
@@ -145,8 +145,18 @@ const CartModal: React.FC<CartModalProps> = ({
         // Import ordersAPI dynamically to avoid circular dependencies
         const { ordersAPI } = await import('@/services/apiService');
         
+        // Transform cart items to match API format
+        const transformedCartItems = cartSummary.items.map(item => ({
+          id: item.id,
+          package_id: item.packageId,
+          creator_id: item.creatorId,
+          quantity: item.quantity,
+          price: item.packagePrice,
+          currency: item.packageCurrency
+        }));
+        
         // Call real checkout API
-        const response = await ordersAPI.checkoutOrders(cartItems);
+        const response = await ordersAPI.checkoutOrders(transformedCartItems);
         
         console.log('✅ Checkout response:', response);
 
@@ -158,10 +168,10 @@ const CartModal: React.FC<CartModalProps> = ({
           const errMsg = response.message || response.error || 'Failed to process checkout. Please try again.';
           alert(`Checkout Failed: ${errMsg}`);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Checkout error:', error);
         let errorMessage = 'An error occurred during checkout. Please try again.';
-        const msg: string = error?.message || '';
+        const msg: string = (error as { message?: string })?.message || '';
         if (msg.includes('401')) {
           errorMessage = 'Authentication failed. Please log in again.';
         } else if (msg.includes('403')) {

@@ -38,15 +38,15 @@ module.exports = {
       },
       fontFamily: {
         // Primary Typeface - Poppins (matching mobile exactly) with fallbacks
-        'poppins': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        'poppins-regular': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        'poppins-medium': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        'poppins-semibold': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        'poppins-bold': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'poppins': ['var(--font-poppins)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'poppins-regular': ['var(--font-poppins)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'poppins-medium': ['var(--font-poppins)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'poppins-semibold': ['var(--font-poppins)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'poppins-bold': ['var(--font-poppins)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
         
         // Secondary Typeface - Alice (italic) - matching mobile with fallbacks
-        'alice': ['Alice', 'Georgia', 'Times New Roman', 'serif'],
-        'alice-italic': ['Alice', 'Georgia', 'Times New Roman', 'serif'],
+        'alice': ['var(--font-alice)', 'Georgia', 'Times New Roman', 'serif'],
+        'alice-italic': ['var(--font-alice)', 'Georgia', 'Times New Roman', 'serif'],
       },
       fontSize: {
         // Font sizes based on mobile app brand guidelines

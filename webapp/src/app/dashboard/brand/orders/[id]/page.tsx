@@ -95,7 +95,12 @@ interface OrderDetails {
   currency?: string;
   quantity?: number;
   price_revision_amount?: string | number;
-  deliverables?: any[]; // Array of submitted deliverable files
+  deliverables?: Array<{
+    filename?: string;
+    type?: string;
+    size?: number;
+    url?: string;
+  }>; // Array of submitted deliverable files
 }
 
 const navigationItems: NavigationItem[] = [
@@ -544,7 +549,7 @@ export default function BrandOrderDetailsPage() {
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Submitted Deliverables</h2>
                   <div className="space-y-3">
-                    {orderDetails.deliverables.map((deliverable: any, index: number) => (
+                    {orderDetails.deliverables.map((deliverable, index: number) => (
                       <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">

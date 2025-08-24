@@ -1,22 +1,13 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 
 export default function SignupSuccessfulPage() {
   const router = useRouter();
 
-  useEffect(() => {
-    // Auto-redirect after 3 seconds to the appropriate dashboard
-    const timer = setTimeout(() => {
-      redirectToDashboard();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const redirectToDashboard = () => {
+  const redirectToDashboard = useCallback(() => {
     const userType = localStorage.getItem('userType');
     if (userType === 'creator') {
       router.push('/dashboard/creator');
@@ -26,7 +17,16 @@ export default function SignupSuccessfulPage() {
       // Fallback to creator dashboard if user type is not set
       router.push('/dashboard/creator');
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    // Auto-redirect after 3 seconds to the appropriate dashboard
+    const timer = setTimeout(() => {
+      redirectToDashboard();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [redirectToDashboard]);
 
   const handleContinue = () => {
     redirectToDashboard();

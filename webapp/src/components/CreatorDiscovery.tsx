@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import PlatformCreatorSection from './PlatformCreatorSection';
 import FilterModal, { CreatorFilters } from './FilterModal';
@@ -47,13 +47,12 @@ interface Creator {
 
 interface CreatorDiscoveryProps {
   onViewCreatorProfile: (creatorId: string, creatorData: Creator) => void;
-  onAddToCart?: (packageId: string, creatorId: string) => void;
+
   showAddToCart?: boolean;
 }
 
 const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
   onViewCreatorProfile,
-  onAddToCart,
   showAddToCart = false,
 }) => {
   const [creators, setCreators] = useState<Record<string, Creator[]>>({});
@@ -78,9 +77,7 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
   }, []);
 
   // Apply filters and search when they change
-  useEffect(() => {
-    applyFiltersAndSearch();
-  }, [creators, filters, searchQuery]);
+
 
   const fetchCreators = async () => {
     try {
@@ -106,26 +103,16 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
           console.log(`🔍 Creators in this group:`, platformCreators);
           
           if (Array.isArray(platformCreators)) {
-            platformCreators.forEach((creator: any) => {
+            platformCreators.forEach((creator: Creator) => {
               // Process creator data
               const socialAccounts = creator.social_accounts || [];
-              if (socialAccounts.length === 0 && creator.social_account) {
-                socialAccounts.push({
-                  platform: backendPlatform,
-                  username: creator.social_account.username || '',
-                  follower_count: creator.social_account.follower_count || 0,
-                  engagement_rate: creator.social_account.engagement_rate || 0,
-                  verified: creator.social_account.verified || false,
-                });
-              }
-              
               if (socialAccounts.length === 0) {
                 socialAccounts.push({
                   platform: backendPlatform,
-                  username: creator.username || creator.handle || '',
-                  follower_count: creator.follower_count || creator.subscribers || 0,
-                  engagement_rate: creator.engagement_rate || 0,
-                  verified: creator.verified || false,
+                  username: creator.name || '',
+                  follower_count: 0,
+                  engagement_rate: 0,
+                  verified: false,
                 });
               }
               
@@ -133,7 +120,25 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
               const packages = creator.packages || [];
               console.log(`🔍 Processing packages for creator ${creator.name}:`, packages);
               
-              packages.forEach((pkg: any) => {
+              packages.forEach((pkg: {
+                title?: string;
+                content_type?: string;
+                type?: string;
+                platform?: string;
+                deliverables?: {
+                  platform?: string;
+                  content_type?: string;
+                  quantity?: number;
+                  revisions?: number;
+                  duration1?: string;
+                  duration2?: string;
+                };
+                quantity?: number;
+                revisions?: number;
+                duration1?: string;
+                duration2?: string;
+                currency?: string;
+              }) => {
                 // Extract the actual package platform from the package data
                 let packagePlatform = '';
                 
@@ -204,16 +209,16 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
               
               const processedCreator: Creator = {
                 id: creator.id,
-                name: creator.name || creator.fullName || 'Unknown Creator',
+                name: creator.name || 'Unknown Creator',
                 email: creator.email || '',
-                profile_image_url: creator.profile_image_url || creator.avatar,
-                bio: creator.bio || creator.about || '',
-                city: creator.city || creator.location_city,
-                state: creator.state || creator.location_state,
+                profile_image_url: creator.profile_image_url || '',
+                bio: creator.bio || '',
+                city: creator.city || '',
+                state: creator.state || '',
                 rating: creator.rating || 0,
                 total_collaborations: creator.total_collaborations || 0,
                 average_response_time: creator.average_response_time || '1HR - 3HR',
-                content_categories: creator.content_categories || creator.categories || [],
+                content_categories: creator.content_categories || [],
                 languages: creator.languages || [],
                 social_accounts: socialAccounts,
                 packages: packages,
@@ -291,7 +296,7 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
     }
   };
 
-  const applyFiltersAndSearch = () => {
+  const applyFiltersAndSearch = useCallback(() => {
     if (!creators || typeof creators !== 'object') return;
     
     const filteredGroups: Record<string, Creator[]> = {};
@@ -314,7 +319,7 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
       // Apply platform filters
       if (filters.platforms.length > 0) {
         filtered = filtered.filter(creator => 
-          creator.social_accounts?.some((acc: any) => filters.platforms.includes(acc.platform.toLowerCase()))
+          creator.social_accounts?.some((acc) => filters.platforms.includes(acc.platform.toLowerCase()))
         );
       }
       
@@ -328,7 +333,7 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
       // Apply follower range filters
       if (filters.followerRange.min > 0 || filters.followerRange.max < 10000000) {
         filtered = filtered.filter(creator => {
-          const maxFollowers = Math.max(...(creator.social_accounts?.map((acc: any) => acc.follower_count) || [0]));
+          const maxFollowers = Math.max(...(creator.social_accounts?.map((acc) => acc.follower_count) || [0]));
           return maxFollowers >= filters.followerRange.min && maxFollowers <= filters.followerRange.max;
         });
       }
@@ -337,7 +342,7 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
       if (filters.priceRange !== 'all') {
         filtered = filtered.filter(creator => {
           if (!creator.packages || creator.packages.length === 0) return false;
-          const packagePrices = creator.packages.map((pkg: any) => pkg.price);
+          const packagePrices = creator.packages.map((pkg) => pkg.price);
           const minPrice = Math.min(...packagePrices);
           const maxPrice = Math.max(...packagePrices);
           
@@ -363,7 +368,7 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
       // Apply verified only filter
       if (filters.verifiedOnly) {
         filtered = filtered.filter(creator => 
-          creator.social_accounts?.some((acc: any) => acc.verified)
+          creator.social_accounts?.some((acc) => acc.verified)
         );
       }
       
@@ -380,7 +385,12 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
     });
     
     setFilteredCreators(filteredGroups);
-  };
+  }, [creators, filters, searchQuery]);
+
+  // Apply filters and search when they change
+  useEffect(() => {
+    applyFiltersAndSearch();
+  }, [creators, filters, searchQuery, applyFiltersAndSearch]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -394,19 +404,7 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
     setSearchQuery('');
   };
 
-  const handleAddToCart = async (packageId: string, creatorId: string) => {
-    try {
-      const response = await profileAPI.addToCart(packageId, creatorId, 1);
-      if (response.success) {
-        toast.success('Package added to cart successfully!');
-      } else {
-        toast.error(response.error || 'Failed to add package to cart');
-      }
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      toast.error('Failed to add package to cart');
-    }
-  };
+
 
   const getActiveFiltersCount = () => {
     let count = 0;
@@ -548,6 +546,7 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
                 packageName: 'Instagram Reel Package',
                 packageDescription: 'Professional Instagram reel creation with trending music and effects',
                 packagePrice: 2500,
+                packageCurrency: 'INR',
                 packageDuration: '3-5 days',
                 platform: 'instagram',
                 deliveryTime: 7,

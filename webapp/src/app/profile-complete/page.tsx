@@ -57,25 +57,19 @@ export default function ProfileCompletePage() {
       <header className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
         {/* Logo */}
         <div className="flex items-center gap-1">
-          <img 
+          <Image 
             src="/images/logo1.svg" 
             alt="im logo" 
+            width={28}
+            height={28}
             className="h-7 w-auto"
-            onError={(e) => {
-              console.error('Failed to load logo1.svg');
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
           />
-          <img 
+          <Image 
             src="/images/logo2.svg" 
             alt="influ mojo text" 
+            width={28}
+            height={28}
             className="h-7 w-auto"
-            onError={(e) => {
-              console.error('Failed to load logo2.svg');
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
           />
         </div>
 
@@ -218,9 +212,11 @@ export default function ProfileCompletePage() {
           <div className="max-w-sm lg:max-w-md xl:max-w-lg w-full space-y-0 text-center">
             {/* Large centered image - EXACTLY like React Native: 294x294 */}
             <div className="w-full flex justify-center mb-4">
-              <img
+              <Image
                 src="https://storage.googleapis.com/tagjs-prod.appspot.com/v1/ZuylBscLOc/udlc4k45_expires_30_days.png"
                 alt="Profile completion"
+                width={294}
+                height={294}
                 className="w-[294px] h-[294px] object-cover"
                 style={{ marginBottom: '16px' }}
               />
@@ -278,9 +274,11 @@ export default function ProfileCompletePage() {
                   }}>
                     View my profile
                   </span>
-                  <img
+                  <Image
                     src="https://storage.googleapis.com/tagjs-prod.appspot.com/v1/ZuylBscLOc/78ugpa0b_expires_30_days.png"
                     alt="arrow"
+                    width={23}
+                    height={23}
                     className="w-6 h-6"
                     style={{ borderRadius: '4px', width: '23px', height: '23px' }}
                   />

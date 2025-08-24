@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   HomeIcon,
   ListBulletIcon,
@@ -97,17 +98,16 @@ interface Creator {
   engagement_rate: number;
   verified: boolean;
   rating?: number;
-  categories: string[];
-  social_media_accounts?: Array<{
-    platform: string;
-    follower_count: number;
-  }>;
+  social_media_accounts?: SocialMediaAccount[];
   gender?: string;
   age?: number;
   response_time?: string;
   bio?: string;
   description?: string;
   content_categories?: string[];
+  categories?: string[];
+  location?: string;
+  price?: number;
 }
 
 interface BrandProfile {
@@ -134,6 +134,27 @@ interface BrandProfile {
   verification_status?: string;
   rating?: number;
   average_response_time?: string;
+}
+
+interface ProfileFormData {
+  fullName: string;
+  gender: string;
+  state: string;
+  city: string;
+  pincode: string;
+  languages: string[];
+  email: string;
+  phone: string;
+  about: string;
+  bio: string;
+  categories: string[];
+  content_categories: string[];
+  coverImageUrl: string;
+  coverImage?: File | null;
+  profileImageUrl: string;
+  profileImage?: File | null;
+  existingCoverImage?: string;
+  existingProfilePicture?: string;
 }
 
 const navigationItems: NavigationItem[] = [
@@ -236,6 +257,47 @@ const transformBackendData = (backendData: Record<string, unknown>): BrandProfil
     average_response_time: getString('average_response_time') || getString('response_time') || '1HR - 3HR',
   };
 };
+
+// Transform BrandProfile to ProfileFormData for the EditProfileModal
+function transformProfileToFormData(brandProfile: BrandProfile | null): ProfileFormData {
+  if (!brandProfile) {
+    return {
+      fullName: '',
+      gender: '',
+      state: '',
+      city: '',
+      pincode: '',
+      languages: [],
+      email: '',
+      phone: '',
+      about: '',
+      categories: [],
+      bio: '',
+      content_categories: [],
+      coverImageUrl: '',
+      profileImageUrl: ''
+    };
+  }
+
+  return {
+    fullName: brandProfile.fullName || '',
+    gender: '',
+    state: brandProfile.state || '',
+    city: brandProfile.city || '',
+    pincode: brandProfile.pincode || '',
+    languages: brandProfile.languages || [],
+    email: brandProfile.email || '',
+    phone: brandProfile.phone || '',
+    about: brandProfile.bio || '',
+    categories: brandProfile.categories || [],
+    bio: brandProfile.bio || '',
+    content_categories: [], // BrandProfile doesn't have content_categories
+    coverImageUrl: brandProfile.coverImage || '',
+    profileImageUrl: brandProfile.profilePicture || '',
+    existingCoverImage: brandProfile.coverImage || '',
+    existingProfilePicture: brandProfile.profilePicture || ''
+  };
+}
 
 export default function BrandDashboard() {
   const router = useRouter();
@@ -502,9 +564,9 @@ export default function BrandDashboard() {
     categories?: string[];
     content_categories?: string[];
     coverImageUrl?: string;
-    coverImage?: string;
+    coverImage?: File | null;
     profileImageUrl?: string;
-    profileImage?: string;
+    profileImage?: File | null;
   }) => {
     try {
       console.log('Saving profile data:', profileData);
@@ -521,8 +583,8 @@ export default function BrandDashboard() {
         phone: profileData.phone,
         bio: profileData.about || profileData.bio,
         categories: profileData.categories || profileData.content_categories,
-        coverImage: profileData.coverImageUrl || profileData.coverImage,
-        profilePicture: profileData.profileImageUrl || profileData.profileImage,
+        coverImage: profileData.coverImageUrl || (profileData.coverImage ? profileData.coverImage.name : undefined),
+        profilePicture: profileData.profileImageUrl || (profileData.profileImage ? profileData.profileImage.name : undefined),
       };
 
       // Call API to update profile
@@ -543,9 +605,9 @@ export default function BrandDashboard() {
             phone: profileData.phone || prev.phone,
             // Ensure categories are properly mapped
             categories: profileData.categories || profileData.content_categories || prev.categories,
-            // Ensure images are properly mapped
-            coverImage: profileData.coverImageUrl || profileData.coverImage || prev.coverImage,
-            profilePicture: profileData.profileImageUrl || profileData.profileImage || prev.profilePicture,
+            // Ensure images are properly mapped - only use string values
+            coverImage: profileData.coverImageUrl || (profileData.coverImage ? profileData.coverImage.name : prev.coverImage),
+            profilePicture: profileData.profileImageUrl || (profileData.profileImage ? profileData.profileImage.name : prev.profilePicture),
             // Ensure bio is properly mapped
             bio: profileData.about || profileData.bio || prev.bio,
           };
@@ -600,15 +662,12 @@ export default function BrandDashboard() {
       return (
     <div key={creator.id} className="flex-shrink-0 w-80 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200" onClick={() => router.push(`/dashboard/brand/creator/${creator.id}`)}>
       <div className="relative">
-        <img 
+        <Image 
           src={creator.profile_image || creator.profilePicture || "/assets/onboarding1.png"} 
           alt={creator.name || creator.fullName || "Creator"} 
+          width={320}
+          height={192}
           className="w-full h-48 object-cover"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            target.nextElementSibling?.classList.remove('hidden');
-          }}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center hidden">
           <span className="text-6xl">🏔️</span>
@@ -778,15 +837,11 @@ export default function BrandDashboard() {
               >
                                {/* Fashion Category */}
                 <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                  <img 
+                  <Image 
                     src="/assets/fashion.jpg" 
                     alt="Fashion" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.nextElementSibling?.classList.remove('hidden');
-                    }}
+                    fill
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center hidden">
                     <span className="text-2xl">👗</span>
@@ -798,15 +853,11 @@ export default function BrandDashboard() {
                
                                {/* Trainer Category */}
                 <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                  <img 
+                  <Image 
                     src="/assets/trainer.jpg" 
                     alt="Trainer" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.nextElementSibling?.classList.remove('hidden');
-                    }}
+                    fill
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center hidden">
                     <span className="text-2xl">💪</span>
@@ -818,15 +869,11 @@ export default function BrandDashboard() {
                
                                {/* Yoga Category */}
                 <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                  <img 
+                  <Image 
                     src="/assets/yoga.jpg" 
                     alt="Yoga" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.nextElementSibling?.classList.remove('hidden');
-                    }}
+                    fill
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center hidden">
                     <span className="text-2xl">🧘</span>
@@ -838,15 +885,11 @@ export default function BrandDashboard() {
                
                                {/* Business Category */}
                 <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                  <img 
+                  <Image 
                     src="/assets/business.jpg" 
                     alt="Business" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.nextElementSibling?.classList.remove('hidden');
-                    }}
+                    fill
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center hidden">
                     <span className="text-2xl">💼</span>
@@ -858,15 +901,11 @@ export default function BrandDashboard() {
 
                                {/* Beauty Category */}
                 <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                  <img 
+                  <Image 
                     src="/assets/beauty.jpg" 
                     alt="Beauty" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.nextElementSibling?.classList.remove('hidden');
-                    }}
+                    fill
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center hidden">
                     <span className="text-2xl">💄</span>
@@ -878,10 +917,11 @@ export default function BrandDashboard() {
 
                              {/* Gaming Category */}
                <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                 <img 
+                 <Image 
                    src="/assets/fashion.jpg" 
                    alt="Gaming" 
-                   className="w-full h-full object-cover"
+                   fill
+                   className="object-cover"
                    onError={(e) => {
                      const target = e.target as HTMLImageElement;
                      target.style.display = 'none';
@@ -900,10 +940,11 @@ export default function BrandDashboard() {
 
                              {/* Travel Category */}
                <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                 <img 
+                 <Image 
                    src="/assets/fashion.jpg" 
                    alt="Travel" 
-                   className="w-full h-full object-cover"
+                   fill
+                   className="object-cover"
                    onError={(e) => {
                      const target = e.target as HTMLImageElement;
                      target.style.display = 'none';
@@ -922,10 +963,11 @@ export default function BrandDashboard() {
 
               {/* Food Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Food" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -944,10 +986,11 @@ export default function BrandDashboard() {
 
               {/* Education Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Education" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -966,10 +1009,11 @@ export default function BrandDashboard() {
 
               {/* Pet Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Pet" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -988,10 +1032,11 @@ export default function BrandDashboard() {
 
               {/* Sports & Fitness Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Sports & Fitness" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -1010,10 +1055,11 @@ export default function BrandDashboard() {
 
               {/* Lifestyle Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Lifestyle" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -1032,10 +1078,11 @@ export default function BrandDashboard() {
 
               {/* Entertainment Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Entertainment" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -1054,10 +1101,11 @@ export default function BrandDashboard() {
 
               {/* Tech Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Tech" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -1076,10 +1124,11 @@ export default function BrandDashboard() {
 
               {/* Photography Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Photography" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -1098,10 +1147,11 @@ export default function BrandDashboard() {
 
               {/* Healthcare Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Healthcare" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -1120,10 +1170,11 @@ export default function BrandDashboard() {
 
               {/* Finance Category */}
               <div className="flex-shrink-0 w-32 h-32 rounded-lg relative overflow-hidden">
-                <img 
+                <Image 
                   src="/assets/fashion.jpg" 
                   alt="Finance" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -1360,10 +1411,11 @@ export default function BrandDashboard() {
                <div className="absolute bottom-0 left-6 transform translate-y-1/2">
                  <div className="w-24 h-24 bg-gray-300 rounded-full border-4 border-white flex items-center justify-center overflow-hidden">
                    {profile?.profilePicture ? (
-                     <img 
+                     <Image 
                        src={profile.profilePicture} 
                        alt="Profile" 
-                       className="w-full h-full object-cover"
+                       fill
+                       className="object-cover"
                        onError={(e) => {
                          const target = e.target as HTMLImageElement;
                          target.style.display = 'none';
@@ -1805,10 +1857,11 @@ export default function BrandDashboard() {
               <div className="absolute bottom-0 left-6 transform translate-y-1/2">
                 <div className="w-24 h-24 bg-gray-300 rounded-full border-4 border-white flex items-center justify-center overflow-hidden">
                   {profile?.profilePicture ? (
-                    <img 
+                    <Image 
                       src={profile.profilePicture} 
                       alt="Profile" 
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
@@ -2057,7 +2110,7 @@ export default function BrandDashboard() {
                 <MapPinIcon className="w-5 h-5 text-gray-500" />
                 <div>
                   <p className="text-sm text-gray-500">Location</p>
-                  <p className="text-gray-900">
+                  <p className="font-medium text-gray-900">
                     {profile?.city || 'Not specified'}{profile?.state && `, ${profile.state}`}{profile?.pincode && ` ${profile.pincode}`}
                   </p>
                 </div>
@@ -2357,10 +2410,11 @@ export default function BrandDashboard() {
             <div className="absolute bottom-0 left-6 transform translate-y-1/2">
               <div className="w-24 h-24 bg-gray-300 rounded-full border-4 border-white flex items-center justify-center overflow-hidden">
                 {profile?.profilePicture ? (
-                  <img 
+                  <Image 
                     src={profile.profilePicture} 
                     alt="Profile" 
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
@@ -3004,7 +3058,7 @@ export default function BrandDashboard() {
         isOpen={showEditProfileModal}
         onClose={() => setShowEditProfileModal(false)}
         onSave={handleSaveProfile}
-        profile={profile}
+        profile={transformProfileToFormData(profile)}
       />
 
     </div>

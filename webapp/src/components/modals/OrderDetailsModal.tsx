@@ -7,7 +7,45 @@ import { toast } from 'react-hot-toast';
 interface OrderDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  order: any;
+  order: {
+    id: string;
+    status: string;
+    created_at: string;
+    accepted_at?: string;
+    deliverables_submitted_at?: string;
+    expected_delivery?: string;
+    total_amount?: number;
+    package?: {
+      title: string;
+      price: number;
+      description?: string;
+      deliverables: {
+        platform: string;
+        content_type: string;
+        quantity: number;
+        revisions: number;
+        duration1: string;
+        duration2: string;
+      };
+    };
+    brand?: {
+      company_name: string;
+    };
+    creator?: {
+      user: {
+        name: string;
+        email?: string;
+      };
+    };
+    additional_instructions?: string;
+    references?: string[];
+    deliverables?: Array<{
+      filename?: string;
+      media_type?: string;
+      file_size?: number;
+      media_url: string;
+    }>;
+  };
   onOrderAction: (action: 'accept' | 'reject' | 'revision', revisionRequirements?: string) => void;
 }
 
@@ -143,7 +181,12 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onOrderActio
               <div className="space-y-4">
                 <h4 className="text-md font-medium text-gray-800">Review Submitted Deliverables</h4>
                 
-                {order.deliverables.map((deliverable: any, index: number) => (
+                {order.deliverables.map((deliverable: {
+                  filename?: string;
+                  media_type?: string;
+                  file_size?: number;
+                  media_url: string;
+                }, index: number) => (
                   <div key={index} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
@@ -252,7 +295,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onOrderActio
                   <ClockIcon className="w-8 h-8 text-gray-400" />
                 </div>
                 <h4 className="text-lg font-medium text-gray-900 mb-2">No Deliverables Yet</h4>
-                <p className="text-gray-500">The creator hasn't submitted deliverables for review yet.</p>
+                <p className="text-gray-500">The creator hasn&apos;t submitted deliverables for review yet.</p>
               </div>
             )}
           </div>

@@ -114,7 +114,7 @@ export default function ProfileSetupScreen() {
     if (emailVerified === 'true') {
       console.log('✅ ProfileSetupScreen - Email already verified in this session');
     }
-  }, [router]);
+  }, [router, isPhoneVerified, phone]);
   
   // Monitor email changes and clear verification if email is cleared
   useEffect(() => {
@@ -408,25 +408,19 @@ export default function ProfileSetupScreen() {
       <header className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
         {/* Logo */}
         <div className="flex items-center gap-1">
-          <img 
+          <Image 
             src="/images/logo1.svg" 
             alt="im logo" 
+            width={28}
+            height={28}
             className="h-7 w-auto"
-            onError={(e) => {
-              console.error('Failed to load logo1.svg');
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
           />
-          <img 
+          <Image 
             src="/images/logo2.svg" 
             alt="influ mojo text" 
+            width={28}
+            height={28}
             className="h-7 w-auto"
-            onError={(e) => {
-              console.error('Failed to load logo2.svg');
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
           />
         </div>
 

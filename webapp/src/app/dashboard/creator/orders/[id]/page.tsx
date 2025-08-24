@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { 
   HomeIcon,
@@ -98,7 +98,12 @@ interface OrderDetails {
   currency?: string;
   quantity?: number;
   price_revision_amount?: string | number;
-  deliverables?: any[]; // Array of submitted deliverable files
+  deliverables?: Array<{
+    filename?: string;
+    type?: string;
+    size?: number;
+    url?: string;
+  }>; // Array of submitted deliverable files
 }
 
 const navigationItems: NavigationItem[] = [
@@ -131,7 +136,7 @@ export default function CreatorOrderViewPage() {
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const [submittingDeliverables, setSubmittingDeliverables] = useState(false);
 
-  const fetchOrder = async () => {
+  const fetchOrder = useCallback(async () => {
     try {
       setLoading(true);
       const response = await ordersAPI.getOrderDetails(orderId);
@@ -238,13 +243,13 @@ export default function CreatorOrderViewPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
 
   useEffect(() => {
     if (orderId) {
       fetchOrder();
     }
-  }, [orderId]);
+  }, [orderId, fetchOrder]);
 
   const handleNavigation = (href: string) => {
     router.push(href);
@@ -659,7 +664,7 @@ export default function CreatorOrderViewPage() {
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">SUBMITTED DELIVERABLES</h3>
               <div className="space-y-3">
-                {orderDetails.deliverables.map((deliverable: any, index: number) => (
+                {orderDetails.deliverables.map((deliverable, index: number) => (
                   <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                     <div className="flex items-center gap-3">
                       <PaperClipIcon className="w-5 h-5 text-blue-500" />

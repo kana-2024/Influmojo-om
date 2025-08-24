@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { XMarkIcon, StarIcon, MapPinIcon, ClockIcon, UserIcon, CheckBadgeIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
+import { XMarkIcon, MapPinIcon, ClockIcon, UserIcon, CheckBadgeIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import CartFormModal from './CartFormModal';
 import CartService from '@/services/cartService';
@@ -72,11 +73,7 @@ export default function CreatorProfileModal({ isOpen, onClose, creator }: Creato
     setShowCartForm(true);
   };
 
-  const handleViewCreatorProfile = () => {
-    // This will show the full creator profile view as shown in mobile screenshots
-    // The profile should show all details on top and packages/portfolio at the bottom
-    console.log('Viewing full creator profile for:', creator?.name);
-  };
+
 
   const handleFormConfirm = (formData: {
     deliveryTime: number;
@@ -92,6 +89,7 @@ export default function CreatorProfileModal({ isOpen, onClose, creator }: Creato
         packageName: selectedPackage.title,
         packageDescription: `${selectedPackage.deliverables.content_type} for ${selectedPackage.deliverables.platform}`,
         packagePrice: selectedPackage.price,
+        packageCurrency: selectedPackage.currency,
         packageDuration: `${selectedPackage.deliverables.duration1} ${selectedPackage.deliverables.duration2}`,
         platform: selectedPackage.deliverables.platform,
         deliveryTime: formData.deliveryTime,
@@ -169,10 +167,11 @@ export default function CreatorProfileModal({ isOpen, onClose, creator }: Creato
                   <div className="flex items-center gap-4">
                     <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
                       {creator.profile_image ? (
-                        <img 
+                        <Image 
                           src={creator.profile_image} 
                           alt={creator.name} 
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                         />
                       ) : (
                         <UserIcon className="w-12 h-12 text-gray-600" />
@@ -224,7 +223,7 @@ export default function CreatorProfileModal({ isOpen, onClose, creator }: Creato
                     ].map((tab) => (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
+                        onClick={() => setActiveTab(tab.id as 'overview' | 'packages')}
                         className={`py-2 px-1 border-b-2 font-medium text-sm ${
                           activeTab === tab.id
                             ? 'border-orange-500 text-orange-600'
@@ -347,7 +346,7 @@ export default function CreatorProfileModal({ isOpen, onClose, creator }: Creato
                       <div className="text-center py-8">
                         <ShoppingCartIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                         <h4 className="text-lg font-medium text-gray-900 mb-2">No packages available</h4>
-                        <p className="text-gray-500">This creator hasn't published any packages yet.</p>
+                        <p className="text-gray-500">This creator hasn&apos;t published any packages yet.</p>
                       </div>
                     )}
                   </div>

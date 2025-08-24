@@ -242,6 +242,14 @@ export const StreamChatModal: React.FC<StreamChatModalProps> = ({
 */
 
 // Placeholder component for now
-export const StreamChatModal: React.FC<any> = () => {
+export const StreamChatModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  order?: {
+    package?: {
+      title?: string;
+    };
+  };
+}> = () => {
   return null;
 };

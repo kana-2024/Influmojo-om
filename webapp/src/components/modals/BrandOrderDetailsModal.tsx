@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   XMarkIcon,
   CheckIcon,
@@ -86,7 +86,7 @@ interface BrandOrderDetailsModalProps {
 }
 
 // Helper function to safely convert BigInt values to strings
-const safeStringify = (value: any): string | number | any => {
+const safeStringify = (value: unknown): string => {
   if (typeof value === 'bigint') {
     return String(value);
   }
@@ -97,21 +97,17 @@ const safeStringify = (value: any): string | number | any => {
       console.log('🔧 Brand Modal safeStringify: Converting BigInt object:', value);
       return String(value);
     }
-    // Handle nested objects recursively
-    const result: any = {};
-    for (const key in value) {
-      result[key] = safeStringify(value[key]);
-    }
-    return result;
+    // For other objects, convert to string
+    return String(value);
   }
   if (Array.isArray(value)) {
-    return value.map(item => safeStringify(item));
+    return String(value);
   }
-  return value;
+  return String(value);
 };
 
 // Helper function to safely convert price values to numbers
-const safePriceConversion = (value: any): number => {
+const safePriceConversion = (value: unknown): number => {
   if (value === null || value === undefined) return 0;
   
   // If it's already a number, return it
@@ -132,9 +128,8 @@ const safePriceConversion = (value: any): number => {
   if (value && typeof value === 'object' && 's' in value && 'e' in value && 'd' in value) {
     try {
       // This is a Decimal.js BigInt object: {s: 1, e: 4, d: [20000]}
-      const sign = value.s;
-      const exponent = value.e;
-      const digits = value.d;
+      const sign = (value as { s: number }).s;
+      const digits = (value as { d: number[] }).d;
       
       if (Array.isArray(digits) && digits.length > 0) {
         // Convert digits array to number - the digits array contains the actual number
@@ -169,13 +164,7 @@ export default function BrandOrderDetailsModal({ isOpen, onClose, orderId }: Bra
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [revisionComments, setRevisionComments] = useState('');
 
-  useEffect(() => {
-    if (isOpen && orderId) {
-      fetchOrderDetails();
-    }
-  }, [isOpen, orderId]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -219,14 +208,14 @@ export default function BrandOrderDetailsModal({ isOpen, onClose, orderId }: Bra
             type: orderData.package_type || orderData.type || 'Standard',
             platform: orderData.platform || 'Instagram',
             duration: orderData.duration || '1 day',
-            revisions: safeStringify(orderData.revisions || orderData.revision_count || 1)
+            revisions: safePriceConversion(orderData.revisions || orderData.revision_count || 1)
           },
           collaboration: orderData.collaboration || {
             id: safeStringify(orderData.collaboration_id || orderData.id),
             status: orderData.status || 'pending',
             started_at: orderData.created_at || orderData.order_date || new Date().toISOString(),
             deadline: orderData.deadline || orderData.estimated_delivery,
-            agreed_rate: safeStringify(orderData.total_amount || orderData.amount || 0),
+            agreed_rate: safePriceConversion(orderData.total_amount || orderData.amount || 0),
             currency: orderData.currency || 'USD',
             contract_terms: orderData.contract_terms || orderData.additional_instructions || 'Standard terms'
           },
@@ -249,14 +238,14 @@ export default function BrandOrderDetailsModal({ isOpen, onClose, orderId }: Bra
           created_at: orderData.created_at || orderData.order_date,
           order_date: orderData.order_date || orderData.created_at,
           status: orderData.status || 'pending',
-          delivery_time: safeStringify(orderData.delivery_time || orderData.duration_days || 1),
+          delivery_time: safePriceConversion(orderData.delivery_time || orderData.duration_days || 1),
           additional_instructions: orderData.additional_instructions || orderData.instructions || '',
           references: Array.isArray(orderData.references) ? orderData.references : 
                      (orderData.references ? [orderData.references] : []),
           total_amount: safePriceConversion(orderData.total_amount || orderData.amount || orderData.package?.price || orderData.package_price || 0),
           currency: orderData.currency || 'USD',
           quantity: safePriceConversion(orderData.quantity || 1),
-          price_revision_amount: safeStringify(orderData.price_revision_amount || 0)
+          price_revision_amount: safePriceConversion(orderData.price_revision_amount || 0)
         };
         
         console.log('📋 Brand Modal Transformed order data:', transformedOrder);
@@ -330,7 +319,13 @@ export default function BrandOrderDetailsModal({ isOpen, onClose, orderId }: Bra
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (isOpen && orderId) {
+      fetchOrderDetails();
+    }
+  }, [isOpen, orderId, fetchOrderDetails]);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -895,7 +890,7 @@ export default function BrandOrderDetailsModal({ isOpen, onClose, orderId }: Bra
                     onChange={(e) => setRevisionComments(e.target.value)}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Be specific about what changes you'd like to see in the deliverables.
+                    Be specific about what changes you&apos;d like to see in the deliverables.
                   </p>
                 </div>
                 

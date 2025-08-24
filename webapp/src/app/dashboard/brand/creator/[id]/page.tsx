@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { 
   ArrowLeftIcon, 
   ShareIcon, 
@@ -167,6 +168,7 @@ export default function CreatorProfilePage() {
         packageName: pkg.title,
         packageDescription: pkg.description,
         packagePrice: pkg.price,
+        packageCurrency: pkg.currency,
         packageDuration: `${pkg.deliverables?.duration1 || ''} ${pkg.deliverables?.duration2 || ''}`,
         platform: pkg.deliverables?.platform || 'Unknown',
         deliveryTime: 7, // Default 7 days
@@ -286,10 +288,11 @@ export default function CreatorProfilePage() {
                 {creator.portfolio_items && creator.portfolio_items.length > 0 ? (
                   creator.portfolio_items.slice(0, 3).map((item, index) => (
                     <div key={item.id} className="relative aspect-square rounded-lg overflow-hidden">
-                      <img
+                      <Image
                         src={item.media_url || '/assets/onboarding1.png'}
                         alt={item.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                       {index === 2 && creator.portfolio_items && creator.portfolio_items.length > 3 && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -307,10 +310,11 @@ export default function CreatorProfilePage() {
                   // Fallback images if no portfolio items
                   Array.from({ length: 3 }).map((_, index) => (
                     <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
-                      <img
+                      <Image
                         src="/assets/onboarding1.png"
                         alt="Creator content"
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                       {index === 2 && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -329,10 +333,11 @@ export default function CreatorProfilePage() {
             <div className="bg-white rounded-lg p-6">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                  <img
+                  <Image
                     src={creator.profile_image || '/assets/onboarding1.png'}
                     alt={creator.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
                 
@@ -539,10 +544,11 @@ export default function CreatorProfilePage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {creator.portfolio_items?.map((item) => (
                     <div key={item.id} className="aspect-square rounded-lg overflow-hidden">
-                      <img
+                      <Image
                         src={item.media_url || '/assets/onboarding1.png'}
                         alt={item.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     </div>
                   ))}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   XMarkIcon,
   CheckIcon,
@@ -13,7 +13,7 @@ import {
   XCircleIcon
 } from '@heroicons/react/24/outline';
 import { FaInstagram, FaYoutube, FaFacebook, FaTiktok } from 'react-icons/fa';
-import { cloudinaryService, CloudinaryUploadResponse } from '@/services/cloudinaryService';
+import { cloudinaryService } from '@/services/cloudinaryService';
 
 interface OrderDetails {
   id: string;
@@ -90,7 +90,7 @@ interface CreatorOrderDetailsModalProps {
 }
 
 // Helper function to safely convert BigInt values to strings
-const safeStringify = (value: any): string | number | any => {
+const safeStringify = (value: unknown): string | number | unknown => {
   if (typeof value === 'bigint') {
     return String(value);
   }
@@ -102,9 +102,9 @@ const safeStringify = (value: any): string | number | any => {
       return String(value);
     }
     // Handle nested objects recursively
-    const result: any = {};
+    const result: Record<string, unknown> = {};
     for (const key in value) {
-      result[key] = safeStringify(value[key]);
+      result[key] = safeStringify((value as Record<string, unknown>)[key]);
     }
     return result;
   }
@@ -114,8 +114,65 @@ const safeStringify = (value: any): string | number | any => {
   return value;
 };
 
+// Helper function to safely convert any value to a string (for ID fields)
+const safeString = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number' || typeof value === 'bigint') {
+    return String(value);
+  }
+  if (value && typeof value === 'object' && value.constructor === Object) {
+    // Check if it's a BigInt representation object
+    if ('s' in value && 'e' in value && 'd' in value) {
+      return String(value);
+    }
+  }
+  // For any other type, convert to string
+  return String(value);
+};
+
+// Helper function to safely convert any value to a number (for numeric fields)
+const safeNumber = (value: unknown): number => {
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const num = parseFloat(value);
+    return isNaN(num) ? 0 : num;
+  }
+  if (typeof value === 'bigint') {
+    return Number(String(value));
+  }
+  if (value && typeof value === 'object' && value.constructor === Object) {
+    // Check if it's a BigInt representation object
+    if ('s' in value && 'e' in value && 'd' in value) {
+      try {
+        const sign = (value as { s: number }).s;
+        const digits = (value as { d: number[] }).d;
+        if (Array.isArray(digits) && digits.length > 0) {
+          let number = 0;
+          for (let i = 0; i < digits.length; i++) {
+            number += digits[i];
+          }
+          return sign * number;
+        }
+      } catch (error) {
+        console.log('🔧 safeNumber: Error parsing BigInt object:', error);
+      }
+    }
+  }
+  // For any other type, try to convert to number
+  try {
+    const num = Number(value);
+    return isNaN(num) ? 0 : num;
+  } catch {
+    return 0;
+  }
+};
+
 // Helper function to safely convert price values to numbers
-const safePriceConversion = (value: any): number => {
+const safePriceConversion = (value: unknown): number => {
   if (value === null || value === undefined) return 0;
   
   // If it's already a number, return it
@@ -136,9 +193,8 @@ const safePriceConversion = (value: any): number => {
   if (value && typeof value === 'object' && 's' in value && 'e' in value && 'd' in value) {
     try {
       // This is a Decimal.js BigInt object: {s: 1, e: 4, d: [20000]}
-      const sign = value.s;
-      const exponent = value.e;
-      const digits = value.d;
+      const sign = (value as { s: number }).s;
+      const digits = (value as { d: number[] }).d;
       
       if (Array.isArray(digits) && digits.length > 0) {
         // Convert digits array to number - the digits array contains the actual number
@@ -175,13 +231,7 @@ export default function CreatorOrderDetailsModal({ isOpen, onClose, orderId, onO
   const [hasRequestedPriceRevision, setHasRequestedPriceRevision] = useState(false);
   const [priceRevisionAmount, setPriceRevisionAmount] = useState('');
 
-  useEffect(() => {
-    if (isOpen && orderId) {
-      fetchOrderDetails();
-    }
-  }, [isOpen, orderId]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -257,9 +307,9 @@ export default function CreatorOrderDetailsModal({ isOpen, onClose, orderId, onO
         
         // Transform the backend data to match our interface
         const transformedOrder: OrderDetails = {
-          id: safeStringify(orderData.id || orderData.order_id || 'unknown'),
+          id: safeString(orderData.id || orderData.order_id || 'unknown'),
           package: orderData.package || {
-            id: safeStringify(orderData.package_id || orderData.id),
+            id: safeString(orderData.package_id || orderData.id),
             title: orderData.package_title || orderData.title || 'Package',
             description: orderData.package_description || orderData.description || 'Package description',
                          price: safePriceConversion(orderData.package?.price || orderData.package_price || orderData.price || orderData.amount || 0),
@@ -267,14 +317,14 @@ export default function CreatorOrderDetailsModal({ isOpen, onClose, orderId, onO
             type: orderData.package_type || orderData.type || 'Standard',
             platform: orderData.platform || 'Instagram',
             duration: orderData.duration || '1 day',
-            revisions: safeStringify(orderData.revisions || orderData.revision_count || 1)
+            revisions: safeNumber(orderData.revisions || orderData.revision_count || 1)
           },
           collaboration: orderData.collaboration || {
-            id: safeStringify(orderData.collaboration_id || orderData.id),
+            id: safeString(orderData.collaboration_id || orderData.id),
             status: orderData.status || 'pending',
             started_at: orderData.created_at || orderData.order_date || new Date().toISOString(),
             deadline: orderData.deadline || orderData.estimated_delivery,
-            agreed_rate: safeStringify(orderData.package?.price || orderData.total_amount || orderData.amount || orderData.package_price || orderData.price || 0),
+            agreed_rate: safePriceConversion(orderData.package?.price || orderData.total_amount || orderData.amount || orderData.package_price || orderData.price || 0),
             currency: orderData.currency || 'USD',
             contract_terms: orderData.contract_terms || orderData.additional_instructions || 'Standard terms'
           },
@@ -297,7 +347,7 @@ export default function CreatorOrderDetailsModal({ isOpen, onClose, orderId, onO
           created_at: orderData.created_at || orderData.order_date,
           order_date: orderData.order_date || orderData.created_at,
           status: orderData.status || 'pending',
-          delivery_time: safeStringify(orderData.delivery_time || orderData.duration_days || 1),
+          delivery_time: safeNumber(orderData.delivery_time || orderData.duration_days || 1),
           additional_instructions: orderData.additional_instructions || orderData.instructions || '',
           references: Array.isArray(orderData.references) ? orderData.references : 
                      (orderData.references ? [orderData.references] : []),
@@ -349,7 +399,13 @@ export default function CreatorOrderDetailsModal({ isOpen, onClose, orderId, onO
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (isOpen && orderId) {
+      fetchOrderDetails();
+    }
+  }, [isOpen, orderId, fetchOrderDetails]);
 
   const handleAcceptOrder = async () => {
     if (!orderDetails) return;

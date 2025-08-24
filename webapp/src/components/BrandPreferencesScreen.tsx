@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { profileAPI } from '@/services/apiService';
@@ -15,18 +15,18 @@ export default function BrandPreferencesScreen() {
   const [industries, setIndustries] = useState<string[]>([]);
   const [industriesLoading, setIndustriesLoading] = useState(true);
 
-  // Fallback industries (same as mobile)
-  const FALLBACK_INDUSTRIES = [
-    'IT & Technology', 'Entertainment', 'Fashion & Beauty', 'Food & Beverage', 
-    'Healthcare', 'Education', 'Finance & Banking', 'Travel & Tourism',
-    'Sports & Fitness', 'Automotive', 'Real Estate', 'E-commerce',
-    'Manufacturing', 'Media & Advertising', 'Consulting', 'Non-Profit'
-  ];
-
   const availableLanguages = ['Hindi', 'English', 'Telugu', 'Bengali', 'Marathi', 'Gujarati', 'Kannada', 'Malayalam', 'Punjabi', 'Tamil'];
 
   // Load industries from API (same as mobile)
-  const loadIndustries = async () => {
+  const loadIndustries = useCallback(async () => {
+    // Fallback industries (same as mobile) - moved inside useCallback to avoid dependency issues
+    const FALLBACK_INDUSTRIES = [
+      'IT & Technology', 'Entertainment', 'Fashion & Beauty', 'Food & Beverage', 
+      'Healthcare', 'Education', 'Finance & Banking', 'Travel & Tourism',
+      'Sports & Fitness', 'Automotive', 'Real Estate', 'E-commerce',
+      'Manufacturing', 'Media & Advertising', 'Consulting', 'Non-Profit'
+    ];
+
     try {
       setIndustriesLoading(true);
       const response = await profileAPI.getIndustries();
@@ -45,7 +45,7 @@ export default function BrandPreferencesScreen() {
     } finally {
       setIndustriesLoading(false);
     }
-  };
+  }, []);
 
   // Load industries on component mount
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function BrandPreferencesScreen() {
       window.location.href = '/creator-preferences';
       return;
     }
-  }, []);
+  }, [loadIndustries]);
 
   // Industry selection logic
   const toggleIndustry = (industry: string) => {
@@ -143,25 +143,19 @@ export default function BrandPreferencesScreen() {
       <header className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
         {/* Logo */}
         <div className="flex items-center gap-1">
-          <img 
+          <Image 
             src="/images/logo1.svg" 
             alt="im logo" 
+            width={28}
+            height={28}
             className="h-7 w-auto"
-            onError={(e) => {
-              console.error('Failed to load logo1.svg');
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
           />
-          <img 
+          <Image 
             src="/images/logo2.svg" 
             alt="influ mojo text" 
+            width={28}
+            height={28}
             className="h-7 w-auto"
-            onError={(e) => {
-              console.error('Failed to load logo2.svg');
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
           />
         </div>
 

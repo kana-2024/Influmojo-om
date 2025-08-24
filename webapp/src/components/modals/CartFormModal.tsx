@@ -31,7 +31,7 @@ const CartFormModal: React.FC<CartFormModalProps> = ({
   const [deliveryTime, setDeliveryTime] = useState(7);
   const [additionalInstructions, setAdditionalInstructions] = useState('');
   const [references, setReferences] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
+
 
   // Reset form when modal opens
   useEffect(() => {

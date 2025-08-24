@@ -7,6 +7,7 @@ export interface CartItem {
   packageName: string;
   packageDescription: string;
   packagePrice: number;
+  packageCurrency: string;
   packageDuration: string;
   platform: string;
   quantity: number;
@@ -84,6 +85,7 @@ class CartService {
     packageName: string;
     packageDescription: string;
     packagePrice: number;
+    packageCurrency: string;
     packageDuration: string;
     platform: string;
   }>): CartSummary {

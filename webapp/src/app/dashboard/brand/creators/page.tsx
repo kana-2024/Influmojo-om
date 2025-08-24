@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { 
   HomeIcon,
   ListBulletIcon,
@@ -541,15 +542,12 @@ export default function CreatorDiscoveryPage() {
                       className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200"
                     >
                       <div className="relative">
-                        <img 
+                        <Image 
                           src={creator.profile_image || creator.profilePicture || "/assets/onboarding1.png"} 
                           alt={creator.name || creator.fullName || "Creator"} 
+                          width={400}
+                          height={192}
                           className="w-full h-48 object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            target.nextElementSibling?.classList.remove('hidden');
-                          }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center hidden">
                           <span className="text-6xl">🏔️</span>

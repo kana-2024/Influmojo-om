@@ -105,25 +105,7 @@ const PlatformCreatorSection: React.FC<PlatformCreatorSectionProps> = ({
     }
   };
 
-  const getPlatformColor = (platformName: string) => {
-    const platformLower = platformName.toLowerCase();
-    switch (platformLower) {
-      case 'youtube':
-        return 'text-red-600';
-      case 'instagram':
-        return 'text-pink-600';
-      case 'tiktok':
-        return 'text-gray-800';
-      case 'twitter':
-        return 'text-blue-500';
-      case 'facebook':
-        return 'text-blue-600';
-      case 'linkedin':
-        return 'text-blue-700';
-      default:
-        return 'text-gray-600';
-    }
-  };
+
 
   return (
     <div className="space-y-4">

@@ -577,7 +577,14 @@ export const ordersAPI = {
   },
 
   // Checkout orders from cart
-  checkoutOrders: async (cartItems: any[]) => {
+  checkoutOrders: async (cartItems: Array<{
+    id: string;
+    package_id: string;
+    creator_id: string;
+    quantity: number;
+    price: number;
+    currency: string;
+  }>) => {
     return await apiRequest(API_ENDPOINTS.CHECKOUT_ORDERS, {
       method: 'POST',
       body: JSON.stringify({ cartItems }),
@@ -585,7 +592,12 @@ export const ordersAPI = {
   },
 
   // Submit deliverables for an order (creators only)
-  submitDeliverables: async (orderId: string, deliverables: any[]) => {
+  submitDeliverables: async (orderId: string, deliverables: Array<{
+    filename: string;
+    type: string;
+    size: number;
+    url: string;
+  }>) => {
     return await apiRequest(`${API_ENDPOINTS.GET_ORDERS}/${orderId}/deliverables`, {
       method: 'POST',
       body: JSON.stringify({ deliverables }),
@@ -687,7 +699,7 @@ export const ticketAPI = {
 
   // Update agent status (online/offline)
   updateAgentStatus: async (status: 'available' | 'busy' | 'offline' | 'away', isOnline?: boolean) => {
-    const body: any = { status };
+    const body: { status: string; isOnline?: boolean } = { status };
     if (isOnline !== undefined) {
       body.isOnline = isOnline;
     }

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   HomeIcon,
   ListBulletIcon,
@@ -97,6 +98,28 @@ interface BackendPackage {
 }
 
 // Update the PortfolioItem interface to match the backend response
+
+// ProfileFormData interface for EditProfileModal
+interface ProfileFormData {
+  fullName: string;
+  gender: string;
+  state: string;
+  city: string;
+  pincode: string;
+  languages: string[];
+  email: string;
+  phone: string;
+  about: string;
+  categories: string[];
+  bio?: string;
+  content_categories?: string[];
+  coverImage?: File | null;
+  profileImage?: File | null;
+  coverImageUrl?: string;
+  profileImageUrl?: string;
+  existingCoverImage?: string;
+  existingProfilePicture?: string;
+}
 interface PortfolioItem {
   id: string;
   title: string;
@@ -139,6 +162,66 @@ interface CreatorProfile {
   verification_status?: string;
   rating?: number;
   average_response_time?: string;
+}
+
+interface ProfileFormData {
+  fullName: string;
+  gender: string;
+  state: string;
+  city: string;
+  pincode: string;
+  languages: string[];
+  email: string;
+  phone: string;
+  about: string;
+  bio?: string;
+  categories: string[];
+  content_categories?: string[];
+  coverImageUrl?: string;
+  coverImage?: File | null;
+  profileImageUrl?: string;
+  profileImage?: File | null;
+}
+
+// Transform CreatorProfile to ProfileFormData for the EditProfileModal
+function transformProfileToFormData(creatorProfile: CreatorProfile | null): ProfileFormData {
+  if (!creatorProfile) {
+    return {
+      fullName: '',
+      gender: '',
+      state: '',
+      city: '',
+      pincode: '',
+      languages: [],
+      email: '',
+      phone: '',
+      about: '',
+      categories: [],
+      bio: '',
+      content_categories: [],
+      coverImageUrl: '',
+      profileImageUrl: ''
+    };
+  }
+
+  return {
+    fullName: creatorProfile.fullName || '',
+    gender: creatorProfile.gender || '',
+    state: creatorProfile.state || '',
+    city: creatorProfile.city || '',
+    pincode: creatorProfile.pincode || '',
+    languages: creatorProfile.languages || [],
+    email: creatorProfile.email || '',
+    phone: creatorProfile.phone || '',
+    about: creatorProfile.bio || '',
+    categories: creatorProfile.content_categories || [],
+    bio: creatorProfile.bio || '',
+    content_categories: creatorProfile.content_categories || [],
+    coverImageUrl: creatorProfile.coverImage || '',
+    profileImageUrl: creatorProfile.profilePicture || '',
+    existingCoverImage: creatorProfile.coverImage || '',
+    existingProfilePicture: creatorProfile.profilePicture || ''
+  };
 }
 
 const navigationItems: NavigationItem[] = [
@@ -553,24 +636,7 @@ export default function CreatorDashboard() {
     );
   };
 
-    const handleSaveProfile = async (profileData: {
-      fullName?: string;
-      gender?: string;
-      state?: string;
-      city?: string;
-      pincode?: string;
-      languages?: string[];
-      email?: string;
-      phone?: string;
-      about?: string;
-      bio?: string;
-      categories?: string[];
-      content_categories?: string[];
-      coverImageUrl?: string;
-      coverImage?: string;
-      profileImageUrl?: string;
-      profileImage?: string;
-    }) => {
+    const handleSaveProfile = async (profileData: ProfileFormData) => {
     try {
       console.log('Saving profile data:', profileData);
       
@@ -586,8 +652,8 @@ export default function CreatorDashboard() {
         phone: profileData.phone,
         bio: profileData.about || profileData.bio,
         content_categories: profileData.categories || profileData.content_categories,
-        coverImage: profileData.coverImageUrl || profileData.coverImage,
-        profilePicture: profileData.profileImageUrl || profileData.profileImage,
+        coverImage: profileData.coverImageUrl || (profileData.coverImage ? profileData.coverImage.name : undefined),
+        profilePicture: profileData.profileImageUrl || (profileData.profileImage ? profileData.profileImage.name : undefined),
       };
 
       // Call API to update profile
@@ -609,9 +675,9 @@ export default function CreatorDashboard() {
             phone: profileData.phone || prev.phone,
             // Ensure categories are properly mapped
             content_categories: profileData.categories || profileData.content_categories || prev.content_categories,
-            // Ensure images are properly mapped
-            coverImage: profileData.coverImageUrl || profileData.coverImage || prev.coverImage,
-            profilePicture: profileData.profileImageUrl || profileData.profileImage || prev.profilePicture,
+            // Ensure images are properly mapped - only use string values
+            coverImage: profileData.coverImageUrl || (profileData.coverImage ? profileData.coverImage.name : prev.coverImage),
+            profilePicture: profileData.profileImageUrl || (profileData.profileImage ? profileData.profileImage.name : prev.profilePicture),
             // Ensure bio is properly mapped
             bio: profileData.about || profileData.bio || prev.bio,
           };
@@ -643,10 +709,11 @@ export default function CreatorDashboard() {
             {/* Large Orange Banner */}
             <div className="relative h-48 bg-orange-500">
               {profile?.coverImage && (
-                <img 
+                <Image 
                   src={profile.coverImage} 
                   alt="Cover" 
-                  className="absolute inset-0 w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               )}
               {/* Large Text "KATY INFLUENCER" */}
@@ -660,14 +727,12 @@ export default function CreatorDashboard() {
               <div className="absolute -bottom-16 left-8">
                 <div className="relative">
                 {profile?.profilePicture ? (
-                  <img
+                  <Image
                     src={profile.profilePicture}
                     alt={profile.fullName}
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
                   />
                 ) : (
                   <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg bg-gray-200 flex items-center justify-center">
@@ -915,8 +980,8 @@ export default function CreatorDashboard() {
                   <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded">Excellent</span>
                 </div>
                 <p className="text-gray-700 mb-3">
-                  "Katy delivered exceptional content that exceeded our expectations. Her creativity and attention to detail 
-                  made our campaign a huge success. Highly recommended!"
+                  &ldquo;Katy delivered exceptional content that exceeded our expectations. Her creativity and attention to detail 
+                  made our campaign a huge success. Highly recommended!&rdquo;
                 </p>
                 <div className="flex items-center gap-1">
                   <span className="text-sm font-medium text-gray-900 mr-2">3.5</span>
@@ -948,8 +1013,8 @@ export default function CreatorDashboard() {
                   <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded">Excellent</span>
                 </div>
                 <p className="text-gray-700 mb-3">
-                  "Working with Katy was a pleasure. She understood our brand perfectly and created content that resonated 
-                  with our target audience. Great communication throughout the project."
+                  &ldquo;Working with Katy was a pleasure. She understood our brand perfectly and created content that resonated 
+                  with our target audience. Great communication throughout the project.&rdquo;
                 </p>
                 <div className="flex items-center gap-1">
                   <span className="text-sm font-medium text-gray-900 mr-2">3.8</span>
@@ -1429,10 +1494,11 @@ export default function CreatorDashboard() {
                 <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                   <div className="bg-gray-100 rounded-lg h-32 mb-3 flex items-center justify-center overflow-hidden">
                     {item.media_type === 'image' ? (
-                      <img 
+                      <Image 
                         src={item.media_url} 
                         alt={item.title}
-                        className="w-full h-full object-cover rounded-lg"
+                        fill
+                        className="object-cover rounded-lg"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
@@ -1731,10 +1797,11 @@ export default function CreatorDashboard() {
           <div className="p-6">
             <div className="flex items-center gap-2 mb-8">
               <div className="w-8 h-8 flex items-center justify-center">
-                <img 
+                <Image 
                   src="/images/logo1.svg" 
                   alt="Influmojo" 
-                  className="w-8 h-8"
+                  width={32}
+                  height={32}
                 />
               </div>
               <span className="text-xl font-bold text-gray-900">influmojo</span>
@@ -1843,8 +1910,10 @@ Note: Packages with active orders cannot be deleted. You'll need to complete or 
         <EditProfileModal
           isOpen={showEditProfileModal}
           onClose={() => setShowEditProfileModal(false)}
-          onSave={handleSaveProfile}
-          profile={profile}
+          onSave={(profileData) => {
+            handleSaveProfile(profileData);
+          }}
+          profile={transformProfileToFormData(profile)}
         />
       )}
 

@@ -2,66 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 import { authAPI, profileAPI } from '@/services/apiService';
 import { COLORS } from '@/config/colors';
 import { googleAuthService } from '@/services/googleAuth';
 import OtpVerificationModal from './OtpVerificationModal';
 
-// Helper function to check if user has completed onboarding
-const checkOnboardingCompletion = async (userType: string): Promise<boolean> => {
-  try {
-    if (userType === 'brand') {
-      const brandProfile = await profileAPI.getBrandProfile();
-      if (brandProfile.success && brandProfile.data) {
-        // Check if brand has completed basic onboarding
-        const profile = brandProfile.data;
-        
-        // Check for company name (not placeholder), bio/about, and categories/industries
-        // Be more lenient - only require company name and at least one other field
-        const hasCompanyName = profile.company_name && profile.company_name !== 'Company Name';
-        const hasBio = profile.bio || profile.about || profile.description;
-        const hasCategories = profile.categories && profile.categories.length > 0 || 
-                            profile.industries && profile.industries.length > 0;
-        const hasBusinessType = profile.business_type || profile.businessType;
-        const hasRole = profile.role_in_organization || profile.role;
-        
-        console.log('🔍 Brand onboarding check:', {
-          hasCompanyName,
-          hasBio,
-          hasCategories,
-          hasBusinessType,
-          hasRole,
-          company_name: profile.company_name,
-          bio: profile.bio,
-          about: profile.about,
-          description: profile.description,
-          categories: profile.categories,
-          industries: profile.industries,
-          business_type: profile.business_type,
-          businessType: profile.businessType,
-          role_in_organization: profile.role_in_organization,
-          role: profile.role
-        });
-        
-        // Brand has completed onboarding if they have company name AND at least 2 other fields
-        const completedFields = [hasBio, hasCategories, hasBusinessType, hasRole].filter(Boolean).length;
-        return hasCompanyName && completedFields >= 2;
-      }
-    } else {
-      const creatorProfile = await profileAPI.getCreatorProfile();
-      if (creatorProfile.success && creatorProfile.data) {
-        // Check if creator has completed basic onboarding (has bio, categories, etc.)
-        const profile = creatorProfile.data;
-        return !!(profile.bio && profile.content_categories && profile.content_categories.length > 0);
-      }
-    }
-    return false;
-  } catch (error) {
-    console.error('Error checking onboarding completion:', error);
-    return false;
-  }
-};
+
 
 export default function LoginScreen() {
   const [phone, setPhone] = useState('');
@@ -309,25 +257,19 @@ export default function LoginScreen() {
       <header className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
         {/* Logo */}
         <div className="flex items-center gap-1">
-          <img 
+          <Image 
             src="/images/logo1.svg" 
             alt="im logo" 
+            width={28}
+            height={28}
             className="h-7 w-auto"
-            onError={(e) => {
-              console.error('Failed to load logo1.svg');
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
           />
-          <img 
+          <Image 
             src="/images/logo2.svg" 
             alt="influ mojo text" 
+            width={28}
+            height={28}
             className="h-7 w-auto"
-            onError={(e) => {
-              console.error('Failed to load logo2.svg');
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
           />
         </div>
 

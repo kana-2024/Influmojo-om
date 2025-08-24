@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   UserIcon,
   ChevronRightIcon,
@@ -13,8 +14,8 @@ import { cloudinaryService } from '@/services/cloudinaryService';
 interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (profileData: any) => void;
-  profile: any;
+  onSave: (profileData: ProfileFormData) => void;
+  profile: ProfileFormData;
 }
 
 interface ProfileFormData {
@@ -28,6 +29,15 @@ interface ProfileFormData {
   phone: string;
   about: string;
   categories: string[];
+  bio?: string;
+  content_categories?: string[];
+  coverImage?: File | null;
+  profileImage?: File | null;
+  coverImageUrl?: string;
+  profileImageUrl?: string;
+  // For existing images from profile
+  existingCoverImage?: string;
+  existingProfilePicture?: string;
 }
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({
@@ -57,8 +67,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
   const [emailOTP, setEmailOTP] = useState(['', '', '', '', '', '']);
   const [phoneOTP, setPhoneOTP] = useState(['', '', '', '', '', '']);
-  const [emailVerified, setEmailVerified] = useState(false);
-  const [phoneVerified, setPhoneVerified] = useState(false);
+
   const [emailTimer, setEmailTimer] = useState(30);
   const [phoneTimer, setPhoneTimer] = useState(30);
   const [showEmailOTP, setShowEmailOTP] = useState(false);
@@ -112,8 +121,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       });
       
       // Set existing image URLs
-      if (profile.coverImage) setCoverImageUrl(profile.coverImage);
-      if (profile.profilePicture) setProfileImageUrl(profile.profilePicture);
+      if (profile.existingCoverImage) setCoverImageUrl(profile.existingCoverImage);
+      if (profile.existingProfilePicture) setProfileImageUrl(profile.existingProfilePicture);
     }
   }, [profile]);
 
@@ -137,7 +146,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     return () => clearInterval(interval);
   }, [phoneTimer, showPhoneOTP]);
 
-  const handleInputChange = (field: keyof ProfileFormData, value: any) => {
+  const handleInputChange = (field: keyof ProfileFormData, value: string | string[]) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -295,10 +304,11 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 {/* Profile Banner */}
         <div className="relative h-48 bg-orange-500 mx-6 mt-6 rounded-lg overflow-hidden">
           {coverImageUrl && (
-            <img 
+            <Image 
               src={coverImageUrl} 
               alt="Cover" 
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           )}
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
@@ -311,9 +321,11 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           <div className="absolute -bottom-16 left-8">
             <div className="relative">
               {profileImageUrl ? (
-                <img
+                <Image
                   src={profileImageUrl}
                   alt="Profile"
+                  width={128}
+                  height={128}
                   className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
                 />
               ) : (
@@ -544,7 +556,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                         ))}
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-500">Didn't receive the OTP?</span>
+                        <span className="text-sm text-gray-500">Didn&apos;t receive the OTP?</span>
                         <span className="text-sm text-blue-600 cursor-pointer">Resend OTP</span>
                       </div>
                       <div className="text-right">
@@ -601,7 +613,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                         ))}
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-500">Didn't receive the OTP?</span>
+                        <span className="text-sm text-gray-500">Didn&apos;t receive the OTP?</span>
                         <span className="text-sm text-blue-600 cursor-pointer">Resend OTP</span>
                       </div>
                       <div className="text-right">
