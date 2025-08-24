@@ -123,7 +123,7 @@ const CartModal: React.FC<CartModalProps> = ({
       // Continue with checkout if profile check fails
     }
 
-    if (confirm(`Are you sure you want to checkout ${cartSummary.totalItems} items for ₹${cartSummary.totalPrice.toLocaleString()}?`)) {
+            if (confirm(`Are you sure you want to checkout ${cartSummary.totalItems} items for ₹${cartSummary.totalPrice.toLocaleString('en-IN')}?`)) {
       setLastCheckoutTime(now);
       setCheckoutLoading(true);
       
@@ -185,7 +185,7 @@ const CartModal: React.FC<CartModalProps> = ({
   };
 
   const formatPrice = (price: number) => {
-    return `₹${price.toLocaleString()}`;
+            return `₹${price.toLocaleString('en-IN')}`;
   };
 
   const groupItemsByCreator = (items: CartItem[]) => {
@@ -381,7 +381,7 @@ const CartModal: React.FC<CartModalProps> = ({
                       Processing...
                     </div>
                   ) : (
-                    `Checkout - ₹${cartSummary.totalPrice.toLocaleString()}`
+                    `Checkout - ₹${cartSummary.totalPrice.toLocaleString('en-IN')}`
                   )}
                 </button>
               </div>

@@ -127,7 +127,8 @@ class GoogleAuthService {
         },
         auto_select: false,
         cancel_on_tap_outside: false,
-        use_fedcm_for_prompt: false // Disable FedCM to avoid CORS issues
+        use_fedcm_for_prompt: false, // Disable FedCM to avoid CORS issues
+        context: 'signin' // Specify context to avoid FedCM issues
       });
 
       // Use renderButton approach for better reliability

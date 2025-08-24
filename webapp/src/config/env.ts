@@ -51,20 +51,30 @@ export const API_ENDPOINTS = {
   // Order endpoints
   CREATE_ORDER: `${ENV.API_BASE_URL}/api/orders`,
   GET_ORDERS: `${ENV.API_BASE_URL}/api/orders`,
-  GET_ORDER_DETAILS: `${ENV.API_BASE_URL}/api/orders/details`,
+  GET_ORDER_DETAILS: `${ENV.API_BASE_URL}/api/orders`,
   CHECKOUT_ORDERS: `${ENV.API_BASE_URL}/api/orders/checkout`,
   GET_BRAND_ORDERS: `${ENV.API_BASE_URL}/api/orders`,
   GET_CREATOR_ORDERS: `${ENV.API_BASE_URL}/api/orders`,
   UPDATE_ORDER_STATUS: `${ENV.API_BASE_URL}/api/orders/status`,
+  SUBMIT_DELIVERABLES: `${ENV.API_BASE_URL}/api/orders`,
 
   // Creator endpoints
   GET_CREATORS: `${ENV.API_BASE_URL}/api/profile/creators`,
+  GET_CREATOR_PROFILE_BY_ID: `${ENV.API_BASE_URL}/api/profile/creators`,
 
   // Cart endpoints
   ADD_TO_CART: `${ENV.API_BASE_URL}/api/cart/add`,
   GET_CART: `${ENV.API_BASE_URL}/api/cart`,
   REMOVE_FROM_CART: `${ENV.API_BASE_URL}/api/cart/remove`,
   UPDATE_CART_ITEM: `${ENV.API_BASE_URL}/api/cart/update`,
+
+  // CRM and Ticket endpoints
+  GET_TICKET_MESSAGES: `${ENV.API_BASE_URL}/api/crm/tickets`,
+  SEND_TICKET_MESSAGE: `${ENV.API_BASE_URL}/api/crm/tickets`,
+  GET_TICKET_BY_ORDER: `${ENV.API_BASE_URL}/api/crm/tickets/order`,
+  UPDATE_TICKET_STATUS: `${ENV.API_BASE_URL}/api/crm/tickets`,
+  UPDATE_AGENT_STATUS: `${ENV.API_BASE_URL}/api/crm/agent/status`,
+  GET_AGENT_STATUS: `${ENV.API_BASE_URL}/api/crm/tickets`,
 };
 
 // Debug environment variables (only in development)

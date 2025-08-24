@@ -270,13 +270,13 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onOrderActio
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Price:</span>
                 <span className="font-medium text-gray-900">
-                  ₹{order.package?.price || order.total_amount || 0}
+                  ₹{Number(order.package?.price || order.total_amount || 0).toLocaleString('en-IN')}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Total Amount:</span>
                 <span className="font-medium text-gray-900">
-                  ₹{order.total_amount || 0}
+                  ₹{Number(order.total_amount || 0).toLocaleString('en-IN')}
                 </span>
               </div>
             </div>

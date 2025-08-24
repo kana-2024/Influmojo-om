@@ -47,7 +47,7 @@ export default function CheckoutConfirmationModal({
               Are you sure you want to checkout?
             </h3>
             <p className="text-gray-600">
-              {cartSummary.totalItems} item{cartSummary.totalItems !== 1 ? 's' : ''} for ₹{cartSummary.totalPrice.toLocaleString()}
+              {cartSummary.totalItems} item{cartSummary.totalItems !== 1 ? 's' : ''} for ₹{cartSummary.totalPrice.toLocaleString('en-IN')}
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export default function CheckoutConfirmationModal({
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Total Amount:</span>
-                <span className="font-medium text-orange-600">₹{cartSummary.totalPrice.toLocaleString()}</span>
+                <span className="font-medium text-orange-600">₹{cartSummary.totalPrice.toLocaleString('en-IN')}</span>
               </div>
             </div>
           </div>

@@ -37,7 +37,7 @@ import EditPackageModal from '@/components/EditPackageModal';
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
 import EditProfileModal from '@/components/EditProfileModal';
 import CartModal from '@/components/modals/CartModal';
-import CreatorOrderDetailsModal from '@/components/modals/CreatorOrderDetailsModal';
+
 
 interface NavigationItem {
   id: string;
@@ -169,14 +169,7 @@ const formatFollowerCount = (count: number): string => {
   return count.toString();
 };
 
-// Helper function to format file size
-const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
+
 
 // Transform backend data to match frontend expected structure
 const transformBackendData = (backendData: Record<string, unknown>): CreatorProfile => {
@@ -318,8 +311,7 @@ export default function CreatorDashboard() {
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showCart, setShowCart] = useState(false);
-  const [showOrderDetailsModal, setShowOrderDetailsModal] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
   
   // Sample notification data - in real app, this would come from API
   const [notifications, setNotifications] = useState([
@@ -500,11 +492,11 @@ export default function CreatorDashboard() {
       await profileAPI.deletePackage(deletingPackageId);
       alert('Package deleted successfully!');
       fetchProfile();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Delete package error:', error);
       
       // Check if it's the specific "active orders" error
-      if (error.message && error.message.includes('active orders')) {
+      if (error instanceof Error && error.message && error.message.includes('active orders')) {
         alert('Cannot delete package with active orders. Please complete or cancel existing orders first.');
       } else {
         alert('Failed to delete package. Please try again.');
@@ -534,7 +526,7 @@ export default function CreatorDashboard() {
     }
   };
 
-  const handleNotificationAction = (action: string, data?: any) => {
+  const handleNotificationAction = (action: string, data?: { id: string }) => {
     switch (action) {
       case 'viewOrder':
         console.log('View order clicked:', data);
@@ -561,7 +553,24 @@ export default function CreatorDashboard() {
     );
   };
 
-    const handleSaveProfile = async (profileData: any) => {
+    const handleSaveProfile = async (profileData: {
+      fullName?: string;
+      gender?: string;
+      state?: string;
+      city?: string;
+      pincode?: string;
+      languages?: string[];
+      email?: string;
+      phone?: string;
+      about?: string;
+      bio?: string;
+      categories?: string[];
+      content_categories?: string[];
+      coverImageUrl?: string;
+      coverImage?: string;
+      profileImageUrl?: string;
+      profileImage?: string;
+    }) => {
     try {
       console.log('Saving profile data:', profileData);
       
@@ -587,10 +596,17 @@ export default function CreatorDashboard() {
       if (response.success) {
         // Update local state with the response data
         setProfile(prev => {
-          if (!prev) return profileData;
+          if (!prev) return null;
           return {
             ...prev,
-            ...profileData,
+            fullName: profileData.fullName || prev.fullName,
+            gender: profileData.gender || prev.gender,
+            state: profileData.state || prev.state,
+            city: profileData.city || prev.city,
+            pincode: profileData.pincode || prev.pincode,
+            languages: profileData.languages || prev.languages,
+            email: profileData.email || prev.email,
+            phone: profileData.phone || prev.phone,
             // Ensure categories are properly mapped
             content_categories: profileData.categories || profileData.content_categories || prev.content_categories,
             // Ensure images are properly mapped
@@ -611,25 +627,7 @@ export default function CreatorDashboard() {
     }
   };
 
-  // Order handlers
 
-  const handleUploadDeliverables = async (files: File[]) => {
-    // TODO: Implement actual upload logic
-    console.log('Uploading deliverables:', files);
-    toast.success('Deliverables uploaded successfully!');
-  };
-
-  const handleAcceptOrder = async () => {
-    // TODO: Implement actual accept logic
-    console.log('Accepting order');
-    toast.success('Order accepted successfully!');
-  };
-
-  const handleRejectOrder = async () => {
-    // TODO: Implement actual reject logic
-    console.log('Rejecting order');
-    toast.success('Order rejected successfully!');
-  };
 
   const renderMainContent = () => {
     if (activeTab === 'dashboard') {
@@ -981,7 +979,7 @@ export default function CreatorDashboard() {
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome {profile?.fullName || 'Creator'}</h1>
                 <div className="text-gray-600">
                   <span className="text-orange-500">Packages List</span> &gt; Packages
-                </div>
+          </div>
               </div>
               <div className="flex items-center gap-4">
                
@@ -1240,7 +1238,7 @@ export default function CreatorDashboard() {
                 </div>
                         
                         <div className="flex items-center justify-between">
-                          <span className="text-orange-500 font-bold text-lg">₹{pkg.price.toLocaleString()}</span>
+                          <span className="text-orange-500 font-bold text-lg">₹{pkg.price.toLocaleString('en-IN')}</span>
                           <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-600 transition-colors flex items-center gap-2">
                             <ShoppingCartIcon className="w-4 h-4" />
                             Add To Cart
@@ -1311,7 +1309,7 @@ export default function CreatorDashboard() {
         </div>
 
                         <div className="flex items-center justify-between">
-                          <span className="text-orange-500 font-bold text-lg">₹{pkg.price.toLocaleString()}</span>
+                          <span className="text-orange-500 font-bold text-lg">₹{pkg.price.toLocaleString('en-IN')}</span>
                           <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-600 transition-colors flex items-center gap-2">
                             <ShoppingCartIcon className="w-4 h-4" />
                             Add To Cart
@@ -1382,7 +1380,7 @@ export default function CreatorDashboard() {
                         </div>
                         
                         <div className="flex items-center justify-between">
-                          <span className="text-orange-500 font-bold text-lg">₹{pkg.price.toLocaleString()}</span>
+                          <span className="text-orange-500 font-bold text-lg">₹{pkg.price.toLocaleString('en-IN')}</span>
                           <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-600 transition-colors flex items-center gap-2">
                             <ShoppingCartIcon className="w-4 h-4" />
                             Add To Cart
@@ -1747,7 +1745,11 @@ export default function CreatorDashboard() {
                 <button
                   key={item.id}
                   onClick={() => {
-                    setActiveTab(item.id);
+                    if (item.id === 'orderList') {
+                      router.push('/dashboard/creator/orders');
+                    } else {
+                      setActiveTab(item.id);
+                    }
                     setShowProfileDropdown(false);
                     setShowNotificationPopup(false);
                   }}
@@ -1856,17 +1858,7 @@ Note: Packages with active orders cannot be deleted. You'll need to complete or 
 
 
 
-      {/* Creator Order Details Modal */}
-      {showOrderDetailsModal && selectedOrder && (
-        <CreatorOrderDetailsModal
-          isOpen={showOrderDetailsModal}
-          onClose={() => setShowOrderDetailsModal(false)}
-          order={selectedOrder}
-          onUploadDeliverables={handleUploadDeliverables}
-          onAcceptOrder={handleAcceptOrder}
-          onRejectOrder={handleRejectOrder}
-        />
-      )}
+
     </div>
   );
 }

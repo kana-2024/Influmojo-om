@@ -54,7 +54,20 @@ const CreatorCard: React.FC<CreatorCardProps> = ({
   showAddToCart = false,
 }) => {
   const [showCartForm, setShowCartForm] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<Creator['packages'][0] | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<{
+    id: string;
+    title: string;
+    price: number;
+    currency: string;
+    deliverables: {
+      platform: string;
+      content_type: string;
+      quantity: number;
+      revisions: number;
+      duration1: string;
+      duration2: string;
+    };
+  } | null>(null);
 
   // Helper function to format follower count
   const formatFollowerCount = (count: number): string => {
@@ -72,7 +85,20 @@ const CreatorCard: React.FC<CreatorCardProps> = ({
   const firstPackage = hasPackages && creator.packages ? creator.packages[0] : null;
 
   // Handle add to cart with form
-  const handleAddToCart = (pkg: Creator['packages'][0]) => {
+  const handleAddToCart = (pkg: {
+    id: string;
+    title: string;
+    price: number;
+    currency: string;
+    deliverables: {
+      platform: string;
+      content_type: string;
+      quantity: number;
+      revisions: number;
+      duration1: string;
+      duration2: string;
+    };
+  }) => {
     setSelectedPackage(pkg);
     setShowCartForm(true);
   };
@@ -219,7 +245,7 @@ const CreatorCard: React.FC<CreatorCardProps> = ({
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-gray-900">Starting from</span>
                 <span className="text-lg font-bold text-orange-600">
-                  ₹{firstPackage.price}
+                  ₹{Number(firstPackage.price).toLocaleString('en-IN')}
                 </span>
               </div>
               

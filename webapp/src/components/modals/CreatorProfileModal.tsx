@@ -51,7 +51,20 @@ interface CreatorProfileModalProps {
 
 export default function CreatorProfileModal({ isOpen, onClose, creator }: CreatorProfileModalProps) {
   const [showCartForm, setShowCartForm] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<Creator['packages'][0] | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<{
+    id: string;
+    title: string;
+    price: number;
+    currency: string;
+    deliverables: {
+      platform: string;
+      content_type: string;
+      quantity: number;
+      revisions: number;
+      duration1: string;
+      duration2: string;
+    };
+  } | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'packages'>('overview');
 
   const handleAddToCart = (pkg: Creator['packages'][0]) => {
@@ -317,7 +330,7 @@ export default function CreatorProfileModal({ isOpen, onClose, creator }: Creato
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="text-2xl font-bold text-orange-600">₹{pkg.price}</p>
+                              <p className="text-2xl font-bold text-orange-600">₹{Number(pkg.price).toLocaleString('en-IN')}</p>
                               <p className="text-sm text-gray-500">{pkg.currency}</p>
                             </div>
                           </div>

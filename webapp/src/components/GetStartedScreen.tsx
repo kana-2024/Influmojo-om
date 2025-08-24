@@ -557,11 +557,12 @@ const Feature = ({ title, description }: { title: string; description: string })
 
 function GoogleButton({ onClick, loading, disabled }: { onClick: () => void; loading: boolean; disabled?: boolean }) {
   return (
-    <button 
-      onClick={onClick}
-      disabled={loading || disabled}
-      className="flex items-center justify-center border border-gray-300 rounded-lg px-3 sm:px-4 py-2.5 hover:bg-gray-50 transition-colors bg-white w-full disabled:opacity-50 disabled:cursor-not-allowed"
-    >
+    <div id="google-signin-container">
+      <button 
+        onClick={onClick}
+        disabled={loading || disabled}
+        className="flex items-center justify-center border border-gray-300 rounded-lg px-3 sm:px-4 py-2.5 hover:bg-gray-50 transition-colors bg-white w-full disabled:opacity-50 disabled:cursor-not-allowed"
+      >
       {loading ? (
         <>
           <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
@@ -584,6 +585,7 @@ function GoogleButton({ onClick, loading, disabled }: { onClick: () => void; loa
         </>
       )}
     </button>
+    </div>
   );
 }
 

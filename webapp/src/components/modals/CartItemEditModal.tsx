@@ -95,7 +95,7 @@ const CartItemEditModal: React.FC<CartItemEditModalProps> = ({
               <h4 className="font-medium text-orange-900 mb-2">{cartItem.packageName}</h4>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-orange-700">{cartItem.platform}</span>
-                <span className="font-semibold text-orange-900">₹{cartItem.packagePrice}</span>
+                                  <span className="font-semibold text-orange-900">₹{Number(cartItem.packagePrice).toLocaleString('en-IN')}</span>
               </div>
               <p className="text-xs text-orange-600 mt-1">Creator: {cartItem.creatorName}</p>
             </div>
