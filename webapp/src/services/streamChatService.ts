@@ -1,7 +1,6 @@
-import { StreamChat } from 'stream-chat';
-
-// StreamChat client instance
-let chatClient: StreamChat | null = null;
+// TEMPORARILY COMMENTED OUT FOR EC2 BUILD - StreamChat functionality will be restored later
+/*
+import StreamChat from 'stream-chat';
 
 export interface StreamChatUser {
   id: string;
@@ -24,17 +23,10 @@ export interface StreamChatChannel {
   createdAt?: string;
 }
 
-/**
- * StreamChat Service for Webapp
- * Handles agent-mediated support conversations
- */
 class StreamChatService {
   private client: StreamChat | null = null;
   private currentUser: StreamChatUser | null = null;
 
-  /**
-   * Initialize StreamChat client
-   */
   async initialize(apiKey: string): Promise<StreamChat> {
     try {
       console.log('🔧 Initializing StreamChat client...');
@@ -49,9 +41,6 @@ class StreamChatService {
     }
   }
 
-  /**
-   * Connect user to StreamChat
-   */
   async connectUser(userId: string, token: string): Promise<StreamChatUser> {
     try {
       if (!this.client) {
@@ -80,9 +69,6 @@ class StreamChatService {
     }
   }
 
-  /**
-   * Get StreamChat token from backend
-   */
   async getToken(): Promise<StreamChatToken> {
     try {
       console.log('🔑 Getting StreamChat token from backend...');
@@ -111,44 +97,48 @@ class StreamChatService {
     }
   }
 
-  /**
-   * Get stored token (helper method)
-   */
-  private getStoredToken(): string | null {
-    try {
-      return localStorage.getItem('token');
-    } catch (error) {
-      console.error('❌ Error getting stored token:', error);
-      return null;
+  private getStoredToken(): string {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token') || '';
     }
+    return '';
   }
 
-  /**
-   * Join a ticket channel
-   */
-  async joinTicketChannel(ticketId: string): Promise<string> {
+  async createTicketChannel(orderId: string, title: string): Promise<string> {
     try {
       if (!this.client) {
         throw new Error('StreamChat client not initialized');
       }
 
-      console.log(`🎫 Joining ticket channel for ticket ${ticketId}...`);
+      console.log(`🎫 Creating ticket channel for order ${orderId}`);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002'}/api/chat/tickets/${ticketId}/join`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getStoredToken()}`
-        }
+      const channel = this.client.channel('messaging', `ticket-${orderId}`, {
+        name: `Support: ${title}`,
+        members: [this.currentUser?.id || ''],
+        created_by_id: this.currentUser?.id || '',
+        custom_type: 'ticket'
       });
 
-      const data = await response.json();
+      await channel.create();
       
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to join ticket channel');
+      console.log(`✅ Ticket channel created: ${channel.id}`);
+      return channel.id;
+    } catch (error) {
+      console.error('❌ Error creating ticket channel:', error);
+      throw error;
+    }
+  }
+
+  async joinTicketChannel(channelId: string): Promise<string> {
+    try {
+      if (!this.client) {
+        throw new Error('StreamChat client not initialized');
       }
 
-      const { channelId } = data.data;
+      console.log(`🚪 Joining ticket channel: ${channelId}`);
+
+      const channel = this.client.channel('messaging', channelId);
+      await channel.watch();
       
       console.log(`✅ Joined ticket channel: ${channelId}`);
       return channelId;
@@ -158,44 +148,31 @@ class StreamChatService {
     }
   }
 
-  /**
-   * Leave a ticket channel
-   */
-  async leaveTicketChannel(ticketId: string): Promise<void> {
+  async leaveTicketChannel(channelId: string): Promise<void> {
     try {
-      console.log(`👋 Leaving ticket channel for ticket ${ticketId}...`);
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002'}/api/chat/tickets/${ticketId}/leave`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getStoredToken()}`
-        }
-      });
-
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to leave ticket channel');
+      if (!this.client) {
+        throw new Error('StreamChat client not initialized');
       }
 
-      console.log(`✅ Left ticket channel for ticket ${ticketId}`);
+      console.log(`🚪 Leaving ticket channel: ${channelId}`);
+
+      const channel = this.client.channel('messaging', channelId);
+      await channel.removeMembers([this.currentUser?.id || '']);
+      
+      console.log(`✅ Left ticket channel: ${channelId}`);
     } catch (error) {
       console.error('❌ Error leaving ticket channel:', error);
       throw error;
     }
   }
 
-  /**
-   * Get user's active channels
-   */
   async getUserChannels(): Promise<StreamChatChannel[]> {
     try {
       if (!this.client) {
         throw new Error('StreamChat client not initialized');
       }
 
-      console.log('📋 Getting user channels...');
+      console.log('📺 Getting user channels...');
 
       const channels = await this.client.queryChannels({
         members: { $in: [this.currentUser?.id || ''] }
@@ -217,9 +194,6 @@ class StreamChatService {
     }
   }
 
-  /**
-   * Get a specific channel
-   */
   async getChannel(channelId: string) {
     try {
       if (!this.client) {
@@ -238,9 +212,6 @@ class StreamChatService {
     }
   }
 
-  /**
-   * Send a message to a channel
-   */
   async sendMessage(channelId: string, messageText: string, messageType: 'text' | 'file' | 'system' = 'text') {
     try {
       if (!this.client) {
@@ -263,9 +234,6 @@ class StreamChatService {
     }
   }
 
-  /**
-   * Get messages from a channel
-   */
   async getMessages(channelId: string, limit: number = 50) {
     try {
       if (!this.client) {
@@ -285,23 +253,14 @@ class StreamChatService {
     }
   }
 
-  /**
-   * Check if user is connected
-   */
   isConnected(): boolean {
     return this.client !== null && this.currentUser !== null;
   }
 
-  /**
-   * Get current user
-   */
   getCurrentUser(): StreamChatUser | null {
     return this.currentUser;
   }
 
-  /**
-   * Disconnect user
-   */
   async disconnectUser(): Promise<void> {
     try {
       if (this.client) {
@@ -316,13 +275,28 @@ class StreamChatService {
     }
   }
 
-  /**
-   * Get StreamChat client instance
-   */
   getClient(): StreamChat | null {
     return this.client;
   }
 }
 
-// Export singleton instance
 export const streamChatService = new StreamChatService();
+*/
+
+// Placeholder service for now
+export const streamChatService = {
+  initialize: async () => Promise.resolve(),
+  connectUser: async () => Promise.resolve(),
+  getToken: async () => Promise.resolve({ token: '', userId: '', apiKey: '' }),
+  createTicketChannel: async () => Promise.resolve(''),
+  joinTicketChannel: async () => Promise.resolve(''),
+  leaveTicketChannel: async () => Promise.resolve(),
+  getUserChannels: async () => Promise.resolve([]),
+  getChannel: async () => Promise.resolve(),
+  sendMessage: async () => Promise.resolve(),
+  getMessages: async () => Promise.resolve([]),
+  isConnected: () => false,
+  getCurrentUser: () => null,
+  disconnectUser: async () => Promise.resolve(),
+  getClient: () => null,
+};
