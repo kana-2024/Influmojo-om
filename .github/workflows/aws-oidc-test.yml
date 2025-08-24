@@ -1,5 +1,10 @@
 name: AWS OIDC Test
 on: workflow_dispatch
+
+permissions:
+  id-token: write        # 👈 allow fetching OIDC token
+  contents: read
+
 jobs:
   whoami:
     runs-on: ubuntu-latest
@@ -8,4 +13,5 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ vars.REGION || 'ap-south-1' }}
+          role-session-name: influmojo-oidc-test
       - run: aws sts get-caller-identity
