@@ -1,0 +1,11 @@
+name: AWS OIDC Test
+on: workflow_dispatch
+jobs:
+  whoami:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.REGION || 'ap-south-1' }}
+      - run: aws sts get-caller-identity
