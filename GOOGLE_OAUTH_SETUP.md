@@ -55,7 +55,7 @@ After creating the OAuth client IDs, update your `mobile/.env` file:
 
 ```env
 # Android OAuth Client ID
-EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID=401925027822-8vnuv8dfjbjnc265fkihkk61qsoofnot.apps.googleusercontent.com
+EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID=your_google_android_client_id_here
 
 # iOS OAuth Client ID  
 EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS=YOUR_IOS_CLIENT_ID_HERE

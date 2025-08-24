@@ -20,7 +20,7 @@ const devEnv = {
   NODE_ENV: 'development',
   JWT_SECRET: 'dev-jwt-secret-from-local-env',
   DATABASE_URL: 'postgresql://localhost:5432/influmojo-dev',
-  GOOGLE_CLIENT_ID: '401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com'
+  GOOGLE_CLIENT_ID: 'your_google_client_id_here'
 };
 
 console.log('📁 Loading from LOCAL .env file:');
@@ -41,7 +41,7 @@ console.log('=========================================');
 const prodEnvFile = {
   PORT: '80',
   NODE_ENV: 'production',
-  GOOGLE_CLIENT_ID: '401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com',
+  GOOGLE_CLIENT_ID: 'your_google_client_id_here',
   WEBAPP_URL: 'https://influmojo.com'
 };
 

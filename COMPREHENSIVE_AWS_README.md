@@ -89,10 +89,10 @@ PORT=3002
 NODE_ENV=development
 
 # 🔑 Google OAuth Configuration
-GOOGLE_CLIENT_ID="401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-GOOGLE_ANDROID_CLIENT_ID="401925027822-br2fn6ohtatmpckjlgfl8eqivb5ernrg.apps.googleusercontent.com"
-GOOGLE_IOS_CLIENT_ID="401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID="your_google_client_id_here"
+GOOGLE_CLIENT_SECRET="your_google_client_secret_here"
+GOOGLE_ANDROID_CLIENT_ID="your_google_android_client_id_here"
+GOOGLE_IOS_CLIENT_ID="your_google_ios_client_id_here"
 
 # 📱 Twilio Configuration (SMS)
 TWILIO_ACCOUNT_SID="your-twilio-account-sid"
@@ -126,9 +126,9 @@ NEXT_PUBLIC_API_URL="http://localhost:3002"
 EXPO_PUBLIC_API_URL="http://localhost:3002"
 
 # 📱 Mobile App Configuration
-EXPO_PUBLIC_GOOGLE_CLIENT_ID="401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com"
-EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID="401925027822-br2fn6ohtatmpckjlgfl8eqivb5ernrg.apps.googleusercontent.com"
-EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS="401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com"
+EXPO_PUBLIC_GOOGLE_CLIENT_ID="your_google_client_id_here"
+EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID="your_google_android_client_id_here"
+EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS="your_google_ios_client_id_here"
 
 # 🚀 AWS Configuration
 AWS_REGION="us-east-1"
@@ -158,10 +158,10 @@ PORT=80
 NODE_ENV=production
 
 # 🔑 Google OAuth Configuration
-GOOGLE_CLIENT_ID="401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET="your-production-google-client-secret"
-GOOGLE_ANDROID_CLIENT_ID="401925027822-br2fn6ohtatmpckjlgfl8eqivb5ernrg.apps.googleusercontent.com"
-GOOGLE_IOS_CLIENT_ID="401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID="your_google_client_id_here"
+GOOGLE_CLIENT_SECRET="your_production_google_client_secret_here"
+GOOGLE_ANDROID_CLIENT_ID="your_google_android_client_id_here"
+GOOGLE_IOS_CLIENT_ID="your_google_ios_client_id_here"
 
 # 📱 Twilio Configuration (SMS)
 TWILIO_ACCOUNT_SID="your-production-twilio-account-sid"

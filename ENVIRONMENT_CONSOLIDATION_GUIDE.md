@@ -118,12 +118,12 @@ WEBAPP_URL=https://influmojo.com
 API_URL=https://api.influmojo.com
 
 # Public Keys
-GOOGLE_CLIENT_ID=401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com
-STREAM_API_KEY=m7zjhhjc9bws
+GOOGLE_CLIENT_ID=your_google_client_id_here
+STREAM_API_KEY=your_stream_api_key_here
 
 # Mobile App Variables
 EXPO_PUBLIC_API_URL=https://api.influmojo.com
-EXPO_PUBLIC_GOOGLE_CLIENT_ID=401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com
+EXPO_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id_here
 ```
 
 ## 📱 Application-Specific Configuration

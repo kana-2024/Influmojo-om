@@ -98,7 +98,7 @@ nohup npm start > webapp.log 2>&1 &
 # Non-sensitive (used by all apps)
 PORT=80
 NODE_ENV=production
-GOOGLE_CLIENT_ID=401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com
+GOOGLE_CLIENT_ID=your_google_client_id_here
 WEBAPP_URL=https://influmojo.com
 
 # Sensitive (overridden by AWS Parameter Store)
@@ -110,7 +110,7 @@ DATABASE_URL=postgresql://localhost:5432/influmojo
 ```javascript
 // 1. Loads from .env file (non-sensitive)
 process.env.PORT = "80"
-process.env.GOOGLE_CLIENT_ID = "401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com"
+process.env.GOOGLE_CLIENT_ID = "your_google_client_id_here"
 
 // 2. AWS Parameter Store overrides sensitive values
 process.env.JWT_SECRET = "aws-jwt-secret"
