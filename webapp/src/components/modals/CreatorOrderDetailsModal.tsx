@@ -90,7 +90,7 @@ interface CreatorOrderDetailsModalProps {
 }
 
 // Helper function to safely convert BigInt values to strings
-const safeStringify = (value: unknown): string | number | unknown => {
+const safeStringify = (value: unknown): string | number => {
   if (typeof value === 'bigint') {
     return String(value);
   }
@@ -101,17 +101,18 @@ const safeStringify = (value: unknown): string | number | unknown => {
       console.log('🔧 safeStringify: Converting BigInt object:', value);
       return String(value);
     }
-    // Handle nested objects recursively
-    const result: Record<string, unknown> = {};
-    for (const key in value) {
-      result[key] = safeStringify((value as Record<string, unknown>)[key]);
-    }
-    return result;
+    // For other objects, convert to string
+    return String(value);
   }
   if (Array.isArray(value)) {
-    return value.map(item => safeStringify(item));
+    // For arrays, convert to string representation
+    return String(value);
   }
-  return value;
+  if (typeof value === 'string' || typeof value === 'number') {
+    return value;
+  }
+  // For any other type, convert to string
+  return String(value);
 };
 
 // Helper function to safely convert any value to a string (for ID fields)
