@@ -1,28 +1,61 @@
-name: Deploy to EC2
+name: Deploy to EC2 via CodeDeploy
 
 on:
-push:
-branches:
-- nandini_dev
+  push:
+    branches:
+      - new-feature-branch
 
 jobs:
-deploy:
-name: Deploy backend to EC2
-runs-on: ubuntu-latest
-
-steps:
-- name: Checkout code
-uses: actions/checkout@v3
-
-- name: Deploy over SSH
-uses: appleboy/ssh-action@master
-with:
-host: ${{ secrets.EC2_HOST }}
-username: ${{ secrets.EC2_USER }}
-key: ${{ secrets.EC2_KEY }}
-script: |
-cd ~/Influmojo-om/backend
-git pull origin nandini_dev
-npm install
-npx prisma generate
-pm2 restart influmojo-backend
+  deploy:
+    name: Deploy backend to EC2 via CodeDeploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+          
+      - name: Create deployment package
+        run: |
+          # Create deployment package
+          tar -czf deployment.tar.gz \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.env*' \
+            --exclude='*.log' \
+            --exclude='coverage' \
+            --exclude='.nyc_output' \
+            .
+          
+      - name: Upload to S3
+        run: |
+          # Upload deployment package to S3
+          aws s3 cp deployment.tar.gz s3://${{ secrets.S3_BUCKET }}/deployments/influmojo-api-$(date +%Y%m%d-%H%M%S).tar.gz
+          
+      - name: Deploy via CodeDeploy
+        run: |
+          # Create CodeDeploy deployment
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
+            --application-name ${{ secrets.CODEDEPLOY_APPLICATION_NAME }} \
+            --deployment-group-name ${{ secrets.CODEDEPLOY_DEPLOYMENT_GROUP }} \
+            --s3-location bucket=${{ secrets.S3_BUCKET }},key=deployments/influmojo-api-$(date +%Y%m%d-%H%M%S).tar.gz,bundleType=tgz \
+            --query 'deploymentId' \
+            --output text)
+          
+          echo "Deployment ID: $DEPLOYMENT_ID"
+          
+          # Wait for deployment to complete
+          echo "Waiting for deployment to complete..."
+          aws deploy wait deployment-successful --deployment-id $DEPLOYMENT_ID
+          
+          echo "✅ Deployment completed successfully!"
+          
+      - name: Cleanup
+        run: |
+          rm -f deployment.tar.gz

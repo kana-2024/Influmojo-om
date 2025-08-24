@@ -1,0 +1,92 @@
+name: Deploy Webapp to Production
+
+on:
+  push:
+    branches:
+      - new-feature-branch
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Webapp
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Create consolidated environment file
+        run: |
+          # Create a temporary .env.local with production values
+          # This will be replaced by the actual consolidated .env during deployment
+          cat > .env.local << EOF
+          NEXT_PUBLIC_API_URL=https://api.influmojo.com
+          NEXT_PUBLIC_WEBAPP_URL=https://influmojo.com
+          NEXT_PUBLIC_STREAMCHAT_API_KEY=m7zjhhjc9bws
+          NODE_ENV=production
+          EOF
+          
+      - name: Build application
+        run: npm run build
+        
+      - name: Create deployment package
+        run: |
+          # Create deployment package excluding unnecessary files
+          tar -czf webapp-deployment.tar.gz \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.next/cache' \
+            --exclude='.env*' \
+            --exclude='*.log' \
+            --exclude='coverage' \
+            --exclude='.nyc_output' \
+            .next \
+            public \
+            package.json \
+            package-lock.json \
+            next.config.js \
+            tailwind.config.js \
+            postcss.config.js \
+            tsconfig.json
+            
+      - name: Upload to S3
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+          
+        run: |
+          # Upload deployment package to S3
+          aws s3 cp webapp-deployment.tar.gz s3://${{ secrets.S3_BUCKET }}/deployments/webapp-$(date +%Y%m%d-%H%M%S).tar.gz
+          
+      - name: Deploy via CodeDeploy
+        run: |
+          # Create CodeDeploy deployment
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
+            --application-name influmojo-webapp \
+            --deployment-group-name influmojo-webapp-prod \
+            --s3-location bucket=${{ secrets.S3_BUCKET }},key=deployments/webapp-$(date +%Y%m%d-%H%M%S).tar.gz,bundleType=tgz \
+            --query 'deploymentId' \
+            --output text)
+          
+          echo "Webapp Deployment ID: $DEPLOYMENT_ID"
+          
+          # Wait for deployment to complete
+          echo "Waiting for webapp deployment to complete..."
+          aws deploy wait deployment-successful --deployment-id $DEPLOYMENT_ID
+          
+          echo "✅ Webapp deployment completed successfully!"
+          
+      - name: Cleanup
+        run: |
+          rm -f webapp-deployment.tar.gz
