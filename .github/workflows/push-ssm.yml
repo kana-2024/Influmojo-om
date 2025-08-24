@@ -6,7 +6,7 @@ jobs:
   push:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write        # needed for OIDC
+      id-token: write
       contents: read
     steps:
       - name: Configure AWS (OIDC)
@@ -15,34 +15,76 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ap-south-1
 
-      - name: Push secrets/vars to SSM
+      - name: Push to SSM (skip empty)
         shell: bash
         env:
           PREFIX: "/influmojo/prod/api"
+
+          # ---------- PUBLIC (vars) ----------
+          NEXT_PUBLIC_API_URL:                  ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_WEBAPP_URL:               ${{ vars.NEXT_PUBLIC_WEBAPP_URL }}
+          NEXT_PUBLIC_STREAMCHAT_API_KEY:       ${{ vars.NEXT_PUBLIC_STREAMCHAT_API_KEY }}
+          NEXT_PUBLIC_ADMIN_API_URL:            ${{ vars.NEXT_PUBLIC_ADMIN_API_URL }}
+          NEXT_PUBLIC_ADMIN_STREAMCHAT_API_KEY: ${{ vars.NEXT_PUBLIC_ADMIN_STREAMCHAT_API_KEY }}
+          NEXT_PUBLIC_STREAM_KEY:               ${{ vars.NEXT_PUBLIC_STREAM_KEY }}
+
+          # ---------- SECRETS (server-only) ----------
+          DATABASE_URL:            ${{ secrets.DATABASE_URL }}
+          JWT_SECRET:              ${{ secrets.JWT_SECRET }}
+          SESSION_SECRET:          ${{ secrets.SESSION_SECRET }}
+          STREAM_API_SECRET:       ${{ secrets.STREAM_API_SECRET }}
+          SENDGRID_API_KEY:        ${{ secrets.SENDGRID_API_KEY }}
+          TWILIO_ACCOUNT_SID:      ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN:       ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_VERIFY_SERVICE_SID: ${{ secrets.TWILIO_VERIFY_SERVICE_SID }}
+          GOOGLE_CLIENT_SECRET:    ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          FACEBOOK_APP_SECRET:     ${{ secrets.FACEBOOK_APP_SECRET }}
+          ZOHO_CLIENT_ID:          ${{ secrets.ZOHO_CLIENT_ID }}
+          ZOHO_CLIENT_SECRET:      ${{ secrets.ZOHO_CLIENT_SECRET }}
+          ZOHO_REFRESH_TOKEN:      ${{ secrets.ZOHO_REFRESH_TOKEN }}
+          CLOUDINARY_CLOUD_NAME:   ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY:      ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET:   ${{ secrets.CLOUDINARY_API_SECRET }}
         run: |
-          put() { aws ssm put-parameter --name "$1" --type "$2" --value "$3" --overwrite --region ap-south-1; }
+          set -euo pipefail
 
-          # ---- PUBLIC (String) ----
-          put "$PREFIX/NEXT_PUBLIC_API_URL"               String "${{ vars.NEXT_PUBLIC_API_URL }}"
-          put "$PREFIX/NEXT_PUBLIC_WEBAPP_URL"            String "${{ vars.NEXT_PUBLIC_WEBAPP_URL }}"
-          put "$PREFIX/NEXT_PUBLIC_STREAMCHAT_API_KEY"    String "${{ vars.NEXT_PUBLIC_STREAMCHAT_API_KEY }}"
-          put "$PREFIX/NEXT_PUBLIC_ADMIN_API_URL"         String "${{ vars.NEXT_PUBLIC_ADMIN_API_URL }}"
-          put "$PREFIX/NEXT_PUBLIC_ADMIN_STREAMCHAT_API_KEY" String "${{ vars.NEXT_PUBLIC_ADMIN_STREAMCHAT_API_KEY }}"
+          put() {
+            local name="$1" type="$2" val="$3"
+            if [[ -n "${val}" ]]; then
+              aws ssm put-parameter \
+                --name "${name}" \
+                --type "${type}" \
+                --value "${val}" \
+                --overwrite \
+                --region ap-south-1 >/dev/null
+              echo "✔ wrote ${name} (${type})"
+            else
+              echo "↷ skipped ${name} (empty)"
+            fi
+          }
 
-          # ---- SERVER-ONLY (SecureString) ----
-          put "$PREFIX/DATABASE_URL"         SecureString "${{ secrets.DATABASE_URL }}"
-          put "$PREFIX/JWT_SECRET"           SecureString "${{ secrets.JWT_SECRET }}"
-          put "$PREFIX/SESSION_SECRET"       SecureString "${{ secrets.SESSION_SECRET }}"
-          put "$PREFIX/STREAM_API_SECRET"    SecureString "${{ secrets.STREAM_API_SECRET }}"
-          put "$PREFIX/SENDGRID_API_KEY"     SecureString "${{ secrets.SENDGRID_API_KEY }}"
-          put "$PREFIX/TWILIO_ACCOUNT_SID"   SecureString "${{ secrets.TWILIO_ACCOUNT_SID }}"
-          put "$PREFIX/TWILIO_AUTH_TOKEN"    SecureString "${{ secrets.TWILIO_AUTH_TOKEN }}"
-          put "$PREFIX/TWILIO_VERIFY_SERVICE_SID" SecureString "${{ secrets.TWILIO_VERIFY_SERVICE_SID }}"
-          put "$PREFIX/GOOGLE_CLIENT_SECRET" SecureString "${{ secrets.GOOGLE_CLIENT_SECRET }}"
-          put "$PREFIX/FACEBOOK_APP_SECRET"  SecureString "${{ secrets.FACEBOOK_APP_SECRET }}"
-          put "$PREFIX/ZOHO_CLIENT_ID"       SecureString "${{ secrets.ZOHO_CLIENT_ID }}"
-          put "$PREFIX/ZOHO_CLIENT_SECRET"   SecureString "${{ secrets.ZOHO_CLIENT_SECRET }}"
-          put "$PREFIX/ZOHO_REFRESH_TOKEN"   SecureString "${{ secrets.ZOHO_REFRESH_TOKEN }}"
-          put "$PREFIX/CLOUDINARY_CLOUD_NAME" SecureString "${{ secrets.CLOUDINARY_CLOUD_NAME }}"
-          put "$PREFIX/CLOUDINARY_API_KEY"    SecureString "${{ secrets.CLOUDINARY_API_KEY }}"
-          put "$PREFIX/CLOUDINARY_API_SECRET" SecureString "${{ secrets.CLOUDINARY_API_SECRET }}"
+          # PUBLIC
+          put "$PREFIX/NEXT_PUBLIC_API_URL"                  String "${NEXT_PUBLIC_API_URL:-}"
+          put "$PREFIX/NEXT_PUBLIC_WEBAPP_URL"               String "${NEXT_PUBLIC_WEBAPP_URL:-}"
+          put "$PREFIX/NEXT_PUBLIC_STREAMCHAT_API_KEY"       String "${NEXT_PUBLIC_STREAMCHAT_API_KEY:-}"
+          put "$PREFIX/NEXT_PUBLIC_ADMIN_API_URL"            String "${NEXT_PUBLIC_ADMIN_API_URL:-}"
+          put "$PREFIX/NEXT_PUBLIC_ADMIN_STREAMCHAT_API_KEY" String "${NEXT_PUBLIC_ADMIN_STREAMCHAT_API_KEY:-}"
+          put "$PREFIX/NEXT_PUBLIC_STREAMCHAT_KEY"               String "${NEXT_PUBLIC_STREAM_KEY:-}"
+
+          # SECRETS
+          put "$PREFIX/DATABASE_URL"             SecureString "${DATABASE_URL:-}"
+          put "$PREFIX/JWT_SECRET"               SecureString "${JWT_SECRET:-}"
+          put "$PREFIX/SESSION_SECRET"           SecureString "${SESSION_SECRET:-}"
+          put "$PREFIX/STREAM_API_SECRET"        SecureString "${STREAM_API_SECRET:-}"
+          put "$PREFIX/SENDGRID_API_KEY"         SecureString "${SENDGRID_API_KEY:-}"
+          put "$PREFIX/TWILIO_ACCOUNT_SID"       SecureString "${TWILIO_ACCOUNT_SID:-}"
+          put "$PREFIX/TWILIO_AUTH_TOKEN"        SecureString "${TWILIO_AUTH_TOKEN:-}"
+          put "$PREFIX/TWILIO_VERIFY_SERVICE_SID" SecureString "${TWILIO_VERIFY_SERVICE_SID:-}"
+          put "$PREFIX/GOOGLE_CLIENT_SECRET"     SecureString "${GOOGLE_CLIENT_SECRET:-}"
+          put "$PREFIX/FACEBOOK_APP_SECRET"      SecureString "${FACEBOOK_APP_SECRET:-}"
+          put "$PREFIX/ZOHO_CLIENT_ID"           SecureString "${ZOHO_CLIENT_ID:-}"
+          put "$PREFIX/ZOHO_CLIENT_SECRET"       SecureString "${ZOHO_CLIENT_SECRET:-}"
+          put "$PREFIX/ZOHO_REFRESH_TOKEN"       SecureString "${ZOHO_REFRESH_TOKEN:-}"
+          put "$PREFIX/CLOUDINARY_CLOUD_NAME"    SecureString "${CLOUDINARY_CLOUD_NAME:-}"
+          put "$PREFIX/CLOUDINARY_API_KEY"       SecureString "${CLOUDINARY_API_KEY:-}"
+          put "$PREFIX/CLOUDINARY_API_SECRET"    SecureString "${CLOUDINARY_API_SECRET:-}"
