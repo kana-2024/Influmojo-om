@@ -29,42 +29,42 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--color-primary);
   color: var(--color-text-dark);
 }
 
-/* Custom font classes - matching mobile app exactly */
+/* Custom font classes - matching mobile app exactly with fallbacks */
 .font-poppins {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .font-poppins-regular {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 400;
 }
 
 .font-poppins-medium {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 500;
 }
 
 .font-poppins-semibold {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 600;
 }
 
 .font-poppins-bold {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 700;
 }
 
 .font-alice {
-  font-family: 'Alice', serif;
+  font-family: 'Alice', Georgia, 'Times New Roman', serif;
 }
 
 .font-alice-italic {
-  font-family: 'Alice', serif;
+  font-family: 'Alice', Georgia, 'Times New Roman', serif;
   font-style: italic;
 }
 

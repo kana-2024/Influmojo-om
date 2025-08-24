@@ -1,14 +1,7 @@
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { Toaster } from 'react-hot-toast';
-
-const poppins = Poppins({ 
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-poppins',
-});
 
 export const metadata: Metadata = {
   title: 'Influmojo - Connect with Skilled Influencers',
@@ -23,6 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Font preloading for better performance */}
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" as="style" />
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Alice:ital,wght@0,400;1,400;1,600&display=swap" as="style" />
+        
         {/* Google Fonts - Poppins and Alice */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -30,10 +27,11 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Alice:ital,wght@0,400;1,400;1,600&display=swap"
           rel="stylesheet"
         />
+        
         {/* Google Identity Services */}
         <script src="https://accounts.google.com/gsi/client" async defer></script>
       </head>
-      <body className={`${poppins.variable} font-poppins`}>
+      <body className="font-poppins">
         <Providers>
           {children}
         </Providers>

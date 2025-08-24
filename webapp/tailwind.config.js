@@ -37,16 +37,16 @@ module.exports = {
         legacyChipYellow: '#FFD88D',
       },
       fontFamily: {
-        // Primary Typeface - Poppins (matching mobile exactly)
-        'poppins': ['Poppins', 'sans-serif'],
-        'poppins-regular': ['Poppins', 'sans-serif'],
-        'poppins-medium': ['Poppins', 'sans-serif'],
-        'poppins-semibold': ['Poppins', 'sans-serif'],
-        'poppins-bold': ['Poppins', 'sans-serif'],
+        // Primary Typeface - Poppins (matching mobile exactly) with fallbacks
+        'poppins': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'poppins-regular': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'poppins-medium': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'poppins-semibold': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'poppins-bold': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
         
-        // Secondary Typeface - Alice (italic) - matching mobile
-        'alice': ['Alice', 'serif'],
-        'alice-italic': ['Alice', 'serif'],
+        // Secondary Typeface - Alice (italic) - matching mobile with fallbacks
+        'alice': ['Alice', 'Georgia', 'Times New Roman', 'serif'],
+        'alice-italic': ['Alice', 'Georgia', 'Times New Roman', 'serif'],
       },
       fontSize: {
         // Font sizes based on mobile app brand guidelines
