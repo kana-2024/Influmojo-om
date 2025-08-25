@@ -7,8 +7,8 @@ import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Influmojo',
-  description: 'Influencer Marketing Platform',
+  title: 'Influmojo - Connect with Skilled Influencers',
+  description: 'Tap into a pool of talented influencers to bring your projects to life. Collaborate seamlessly and achieve outstanding results.',
 };
 
 export default function RootLayout({
@@ -19,15 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Fonts - load fonts from CDN */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Alice:ital@0;1&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
-          rel="stylesheet"
-        />
+        {/* Google Identity Services */}
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
       </head>
-      <body className={inter.className}>
+      <body className="font-poppins">
         <Providers>
           {children}
         </Providers>
@@ -38,20 +33,6 @@ export default function RootLayout({
             style: {
               background: '#363636',
               color: '#fff',
-            },
-            success: {
-              duration: 3000,
-              iconTheme: {
-                primary: '#10B981',
-                secondary: '#fff',
-              },
-            },
-            error: {
-              duration: 4000,
-              iconTheme: {
-                primary: '#EF4444',
-                secondary: '#fff',
-              },
             },
           }}
         />

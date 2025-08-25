@@ -50,22 +50,8 @@ const nextConfig = {
   serverRuntimeConfig: {
     NODE_ENV: process.env.NODE_ENV,
   },
-  // Allow external fonts and optimize them properly
+  // Enable font optimization for Google Fonts
   optimizeFonts: true,
-  // Add Google Fonts domains to allowed list
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
-          },
-        ],
-      },
-    ]
-  },
 };
 
 module.exports = nextConfig;
