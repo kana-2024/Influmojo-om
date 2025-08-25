@@ -71,7 +71,7 @@ router.post('/update-basic-info', [
   }),
   body('dob').optional(),
   body('city').notEmpty().withMessage('City is required'),
-  body('company_name').optional,
+  body('company_name').optional(),
   body('business_type').optional().isIn(['SME', 'Startup', 'Enterprise']).withMessage('Valid business type is required'),
   body('website_url').optional().custom((value) => {
     if (value && value.trim() !== '') {
@@ -87,16 +87,35 @@ router.post('/update-basic-info', [
     }
     return true;
   }),
-  body('role').optional()
+  body('role').optional(),
+  body('about').optional()
 ], validateRequest, authenticateJWT, async (req, res) => {
   try {
-    const { gender, email, phone, dob, state, city, company_name, business_type, website_url, role } = req.body;
+    const { gender, email, phone, dob, state, city, company_name, business_type, website_url, role, about } = req.body;
     const userId = BigInt(req.user.id);
 
-    // Get user to check user type
-    const user = await prisma.user.findUnique({
-      where: { id: userId }
+    console.log('🔍 Update basic info request:', {
+      userId: userId.toString(),
+      gender,
+      email,
+      phone,
+      city,
+      company_name,
+      business_type,
+      website_url,
+      role,
+      about
     });
+
+    // Get user to check user type
+    const user = await Promise.race([
+      prisma.user.findUnique({
+        where: { id: userId }
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database query timeout')), 10000)
+      )
+    ]);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -144,12 +163,17 @@ router.post('/update-basic-info', [
 
     // Check if email already exists for another user
     if (email) {
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          email: email,
-          id: { not: userId }
-        }
-      });
+      const existingUser = await Promise.race([
+        prisma.user.findFirst({
+          where: {
+            email: email,
+            id: { not: userId }
+          }
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Email check timeout')), 10000)
+        )
+      ]);
       
       if (existingUser) {
         return res.status(409).json({
@@ -161,12 +185,17 @@ router.post('/update-basic-info', [
 
     // Check if phone already exists for another user
     if (phone) {
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          phone: phone,
-          id: { not: userId }
-        }
-      });
+      const existingUser = await Promise.race([
+        prisma.user.findFirst({
+          where: {
+            phone: phone,
+            id: { not: userId }
+          }
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Phone check timeout')), 10000)
+        )
+      ]);
       
       if (existingUser) {
         return res.status(409).json({
@@ -191,10 +220,15 @@ router.post('/update-basic-info', [
       updateData.phone_verified = true;
     }
     
-    await prisma.user.update({
-      where: { id: userId },
-      data: updateData
-    });
+    await Promise.race([
+      prisma.user.update({
+        where: { id: userId },
+        data: updateData
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('User update timeout')), 10000)
+      )
+    ]);
 
     // Create or update profile based on user type
     if (user.user_type === 'creator') {
@@ -204,20 +238,25 @@ router.post('/update-basic-info', [
       console.log('🔍 Debug: city to save:', city);
       
       // Create or update creator profile
-      const creatorProfile = await prisma.creatorProfile.upsert({
-        where: { user_id: userId },
-        update: {
-          gender,
-          date_of_birth: dateOfBirth,
-          location_city: city
-        },
-        create: {
-          user_id: userId,
-          gender,
-          date_of_birth: dateOfBirth,
-          location_city: city
-        }
-      });
+      const creatorProfile = await Promise.race([
+        prisma.creatorProfile.upsert({
+          where: { user_id: userId },
+          update: {
+            gender,
+            date_of_birth: dateOfBirth,
+            location_city: city
+          },
+          create: {
+            user_id: userId,
+            gender,
+            date_of_birth: dateOfBirth,
+            location_city: city
+          }
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Creator profile upsert timeout')), 10000)
+        )
+      ]);
 
       console.log('🔍 Debug: Creator profile saved successfully');
       console.log('🔍 Debug: Saved date_of_birth:', creatorProfile.date_of_birth);
@@ -239,10 +278,15 @@ router.post('/update-basic-info', [
     } else if (user.user_type === 'brand') {
       // For brand profiles, we'll use a different approach
       // First try to find existing profile
-      const existingProfile = await prisma.brandProfile.findMany({
-        where: { user_id: userId },
-        take: 1
-      });
+      const existingProfile = await Promise.race([
+        prisma.brandProfile.findMany({
+          where: { user_id: userId },
+          take: 1
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Database query timeout')), 10000)
+        )
+      ]);
 
       let brandProfile;
       
@@ -257,31 +301,42 @@ router.post('/update-basic-info', [
 
       if (existingProfile.length > 0) {
         // Update existing brand profile
-        brandProfile = await prisma.brandProfile.update({
-          where: { id: existingProfile[0].id },
-          data: {
-            company_name: company_name || existingProfile[0].company_name, // Update company name if provided
-            gender,
-            location_city: city,
-            business_type: business_type,
-            website_url: formattedWebsiteUrl,
-            role_in_organization: role || null
-          }
-        });
+        brandProfile = await Promise.race([
+          prisma.brandProfile.update({
+            where: { id: existingProfile[0].id },
+            data: {
+              company_name: company_name || existingProfile[0].company_name, // Update company name if provided
+              gender,
+              location_city: city,
+              business_type: business_type,
+              website_url: formattedWebsiteUrl,
+              role_in_organization: role || null,
+              description: about || null
+            }
+          }),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Database update timeout')), 10000)
+          )
+        ]);
       } else {
         // Create new brand profile
-        brandProfile = await prisma.brandProfile.create({
-          data: {
-            user_id: userId,
-            company_name: company_name || user.name, // Use provided company name or fallback to user name
-            company_name: user.name, // Use user name as default company name
-            gender,
-            location_city: city,
-            business_type: business_type,
-            website_url: formattedWebsiteUrl,
-            role_in_organization: role || null
-          }
-        });
+        brandProfile = await Promise.race([
+          prisma.brandProfile.create({
+            data: {
+              user_id: userId,
+              company_name: company_name || user.name, // Use provided company name or fallback to user name
+              gender,
+              location_city: city,
+              business_type: business_type,
+              website_url: formattedWebsiteUrl,
+              role_in_organization: role || null,
+              description: about || null
+            }
+          }),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Database create timeout')), 10000)
+          )
+        ]);
       }
 
       // Convert BigInt to string for JSON serialization
@@ -290,6 +345,8 @@ router.post('/update-basic-info', [
         id: brandProfile.id.toString(),
         user_id: brandProfile.user_id.toString()
       };
+
+      console.log('✅ Brand profile updated successfully:', serializedProfile);
 
       res.json({
         success: true,
@@ -302,6 +359,26 @@ router.post('/update-basic-info', [
 
   } catch (error) {
     console.error('Update basic info error:', error);
+    console.error('Error stack:', error.stack);
+    
+    // Check if it's a database connection error
+    if (error.code === 'P1001' || error.code === 'P1002' || error.code === 'P1003') {
+      console.error('Database connection error detected');
+      return res.status(503).json({ 
+        error: 'Database connection error',
+        message: 'Database is temporarily unavailable. Please try again.' 
+      });
+    }
+    
+    // Check if it's a Prisma validation error
+    if (error.code === 'P2002' || error.code === 'P2003' || error.code === 'P2025') {
+      console.error('Prisma validation error detected');
+      return res.status(400).json({ 
+        error: 'Validation error',
+        message: error.message 
+      });
+    }
+    
     res.status(500).json({ 
       error: 'Failed to update basic info',
       message: error.message 
@@ -405,14 +482,14 @@ router.post('/update-preferences', [
       });
 
     } else if (user.user_type === 'brand') {
-      console.log('Processing brand preferences...');
+      console.log('🔍 Processing brand profile update for user:', userId.toString());
       
       // Check if brand profile exists
       const existingBrandProfile = await prisma.brandProfile.findFirst({
         where: { user_id: userId }
       });
 
-      console.log('Existing brand profile:', existingBrandProfile ? 'Found' : 'Not found');
+      console.log('🔍 Existing brand profile found:', existingBrandProfile ? 'Found' : 'Not found');
 
       let brandProfile;
       
@@ -1044,18 +1121,23 @@ router.get('/profile', authenticateJWT, async (req, res) => {
   try {
     const userId = BigInt(req.user.id);
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        creator_profiles: {
-          include: {
-            kyc: true,
-            portfolio_items: true,
-            social_media_accounts: true
+    const user = await Promise.race([
+      prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          creator_profiles: {
+            include: {
+              kyc: true,
+              portfolio_items: true,
+              social_media_accounts: true
+            }
           }
         }
-      }
-    });
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database query timeout')), 10000)
+      )
+    ]);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -1110,23 +1192,28 @@ router.get('/creator-profile', authenticateJWT, async (req, res) => {
     console.log('🔍 Creator profile request received for user ID:', req.user.id);
     const userId = BigInt(req.user.id);
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        creator_profiles: {
-          include: {
-            kyc: true,
-            portfolio_items: true,
-            social_media_accounts: true,
-            packages_created: {
-              orderBy: {
-                created_at: 'desc'
+    const user = await Promise.race([
+      prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          creator_profiles: {
+            include: {
+              kyc: true,
+              portfolio_items: true,
+              social_media_accounts: true,
+              packages_created: {
+                orderBy: {
+                  created_at: 'desc'
+                }
               }
             }
           }
         }
-      }
-    });
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database query timeout')), 10000)
+      )
+    ]);
 
     console.log('🔍 User found:', !!user);
     if (user) {
@@ -1287,22 +1374,27 @@ router.get('/brand-profile', authenticateJWT, async (req, res) => {
     console.log('🔍 Brand profile request received for user ID:', req.user.id);
     const userId = BigInt(req.user.id);
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        brand_profiles: {
-          include: {
-            campaigns: true,
-            collaborations: true,
-            portfolio_items: {
-              orderBy: {
-                created_at: 'desc'
+    const user = await Promise.race([
+      prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          brand_profiles: {
+            include: {
+              campaigns: true,
+              collaborations: true,
+              portfolio_items: {
+                orderBy: {
+                  created_at: 'desc'
+                }
               }
             }
           }
         }
-      }
-    });
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database query timeout')), 10000)
+      )
+    ]);
 
     console.log('🔍 User found:', !!user);
     console.log('🔍 User type:', user?.user_type);
@@ -1486,7 +1578,7 @@ router.post('/create-campaign', [
   }
 });
 
-// Get all creators for brand home screen
+// Get all creators for brand home screen - PUBLIC ROUTE
 router.get('/creators', async (req, res) => {
   try {
     console.log('🔍 Fetching creators for brand home screen...');
@@ -1660,6 +1752,159 @@ router.get('/creators', async (req, res) => {
   }
 });
 
+// Get individual creator profile by ID (without platform requirement) - PUBLIC ROUTE
+router.get('/creators/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Validate parameters
+    if (!id || id === 'undefined' || id === 'null') {
+      console.error('❌ Invalid creator ID:', id);
+      return res.status(400).json({ 
+        error: 'Invalid creator ID',
+        message: 'Creator ID is required and must be valid.'
+      });
+    }
+    
+    const creatorId = BigInt(id);
+    
+    console.log(`🔍 Fetching creator profile by ID: ${id}`);
+    
+    const creator = await prisma.creatorProfile.findUnique({
+      where: { id: creatorId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profile_image_url: true,
+            cover_image_url: true,
+            email: true,
+            phone: true
+          }
+        },
+        social_media_accounts: {
+          select: {
+            id: true,
+            platform: true,
+            username: true,
+            follower_count: true,
+            engagement_rate: true,
+            avg_views: true,
+            verified: true
+          }
+        },
+        portfolio_items: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            media_url: true,
+            media_type: true,
+            platform: true,
+            tags: true,
+            is_featured: true
+          }
+        },
+        packages_created: {
+          select: {
+            id: true,
+            type: true,
+            title: true,
+            description: true,
+            price: true,
+            currency: true,
+            deliverables: true,
+            is_active: true,
+            created_at: true,
+            updated_at: true
+          },
+          where: {
+            is_active: true
+          }
+        }
+      }
+    });
+
+    if (!creator) {
+      console.error(`❌ Creator not found: ${id}`);
+      return res.status(404).json({ 
+        error: 'Creator not found',
+        message: 'The requested creator profile does not exist.'
+      });
+    }
+
+    console.log(`✅ Creator profile found: ${creator.user.name}`);
+
+    // Serialize the data
+    const serializedCreator = {
+      id: creator.id.toString(),
+      user_id: creator.user_id.toString(),
+      name: creator.user.name,
+      profile_image: creator.user.profile_image_url,
+      cover_image: creator.user.cover_image_url,
+      email: creator.user.email,
+      phone: creator.user.phone,
+      bio: creator.bio,
+      gender: creator.gender,
+      date_of_birth: creator.date_of_birth,
+      location_city: creator.location_city,
+      location_state: creator.location_state,
+      content_categories: creator.content_categories,
+      interests: creator.interests,
+      platform: creator.platform,
+      rating: creator.rating?.toString(),
+      total_collaborations: creator.total_collaborations?.toString(),
+      average_response_time: creator.average_response_time,
+      verified: creator.verified,
+      featured: creator.featured,
+      social_media_accounts: creator.social_media_accounts.map(account => ({
+        id: account.id.toString(),
+        platform: account.platform,
+        username: account.username,
+        follower_count: parseInt(account.follower_count.toString()),
+        engagement_rate: parseFloat(account.engagement_rate.toString()),
+        avg_views: parseInt(account.avg_views.toString()),
+        verified: account.verified
+      })),
+      portfolio_items: creator.portfolio_items.map(item => ({
+        id: item.id.toString(),
+        title: item.title,
+        description: item.description,
+        media_url: item.media_url,
+        media_type: item.media_type,
+        platform: item.platform,
+        tags: item.tags,
+        is_featured: item.is_featured
+      })),
+      packages: creator.packages_created.map(pkg => ({
+        id: pkg.id.toString(),
+        type: pkg.type,
+        title: pkg.title,
+        description: pkg.description,
+        price: parseFloat(pkg.price.toString()),
+        currency: pkg.currency,
+        deliverables: pkg.deliverables,
+        is_active: pkg.is_active,
+        created_at: pkg.created_at.toISOString(),
+        updated_at: pkg.updated_at.toISOString()
+      }))
+    };
+
+    res.json({
+      success: true,
+      data: serializedCreator
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching creator profile:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      message: 'Failed to fetch creator profile.'
+    });
+  }
+});
+
 // Get creators by platform
 router.get('/creators/:platform', authenticateJWT, async (req, res) => {
   try {
@@ -1796,7 +2041,7 @@ router.get('/creators/:platform', authenticateJWT, async (req, res) => {
   }
 });
 
-// Get individual creator profile
+// Get individual creator profile by platform and ID
 router.get('/creators/:platform/:id', authenticateJWT, async (req, res) => {
   try {
     const { platform, id } = req.params;

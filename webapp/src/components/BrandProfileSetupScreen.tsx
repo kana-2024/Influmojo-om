@@ -99,6 +99,10 @@ export default function BrandProfileSetupScreen() {
           setIsGoogleUser(true);
           if (userEmail) {
             setEmail(userEmail);
+            // For Google users, email is automatically verified
+            sessionStorage.setItem('emailVerified', 'true');
+            sessionStorage.setItem('verifiedEmail', userEmail);
+            console.log('✅ BrandProfileSetupScreen - Google user email automatically verified:', userEmail);
           }
         } else if (authProvider === 'mobile') {
           setIsGoogleUser(false);
@@ -144,6 +148,10 @@ export default function BrandProfileSetupScreen() {
         setIsGoogleUser(true);
         if (userEmail) {
           setEmail(userEmail);
+          // For Google users, email is automatically verified
+          sessionStorage.setItem('emailVerified', 'true');
+          sessionStorage.setItem('verifiedEmail', userEmail);
+          console.log('✅ BrandProfileSetupScreen - Google user email automatically verified:', userEmail);
         }
       } else if (authProvider === 'mobile') {
         setIsGoogleUser(false);
@@ -451,7 +459,16 @@ export default function BrandProfileSetupScreen() {
       // Add email/phone based on user type (like mobile app)
       if (isGoogleUser) {
         if (phone.trim()) {
-          basicProfileData.phone = phone.trim();
+          // Format phone number to include +91 prefix like mobile app
+          let formattedPhone = phone.trim();
+          if (!formattedPhone.startsWith('+91')) {
+            if (formattedPhone.startsWith('91') && formattedPhone.length === 12) {
+              formattedPhone = '+' + formattedPhone;
+            } else if (formattedPhone.length === 10) {
+              formattedPhone = '+91' + formattedPhone;
+            }
+          }
+          basicProfileData.phone = formattedPhone;
         }
         // Don't send email for Google users as it's already set during signup
       } else {
@@ -469,21 +486,67 @@ export default function BrandProfileSetupScreen() {
       console.log('Sending complete brand profile data to updateBasicInfo (following mobile app):', basicProfileData);
 
       try {
-        // First, ensure the brand profile exists by calling createMissingProfiles
-        console.log('🔄 Creating missing brand profile first...');
-        const createProfileResponse = await authAPI.createMissingProfiles();
-        console.log('✅ Profile creation response:', createProfileResponse);
+        // Remove the createMissingProfiles call as it's not needed here and causes flow issues
+        // The profile creation is already handled during OTP verification
         
         // Now send all data to updateBasicInfo like mobile app does
         console.log('Sending brand profile data to updateBasicInfo:', basicProfileData);
-        const response = await profileAPI.updateBasicInfo(basicProfileData);
-        console.log('Brand profile saved successfully:', response);
+        console.log('🚀 About to call profileAPI.updateBasicInfo...');
+        
+        // Add timeout to prevent hanging API calls
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('API call timeout after 15 seconds')), 15000)
+        );
+        
+        // Try API call with retry mechanism
+        let response;
+        let retryCount = 0;
+        const maxRetries = 2;
+        
+        while (retryCount <= maxRetries) {
+          try {
+            console.log(`🔄 Attempt ${retryCount + 1} to call updateBasicInfo...`);
+            response = await Promise.race([
+              profileAPI.updateBasicInfo(basicProfileData),
+              timeoutPromise
+            ]);
+            console.log('✅ Brand profile saved successfully:', response);
+            break; // Success, exit retry loop
+          } catch (retryError) {
+            retryCount++;
+            console.warn(`⚠️ API call attempt ${retryCount} failed:`, retryError);
+            
+            if (retryCount > maxRetries) {
+              throw retryError; // Give up after max retries
+            }
+            
+            // Wait before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+          }
+        }
+        
+        console.log('🚀 Profile save completed, proceeding to navigation...');
         
         // Store userType in localStorage for profile completion page
         localStorage.setItem('userType', 'brand');
+        console.log('💾 User type stored in localStorage');
+        
+        // Clear signup flow flag as user is moving to next step
+        sessionStorage.removeItem('isSignupFlow');
+        console.log('✅ Moving to brand preferences step - isSignupFlow flag cleared');
         
         // Navigate to brand preferences
-        router.push('/brand-preferences');
+        setLoading(false); // Reset loading before navigation
+        console.log('🚀 Navigating to /brand-preferences...');
+        try {
+          await router.push('/brand-preferences');
+          console.log('✅ Navigation to brand preferences successful');
+        } catch (navError) {
+          console.error('❌ Navigation failed:', navError);
+          // Fallback: try window.location
+          console.log('🔄 Trying fallback navigation with window.location...');
+          window.location.href = '/brand-preferences';
+        }
       } catch (error: unknown) {
         // Create a proper error interface for API errors
         interface ApiError {
@@ -794,7 +857,7 @@ export default function BrandProfileSetupScreen() {
                 </div>
                 <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-lg">
                   <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
                   <span className="text-xs text-green-700 font-poppins-regular">Your email is verified via Google</span>
                 </div>

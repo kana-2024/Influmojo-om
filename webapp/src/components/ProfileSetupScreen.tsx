@@ -4,21 +4,25 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { authAPI, profileAPI } from '@/services/apiService';
+import { authAPI, profileAPI, isAuthenticated, getCurrentUser, checkBackendHealth } from '@/services/apiService';
 import { googleAuthService } from '@/services/googleAuth';
 import OtpVerificationModal from './OtpVerificationModal';
 
 export default function ProfileSetupScreen() {
-  const router = useRouter();
-  const [gender, setGender] = useState('Male');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [dob, setDob] = useState('');
-  const [city, setCity] = useState('');
-  const [loading, setLoading] = useState(false);
+   const router = useRouter();
+   const [gender, setGender] = useState('Male');
+   const [email, setEmail] = useState('');
+   const [phone, setPhone] = useState('');
+   const [dob, setDob] = useState('');
+   const [city, setCity] = useState('');
+     const [loading, setLoading] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
+   
+   // Computed disabled state to avoid React state synchronization issues
+   const isButtonDisabled = loading || !city.trim() || !dob || (isGoogleUser ? (!phone.trim() || !isPhoneVerified) : (!email.trim() || sessionStorage.getItem('emailVerified') !== 'true'));
   
   // OTP related state
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -54,6 +58,10 @@ export default function ProfileSetupScreen() {
         // Pre-fill email if available
         if (userEmail) {
           setEmail(userEmail);
+          // For Google users, email is automatically verified
+          sessionStorage.setItem('emailVerified', 'true');
+          sessionStorage.setItem('verifiedEmail', userEmail);
+          console.log('✅ ProfileSetupScreen - Google user email automatically verified:', userEmail);
         }
       } else if (authProvider === 'mobile') {
         console.log('📱 ProfileSetupScreen - User is mobile user');
@@ -99,10 +107,21 @@ export default function ProfileSetupScreen() {
     // Check user type and redirect if necessary
     const checkUserType = () => {
       const storedUserType = sessionStorage.getItem('selectedUserType');
-      if (storedUserType === 'brand') {
-        console.log('Creator ProfileSetupScreen: User is brand, redirecting to brand profile setup');
+      const currentUser = getCurrentUser();
+      
+      // Only redirect if:
+      // 1. User explicitly selected brand during signup AND
+      // 2. Current user from backend is also brand type
+      if (storedUserType === 'brand' && currentUser?.user_type === 'brand') {
+        console.log('Creator ProfileSetupScreen: User is confirmed brand, redirecting to brand profile setup');
         router.push('/brand-profile-setup');
         return;
+      } else if (storedUserType === 'brand' && currentUser?.user_type !== 'brand') {
+        // User selected brand but backend shows creator - clear the selection and stay
+        console.log('Creator ProfileSetupScreen: User selected brand but backend shows creator, staying on creator flow');
+        sessionStorage.removeItem('selectedUserType');
+      } else {
+        console.log('Creator ProfileSetupScreen: User is creator, staying on creator profile setup');
       }
     };
     
@@ -116,14 +135,115 @@ export default function ProfileSetupScreen() {
     }
   }, [router, isPhoneVerified, phone]);
   
-  // Monitor email changes and clear verification if email is cleared
+     // Monitor email changes and clear verification if email is cleared
+   useEffect(() => {
+     if (!email.trim() && sessionStorage.getItem('emailVerified') === 'true') {
+       console.log('🗑️ ProfileSetupScreen - Email cleared, removing verification status');
+       sessionStorage.removeItem('emailVerified');
+       sessionStorage.removeItem('verifiedEmail');
+     }
+   }, [email]);
+
+     // Monitor loading state changes for debugging
   useEffect(() => {
-    if (!email.trim() && sessionStorage.getItem('emailVerified') === 'true') {
-      console.log('🗑️ ProfileSetupScreen - Email cleared, removing verification status');
-      sessionStorage.removeItem('emailVerified');
-      sessionStorage.removeItem('verifiedEmail');
+    console.log('🔄 Loading state changed to:', loading);
+  }, [loading]);
+
+  // Function to show user-friendly error messages
+  const showUserFriendlyError = (error: Error) => {
+    let message = 'An unexpected error occurred. Please try again.';
+    
+    if (error.message.includes('Authentication')) {
+      message = 'Your session has expired. Please sign in again.';
+    } else if (error.message.includes('timeout')) {
+      message = 'The server is taking too long to respond. This might be a temporary issue. Please try again.';
+    } else if (error.message.includes('Network error')) {
+      message = 'Unable to connect to the server. This might be a temporary network issue. Please try again.';
+    } else if (error.message.includes('Validation failed')) {
+      message = 'Please check your input and try again.';
     }
-  }, [email]);
+    
+    alert(message);
+  };
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      console.log('🔍 ProfileSetupScreen - Checking authentication...');
+      
+      if (!isAuthenticated()) {
+        console.error('❌ ProfileSetupScreen - User not authenticated');
+        console.error('❌ User must be authenticated before accessing profile setup');
+        alert('Authentication required. Please sign in first.');
+        // Redirect to login
+        window.location.href = '/login';
+        return;
+      }
+      
+      // Get current user info
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        console.log('✅ ProfileSetupScreen - User authenticated:', currentUser);
+        console.log('🔍 User type:', currentUser.user_type);
+        console.log('🔍 User ID:', currentUser.id);
+        console.log('🔍 User email:', currentUser.email);
+      } else {
+        console.error('❌ ProfileSetupScreen - Could not get user info from token');
+        alert('Authentication error. Please sign in again.');
+        window.location.href = '/login';
+        return;
+      }
+      
+      console.log('✅ ProfileSetupScreen - Authentication validated successfully');
+      
+      // Check backend health
+      const backendHealthy = await checkBackendHealth();
+      if (!backendHealthy) {
+        console.warn('⚠️ Backend health check failed - API calls may not work');
+        alert('Warning: The backend server appears to be unavailable. Profile creation may not work properly.');
+      } else {
+        console.log('✅ Backend health check passed');
+      }
+      
+      // Check if user has already completed onboarding
+      // Only check this if user is not in the signup flow (i.e., they came from login, not signup)
+      try {
+        const isSignupFlow = sessionStorage.getItem('isSignupFlow') === 'true' || 
+                            window.location.pathname.includes('signup');
+        
+        if (!isSignupFlow && currentUser?.user_type === 'creator') {
+          const creatorProfile = await profileAPI.getCreatorProfile();
+          if (creatorProfile.success && creatorProfile.data) {
+            // Check if the profile is actually complete (has required fields)
+            const profile = creatorProfile.data;
+            const hasBasicInfo = profile.gender && profile.location_city;
+            const hasPreferences = profile.content_categories && 
+                                 profile.content_categories.length > 0 && 
+                                 profile.bio && 
+                                 profile.languages && 
+                                 profile.languages.length > 0;
+            
+            if (hasBasicInfo && hasPreferences) {
+              console.log('✅ User has already completed onboarding with all required fields, redirecting to dashboard');
+              window.location.href = '/dashboard/creator';
+              return;
+            } else {
+              console.log('⚠️ User has initial profile but onboarding is incomplete, continuing with setup');
+              console.log('🔍 Profile status:', { hasBasicInfo, hasPreferences });
+            }
+          }
+        } else if (isSignupFlow) {
+          console.log('✅ User is in signup flow, allowing them to complete the signup process');
+        }
+      } catch (profileError) {
+        console.log('⚠️ Could not check existing profile, user may need to complete onboarding');
+      }
+      
+      setAuthChecking(false);
+    };
+    
+    checkAuth();
+  }, []);
 
   const handleSendOtp = async () => {
     if (!phone.trim()) {
@@ -260,91 +380,173 @@ export default function ProfileSetupScreen() {
       return;
     }
     
-    console.log('Validation passed successfully');
+    if (!dob) {
+      console.log('Validation failed: date of birth is empty');
+      alert('Please select your date of birth');
+      return;
+    }
     
-    setLoading(true);
+         console.log('Validation passed successfully');
+     
+     console.log('🔍 Setting loading to true at line 274');
+     setLoading(true);
+     console.log('🔍 Loading state after setLoading(true):', loading);
     
     try {
-      // Prepare basic profile data - different for Google vs phone users
-      const profileData: {
-        gender: string;
-        dob: string;
-        state: string;
-        city: string;
-        pincode: string;
-        email?: string;
-        phone?: string;
-      } = {
-        gender,
-        dob: dob,
-        state: 'Maharashtra', // Default state - can be made configurable later
-        city: city.trim(),
-        pincode: '400001' // Default pincode - can be made configurable later
-      };
+      // Prepare basic profile data - following mobile app approach but including required backend fields
+             const profileData: {
+         gender: string;
+         dob: string;
+         city: string;
+         state?: string;
+         pincode?: string;
+         email?: string;
+         phone?: string;
+       } = {
+         gender,
+         dob: dob,
+         city: city.trim()
+         // Commenting out state and pincode temporarily to test
+         // state: 'Maharashtra', // Default state - required by backend
+         // pincode: '400001' // Default pincode - required by backend
+       };
 
-      // Add email/phone based on user type
+      // Only add email/phone if they have values and are different from existing (like mobile app)
       if (isGoogleUser) {
-        // Google user: email is already verified, phone needs verification
-        profileData.email = email.trim();
-        profileData.phone = `+91${phone.trim()}`;
+        if (phone.trim()) {
+          profileData.phone = `+91${phone.trim()}`;
+        }
+        // Don't send email for Google users as it's already set during signup
       } else {
-        // Phone user: phone is already verified, email needs verification
-        profileData.phone = `+91${phone.trim()}`;
-        profileData.email = email.trim();
-      }
-
-      // Add email/phone based on user type
-      if (isGoogleUser) {
-        // Google user: email is already verified, phone needs verification
-        profileData.email = email.trim();
-        profileData.phone = `+91${phone.trim()}`;
-      } else {
-        // Phone user: phone is already verified, email needs verification
-        profileData.phone = `+91${phone.trim()}`;
-        profileData.email = email.trim();
+        if (email.trim()) {
+          profileData.email = email.trim();
+        }
+        // Don't send phone for phone users as it's already set during signup
       }
       
-      console.log('Preparing basic profile data:', profileData);
+      console.log('Preparing basic profile data (mobile app approach):', profileData);
       
-      // Save basic profile data to the database
-      console.log('Saving basic profile data to database:', profileData);
+      // Save basic profile data to the database - following mobile app approach
+      console.log('Saving basic profile data to database...');
+      
+      // Save basic profile data to the database using the API
+      console.log('🔍 Calling profileAPI.updateBasicInfo with data:', profileData);
       
       try {
-        // First, ensure the creator profile exists by calling createMissingProfiles
-        console.log('🔄 Creating missing creator profile first...');
-        const createProfileResponse = await authAPI.createMissingProfiles();
-        console.log('✅ Profile creation response:', createProfileResponse);
-        
-        const basicInfoResponse = await profileAPI.updateBasicInfo(profileData);
-        console.log('Basic profile saved to database:', basicInfoResponse);
-        
-        if (basicInfoResponse.success) {
-          // Also store in sessionStorage for the preferences step
-          sessionStorage.setItem('basicProfileData', JSON.stringify(profileData));
-          console.log('Basic profile data also stored in sessionStorage');
-          
-          // Store userType in localStorage for profile completion page
-          localStorage.setItem('userType', 'creator');
-          
-          // Navigate to preferences step using Next.js router
-          router.push('/creator-preferences');
-        } else {
-          throw new Error(basicInfoResponse.message || 'Failed to save basic profile');
+        // Check authentication before making API call
+        if (!isAuthenticated()) {
+          throw new Error('Authentication required. Please sign in again.');
         }
-      } catch (saveError) {
-        console.error('Failed to save basic profile to database:', saveError);
         
-        // Even if saving fails, store in sessionStorage and continue
-        // The preferences step can try to save it again
+        const currentUser = getCurrentUser();
+        console.log('🔍 Making API call for user:', currentUser);
+        
+        // Validate user type
+        if (currentUser?.user_type !== 'creator') {
+          console.error('❌ User type mismatch. Expected: creator, Got:', currentUser?.user_type);
+          alert('This page is for creators only. Please use the appropriate signup flow.');
+          window.location.href = '/signup-creator';
+          return;
+        }
+        
+        // Add timeout to prevent hanging API calls
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('API call timeout after 10 seconds')), 10000)
+        );
+        
+        // Try API call with retry mechanism
+        let basicInfoResponse;
+        let retryCount = 0;
+        const maxRetries = 2;
+        
+        while (retryCount <= maxRetries) {
+          try {
+            basicInfoResponse = await Promise.race([
+              profileAPI.updateBasicInfo(profileData),
+              timeoutPromise
+            ]);
+            console.log('✅ Basic profile saved to database:', basicInfoResponse);
+            break; // Success, exit retry loop
+          } catch (retryError) {
+            retryCount++;
+            console.warn(`⚠️ API call attempt ${retryCount} failed:`, retryError);
+            
+            if (retryCount > maxRetries) {
+              throw retryError; // Give up after max retries
+            }
+            
+            // Wait before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+          }
+        }
+        
+        // Store in sessionStorage for the preferences step
         sessionStorage.setItem('basicProfileData', JSON.stringify(profileData));
-        console.log('Basic profile data stored in sessionStorage despite save failure');
+        console.log('📝 Basic profile data stored in sessionStorage');
         
         // Store userType in localStorage for profile completion page
         localStorage.setItem('userType', 'creator');
         
+        // Clear signup flow flag as user is moving to next step
+        sessionStorage.removeItem('isSignupFlow');
+        console.log('✅ Moving to preferences step - isSignupFlow flag cleared');
+        
         // Navigate to preferences step using Next.js router
-        router.push('/creator-preferences');
-      }
+        console.log('🚀 Navigating to /creator-preferences...');
+        console.log('🔍 Setting loading to false before navigation');
+        setLoading(false); // Reset loading before navigation
+        try {
+          await router.push('/creator-preferences');
+          console.log('✅ Navigation successful');
+        } catch (navError) {
+          console.error('❌ Navigation failed:', navError);
+          // Fallback: try window.location
+          console.log('🔄 Trying fallback navigation with window.location...');
+          window.location.href = '/creator-preferences';
+        }
+             } catch (apiError) {
+         console.error('❌ API call failed:', apiError);
+         
+         // Check if it's an authentication error
+         if (apiError instanceof Error) {
+           if (apiError.message.includes('401') || apiError.message.includes('403') || apiError.message.includes('Unauthorized')) {
+             console.error('❌ Authentication error - redirecting to login');
+             localStorage.removeItem('token');
+             window.location.href = '/login';
+             return;
+           }
+           
+           if (apiError.message.includes('timeout') || apiError.message.includes('Network error')) {
+             console.error('❌ Network/Timeout error:', apiError.message);
+             showUserFriendlyError(apiError);
+             setLoading(false);
+             return;
+           }
+         }
+         
+         // For other errors, fallback to sessionStorage
+         console.log('📝 Falling back to sessionStorage due to API error');
+         sessionStorage.setItem('basicProfileData', JSON.stringify(profileData));
+         console.log('📝 Basic profile data stored in sessionStorage (fallback)');
+         
+         // Store userType in localStorage for profile completion page
+         localStorage.setItem('userType', 'creator');
+         
+         // Clear signup flow flag as user is moving to next step
+         sessionStorage.removeItem('isSignupFlow');
+         console.log('✅ Moving to preferences step - isSignupFlow flag cleared (fallback)');
+         
+         // Navigate to preferences step
+         console.log('🚀 Navigating to /creator-preferences (fallback)...');
+         setLoading(false);
+         try {
+           await router.push('/creator-preferences');
+           console.log('✅ Navigation successful (fallback)');
+         } catch (navError) {
+           console.error('❌ Navigation failed (fallback):', navError);
+           window.location.href = '/creator-preferences';
+         }
+       }
     } catch (error) {
       console.error('Unexpected error in handleNextStep:', error);
       alert('An unexpected error occurred. Please try again.');
@@ -401,6 +603,37 @@ export default function ProfileSetupScreen() {
       setGoogleVerifying(false);
     }
   };
+
+  // Define Feature component inside the main component
+  const Feature = ({ title, description }: { title: string; description: string }) => (
+    <div className="flex items-start space-x-2">
+      {/* Orange checkmark icon inside circle */}
+      <div className="w-4 h-4 sm:w-5 sm:h-5 bg-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+        <svg width="8" height="8" className="sm:w-2.5 sm:h-2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        {/* Feature title - using Poppins SemiBold like mobile */}
+        <h3 className="text-sm sm:text-base lg:text-lg font-poppins-semibold text-textDark mb-1">{title}</h3>
+        {/* Feature description - using Poppins Regular like mobile */}
+        <p className="text-xs sm:text-sm lg:text-base font-poppins-regular text-textLight leading-relaxed">{description}</p>
+      </div>
+    </div>
+  );
+
+  // Show loading screen while checking authentication
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-white font-poppins-regular flex flex-col items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-secondary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-poppins-semibold text-textDark mb-2">Checking Authentication...</h2>
+          <p className="text-sm text-textGray">Please wait while we verify your login status</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-poppins-regular flex flex-col">
@@ -616,9 +849,7 @@ export default function ProfileSetupScreen() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-lg">
-                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
+                  <span className="w-4 h-4 text-green-600 text-lg">✅</span>
                   <span className="text-xs text-green-700 font-poppins-regular">Your email is verified via Google</span>
                 </div>
               </div>
@@ -665,15 +896,13 @@ export default function ProfileSetupScreen() {
                 {sessionStorage.getItem('emailVerified') === 'true' && email.trim() !== '' ? (
                   <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-lg">
                     <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                     <span className="text-xs text-green-700 font-poppins-regular">Your email is verified via Google</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
+                    <span className="w-4 h-4 text-blue-600 text-lg">ℹ️</span>
                     <span className="text-xs text-blue-700 font-poppins-regular">Please verify your email address with Google</span>
                   </div>
                 )}
@@ -725,9 +954,7 @@ export default function ProfileSetupScreen() {
                 {/* Phone verification status messages for Google users */}
                 {!isPhoneVerified && (
                   <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
+                    <span className="w-4 h-4 text-blue-600 text-lg">ℹ️</span>
                     <span className="text-xs text-blue-700 font-poppins-regular">Please verify your phone number to continue</span>
                   </div>
                 )}
@@ -745,9 +972,7 @@ export default function ProfileSetupScreen() {
                 {/* OTP Error Display */}
                 {otpError && (
                   <div className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg">
-                    <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
+                    <span className="w-4 h-4 text-red-600 text-lg">⚠️</span>
                     <span className="text-xs text-red-700 font-poppins-regular">{otpError}</span>
                   </div>
                 )}
@@ -801,6 +1026,7 @@ export default function ProfileSetupScreen() {
                   type="button"
                   onClick={() => {
                     console.log('City modal toggle clicked, current state:', showCityModal);
+                    console.log('Current city value:', city);
                     setShowCityModal(!showCityModal);
                   }}
                   className="w-full py-2.5 px-3 border border-gray-300 rounded-lg text-xs sm:text-sm font-poppins-regular text-left bg-white focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex items-center justify-between"
@@ -830,13 +1056,41 @@ export default function ProfileSetupScreen() {
               </div>
             </div>
 
+            {/* Debug Info - Remove in production */}
+            {false && process.env.NODE_ENV === 'development' && (
+              <div className="p-3 bg-gray-100 rounded-lg text-xs font-mono">
+                <div>Debug Info:</div>
+                <div>Loading: {loading.toString()}</div>
+                <div>City: &quot;{city.trim()}&quot;</div>
+                <div>IsGoogleUser: {isGoogleUser.toString()}</div>
+                <div>Phone: &quot;{phone.trim()}&quot;</div>
+                <div>IsPhoneVerified: {isPhoneVerified.toString()}</div>
+                <div>Email: &quot;{email.trim()}&quot;</div>
+                <div>EmailVerified: {sessionStorage.getItem('emailVerified')}</div>
+                <div>Date of Birth: &quot;{dob}&quot;</div>
+                <div>Button Disabled: {isButtonDisabled.toString()}</div>
+              </div>
+            )}
+
             {/* Next Step Button */}
             <button
-              onClick={handleNextStep}
-              disabled={loading || !city.trim() || (isGoogleUser ? (!phone.trim() || !isPhoneVerified) : (!email.trim() || sessionStorage.getItem('emailVerified') !== 'true'))}
+              onClick={() => {
+                console.log('🎯 Next Step button clicked!');
+                console.log('Button state:', {
+                  loading,
+                  city: city.trim(),
+                  isGoogleUser,
+                  phone: phone.trim(),
+                  isPhoneVerified,
+                  email: email.trim(),
+                  emailVerified: sessionStorage.getItem('emailVerified')
+                });
+                handleNextStep();
+              }}
+                             disabled={isButtonDisabled}
               className="w-full py-2.5 text-white text-sm font-poppins-semibold rounded-lg flex justify-center items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed mt-6"
               style={{ background: 'linear-gradient(180deg, #FE8F00, #FC5213)' }}
-              title={`Button state: loading=${loading}, city=${city.trim()}, ${isGoogleUser ? `phone=${phone.trim()}, verified=${isPhoneVerified}` : `email=${email.trim()}, verified=${sessionStorage.getItem('emailVerified')}`}`}
+                             title={`Button state: loading=${loading}, city=${city.trim()}, dob=${dob}, ${isGoogleUser ? `phone=${phone.trim()}, verified=${isPhoneVerified}` : `email=${email.trim()}, verified=${sessionStorage.getItem('emailVerified')}`}, disabled=${isButtonDisabled}`}
             >
               {loading ? (
                 <>
@@ -850,6 +1104,32 @@ export default function ProfileSetupScreen() {
                 </>
               )}
             </button>
+            
+            {/* Fallback Button - Skip API Call */}
+            {false && process.env.NODE_ENV === 'development' && (
+              <button
+                onClick={() => {
+                  console.log('🔄 Fallback: Skipping API call, proceeding with sessionStorage...');
+                  // Store data locally and proceed
+                  const profileData = {
+                    gender,
+                    dob: dob,
+                    city: city.trim(),
+                    phone: isGoogleUser ? `+91${phone.trim()}` : undefined,
+                    email: !isGoogleUser ? email.trim() : undefined
+                  };
+                  
+                  sessionStorage.setItem('basicProfileData', JSON.stringify(profileData));
+                  localStorage.setItem('userType', 'creator');
+                  
+                  // Navigate directly
+                  window.location.href = '/creator-preferences';
+                }}
+                className="w-full py-2.5 text-[#20536d] text-sm font-poppins-semibold rounded-lg border-2 border-[#20536d] bg-white hover:bg-[#20536d] hover:text-white transition-colors mt-3"
+              >
+                🚨 Skip API Call (Development Only)
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -876,20 +1156,3 @@ export default function ProfileSetupScreen() {
     </div>
   );
 }
-
-const Feature = ({ title, description }: { title: string; description: string }) => (
-  <div className="flex items-start space-x-2">
-    {/* Orange checkmark icon inside circle */}
-    <div className="w-4 h-4 sm:w-5 sm:h-5 bg-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-      <svg width="8" height="8" className="sm:w-2.5 sm:h-2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="white"/>
-      </svg>
-    </div>
-    <div>
-      {/* Feature title - using Poppins SemiBold like mobile */}
-      <h3 className="text-sm sm:text-base lg:text-lg font-poppins-semibold text-textDark mb-1">{title}</h3>
-      {/* Feature description - using Poppins Regular like mobile */}
-      <p className="text-xs sm:text-sm lg:text-base font-poppins-regular text-textLight leading-relaxed">{description}</p>
-    </div>
-  </div>
-); 

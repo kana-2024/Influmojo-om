@@ -17,6 +17,7 @@ import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import { profileAPI } from '@/services/apiService';
 import CartService from '@/services/cartService';
 import { toast } from 'react-hot-toast';
+import { formatPrice } from '@/utils/currency';
 
 interface CreatorProfile {
   id: string;
@@ -78,15 +79,17 @@ interface CreatorProfile {
   }>;
 }
 
-export default function CreatorProfilePage() {
+export default function PublicCreatorProfilePage() {
   const params = useParams();
   const router = useRouter();
   const creatorId = params.id as string;
   
+
+  
   const [creator, setCreator] = useState<CreatorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'all' | 'instagram' | 'ugc'>('all');
+     const [activeTab, setActiveTab] = useState<'all' | 'instagram' | 'facebook'>('all');
   const [selectedPackage, setSelectedPackage] = useState<CreatorProfile['packages'][0] | null>(null);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
 
@@ -94,8 +97,8 @@ export default function CreatorProfilePage() {
     try {
       setLoading(true);
       
-      // First try to get creator profile by ID
-      const profileResponse = await profileAPI.getCreatorProfileById(creatorId);
+      // First try to get creator profile by ID (public endpoint)
+      const profileResponse = await profileAPI.getPublicCreatorProfileById(creatorId);
       
       if (profileResponse.success && profileResponse.data) {
         console.log('✅ Creator profile fetched successfully:', profileResponse.data);
@@ -136,9 +139,9 @@ export default function CreatorProfilePage() {
         return;
       }
       
-      // Fallback: try to get creator from the creators list
+      // Fallback: try to get creator from the creators list (public endpoint)
       console.log('🔄 Fallback: fetching from creators list...');
-      const response = await profileAPI.getCreators();
+      const response = await profileAPI.getPublicCreators();
       
       if (response.success && response.data) {
         // Find the specific creator from the response
@@ -234,12 +237,12 @@ export default function CreatorProfilePage() {
     }
   };
 
-  const filteredPackages = creator?.packages?.filter(pkg => {
-    if (activeTab === 'all') return true;
-    if (activeTab === 'instagram') return pkg.deliverables?.platform?.toLowerCase() === 'instagram';
-    if (activeTab === 'ugc') return pkg.deliverables?.platform?.toLowerCase() === 'ugc';
-    return true;
-  }) || [];
+     const filteredPackages = creator?.packages?.filter(pkg => {
+     if (activeTab === 'all') return true;
+     if (activeTab === 'instagram') return pkg.deliverables?.platform?.toLowerCase() === 'instagram';
+     if (activeTab === 'facebook') return pkg.deliverables?.platform?.toLowerCase() === 'facebook';
+     return true;
+   }) || [];
 
   if (loading) {
     return (
@@ -257,12 +260,12 @@ export default function CreatorProfilePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error || 'Creator not found'}</p>
-          <button
-            onClick={() => router.back()}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            Go Back
-          </button>
+                             <button
+                     onClick={() => router.back()}
+                     className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                   >
+                     Go Back
+                   </button>
         </div>
       </div>
     );
@@ -386,21 +389,31 @@ export default function CreatorProfilePage() {
                     </div>
                   </div>
                   
-                  <p className="text-gray-600 mb-3">
-                    {(creator.location_city || creator.city) && (creator.location_state || creator.state)
-                      ? `${creator.location_city || creator.city}, ${creator.location_state || creator.state}, United States`
-                      : 'Los Angeles, CA, United States'
-                    }
-                  </p>
+                                     <p className="text-gray-600 mb-3">
+                     {(() => {
+                       const city = creator.location_city || creator.city;
+                       const state = creator.location_state || creator.state;
+                       
+                       if (city && state) {
+                         return `${city}, ${state}`;
+                       } else if (city) {
+                         return city;
+                       } else if (state) {
+                         return state;
+                       } else {
+                         return 'Location not specified';
+                       }
+                     })()}
+                   </p>
                   
                   {/* Social Media Icons with Followers - EXACTLY like screenshot */}
-                  <div className="flex items-center gap-3">
-                    {creator.social_media_accounts && creator.social_media_accounts.length > 0 ? (
-                      creator.social_media_accounts.slice(0, 3).map((account, index) => (
-                        <button 
-                          key={account.id || index}
-                          className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                        >
+                                     <div className="flex items-center gap-3">
+                     {creator.social_media_accounts && creator.social_media_accounts.length > 0 ? (
+                       creator.social_media_accounts.slice(0, 3).map((account, index) => (
+                         <button 
+                           key={account.id || index}
+                           className="flex items-center gap-2 px-3 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+                         >
                           {account.platform.toLowerCase() === 'instagram' && <PhotoIcon className="w-4 h-4" />}
                           {account.platform.toLowerCase() === 'youtube' && <PlayIcon className="w-4 h-4" />}
                           {account.platform.toLowerCase() === 'tiktok' && <UserIcon className="w-4 h-4" />}
@@ -416,21 +429,21 @@ export default function CreatorProfilePage() {
                         </button>
                       ))
                     ) : (
-                      // Fallback social media buttons
-                      <>
-                        <button className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
-                          <PhotoIcon className="w-4 h-4" />
-                          <span className="text-sm font-medium">Followers</span>
-                        </button>
-                        <button className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
-                          <PlayIcon className="w-4 h-4" />
-                          <span className="text-sm font-medium">Followers</span>
-                        </button>
-                        <button className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
-                          <UserIcon className="w-4 h-4" />
-                          <span className="text-sm font-medium">Followers</span>
-                        </button>
-                      </>
+                                             // Fallback social media buttons
+                       <>
+                         <button className="flex items-center gap-2 px-3 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors">
+                           <PhotoIcon className="w-4 h-4" />
+                           <span className="text-sm font-medium">Followers</span>
+                         </button>
+                         <button className="flex items-center gap-2 px-3 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors">
+                           <PlayIcon className="w-4 h-4" />
+                           <span className="text-sm font-medium">Followers</span>
+                         </button>
+                         <button className="flex items-center gap-2 px-3 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors">
+                           <UserIcon className="w-4 h-4" />
+                           <span className="text-sm font-medium">Followers</span>
+                         </button>
+                       </>
                     )}
                   </div>
                 </div>
@@ -439,15 +452,15 @@ export default function CreatorProfilePage() {
 
             {/* Top Creator Badge - EXACTLY like screenshot */}
             <div className="bg-white rounded-lg p-6">
-              <div className="flex items-center gap-3 p-4 bg-pink-50 rounded-lg border border-pink-200">
-                <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center">
-                  <StarIcon className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-pink-900">{creator.name || 'Anastasiia'} is a Top Creator</h4>
-                  <p className="text-sm text-pink-700">Top creators have completed multiple orders and have a high rating from brands.</p>
-                </div>
-              </div>
+                                 <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                     <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
+                       <StarIcon className="w-6 h-6 text-white" />
+                     </div>
+                     <div>
+                       <h4 className="font-semibold text-orange-900">{creator.name || 'Anastasiia'} is a Top Creator</h4>
+                       <p className="text-sm text-orange-700">Top creators have completed multiple orders and have a high rating from brands.</p>
+                     </div>
+                   </div>
             </div>
 
             {/* Creator Bio - EXACTLY like screenshot */}
@@ -466,23 +479,23 @@ export default function CreatorProfilePage() {
                 <>
                   {/* Package Tabs - EXACTLY like screenshot */}
                   <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1">
-                    {[
-                      { id: 'all', label: 'All' },
-                      { id: 'instagram', label: 'Instagram' },
-                      { id: 'ugc', label: 'UGC' }
-                    ].map((tab) => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as 'all' | 'instagram' | 'ugc')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                          activeTab === tab.id
-                            ? 'bg-white text-gray-900 shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
-                        }`}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
+                                         {[
+                       { id: 'all', label: 'All' },
+                       { id: 'instagram', label: 'Instagram' },
+                       { id: 'facebook', label: 'Facebook' }
+                     ].map((tab) => (
+                       <button
+                         key={tab.id}
+                         onClick={() => setActiveTab(tab.id as 'all' | 'instagram' | 'facebook')}
+                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                           activeTab === tab.id
+                             ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                             : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
+                         }`}
+                       >
+                         {tab.label}
+                       </button>
+                     ))}
                   </div>
                   
                   {/* Package List - EXACTLY like screenshot */}
@@ -493,18 +506,17 @@ export default function CreatorProfilePage() {
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-2">
-                                <input
-                                  type="radio"
-                                  name="selectedPackage"
-                                  value={pkg.id}
-                                  checked={selectedPackage?.id === pkg.id}
-                                  onChange={() => setSelectedPackage(pkg)}
-                                  className="text-purple-500 focus:ring-purple-500"
-                                />
+                                                         <input
+                           type="radio"
+                           name="selectedPackage"
+                           value={pkg.id}
+                           checked={selectedPackage?.id === pkg.id}
+                           onChange={() => setSelectedPackage(pkg)}
+                           className="text-orange-500 focus:ring-orange-500"
+                         />
                                 <h4 className="font-semibold text-gray-900">{pkg.title}</h4>
                                 <span className="text-2xl font-bold text-gray-900">
-                                  ${pkg.price}
-                                  {pkg.currency && pkg.currency !== 'USD' && ` ${pkg.currency}`}
+                                  {formatPrice(pkg.price, pkg.currency)}
                                 </span>
                               </div>
                               <p className="text-gray-600 text-sm">{pkg.description}</p>
@@ -560,8 +572,7 @@ export default function CreatorProfilePage() {
                   {/* Price Display - EXACTLY like screenshot */}
                   <div className="text-center mb-6">
                     <span className="text-4xl font-bold text-gray-900">
-                      ${selectedPackage.price}
-                      {selectedPackage.currency && selectedPackage.currency !== 'USD' && ` ${selectedPackage.currency}`}
+                      {formatPrice(selectedPackage.price, selectedPackage.currency)}
                     </span>
                   </div>
                   
@@ -573,13 +584,13 @@ export default function CreatorProfilePage() {
                     </div>
                   </div>
                   
-                  {/* Add to Cart Button - EXACTLY like screenshot */}
-                  <button
-                    onClick={() => handleAddToCart(selectedPackage)}
-                    className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl mb-4"
-                  >
-                    Add to Cart
-                  </button>
+                                     {/* Add to Cart Button - EXACTLY like screenshot */}
+                   <button
+                     onClick={() => handleAddToCart(selectedPackage)}
+                     className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl mb-4"
+                   >
+                     Add to Cart
+                   </button>
                   
                   {/* Custom Offer Link - EXACTLY like screenshot */}
                   <div className="text-center mb-4">

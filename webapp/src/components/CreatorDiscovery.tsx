@@ -85,7 +85,7 @@ const CreatorDiscovery: React.FC<CreatorDiscoveryProps> = ({
       setError(null);
       
       console.log('🔍 Fetching creators for discovery...');
-      const response = await profileAPI.getCreators();
+      const response = await profileAPI.getPublicCreators();
       
       if (response.success && response.data) {
         console.log('✅ Creators fetched successfully:', response.data);

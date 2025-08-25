@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { profileAPI } from '@/services/apiService';
+import { profileAPI, isAuthenticated, getCurrentUser } from '@/services/apiService';
 
 export default function BrandPreferencesScreen() {
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
@@ -47,16 +47,46 @@ export default function BrandPreferencesScreen() {
     }
   }, []);
 
-  // Load industries on component mount
+  // Check authentication and user type on component mount
   useEffect(() => {
-    loadIndustries();
+    const checkAuth = () => {
+      console.log('🔍 BrandPreferencesScreen - Checking authentication...');
+      
+      if (!isAuthenticated()) {
+        console.error('❌ BrandPreferencesScreen - User not authenticated');
+        alert('Authentication required. Please sign in first.');
+        window.location.href = '/login';
+        return;
+      }
+      
+      // Get current user info
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        console.log('✅ BrandPreferencesScreen - User authenticated:', currentUser);
+        
+        // Validate user type
+        if (currentUser.user_type !== 'brand') {
+          console.error('❌ User type mismatch. Expected: brand, Got:', currentUser.user_type);
+          if (currentUser.user_type === 'creator') {
+            window.location.href = '/creator-preferences';
+          } else {
+            alert('This page is for brands only. Please use the appropriate signup flow.');
+            window.location.href = '/signup-brand';
+          }
+          return;
+        }
+      } else {
+        console.error('❌ BrandPreferencesScreen - Could not get user info from token');
+        alert('Authentication error. Please sign in again.');
+        window.location.href = '/login';
+        return;
+      }
+      
+      console.log('✅ BrandPreferencesScreen - Authentication validated successfully');
+    };
     
-    // Check if user is a creator and redirect them to creator preferences since this screen is for brands only
-    const storedUserType = sessionStorage.getItem('selectedUserType') as 'creator' | 'brand' | null;
-    if (storedUserType === 'creator') {
-      window.location.href = '/creator-preferences';
-      return;
-    }
+    checkAuth();
+    loadIndustries();
   }, [loadIndustries]);
 
   // Industry selection logic
@@ -111,13 +141,69 @@ export default function BrandPreferencesScreen() {
       console.log('🔍 about:', about.trim());
       console.log('🔍 selectedLanguages:', selectedLanguages);
       
-      // Call the same API as mobile with same data structure
-      // Backend expects: categories, about, languages (exactly like mobile app)
-      await profileAPI.updatePreferences(preferencesData);
-
-
-      // Navigate to profile complete
-      window.location.href = '/profile-complete';
+      // Call the API to save brand preferences
+      console.log('🔍 Calling profileAPI.updatePreferences with data:', preferencesData);
+      
+      try {
+        // Check authentication before API call
+        if (!isAuthenticated()) {
+          throw new Error('Authentication required. Please sign in again.');
+        }
+        
+        const preferencesResponse = await profileAPI.updatePreferences(preferencesData);
+        
+        if (preferencesResponse.success) {
+          console.log('✅ Brand preferences saved successfully:', preferencesResponse);
+          
+          // Clear signup flow flag since user has completed signup
+          sessionStorage.removeItem('isSignupFlow');
+          console.log('✅ Brand signup flow completed - isSignupFlow flag cleared');
+          
+          // Navigate to profile complete
+          console.log('🚀 Navigating to /profile-complete...');
+          try {
+            window.location.href = '/profile-complete';
+            console.log('✅ Navigation successful');
+          } catch (navError) {
+            console.error('❌ Navigation failed:', navError);
+            window.location.href = '/profile-complete';
+          }
+        } else {
+          throw new Error(preferencesResponse.message || 'Failed to save preferences');
+        }
+      } catch (apiError) {
+        console.error('❌ API call failed:', apiError);
+        
+        // Check if it's an authentication error
+        if (apiError instanceof Error) {
+          if (apiError.message.includes('Authentication')) {
+            console.error('❌ Authentication error - redirecting to login');
+            localStorage.removeItem('token');
+            alert('Your session has expired. Please sign in again.');
+            window.location.href = '/login';
+            return;
+          }
+        }
+        
+        // For other errors, fallback to sessionStorage
+        console.log('📝 Falling back to sessionStorage due to API error');
+        sessionStorage.setItem('brandPreferencesData', JSON.stringify(preferencesData));
+        console.log('📝 Brand preferences data stored in sessionStorage (fallback)');
+        
+        // Navigate to profile complete
+        console.log('🚀 Navigating to /profile-complete (fallback)...');
+        try {
+          // Clear signup flow flag since user has completed signup
+          sessionStorage.removeItem('isSignupFlow');
+          console.log('✅ Brand signup flow completed - isSignupFlow flag cleared (fallback)');
+          
+          window.location.href = '/profile-complete';
+          console.log('✅ Navigation successful (fallback)');
+        } catch (navError) {
+          console.error('❌ Navigation failed (fallback):', navError);
+          window.location.href = '/profile-complete';
+        }
+      }
     } catch (error) {
       console.error('Error saving brand preferences:', error);
       
@@ -448,6 +534,29 @@ export default function BrandPreferencesScreen() {
                 </>
               )}
             </button>
+            
+            {/* Fallback Button - Skip API Call */}
+            {false && process.env.NODE_ENV === 'development' && (
+              <button
+                onClick={() => {
+                  console.log('🔄 Fallback: Skipping API call, proceeding with sessionStorage...');
+                  // Store brand preferences data in sessionStorage
+                  const preferencesData = {
+                    categories: selectedIndustries,
+                    about: about.trim(),
+                    languages: selectedLanguages,
+                  };
+                  sessionStorage.setItem('brandPreferencesData', JSON.stringify(preferencesData));
+                  console.log('📝 Brand preferences data stored in sessionStorage (fallback)');
+                  
+                  // Navigate to profile complete
+                  window.location.href = '/profile-complete';
+                }}
+                className="w-full py-2.5 text-[#20536d] text-sm font-poppins-semibold rounded-lg border-2 border-[#20536d] bg-white hover:bg-[#20536d] hover:text-white transition-colors mt-3"
+              >
+                🚨 Skip API Call (Development Only)
+              </button>
+            )}
           </div>
         </div>
       </div>

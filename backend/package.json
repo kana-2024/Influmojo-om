@@ -13,7 +13,8 @@
     "db:migrate": "dotenv -e .env -- prisma migrate dev",
     "db:studio": "dotenv -e .env -- prisma studio",
     "setup:env": "cp .env.example .env || echo 'Please create .env file manually'",
-    "create-profiles": "node create-missing-profiles.js"
+    "create-profiles": "node create-missing-profiles.js",
+    "migrate:currency": "node migrate-currency-to-inr.js"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",

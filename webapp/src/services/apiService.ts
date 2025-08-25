@@ -43,8 +43,127 @@ const clearToken = (): void => {
   localStorage.removeItem('token');
 };
 
+// Validate token format and expiration
+const validateToken = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  const token = localStorage.getItem('token');
+  if (!token) return false;
+  
+  // Basic JWT format validation
+  if (token.split('.').length !== 3) {
+    console.error('[apiService] Invalid token format');
+    clearToken();
+    return false;
+  }
+  
+  // Check if token is expired (basic check)
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    
+    if (payload.exp && payload.exp < currentTime) {
+      console.error('[apiService] Token expired');
+      handleTokenExpiration();
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('[apiService] Token validation error:', error);
+    clearToken();
+    return false;
+  }
+};
+
+// Check if user is authenticated
+export const isAuthenticated = (): boolean => {
+  return validateToken();
+};
+
+// Check if token needs refresh (expires within 1 hour)
+export const shouldRefreshToken = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  const token = localStorage.getItem('token');
+  if (!token) return false;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    const oneHour = 60 * 60;
+    
+    // Check if token expires within 1 hour
+    return payload.exp && (payload.exp - currentTime) < oneHour;
+  } catch (error) {
+    console.error('[apiService] Error checking token refresh:', error);
+    return false;
+  }
+};
+
+// Handle token expiration gracefully
+export const handleTokenExpiration = () => {
+  console.log('[apiService] Token expired, redirecting to login');
+  clearToken();
+  
+  if (typeof window !== 'undefined') {
+    // Show a user-friendly message
+    alert('Your session has expired. Please sign in again.');
+    // Redirect to login
+    window.location.href = '/login';
+  }
+};
+
+// Get current user info from token
+export const getCurrentUser = () => {
+  if (typeof window === 'undefined') return null;
+  
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return {
+      id: payload.userId || payload.id,
+      email: payload.email,
+      user_type: payload.user_type
+    };
+  } catch (error) {
+    console.error('[apiService] Error parsing user from token:', error);
+    return null;
+  }
+};
+
+// Check if backend is accessible
+export const checkBackendHealth = async (): Promise<boolean> => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002'}/api/health`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (response.ok) {
+      console.log('[apiService] Backend health check: OK');
+      return true;
+    } else {
+      console.error('[apiService] Backend health check: Failed with status', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.error('[apiService] Backend health check: Network error', error);
+    return false;
+  }
+};
+
 // API request helper
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+  // Validate token before making request
+  if (!validateToken()) {
+    throw new Error('Authentication token is invalid or expired. Please sign in again.');
+  }
+  
   const token = getToken();
   
   const defaultHeaders = {
@@ -78,6 +197,24 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
       throw new Error(`Non-JSON response: ${responseText.substring(0, 100)}`);
     }
 
+    // Handle authentication errors
+    if (response.status === 401 || response.status === 403) {
+      console.error('[apiService] Authentication error:', response.status, data);
+      // Clear invalid token
+      clearToken();
+      
+      // If this is a browser environment, redirect to login
+      if (typeof window !== 'undefined') {
+        console.log('[apiService] Redirecting to login due to authentication error');
+        // Use a small delay to allow the error to be handled by the caller
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 100);
+      }
+      
+      throw new Error(`Authentication failed: ${data.message || 'Unauthorized'}`);
+    }
+
     if (!response.ok) {
       throw new Error(data.message || `HTTP error! status: ${response.status}`);
     }
@@ -85,6 +222,13 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     return data;
   } catch (error) {
     console.error('[apiService] Request failed:', error);
+    
+    // Handle network errors gracefully
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      console.error('[apiService] Network error - backend may be unavailable');
+      throw new Error('Network error: Unable to connect to the server. Please check your internet connection and try again.');
+    }
+    
     throw error;
   }
 };
@@ -339,6 +483,76 @@ export const profileAPI = {
     return response;
   },
 
+  // Get all creators for public pages (no authentication required)
+  getPublicCreators: async () => {
+    try {
+      const response = await fetch(API_ENDPOINTS.GET_CREATORS, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      let data;
+      const contentType = response.headers.get('content-type');
+      const responseText = await response.text();
+      
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('[apiService] JSON parse error:', parseError);
+          throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
+        }
+      } else {
+        throw new Error(`Non-JSON response: ${responseText.substring(0, 100)}`);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+
+      // Safely parse JSON fields if they exist
+      if (data.success && data.data) {
+        Object.keys(data.data).forEach(platform => {
+          if (data.data[platform] && Array.isArray(data.data[platform])) {
+            data.data[platform].forEach((creator: {
+              id: string;
+              name: string;
+              profile_image?: string;
+              rating?: number;
+              followers?: string;
+              engagement_rate?: number;
+              categories?: string[];
+              city?: string;
+              state?: string;
+              age?: number;
+              date_of_birth?: string;
+              languages?: unknown;
+              content_categories?: unknown;
+              social_media_accounts?: unknown;
+              portfolio_items?: unknown;
+              user?: {
+                age?: number;
+                date_of_birth?: string;
+              };
+            }) => {
+              creator.languages = safeJsonParse(creator.languages, []);
+              creator.content_categories = safeJsonParse(creator.content_categories, []);
+              creator.social_media_accounts = safeJsonParse(creator.social_media_accounts, []);
+              creator.portfolio_items = safeJsonParse(creator.portfolio_items, []);
+            });
+          }
+        });
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('[apiService] Public creators request failed:', error);
+      throw error;
+    }
+  },
+
   // Get creator profile by ID
   getCreatorProfileById: async (creatorId: string, platform?: string) => {
     const endpoint = platform 
@@ -358,6 +572,51 @@ export const profileAPI = {
     }
     
     return response;
+  },
+
+  // Get creator profile by ID for public pages (no authentication required)
+  getPublicCreatorProfileById: async (creatorId: string) => {
+    try {
+      const endpoint = `${API_ENDPOINTS.GET_CREATOR_PROFILE_BY_ID}/${creatorId}`;
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      let data;
+      const contentType = response.headers.get('content-type');
+      const responseText = await response.text();
+      
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('[apiService] JSON parse error:', parseError);
+          throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
+        }
+      } else {
+        throw new Error(`Non-JSON response: ${responseText.substring(0, 100)}`);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+
+      // Safely parse JSON fields if they exist
+      if (data.success && data.data) {
+        data.data.languages = safeJsonParse(data.data.languages, []);
+        data.data.content_categories = safeJsonParse(data.data.content_categories, []);
+        data.data.social_media_accounts = safeJsonParse(data.data.social_media_accounts, []);
+        data.data.portfolio_items = safeJsonParse(data.data.portfolio_items, []);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('[apiService] Public creator profile request failed:', error);
+      throw error;
+    }
   },
 
   // Update profile

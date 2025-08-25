@@ -393,7 +393,7 @@ model Package {
   title            String
   description      String?
   price            Decimal
-  currency         String        @default("USD")
+  currency         String        @default("INR")
   deliverables     Json?
   is_active        Boolean       @default(true)
   created_at       DateTime      @default(now())

@@ -660,7 +660,7 @@ export default function BrandDashboard() {
     };
 
       return (
-    <div key={creator.id} className="flex-shrink-0 w-80 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200" onClick={() => router.push(`/dashboard/brand/creator/${creator.id}`)}>
+    <div key={creator.id} className="flex-shrink-0 w-80 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200" onClick={() => router.push(`/creator/${creator.id}`)}>
       <div className="relative">
         <Image 
           src={creator.profile_image || creator.profilePicture || "/assets/onboarding1.png"} 
@@ -1813,10 +1813,10 @@ export default function BrandDashboard() {
           </div>
           
           {profile?.portfolio_items && profile.portfolio_items.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {profile.portfolio_items.map((item) => (
                 <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="bg-gray-100 rounded-lg p-4 mb-3 flex items-center justify-center">
+                  <div className="bg-gray-100 rounded-lg aspect-square mb-3 flex items-center justify-center">
                     <DocumentTextIcon className="w-12 h-12 text-gray-400" />
                   </div>
                   <h4 className="font-semibold text-gray-900 mb-2">{item.fileName}</h4>

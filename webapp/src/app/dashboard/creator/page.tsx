@@ -590,6 +590,27 @@ export default function CreatorDashboard() {
     }
   };
 
+  const handleEditPortfolio = (item: PortfolioItem) => {
+    // TODO: Implement portfolio editing functionality
+    console.log('Edit portfolio item:', item);
+    alert('Portfolio editing functionality coming soon!');
+  };
+
+  const handleDeletePortfolio = async (itemId: string) => {
+    if (confirm('Are you sure you want to delete this portfolio item? This action cannot be undone.')) {
+      try {
+        // TODO: Implement portfolio deletion API call
+        console.log('Delete portfolio item:', itemId);
+        alert('Portfolio deletion functionality coming soon!');
+        // await profileAPI.deletePortfolio(itemId);
+        // fetchProfile();
+      } catch (error) {
+        console.error('Delete portfolio error:', error);
+        alert('Failed to delete portfolio item. Please try again.');
+      }
+    }
+  };
+
   const handleProfileAction = (action: string) => {
     switch (action) {
       case 'profile':
@@ -1489,11 +1510,12 @@ export default function CreatorDashboard() {
           </div>
           
           {profile?.portfolio_items && profile.portfolio_items.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {profile.portfolio_items.map((item) => (
-                <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="bg-gray-100 rounded-lg h-32 mb-3 flex items-center justify-center overflow-hidden">
-                    {item.media_type === 'image' ? (
+                <div key={item.id} className="relative group">
+                  {/* Image Container */}
+                  <div className="bg-gray-100 rounded-lg aspect-square overflow-hidden relative">
+                    {item.media_type === 'image' && item.media_url ? (
                       <Image 
                         src={item.media_url} 
                         alt={item.title}
@@ -1502,17 +1524,34 @@ export default function CreatorDashboard() {
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
-                          target.nextElementSibling?.classList.remove('hidden');
                         }}
                       />
-                    ) : null}
-                    <DocumentTextIcon className={`w-12 h-12 text-gray-400 ${item.media_type === 'image' ? 'hidden' : ''}`} />
+                    ) : (
+                      <DocumentTextIcon className="w-8 h-8 text-gray-400 absolute inset-0 m-auto" />
+                    )}
+                    
+                    {/* Edit/Delete Overlay */}
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => handleEditPortfolio(item)}
+                          className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+                          title="Edit"
+                        >
+                          <PencilIcon className="w-4 h-4 text-white" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeletePortfolio(item.id)}
+                          className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                          title="Delete"
+                        >
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <h4 className="font-semibold text-gray-900 mb-2">{item.title}</h4>
-                  <p className="text-gray-600 text-sm mb-2">{item.media_type}</p>
-                  <p className="text-gray-500 text-xs">
-                    {item.file_size ? (item.file_size / 1024 / 1024).toFixed(2) : 'Unknown'} MB
-                  </p>
                 </div>
               ))}
             </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { profileAPI } from '@/services/apiService';
+import { profileAPI, isAuthenticated, getCurrentUser } from '@/services/apiService';
 
 export default function CreatorPreferencesScreen() {
   const router = useRouter();
@@ -107,15 +107,28 @@ export default function CreatorPreferencesScreen() {
       // Save basic profile info first using updateBasicInfo
       if (Object.keys(basicProfileData).length > 0) {
         try {
+          // Check authentication before API call
+          if (!isAuthenticated()) {
+            throw new Error('Authentication required. Please sign in again.');
+          }
+          
           const basicInfoResponse = await profileAPI.updateBasicInfo(basicProfileData);
-          console.log('Basic info saved:', basicInfoResponse);
+          console.log('✅ Basic info saved:', basicInfoResponse);
         } catch (basicError) {
-          console.warn('Failed to save basic info:', basicError);
+          console.warn('⚠️ Failed to save basic info:', basicError);
+          
+          // Check if it's an authentication error
+          if (basicError instanceof Error && basicError.message.includes('Authentication')) {
+            alert('Your session has expired. Please sign in again.');
+            window.location.href = '/login';
+            return;
+          }
+          
           // Continue with preferences even if basic info fails
         }
       }
 
-      // Save preferences
+      // Save preferences using the API
       const preferencesData = {
         categories: selectedCategories,
         about: about.trim(),
@@ -123,18 +136,78 @@ export default function CreatorPreferencesScreen() {
         platform: selectedPlatforms
       };
 
-      const preferencesResponse = await profileAPI.updatePreferences(preferencesData);
-      
-      if (preferencesResponse.success) {
-        console.log('Preferences saved successfully:', preferencesResponse);
+      try {
+        // Check authentication before API call
+        if (!isAuthenticated()) {
+          throw new Error('Authentication required. Please sign in again.');
+        }
         
-        // Clear stored data
+        const preferencesResponse = await profileAPI.updatePreferences(preferencesData);
+        
+        if (preferencesResponse.success) {
+          console.log('✅ Preferences saved successfully:', preferencesResponse);
+          
+          // Clear stored data
+          sessionStorage.removeItem('basicProfileData');
+          
+          // Clear signup flow flag since user has completed signup
+          sessionStorage.removeItem('isSignupFlow');
+          console.log('✅ Signup flow completed - isSignupFlow flag cleared');
+          
+          // Navigate to profile complete
+          console.log('🚀 Navigating to /profile-complete...');
+          try {
+            await router.push('/profile-complete');
+            console.log('✅ Navigation successful');
+          } catch (navError) {
+            console.error('❌ Navigation failed:', navError);
+            window.location.href = '/profile-complete';
+          }
+        } else {
+          throw new Error(preferencesResponse.message || 'Failed to save preferences');
+        }
+      } catch (apiError) {
+        console.error('❌ API call failed:', apiError);
+        
+        // Check if it's an authentication error
+        if (apiError instanceof Error) {
+          if (apiError.message.includes('Authentication')) {
+            console.error('❌ Authentication error - redirecting to login');
+            localStorage.removeItem('token');
+            alert('Your session has expired. Please sign in again.');
+            window.location.href = '/login';
+            return;
+          }
+        }
+        
+        // For other errors, fallback to sessionStorage
+        console.log('📝 Falling back to sessionStorage due to API error');
+        const completeProfileData = {
+          ...basicProfileData,
+          categories: selectedCategories,
+          about: about.trim(),
+          languages: selectedLanguages,
+          platform: selectedPlatforms
+        };
+        sessionStorage.setItem('completeProfileData', JSON.stringify(completeProfileData));
+        console.log('📝 Complete profile data stored in sessionStorage (fallback)');
+        
+        // Clear basic profile data
         sessionStorage.removeItem('basicProfileData');
         
+        // Clear signup flow flag since user has completed signup
+        sessionStorage.removeItem('isSignupFlow');
+        console.log('✅ Signup flow completed - isSignupFlow flag cleared (fallback)');
+        
         // Navigate to profile complete
-        router.push('/profile-complete');
-      } else {
-        throw new Error(preferencesResponse.message || 'Failed to save preferences');
+        console.log('🚀 Navigating to /profile-complete (fallback)...');
+        try {
+          await router.push('/profile-complete');
+          console.log('✅ Navigation successful (fallback)');
+        } catch (navError) {
+          console.error('❌ Navigation failed (fallback):', navError);
+          window.location.href = '/profile-complete';
+        }
       }
     } catch (error) {
       console.error('Error saving preferences:', error);
@@ -144,18 +217,47 @@ export default function CreatorPreferencesScreen() {
     }
   };
 
-  // Load selectedUserType from sessionStorage on component mount
+  // Check authentication and user type on component mount
   useEffect(() => {
-    const storedUserType = sessionStorage.getItem('selectedUserType') as 'creator' | 'brand' | null;
-    if (storedUserType) {
-      setSelectedUserType(storedUserType);
+    const checkAuth = () => {
+      console.log('🔍 CreatorPreferencesScreen - Checking authentication...');
       
-      // If user is a brand, redirect them to brand preferences since this screen is for creators only
-      if (storedUserType === 'brand') {
-        router.push('/brand-preferences');
+      if (!isAuthenticated()) {
+        console.error('❌ CreatorPreferencesScreen - User not authenticated');
+        alert('Authentication required. Please sign in first.');
+        window.location.href = '/login';
         return;
       }
-    }
+      
+      // Get current user info
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        console.log('✅ CreatorPreferencesScreen - User authenticated:', currentUser);
+        
+        // Validate user type
+        if (currentUser.user_type !== 'creator') {
+          console.error('❌ User type mismatch. Expected: creator, Got:', currentUser.user_type);
+          if (currentUser.user_type === 'brand') {
+            router.push('/brand-preferences');
+          } else {
+            alert('This page is for creators only. Please use the appropriate signup flow.');
+            window.location.href = '/signup-creator';
+          }
+          return;
+        }
+        
+        setSelectedUserType('creator');
+      } else {
+        console.error('❌ CreatorPreferencesScreen - Could not get user info from token');
+        alert('Authentication error. Please sign in again.');
+        window.location.href = '/login';
+        return;
+      }
+      
+      console.log('✅ CreatorPreferencesScreen - Authentication validated successfully');
+    };
+    
+    checkAuth();
   }, [router]);
 
   return (
@@ -538,6 +640,50 @@ export default function CreatorPreferencesScreen() {
                 </>
               )}
             </button>
+            
+            {/* Fallback Button - Skip API Call */}
+            {false && process.env.NODE_ENV === 'development' && (
+              <button
+                onClick={() => {
+                  console.log('🔄 Fallback: Skipping API calls, proceeding with sessionStorage...');
+                  // Get basic profile data from sessionStorage
+                  const basicProfileDataStr = sessionStorage.getItem('basicProfileData');
+                  let basicProfileData = {};
+                  
+                  if (basicProfileDataStr) {
+                    try {
+                      basicProfileData = JSON.parse(basicProfileDataStr);
+                    } catch (e) {
+                      console.warn('Failed to parse basic profile data:', e);
+                    }
+                  }
+                  
+                  // Store complete profile data in sessionStorage
+                  const completeProfileData = {
+                    ...basicProfileData,
+                    categories: selectedCategories,
+                    about: about.trim(),
+                    languages: selectedLanguages,
+                    platform: selectedPlatforms
+                  };
+                  sessionStorage.setItem('completeProfileData', JSON.stringify(completeProfileData));
+                  console.log('📝 Complete profile data stored in sessionStorage (fallback)');
+                  
+                  // Clear basic profile data
+                  sessionStorage.removeItem('basicProfileData');
+                  
+                  // Clear signup flow flag since user has completed signup
+                  sessionStorage.removeItem('isSignupFlow');
+                  console.log('✅ Signup flow completed - isSignupFlow flag cleared (fallback)');
+                  
+                  // Navigate to profile complete
+                  window.location.href = '/profile-complete';
+                }}
+                className="w-full py-2.5 text-[#20536d] text-sm font-poppins-semibold rounded-lg border-2 border-[#20536d] bg-white hover:bg-[#20536d] hover:text-white transition-colors mt-3"
+              >
+                🚨 Skip API Call (Development Only)
+              </button>
+            )}
           </div>
         </div>
       </div>
