@@ -29,7 +29,43 @@ const prisma = new PrismaClient();
 // Import AWS Parameter Store utility
 const awsParameterStore = require('./utils/awsParameterStore');
 
-const PORT = process.env.PORT || 3001;
+// --- replace your PORT line with a placeholder (we'll set it after SSM load) ---
+let PORT = 3002; // default; will be overridden after SSM load
+
+// Build a dynamic CORS origin function
+const allowedOriginsFromEnv = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
+const influmojoRegex = /^https:\/\/([a-z0-9-]+\.)?influmojo\.com$/i;
+
+const corsOrigin = (origin, callback) => {
+  const isProd = (process.env.NODE_ENV === 'production');
+
+  // SSR / curl / server-to-server requests without Origin are OK
+  if (!origin) return callback(null, true);
+
+  if (isProd) {
+    const inAllowlist = allowedOriginsFromEnv.includes(origin);
+    if (inAllowlist || influmojoRegex.test(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked in production: ${origin}`), false);
+  }
+
+  // Dev convenience
+  const devAllow = new Set([
+    'http://localhost:3000', 'http://127.0.0.1:3000',
+    'http://localhost:3001', 'http://127.0.0.1:3001',
+    'http://localhost:3002', 'http://127.0.0.1:3002',
+    'http://localhost:8081', 'exp://localhost:8081'
+  ]);
+  if (devAllow.has(origin) || /ngrok/.test(origin)) {
+    return callback(null, true);
+  }
+  return callback(new Error(`CORS blocked (dev): ${origin}`), false);
+};
 
 // Global BigInt and Date serializer for JSON responses
 const originalJson = express.response.json;
@@ -82,29 +118,13 @@ const limiter = rateLimit({
 // Trust proxy for ngrok
 app.set('trust proxy', 1);
 
-// Middleware
-app.use(helmet());
+// Middleware (keep what you had, but swap cors(...) to use our origin fn)
+app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors({
-  origin: [
-    'http://localhost:3000', 
-    'http://127.0.0.1:3000',
-    'http://192.168.31.75:3000', 
-    'http://192.168.31.57:3000',
-    'http://192.168.31.57:3002',
-    'http://localhost:3002',
-    'http://localhost:3001',
-    'exp://192.168.31.75:8081',
-    'exp://192.168.31.57:8081',
-    'http://localhost:8081',
-    'exp://localhost:8081',
-    'https://fair-legal-gar.ngrok-free.app',
-    'exp://fair-legal-gar.ngrok-free.app',
-    'file://',  // Allow file:// protocol for local HTML files
-    'null'      // Allow null origin for local file access
-  ],
+  origin: corsOrigin,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','ngrok-skip-browser-warning'],
 }));
 app.use(morgan('combined'));
 app.use(limiter);
@@ -220,26 +240,25 @@ app.use((err, req, res, next) => {
 // Database connection and server start
 async function startServer() {
   try {
-    // Load environment variables from AWS Parameter Store first
+    // 1) Load env from SSM first (in prod), then read env vars
     await awsParameterStore.loadProductionEnvVars();
-    
-    // Validate critical environment variables
+
+    // 2) Now pull env values (these can come from SSM or .env)
+    PORT = parseInt(process.env.PORT || '3002', 10);
+
     const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
     if (!awsParameterStore.validateRequiredVars(requiredEnvVars)) {
       process.exit(1);
     }
-    
+
     console.log('✅ Environment variables loaded successfully');
-    
     await prisma.$connect();
     console.log('✅ Database connected successfully');
-    
+
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📱 Health check: http://localhost:${PORT}/api/health`);
-      console.log(`📱 Network access: http://192.168.31.57:${PORT}/api/health`);
       console.log(`🔐 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🔐 AWS Parameter Store: ${process.env.NODE_ENV === 'production' ? 'Enabled' : 'Disabled'}`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
