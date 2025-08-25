@@ -1,27 +1,14 @@
 import type { Metadata } from 'next';
-import { Poppins, Alice } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { Toaster } from 'react-hot-toast';
 
-// Initialize fonts
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-poppins',
-  display: 'swap',
-});
-
-const alice = Alice({
-  subsets: ['latin'],
-  weight: ['400'],
-  variable: '--font-alice',
-  display: 'swap',
-});
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Influmojo - Connect with Skilled Influencers',
-  description: 'Tap into a pool of talented influencers to bring your projects to life. Collaborate seamlessly and achieve outstanding results.',
+  title: 'Influmojo',
+  description: 'Influencer Marketing Platform',
 };
 
 export default function RootLayout({
@@ -30,16 +17,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${poppins.variable} ${alice.variable}`}>
+    <html lang="en">
       <head>
-        {/* Google Identity Services */}
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        {/* Google Fonts - load fonts from CDN */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Alice:ital@0;1&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className="font-poppins">
+      <body className={inter.className}>
         <Providers>
           {children}
         </Providers>
-        <Toaster 
+        <Toaster
           position="top-right"
           toastOptions={{
             duration: 4000,

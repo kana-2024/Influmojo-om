@@ -1,61 +1,51 @@
-export const FONTS = {
-  // Primary Typeface - Poppins
-  primary: {
-    regular: 'Poppins-Regular',
-    medium: 'Poppins-Medium',
-    semiBold: 'Poppins-SemiBold',
-    bold: 'Poppins-Bold',
-  },
-  // Secondary Typeface - Alice (italic)
-  secondary: {
-    italic: 'Alice-Italic',
-  },
-  // Font sizes based on brand guidelines
-  sizes: {
-    body: 18,      // 18px for body text (Poppins)
-    caption: 14,   // 14px for captions (Poppins)
-    title: 20,     // Main titles
-    subtitle: 16,  // Subtitles
-    small: 12,     // Small text
-    large: 24,     // Large headings
-  },
-  // Predefined text styles for consistency
-  styles: {
-    // Main headings - Alice italic
-    heading: {
-      fontFamily: 'Alice-Italic',
-      fontSize: 24,
-      fontWeight: 'normal',
+// Local fonts configuration for Influmojo webapp
+// This avoids external font downloads during build process
+
+import localFont from 'next/font/local'
+
+// Alice font (local fallback)
+export const aliceFont = localFont({
+  src: [
+    {
+      path: '../../assets/fonts/alice-regular.woff2',
+      weight: '400',
+      style: 'normal',
     },
-    // Body text - Poppins
-    body: {
-      fontFamily: 'Poppins-Regular',
-      fontSize: 18,
-      fontWeight: 'normal',
+  ],
+  variable: '--font-alice',
+  display: 'swap',
+})
+
+// Poppins font (local fallback)
+export const poppinsFont = localFont({
+  src: [
+    {
+      path: '../../assets/fonts/poppins-regular.woff2',
+      weight: '400',
+      style: 'normal',
     },
-    // Captions - Poppins
-    caption: {
-      fontFamily: 'Poppins-Regular',
-      fontSize: 14,
-      fontWeight: 'normal',
+    {
+      path: '../../assets/fonts/poppins-medium.woff2',
+      weight: '500',
+      style: 'normal',
     },
-    // Button text - Poppins medium
-    button: {
-      fontFamily: 'Poppins-Medium',
-      fontSize: 16,
-      fontWeight: '500',
+    {
+      path: '../../assets/fonts/poppins-semibold.woff2',
+      weight: '600',
+      style: 'normal',
     },
-    // Input text - Poppins
-    input: {
-      fontFamily: 'Poppins-Regular',
-      fontSize: 15,
-      fontWeight: 'normal',
+    {
+      path: '../../assets/fonts/poppins-bold.woff2',
+      weight: '700',
+      style: 'normal',
     },
-    // Section titles - Poppins semi-bold
-    sectionTitle: {
-      fontFamily: 'Poppins-SemiBold',
-      fontSize: 15,
-      fontWeight: '600',
-    },
-  },
-}; 
+  ],
+  variable: '--font-poppins',
+  display: 'swap',
+})
+
+// Fallback fonts for better performance
+export const fallbackFonts = {
+  alice: 'Alice, Georgia, serif',
+  poppins: 'Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+} 
