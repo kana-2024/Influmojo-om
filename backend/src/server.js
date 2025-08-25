@@ -54,13 +54,16 @@ const corsOrigin = (origin, callback) => {
     return callback(new Error(`CORS blocked in production: ${origin}`), false);
   }
 
-  // Dev convenience
+  // Dev convenience - includes common development ports
   const devAllow = new Set([
     'http://localhost:3000', 'http://127.0.0.1:3000',
     'http://localhost:3001', 'http://127.0.0.1:3001',
     'http://localhost:3002', 'http://127.0.0.1:3002',
-    'http://localhost:8081', 'exp://localhost:8081'
-  ]);
+    'http://localhost:8081', 'exp://localhost:8081',
+    // Allow ngrok for development
+    /ngrok/.test(origin) ? origin : null
+  ].filter(Boolean));
+  
   if (devAllow.has(origin) || /ngrok/.test(origin)) {
     return callback(null, true);
   }

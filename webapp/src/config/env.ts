@@ -1,18 +1,28 @@
 // Environment configuration for webapp
-// Force the correct API URL - this ensures we always use the local backend server
-const FORCE_API_URL = 'http://localhost:3002';
+// Supports both development and production with AWS Parameter Store integration
 
+// Determine environment
+const isProduction = process.env.NODE_ENV === 'production';
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// API Configuration - Dynamic based on environment
 export const ENV = {
-  // API Configuration - Force the correct URL like mobile
-  API_BASE_URL: FORCE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002',
+  // API Configuration - Loaded from environment variables
+  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 
+                 (isProduction ? 'https://api.influmojo.com' : 'http://localhost:3002'),
   GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
   
   // App Configuration
   APP_NAME: 'Influ Mojo',
   APP_VERSION: '1.0.0',
+  
+  // Environment info
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  IS_PRODUCTION: isProduction,
+  IS_DEVELOPMENT: isDevelopment,
 };
 
-// API endpoints - matching mobile app exactly
+// API endpoints - dynamic based on environment
 export const API_ENDPOINTS = {
   // Auth endpoints
   LOGIN: `${ENV.API_BASE_URL}/api/auth/login`,
@@ -78,20 +88,26 @@ export const API_ENDPOINTS = {
 };
 
 // Debug environment variables (only in development)
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && isDevelopment) {
   console.log('=== Environment Variables Debug ===');
-  console.log('FORCE_API_URL:', FORCE_API_URL);
+  console.log('NODE_ENV:', process.env.NODE_ENV);
   console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
   console.log('ENV.API_BASE_URL:', ENV.API_BASE_URL);
+  console.log('ENV.IS_PRODUCTION:', ENV.IS_PRODUCTION);
+  console.log('ENV.IS_DEVELOPMENT:', ENV.IS_DEVELOPMENT);
   console.log('API_ENDPOINTS.GOOGLE_AUTH:', API_ENDPOINTS.GOOGLE_AUTH);
   console.log('API_ENDPOINTS.SEND_OTP:', API_ENDPOINTS.SEND_OTP);
   
-  // Validate that we're using the correct URL
-  if (!ENV.API_BASE_URL.includes('localhost:3002')) {
-    console.error('❌ WARNING: API_BASE_URL is not using the correct local backend URL!');
+  // Validate that we're using the correct URL for the environment
+  if (isProduction && !ENV.API_BASE_URL.includes('influmojo.com')) {
+    console.error('❌ WARNING: Production mode but API_BASE_URL is not using influmojo.com!');
+    console.error('Current URL:', ENV.API_BASE_URL);
+    console.error('Expected URL: https://api.influmojo.com');
+  } else if (isDevelopment && !ENV.API_BASE_URL.includes('localhost')) {
+    console.error('❌ WARNING: Development mode but API_BASE_URL is not using localhost!');
     console.error('Current URL:', ENV.API_BASE_URL);
     console.error('Expected URL: http://localhost:3002');
   } else {
-    console.log('✅ API_BASE_URL is correctly configured');
+    console.log('✅ API_BASE_URL is correctly configured for', isProduction ? 'production' : 'development');
   }
 } 
