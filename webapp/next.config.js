@@ -34,19 +34,19 @@ const nextConfig = {
       },
     ],
   },
+  // Environment variable handling - only allow safe public variables
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
-    NODE_ENV: process.env.NODE_ENV,
   },
   // Server configuration for EC2 deployment
   experimental: {
     serverComponentsExternalPackages: ['aws-sdk'],
   },
-  // Environment variable handling
+  // Public runtime config for client-side access
   publicRuntimeConfig: {
-    NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
+  // Server runtime config for server-side only
   serverRuntimeConfig: {
     NODE_ENV: process.env.NODE_ENV,
   },

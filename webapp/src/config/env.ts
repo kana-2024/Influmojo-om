@@ -1,7 +1,7 @@
 // Environment configuration for webapp
 // Supports both development and production with AWS Parameter Store integration
 
-// Determine environment
+// Determine environment - use process.env directly to avoid Next.js conflicts
 const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -16,7 +16,7 @@ export const ENV = {
   APP_NAME: 'Influ Mojo',
   APP_VERSION: '1.0.0',
   
-  // Environment info
+  // Environment info - accessed directly from process.env
   NODE_ENV: process.env.NODE_ENV || 'development',
   IS_PRODUCTION: isProduction,
   IS_DEVELOPMENT: isDevelopment,
