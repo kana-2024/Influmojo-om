@@ -5,10 +5,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:ec2": "./scripts/build-and-package.sh",
+    "deploy:ec2": "./scripts/deploy-to-ec2.sh",
+    "deploy:auto": "powershell -ExecutionPolicy Bypass -File ./scripts/auto-deploy-clean.ps1"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

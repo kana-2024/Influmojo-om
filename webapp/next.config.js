@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // 🚀 Standalone output for EC2 deployment
+  output: 'standalone',
+  
   // ⚡ Skip lint during production builds on the server (run lint in CI instead)
   eslint: { ignoreDuringBuilds: true },
 
