@@ -5,11 +5,6 @@ on:
     branches: [ new-feature-branch ]
   workflow_dispatch:
 
-env:
-  AWS_REGION: ap-south-1
-  INSTANCE_ID: i-0b338206ea637e1b4
-  S3_BUCKET: influmojo-deployments
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -32,7 +27,7 @@ jobs:
         working-directory: webapp
         run: npm ci --no-audit --no-fund
 
-      - name: Build (standalone, flattened)
+      - name: Build (Next.js standalone)
         working-directory: webapp
         env:
           NEXT_PUBLIC_API_URL: /api
@@ -42,85 +37,99 @@ jobs:
           node -v && npm -v
           npm run build
 
-          echo "📦 Packaging flattened standalone output..."
-          rm -rf package && mkdir -p package/.next/static
+          echo "📦 Packaging..."
+          rm -rf package
+          mkdir -p package
 
-          # FLATTEN the standalone runtime (puts server.js at package/server.js)
+          # 1) Flatten the standalone server + node_modules to package/
           cp -R .next/standalone/* package/
 
-          # Provide Next runtime bits
-          cp -R .next/static/* package/.next/static/
-          cp .next/BUILD_ID package/.next/BUILD_ID
+          # 2) Copy the rest of .next that runtime needs (server, BUILD_ID, static, etc.)
+          rsync -a --exclude "cache" --exclude "standalone" .next/ package/.next/
 
-          # Optional: ship public assets
-          if [ -d "public" ]; then cp -R public package/public; fi
+          # 3) Add public assets if present
+          if [ -d "public" ]; then
+            cp -R public package/public
+          fi
 
-          # Sanity check: server.js must exist
-          test -f package/server.js || { echo "server.js missing in package"; ls -la package; exit 1; }
+          # 4) Tiny start wrapper to avoid quoting/ENV/cwd issues
+          cat > package/start.sh <<'EOF'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          cd "$(dirname "$0")"
 
-          echo "🗜️ Creating zip..."
-          (cd package && zip -qr ../webapp-${GITHUB_SHA}.zip .)
-          ls -lh webapp-${GITHUB_SHA}.zip
+          ENTRY=server.js
+          [ -f ".next/standalone/server.js" ] && ENTRY=".next/standalone/server.js"
+
+          export NODE_ENV=production
+          export PORT=3000
+          export HOST=0.0.0.0
+
+          exec "$(command -v node)" "$ENTRY"
+          EOF
+          chmod +x package/start.sh
+
+          # 5) Zip it up
+          (cd package && zip -qr ../webapp-${{ github.sha }}.zip .)
+          ls -lh webapp-${{ github.sha }}.zip
 
       - name: Configure AWS (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::424592696132:role/GitHubActionsRole
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ap-south-1
 
       - name: Upload artifact to S3
         run: |
           echo "☁️ Uploading to S3..."
-          aws s3 cp webapp/webapp-${GITHUB_SHA}.zip s3://${{ env.S3_BUCKET }}/releases/
-          echo "✅ Uploaded: s3://${{ env.S3_BUCKET }}/releases/webapp-${GITHUB_SHA}.zip"
+          aws s3 cp webapp/webapp-${{ github.sha }}.zip s3://influmojo-deployments/releases/
+          echo "✅ Uploaded: s3://influmojo-deployments/releases/webapp-${{ github.sha }}.zip"
 
       - name: Deploy to EC2 via SSM
         run: |
           echo "🚀 Deploying to EC2..."
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
-            --instance-ids "${{ env.INSTANCE_ID }}" \
-            --comment "Deploy webapp ${GITHUB_SHA}" \
-            --parameters '{
-              "commands": [
-                "set -euo pipefail",
-                "REL=\"'$GITHUB_SHA'\"",
-                "ZIP=\"/tmp/webapp-'$GITHUB_SHA'.zip\"",
-                "echo \"📦 Downloading release $REL\"",
-                "aws s3 cp s3://'${{ env.S3_BUCKET }}'/releases/webapp-$REL.zip $ZIP",
-                "sudo mkdir -p /opt/influmojo/releases/$REL /opt/influmojo/current",
-                "echo \"📁 Extracting...\"",
-                "sudo unzip -qo $ZIP -d /opt/influmojo/releases/$REL",
-                "sudo ln -sfn /opt/influmojo/releases/$REL /opt/influmojo/current",
-                "cd /opt/influmojo/current",
-                "echo \"🧪 Post-extract check:\"",
-                "ls -la | sed -n '1,50p'",
-                "test -f server.js || { echo \"❌ server.js missing in /opt/influmojo/current\"; exit 1; }",
+            --instance-ids i-0b338206ea637e1b4 \
+            --comment "Deploy webapp $GITHUB_SHA" \
+            --parameters 'commands=[
+              "set -euo pipefail",
+              "REL=\"$GITHUB_SHA\"",
+              "ZIP=\"/tmp/webapp-$GITHUB_SHA.zip\"",
+              "echo Downloading package...",
+              "aws s3 cp s3://influmojo-deployments/releases/webapp-$GITHUB_SHA.zip $ZIP",
+              "sudo mkdir -p /opt/influmojo/releases/$REL /opt/influmojo/current",
+              "echo Unzipping...",
+              "sudo unzip -qo $ZIP -d /opt/influmojo/releases/$REL",
+              "echo Linking current -> $REL",
+              "sudo ln -sfn /opt/influmojo/releases/$REL /opt/influmojo/current",
 
-                "echo \"🔄 Restarting webapp via PM2 (entry=server.js)\"",
-                "sudo -iu ssm-user bash -lc \"pm2 delete webapp >/dev/null 2>&1 || true\"",
-                "sudo -iu ssm-user bash -lc \"NODE_ENV=production PORT=3000 HOST=0.0.0.0 pm2 start \\\"$(which node)\\\" --name webapp --cwd /opt/influmojo/current -- server.js\"",
-                "sudo -iu ssm-user bash -lc \"pm2 save\"",
+              "echo Starting via PM2...",
+              "sudo -iu ssm-user bash -lc \"set -euo pipefail; \
+                 cd /opt/influmojo/current; \
+                 pm2 delete webapp >/dev/null 2>&1 || true; \
+                 pm2 start ./start.sh --name webapp; \
+                 pm2 save; \
+                 pm2 describe webapp | egrep 'pm_cwd|pm_exec_path|status' || true; \
+                 ss -ltnp | egrep ':3000|:3002' || true; \
+                 echo Testing local port...; \
+                 ip=\\$(hostname -I | awk '{print \\$1}'); \
+                 curl -sS -I http://\\$ip:3000/ || true; \
+                 pm2 logs webapp --lines 50 --timestamp --nostream || true\"",
 
-                "echo \"🔍 Health check\"",
-                "ss -ltnp | egrep \\":3000|:3002\\" || true",
-                "curl -sS -I http://127.0.0.1:3000/ || true",
-                "sudo -iu ssm-user bash -lc \"pm2 logs webapp --lines 60 --timestamp --nostream || true\"",
-
-                "rm -f $ZIP",
-                "echo \"✅ Deploy done\""
-              ]
-            }' \
+              "rm -f $ZIP",
+              "echo ✅ Done"
+            ]' \
             --output text
 
-          echo "⏳ Give the process a few seconds to bind port 3000..."
-          sleep 8
-          echo "✅ Command sent."
+          echo "⏳ Letting the service settle for a few seconds..."
+          sleep 15
+          echo "✅ Deployment command sent."
 
       - name: Deployment Summary
         run: |
           echo "🎉 Deployment completed!"
-          echo "📦 Package: webapp-${GITHUB_SHA}.zip"
-          echo "🌐 ALB: http://influmojo-alb-1717302406.ap-south-1.elb.amazonaws.com/"
-          echo "📋 Commit: ${GITHUB_SHA}"
-          echo "🔀 Branch: ${GITHUB_REF_NAME}"
+          echo "📦 Package: webapp-${{ github.sha }}.zip"
+          echo "🌐 URL: http://influmojo-alb-1717302406.ap-south-1.elb.amazonaws.com/"
+          echo "📋 Commit: ${{ github.sha }}"
+          echo "🔀 Branch: ${{ github.ref_name }}"
