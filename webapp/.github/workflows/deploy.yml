@@ -3,15 +3,26 @@ name: Deploy Webapp
 on:
   push:
     branches: [ new-feature-branch ]   # adjust to your main branch
-  workflow_dispatch:  # Allow manual triggers
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-webapp
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: ap-south-1
+  S3_BUCKET: influmojo-deployments
+  S3_PREFIX: releases
+  INSTANCE_ID: i-0b338206ea637e1b4
+  ROLE_ARN: arn:aws:iam::424592696132:role/GitHubActionsRole
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write        # for OIDC
+      id-token: write
       contents: read
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,85 +41,83 @@ jobs:
       - name: Build (standalone)
         working-directory: webapp
         env:
-          NEXT_PUBLIC_API_URL: /api     # same-origin via ALB
+          # keep API same-origin through ALB path rules
+          NEXT_PUBLIC_API_URL: /api
           NODE_OPTIONS: --max_old_space_size=1024
         run: |
           echo "🔨 Building webapp..."
           node -v && npm -v
-          # next.config.js has: output: 'standalone'
+          # next.config.js must have: output: 'standalone'
           npm run build
-          
+
           echo "📦 Packaging standalone output..."
           rm -rf package && mkdir -p package/.next/static
+          # standalone runtime
           cp -R .next/standalone/* package/
+          # static assets + build id for runtime checks
           cp -R .next/static/* package/.next/static/
-          cp .next/BUILD_ID package/.next/BUILD_ID
-          if [ -d "public" ]; then
-            cp -R public package/public
-          fi
-          
+          cp .next/BUILD_ID package/.next/BUILD_ID || true
+          # public assets (optional but common)
+          if [ -d "public" ]; then cp -R public package/public; fi
+
           echo "🗜️ Creating deployment package..."
           (cd package && zip -qr ../webapp-${{ github.sha }}.zip .)
-          
-          echo "✅ Package created: webapp-${{ github.sha }}.zip"
           ls -lh webapp-${{ github.sha }}.zip
 
       - name: Configure AWS (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::424592696132:role/GitHubActionsRole  # Replace with your role ARN
-          aws-region: ap-south-1
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload artifact to S3
         run: |
-          echo "☁️ Uploading to S3..."
-          aws s3 cp webapp/webapp-${{ github.sha }}.zip s3://influmojo-deployments/releases/
-          echo "✅ Uploaded to S3: s3://influmojo-deployments/releases/webapp-${{ github.sha }}.zip"
+          echo "☁️ Uploading to s3://${{ env.S3_BUCKET }}/${{ env.S3_PREFIX }}/"
+          aws s3 cp webapp/webapp-${{ github.sha }}.zip s3://${{ env.S3_BUCKET }}/${{ env.S3_PREFIX }}/
+          echo "✅ Uploaded: s3://${{ env.S3_BUCKET }}/${{ env.S3_PREFIX }}/webapp-${{ github.sha }}.zip"
 
       - name: Deploy to EC2 via SSM
         run: |
           echo "🚀 Deploying to EC2..."
-          aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --instance-ids i-0b338206ea637e1b4 \
-            --comment "Deploy webapp $GITHUB_SHA" \
-            --parameters 'commands=[
-              "set -euo pipefail",
-              "echo \"🚀 Starting deployment of webapp-$GITHUB_SHA\"",
-              "REL=\"$GITHUB_SHA\"",
-              "ZIP=\"/tmp/webapp-$GITHUB_SHA.zip\"",
-              "echo \"📦 Downloading package from S3...\"",
-              "aws s3 cp s3://influmojo-deployments/releases/webapp-$GITHUB_SHA.zip $ZIP",
-              "echo \"📁 Setting up directories...\"",
-              "sudo mkdir -p /opt/influmojo/releases/$REL /opt/influmojo/current",
-              "echo \"📦 Extracting package...\"",
-              "sudo unzip -qo $ZIP -d /opt/influmojo/releases/$REL",
-              "echo \"🔗 Creating symlink...\"",
-              "sudo ln -sfn /opt/influmojo/releases/$REL /opt/influmojo/current",
-              "echo \"🔄 Restarting webapp with PM2...\"",
-              "NODE_BIN=/home/ssm-user/.nvm/versions/node/v20.19.4/bin",
-              "PM2=$NODE_BIN/pm2; NODE=$NODE_BIN/node",
-              "cd /opt/influmojo/current",
-              "sudo -iu ssm-user bash -lc \"\\\"$PM2\\\" describe webapp >/dev/null 2>&1 && NODE_ENV=production PORT=3000 HOST=0.0.0.0 \\\"$PM2\\\" reload webapp --update-env || NODE_ENV=production PORT=3000 HOST=0.0.0.0 \\\"$PM2\\\" start \\\"$NODE\\\" --name webapp -- .next/standalone/server.js\"",
-              "sudo -iu ssm-user bash -lc \"\\\"$PM2\\\" save\"",
-              "echo \"✅ Deployment completed!\"",
-              "echo \"🌐 Webapp should be live at: http://influmojo-alb-1717302406.ap-south-1.elb.amazonaws.com/\"",
-              "sudo -iu ssm-user bash -lc \"\\\"$PM2\\\" status\"",
-              "rm -f $ZIP"
-            ]' \
-            --output text
-          
-          echo "⏳ Waiting for deployment to complete..."
-          # Wait for command to complete
-          sleep 30
-          
-          echo "✅ Deployment triggered successfully!"
-          echo "🌐 Check your webapp at: http://influmojo-alb-1717302406.ap-south-1.elb.amazonaws.com/"
+          INVOCATION_ID=$(
+            aws ssm send-command \
+              --document-name "AWS-RunShellScript" \
+              --instance-ids "${{ env.INSTANCE_ID }}" \
+              --comment "Deploy webapp $GITHUB_SHA" \
+              --parameters 'commands=[
+                "set -euo pipefail",
+                "echo \"🚀 Starting deployment of webapp-$GITHUB_SHA\"",
+                "REL=\"$GITHUB_SHA\"",
+                "ZIP=\"/tmp/webapp-$GITHUB_SHA.zip\"",
+                "echo \"📦 Downloading package from S3...\"",
+                "aws s3 cp s3://'${{ env.S3_BUCKET }}'/'${{ env.S3_PREFIX }}'/webapp-$GITHUB_SHA.zip $ZIP",
+                "echo \"📁 Setting up directories...\"",
+                "sudo mkdir -p /opt/influmojo/releases/$REL /opt/influmojo/current",
+                "echo \"📦 Extracting package...\"",
+                "sudo unzip -qo $ZIP -d /opt/influmojo/releases/$REL",
+                "echo \"🔗 Updating symlink...\"",
+                "sudo ln -sfn /opt/influmojo/releases/$REL /opt/influmojo/current",
+                "cd /opt/influmojo/current",
+                "echo \"🔎 Detecting entrypoint...\"",
+                "ENTRY=server.js; [ -f .next/standalone/server.js ] && ENTRY=.next/standalone/server.js",
+                "echo \"➡️  ENTRY=$ENTRY\"",
+                "echo \"🔄 Starting/Reloading with PM2...\"",
+                "sudo -iu ssm-user bash -lc 'set -e; cd /opt/influmojo/current; if ! command -v pm2 >/dev/null 2>&1; then npm i -g pm2 >/dev/null 2>&1; fi; (pm2 describe webapp >/dev/null 2>&1 && NODE_ENV=production PORT=3000 HOST=0.0.0.0 pm2 reload webapp --update-env) || NODE_ENV=production PORT=3000 HOST=0.0.0.0 pm2 start \"$(which node)\" --name webapp --cwd /opt/influmojo/current -- \"$ENTRY\"; pm2 save'",
+                "echo \"✅ Done. PM2 status:\"",
+                "sudo -iu ssm-user bash -lc 'pm2 status --no-color'"
+              ]' \
+              --query "Command.CommandId" \
+              --output text
+          )
+          echo "📨 SSM CommandId: $INVOCATION_ID"
+
+          echo "⏳ Waiting briefly for app to boot..."
+          sleep 20
 
       - name: Deployment Summary
         run: |
           echo "🎉 Deployment completed!"
           echo "📦 Package: webapp-${{ github.sha }}.zip"
-          echo "🌐 URL: http://influmojo-alb-1717302406.ap-south-1.elb.amazonaws.com/"
+          echo "🌐 ALB URL: http://influmojo-alb-1717302406.ap-south-1.elb.amazonaws.com/"
           echo "📋 Commit: ${{ github.sha }}"
           echo "🔀 Branch: ${{ github.ref_name }}"
