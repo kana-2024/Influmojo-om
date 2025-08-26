@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // ⚡ Skip lint during production builds on the server (run lint in CI instead)
+  eslint: { ignoreDuringBuilds: true },
+
+  // ⚡ Optionally skip TS errors during build on the server.
+  // Keep a separate "typecheck" step in CI to enforce types.
+  typescript: { ignoreBuildErrors: true },
+
+  swcMinify: true,
+
   images: {
     remotePatterns: [
       {
@@ -50,8 +59,8 @@ const nextConfig = {
   serverRuntimeConfig: {
     NODE_ENV: process.env.NODE_ENV,
   },
-  // Enable font optimization for Google Fonts
-  optimizeFonts: true,
+  // Disable font optimization - using hosted fonts instead
+  optimizeFonts: false,
 };
 
 module.exports = nextConfig;

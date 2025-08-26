@@ -9,33 +9,47 @@ echo "🚀 Starting production deployment for Influmojo Webapp..."
 export NODE_ENV=production
 export PORT=3000
 
-# Load environment variables from AWS Parameter Store (if available)
+# Load environment variables with better error handling
+echo "🔐 Loading environment variables..."
+
+# Try AWS Parameter Store first, fallback to local files
 if command -v aws &> /dev/null; then
-    echo "🔐 Loading environment variables from AWS Parameter Store..."
+    echo "📡 Attempting to load from AWS Parameter Store..."
     
-    # Load critical environment variables
-    export NEXT_PUBLIC_API_URL=$(aws ssm get-parameter --name "/influmojo/prod/webapp-api-url" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "https://api.influmojo.com")
-    export NEXT_PUBLIC_GOOGLE_CLIENT_ID=$(aws ssm get-parameter --name "/influmojo/prod/google-client-id" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "")
+    # Load with timeout and better error handling
+    export NEXT_PUBLIC_API_URL=$(timeout 10 aws ssm get-parameter --name "/influmojo/prod/webapp-api-url" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "https://api.influmojo.com")
+    export NEXT_PUBLIC_GOOGLE_CLIENT_ID=$(timeout 10 aws ssm get-parameter --name "/influmojo/prod/google-client-id" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "")
     
     echo "✅ Environment variables loaded from AWS Parameter Store"
 else
-    echo "⚠️  AWS CLI not found, using .env.production file"
-    if [ -f .env.production ]; then
-        export $(cat .env.production | grep -v '^#' | xargs)
-        echo "✅ Environment variables loaded from .env.production"
-    else
-        echo "❌ .env.production file not found"
-        exit 1
-    fi
+    echo "⚠️  AWS CLI not found, trying local environment files..."
 fi
 
-# Install dependencies
+# Fallback to local environment files
+if [ -f .env.production ]; then
+    echo "📄 Loading from .env.production..."
+    export $(cat .env.production | grep -v '^#' | xargs)
+    echo "✅ Environment variables loaded from .env.production"
+elif [ -f .env.local ]; then
+    echo "📄 Loading from .env.local..."
+    export $(cat .env.local | grep -v '^#' | xargs)
+    echo "✅ Environment variables loaded from .env.local"
+else
+    echo "⚠️  No environment file found, using defaults"
+    export NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-"https://api.influmojo.com"}
+fi
+
+# Install ALL dependencies (including dev dependencies for build)
 echo "📦 Installing dependencies..."
-npm ci --only=production
+npm ci
 
 # Build the application
 echo "🔨 Building application..."
 npm run build
+
+# Remove dev dependencies after build to save space
+echo "🧹 Removing dev dependencies..."
+npm prune --production
 
 # Start the production server
 echo "🚀 Starting production server on port $PORT..."
