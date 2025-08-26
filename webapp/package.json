@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "build:ec2": "./scripts/build-and-package.sh",
     "deploy:ec2": "./scripts/deploy-to-ec2.sh",
-    "deploy:auto": "powershell -ExecutionPolicy Bypass -File ./scripts/auto-deploy-clean.ps1"
+    "deploy:auto": "powershell -ExecutionPolicy Bypass -File ./scripts/simple-deploy-fixed.ps1"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
