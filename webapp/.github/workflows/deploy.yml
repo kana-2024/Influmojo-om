@@ -42,6 +42,7 @@ jobs:
           rm -rf package && mkdir -p package/.next/static
           cp -R .next/standalone/* package/
           cp -R .next/static/* package/.next/static/
+          cp .next/BUILD_ID package/.next/BUILD_ID
           if [ -d "public" ]; then
             cp -R public package/public
           fi
