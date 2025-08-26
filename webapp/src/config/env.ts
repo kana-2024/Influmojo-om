@@ -7,9 +7,9 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 
 // API Configuration - Dynamic based on environment
 export const ENV = {
-  // API Configuration - Loaded from environment variables
+  // API Configuration - Use relative URLs for production (ALB routing), absolute for development
   API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 
-                 (isProduction ? 'https://api.influmojo.com' : 'http://localhost:3002'),
+                 (isProduction ? '/api' : 'http://localhost:3002'),
   GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
   
   // App Configuration
@@ -99,15 +99,15 @@ if (typeof window !== 'undefined' && isDevelopment) {
   console.log('API_ENDPOINTS.SEND_OTP:', API_ENDPOINTS.SEND_OTP);
   
   // Validate that we're using the correct URL for the environment
-  if (isProduction && !ENV.API_BASE_URL.includes('influmojo.com')) {
-    console.error('❌ WARNING: Production mode but API_BASE_URL is not using influmojo.com!');
+  if (isProduction && !ENV.API_BASE_URL.startsWith('/api')) {
+    console.error('❌ WARNING: Production mode but API_BASE_URL is not using relative path!');
     console.error('Current URL:', ENV.API_BASE_URL);
-    console.error('Expected URL: https://api.influmojo.com');
+    console.error('Expected URL: /api (relative path for ALB routing)');
   } else if (isDevelopment && !ENV.API_BASE_URL.includes('localhost')) {
     console.error('❌ WARNING: Development mode but API_BASE_URL is not using localhost!');
     console.error('Current URL:', ENV.API_BASE_URL);
     console.error('Expected URL: http://localhost:3002');
   } else {
-    console.log('✅ API_BASE_URL is correctly configured for', isProduction ? 'production' : 'development');
+    console.log('✅ API_BASE_URL is correctly configured for', isProduction ? 'production (relative path)' : 'development');
   }
 } 

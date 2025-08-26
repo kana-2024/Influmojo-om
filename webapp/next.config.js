@@ -53,7 +53,7 @@ const nextConfig = {
   },
   // Public runtime config for client-side access
   publicRuntimeConfig: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    // API URL now uses relative paths, no need to expose via runtime config
   },
   // Server runtime config for server-side only
   serverRuntimeConfig: {
