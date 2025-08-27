@@ -5,11 +5,11 @@ on:
     branches: [ new-feature-branch ]
     paths:
       - 'webapp/**'
-      - '.github/workflows/deploy-webapp.yml'
+      - '.github/workflows/deploy-webapp-ec2.yml'
   workflow_dispatch:
 
 concurrency:
-  group: deploy-webapp-ec2
+  group: webapp-ec2-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -21,10 +21,11 @@ jobs:
 
     env:
       AWS_REGION: ap-south-1
+      ROLE_ARN: arn:aws:iam::424592696132:role/GitHubActionsRole
       S3_BUCKET: influmojo-deployments
       INSTANCE_ID: i-0b338206ea637e1b4
       APP_ROOT: /opt/influmojo
-      PORT: 3000
+      PORT: "3000"
 
     steps:
       - name: Checkout code
@@ -51,15 +52,31 @@ jobs:
           node -v && npm -v
           npm run build
 
-          echo "📦 Packaging standalone output (flattened)…"
+          echo "📦 Packaging (flattened standalone)…"
           rm -rf package && mkdir -p package/.next/static
-          # Copy the standalone bundle to package/ -> puts server.js at package/server.js
+
+          # 1) Copy standalone runtime to package/  -> server.js ends up at package/server.js
           cp -R .next/standalone/* package/
-          # Copy runtime assets and BUILD_ID (required!)
-          cp -R .next/static/* package/.next/static/
-          cp .next/BUILD_ID package/.next/BUILD_ID
-          # Optional: public assets
+
+          # 2) Copy runtime assets + BUILD_ID (required by Next!)
+          rsync -a --exclude "cache" --exclude "standalone" .next/ package/.next/
+
+          # 3) Public assets (optional)
           if [ -d "public" ]; then cp -R public package/public; fi
+
+          # 4) Tiny start wrapper to avoid env/cwd quoting issues
+          cat > package/start.sh <<'EOF'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          cd "$(dirname "$0")"
+          ENTRY=server.js
+          [ -f ".next/standalone/server.js" ] && ENTRY=".next/standalone/server.js"
+          export NODE_ENV=production
+          export PORT=${PORT:-3000}
+          export HOST=0.0.0.0
+          exec "$(command -v node)" "$ENTRY"
+          EOF
+          chmod +x package/start.sh
 
           echo "🗜️ Creating ZIP…"
           (cd package && zip -qr ../webapp-${GITHUB_SHA}.zip .)
@@ -68,7 +85,7 @@ jobs:
       - name: Configure AWS (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::424592696132:role/GitHubActionsRole
+          role-to-assume: ${{ env.ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload artifact to S3
@@ -79,6 +96,8 @@ jobs:
           echo "✅ s3://${S3_BUCKET}/releases/webapp-${GITHUB_SHA}.zip"
 
       - name: Deploy to EC2 via SSM
+        env:
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           echo "🚀 Deploying to EC2..."
           aws ssm send-command \
@@ -88,36 +107,40 @@ jobs:
             --parameters '{
               "commands": [
                 "set -euo pipefail",
-                "REL=\"'${GITHUB_SHA}'\"",
-                "ZIP=\"/tmp/webapp-'${GITHUB_SHA}'.zip\"",
-                "echo \">>> downloading package\"",
-                "aws s3 cp s3://'${S3_BUCKET}'/releases/webapp-'${GITHUB_SHA}'.zip ${ZIP}",
-                "echo \">>> preparing release dir\"",
+                "REL='${GITHUB_SHA}'",
+                "ZIP=/tmp/webapp-'${GITHUB_SHA}'.zip",
+                "echo '>>> download package'",
+                "aws s3 cp s3://'${S3_BUCKET}'/releases/webapp-'${GITHUB_SHA}'.zip \"$ZIP\"",
+
+                "echo '>>> prepare release dir'",
                 "sudo mkdir -p '${APP_ROOT}'/releases/${REL} '${APP_ROOT}'/current",
-                "echo \">>> unzipping\"",
-                "sudo unzip -qo ${ZIP} -d '${APP_ROOT}'/releases/${REL}",
 
-                "echo \">>> sanity checks\"",
-                "test -f '${APP_ROOT}'/releases/${REL}/server.js || { echo \"server.js missing in release\"; ls -la '${APP_ROOT}'/releases/${REL}; exit 1; }",
-                "test -f '${APP_ROOT}'/releases/${REL}/.next/BUILD_ID || { echo \".next/BUILD_ID missing\"; ls -la '${APP_ROOT}'/releases/${REL}/.next || true; exit 1; }",
+                "echo '>>> unzip'",
+                "sudo unzip -qo \"$ZIP\" -d '${APP_ROOT}'/releases/${REL}",
+                "sudo chown -R ssm-user:ssm-user '${APP_ROOT}'/releases/${REL}",
+                "sudo chmod +x '${APP_ROOT}'/releases/${REL}/start.sh",
 
-                "echo \">>> linking current -> ${REL}\"",
+                "echo '>>> sanity checks'",
+                "test -f '${APP_ROOT}'/releases/${REL}/server.js || { echo 'server.js missing'; ls -la '${APP_ROOT}'/releases/${REL}; exit 1; }",
+                "test -f '${APP_ROOT}'/releases/${REL}/.next/BUILD_ID || { echo '.next/BUILD_ID missing'; ls -la '${APP_ROOT}'/releases/${REL}/.next || true; exit 1; }",
+
+                "echo '>>> link current -> ${REL}'",
                 "sudo ln -sfn '${APP_ROOT}'/releases/${REL} '${APP_ROOT}'/current",
 
-                "echo \">>> starting with pm2\"",
+                "echo '>>> start via pm2'",
                 "sudo -iu ssm-user bash -lc 'set -euo pipefail; \
                   APP=\"'${APP_ROOT}'/current\"; cd \"$APP\"; \
                   pm2 delete webapp >/dev/null 2>&1 || true; \
-                  ENTRY=server.js; [ -f .next/standalone/server.js ] && ENTRY=.next/standalone/server.js; \
-                  echo \"ENTRY=$ENTRY  CWD=$(pwd)\"; \
-                  NODE_ENV=production PORT='${PORT}' HOST=0.0.0.0 pm2 start \"$(which node)\" --name webapp --cwd \"$APP\" -- \"$ENTRY\"; \
+                  NODE_ENV=production PORT='${PORT}' HOST=0.0.0.0 pm2 start ./start.sh --name webapp; \
                   pm2 save; \
                   pm2 describe webapp | egrep \"pm_exec_path|pm_cwd|status\" || true; \
                   ss -ltnp | egrep \":'${PORT}'|:3002\" || true; \
-                  curl -sS -I http://127.0.0.1:'${PORT}'/ || true; \
-                  pm2 logs webapp --lines 50 --timestamp --nostream || true' ",
+                  ip=$(hostname -I | awk \"{print \\$1}\"); \
+                  echo Testing http://$ip:'${PORT}'/ ; \
+                  curl -sS -I http://$ip:'${PORT}'/ | head -1 || true; \
+                  pm2 logs webapp --lines 60 --timestamp --nostream || true'",
 
-                "rm -f ${ZIP}",
+                "rm -f \"$ZIP\"",
                 "echo '✅ done'"
               ]
             }' \
