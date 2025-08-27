@@ -96,21 +96,21 @@ jobs:
           set -euo pipefail
           echo "🚀 Deploying to EC2..."
 
-          # Build SSM parameters JSON. NOTE: all remote $vars are escaped so the runner doesn't expand them.
-          cat > /tmp/ssm-params.json <<JSON
+          # 1) Write a template with NO expansion (single-quoted heredoc)
+          cat > /tmp/ssm-params.tmpl <<'JSON'
           {
             "commands": [
               "set -euo pipefail",
               "REL=\"${GITHUB_SHA}\"",
               "ZIP=\"/tmp/webapp-${GITHUB_SHA}.zip\"",
               "echo \">>> download package\"",
-              "aws s3 cp s3://${S3_BUCKET}/releases/webapp-${GITHUB_SHA}.zip \"\\$ZIP\"",
+              "aws s3 cp s3://${S3_BUCKET}/releases/webapp-${GITHUB_SHA}.zip \"$ZIP\"",
 
               "echo \">>> prepare release dir\"",
               "sudo mkdir -p ${APP_ROOT}/releases/${GITHUB_SHA} ${APP_ROOT}/current",
 
               "echo \">>> unzip\"",
-              "sudo unzip -qo \"\\$ZIP\" -d ${APP_ROOT}/releases/${GITHUB_SHA}",
+              "sudo unzip -qo \"$ZIP\" -d ${APP_ROOT}/releases/${GITHUB_SHA}",
               "sudo chown -R ssm-user:ssm-user ${APP_ROOT}/releases/${GITHUB_SHA}",
               "sudo chmod +x ${APP_ROOT}/releases/${GITHUB_SHA}/start.sh",
 
@@ -123,23 +123,28 @@ jobs:
 
               "echo \">>> start via pm2\"",
               "sudo -iu ssm-user bash -lc 'set -euo pipefail; \
-                APP=\"${APP_ROOT}/current\"; cd \"\\$APP\"; \
+                APP=\"${APP_ROOT}/current\"; cd \"$APP\"; \
                 pm2 delete webapp >/dev/null 2>&1 || true; \
                 NODE_ENV=production PORT=${PORT} HOST=0.0.0.0 pm2 start ./start.sh --name webapp; \
                 pm2 save; \
                 pm2 describe webapp | egrep \"pm_exec_path|pm_cwd|status\" || true; \
                 ss -ltnp | egrep \":${PORT}|:3002\" || true; \
-                ip=\\$(hostname -I | awk \"{print \\\\$1}\"); \
-                echo Testing http://\\$ip:${PORT}/ ; \
-                curl -sS -I http://\\$ip:${PORT}/ | head -1 || true; \
+                ip=$(hostname -I | awk \"{print \\$1}\"); \
+                echo Testing http://$ip:${PORT}/ ; \
+                curl -sS -I http://$ip:${PORT}/ | head -1 || true; \
                 pm2 logs webapp --lines 60 --timestamp --nostream || true'",
 
-              "rm -f \"\\$ZIP\"",
+              "rm -f \"$ZIP\"",
               "echo \"✅ done\""
             ]
           }
           JSON
 
+          # 2) Substitute ONLY runner-side vars into the template
+          envsubst '${GITHUB_SHA} ${S3_BUCKET} ${APP_ROOT} ${PORT}' \
+            < /tmp/ssm-params.tmpl > /tmp/ssm-params.json
+
+          # 3) Ship the command
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --instance-ids "${INSTANCE_ID}" \
