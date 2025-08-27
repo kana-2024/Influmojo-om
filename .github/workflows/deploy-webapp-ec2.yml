@@ -54,17 +54,11 @@ jobs:
 
           echo "📦 Packaging (flattened standalone)…"
           rm -rf package && mkdir -p package/.next/static
-
-          # 1) Copy standalone runtime to package/  -> server.js ends up at package/server.js
           cp -R .next/standalone/* package/
-
-          # 2) Copy runtime assets + BUILD_ID (required by Next!)
           rsync -a --exclude "cache" --exclude "standalone" .next/ package/.next/
-
-          # 3) Public assets (optional)
           if [ -d "public" ]; then cp -R public package/public; fi
 
-          # 4) Tiny start wrapper to avoid env/cwd quoting issues
+          # tiny start wrapper so PM2 just runs ./start.sh
           cat > package/start.sh <<'EOF'
           #!/usr/bin/env bash
           set -euo pipefail
@@ -99,51 +93,58 @@ jobs:
         env:
           GITHUB_SHA: ${{ github.sha }}
         run: |
+          set -euo pipefail
           echo "🚀 Deploying to EC2..."
+
+          # Build SSM parameters JSON. NOTE: all remote $vars are escaped so the runner doesn't expand them.
+          cat > /tmp/ssm-params.json <<JSON
+          {
+            "commands": [
+              "set -euo pipefail",
+              "REL=\"${GITHUB_SHA}\"",
+              "ZIP=\"/tmp/webapp-${GITHUB_SHA}.zip\"",
+              "echo \">>> download package\"",
+              "aws s3 cp s3://${S3_BUCKET}/releases/webapp-${GITHUB_SHA}.zip \"\\$ZIP\"",
+
+              "echo \">>> prepare release dir\"",
+              "sudo mkdir -p ${APP_ROOT}/releases/${GITHUB_SHA} ${APP_ROOT}/current",
+
+              "echo \">>> unzip\"",
+              "sudo unzip -qo \"\\$ZIP\" -d ${APP_ROOT}/releases/${GITHUB_SHA}",
+              "sudo chown -R ssm-user:ssm-user ${APP_ROOT}/releases/${GITHUB_SHA}",
+              "sudo chmod +x ${APP_ROOT}/releases/${GITHUB_SHA}/start.sh",
+
+              "echo \">>> sanity checks\"",
+              "test -f ${APP_ROOT}/releases/${GITHUB_SHA}/server.js || { echo 'server.js missing'; ls -la ${APP_ROOT}/releases/${GITHUB_SHA}; exit 1; }",
+              "test -f ${APP_ROOT}/releases/${GITHUB_SHA}/.next/BUILD_ID || { echo '.next/BUILD_ID missing'; ls -la ${APP_ROOT}/releases/${GITHUB_SHA}/.next || true; exit 1; }",
+
+              "echo \">>> link current -> ${GITHUB_SHA}\"",
+              "sudo ln -sfn ${APP_ROOT}/releases/${GITHUB_SHA} ${APP_ROOT}/current",
+
+              "echo \">>> start via pm2\"",
+              "sudo -iu ssm-user bash -lc 'set -euo pipefail; \
+                APP=\"${APP_ROOT}/current\"; cd \"\\$APP\"; \
+                pm2 delete webapp >/dev/null 2>&1 || true; \
+                NODE_ENV=production PORT=${PORT} HOST=0.0.0.0 pm2 start ./start.sh --name webapp; \
+                pm2 save; \
+                pm2 describe webapp | egrep \"pm_exec_path|pm_cwd|status\" || true; \
+                ss -ltnp | egrep \":${PORT}|:3002\" || true; \
+                ip=\\$(hostname -I | awk \"{print \\\\$1}\"); \
+                echo Testing http://\\$ip:${PORT}/ ; \
+                curl -sS -I http://\\$ip:${PORT}/ | head -1 || true; \
+                pm2 logs webapp --lines 60 --timestamp --nostream || true'",
+
+              "rm -f \"\\$ZIP\"",
+              "echo \"✅ done\""
+            ]
+          }
+          JSON
+
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --instance-ids "${INSTANCE_ID}" \
             --comment "Deploy webapp ${GITHUB_SHA}" \
-            --parameters '{
-              "commands": [
-                "set -euo pipefail",
-                "REL='${GITHUB_SHA}'",
-                "ZIP=/tmp/webapp-'${GITHUB_SHA}'.zip",
-                "echo '>>> download package'",
-                "aws s3 cp s3://'${S3_BUCKET}'/releases/webapp-'${GITHUB_SHA}'.zip \"$ZIP\"",
-
-                "echo '>>> prepare release dir'",
-                "sudo mkdir -p '${APP_ROOT}'/releases/${REL} '${APP_ROOT}'/current",
-
-                "echo '>>> unzip'",
-                "sudo unzip -qo \"$ZIP\" -d '${APP_ROOT}'/releases/${REL}",
-                "sudo chown -R ssm-user:ssm-user '${APP_ROOT}'/releases/${REL}",
-                "sudo chmod +x '${APP_ROOT}'/releases/${REL}/start.sh",
-
-                "echo '>>> sanity checks'",
-                "test -f '${APP_ROOT}'/releases/${REL}/server.js || { echo 'server.js missing'; ls -la '${APP_ROOT}'/releases/${REL}; exit 1; }",
-                "test -f '${APP_ROOT}'/releases/${REL}/.next/BUILD_ID || { echo '.next/BUILD_ID missing'; ls -la '${APP_ROOT}'/releases/${REL}/.next || true; exit 1; }",
-
-                "echo '>>> link current -> ${REL}'",
-                "sudo ln -sfn '${APP_ROOT}'/releases/${REL} '${APP_ROOT}'/current",
-
-                "echo '>>> start via pm2'",
-                "sudo -iu ssm-user bash -lc 'set -euo pipefail; \
-                  APP=\"'${APP_ROOT}'/current\"; cd \"$APP\"; \
-                  pm2 delete webapp >/dev/null 2>&1 || true; \
-                  NODE_ENV=production PORT='${PORT}' HOST=0.0.0.0 pm2 start ./start.sh --name webapp; \
-                  pm2 save; \
-                  pm2 describe webapp | egrep \"pm_exec_path|pm_cwd|status\" || true; \
-                  ss -ltnp | egrep \":'${PORT}'|:3002\" || true; \
-                  ip=$(hostname -I | awk \"{print \\$1}\"); \
-                  echo Testing http://$ip:'${PORT}'/ ; \
-                  curl -sS -I http://$ip:'${PORT}'/ | head -1 || true; \
-                  pm2 logs webapp --lines 60 --timestamp --nostream || true'",
-
-                "rm -f \"$ZIP\"",
-                "echo '✅ done'"
-              ]
-            }' \
+            --parameters file:///tmp/ssm-params.json \
             --output text
 
       - name: Deployment Summary
