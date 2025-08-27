@@ -1,39 +1,46 @@
 # syntax=docker/dockerfile:1
-# Build deps
-FROM node:20-alpine AS deps
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --no-audit --no-fund
 
-# Build app
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --no-audit --no-fund
-COPY . .
-# You already have output: 'standalone' in next.config.js
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
-
-# Runtime
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-# Copy the standalone server (this drops server.js at /app/server.js)
-COPY --from=builder /app/.next/standalone ./
-# Copy required runtime assets
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/.next/BUILD_ID ./.next/BUILD_ID
-# Public assets (optional)
-COPY --from=builder /app/public ./public
-
-# Non-root
-RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
-USER 1001
-
-EXPOSE 3000
-ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
-
-# Start Next in standalone mode
-CMD ["node","server.js"]
+# ---- deps (cached) ----
+    FROM node:20-alpine AS deps
+    WORKDIR /app
+    COPY package*.json ./
+    RUN npm ci --no-audit --no-fund
+    
+    # ---- build ----
+    FROM node:20-alpine AS builder
+    WORKDIR /app
+    ENV NEXT_TELEMETRY_DISABLED=1
+    COPY --from=deps /app/node_modules ./node_modules
+    COPY . .
+    # next.config.js has output: 'standalone'
+    RUN npm run build
+    
+    # ---- runtime ----
+    FROM node:20-alpine AS runner
+    WORKDIR /app
+    ENV NODE_ENV=production
+    
+    # Copy the standalone server (puts server.js at /app/server.js)
+    COPY --from=builder /app/.next/standalone ./
+    # Static assets + BUILD_ID required at runtime
+    COPY --from=builder /app/.next/static ./.next/static
+    COPY --from=builder /app/.next/BUILD_ID ./.next/BUILD_ID
+    # Public assets if you use them
+    COPY --from=builder /app/public ./public
+    
+    # Run as non-root (👍)
+    RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
+    USER 1001
+    
+    # Port/env for ECS/ALB
+    EXPOSE 3000
+    ENV PORT=3000
+    ENV HOST=0.0.0.0
+    
+    # Optional container healthcheck (ECS will surface this)
+    # If you have curl in the image, you can use it; busybox wget works too:
+    HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1
+    
+    # Start Next standalone
+    CMD ["node","server.js"]
+    
