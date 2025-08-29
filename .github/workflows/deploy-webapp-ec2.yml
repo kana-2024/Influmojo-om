@@ -1,0 +1,158 @@
+name: Deploy Webapp (EC2)
+
+on:
+  push:
+    branches: [ new-feature-branch ]
+    paths:
+      - 'webapp/**'
+      - '.github/workflows/deploy-webapp-ec2.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: webapp-ec2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      AWS_REGION: ap-south-1
+      ROLE_ARN: arn:aws:iam::424592696132:role/GitHubActionsRole
+      S3_BUCKET: influmojo-deployments
+      INSTANCE_ID: i-0b338206ea637e1b4
+      APP_ROOT: /opt/influmojo
+      PORT: "3000"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install dependencies
+        working-directory: webapp
+        run: npm ci --no-audit --no-fund
+
+      - name: Build (Next.js standalone)
+        working-directory: webapp
+        env:
+          NEXT_PUBLIC_API_URL: /api
+          NODE_OPTIONS: --max_old_space_size=1024
+        run: |
+          echo "🔨 Building webapp..."
+          node -v && npm -v
+          npm run build
+
+          echo "📦 Packaging (flattened standalone)…"
+          rm -rf package && mkdir -p package/.next/static
+          cp -R .next/standalone/* package/
+          rsync -a --exclude "cache" --exclude "standalone" .next/ package/.next/
+          if [ -d "public" ]; then cp -R public package/public; fi
+
+          # tiny start wrapper so PM2 just runs ./start.sh
+          cat > package/start.sh <<'EOF'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          cd "$(dirname "$0")"
+          ENTRY=server.js
+          [ -f ".next/standalone/server.js" ] && ENTRY=".next/standalone/server.js"
+          export NODE_ENV=production
+          export PORT=${PORT:-3000}
+          export HOST=0.0.0.0
+          exec "$(command -v node)" "$ENTRY"
+          EOF
+          chmod +x package/start.sh
+
+          echo "🗜️ Creating ZIP…"
+          (cd package && zip -qr ../webapp-${GITHUB_SHA}.zip .)
+          ls -lh webapp-${GITHUB_SHA}.zip
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload artifact to S3
+        working-directory: webapp
+        run: |
+          echo "☁️ Uploading to s3://${S3_BUCKET}/releases/"
+          aws s3 cp webapp-${GITHUB_SHA}.zip s3://${S3_BUCKET}/releases/
+          echo "✅ s3://${S3_BUCKET}/releases/webapp-${GITHUB_SHA}.zip"
+
+      - name: Deploy to EC2 via SSM
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          echo "🚀 Deploying to EC2..."
+
+          # 1) Write a template with NO expansion (single-quoted heredoc)
+          cat > /tmp/ssm-params.tmpl <<'JSON'
+          {
+            "commands": [
+              "set -euo pipefail",
+              "REL=\"${GITHUB_SHA}\"",
+              "ZIP=\"/tmp/webapp-${GITHUB_SHA}.zip\"",
+              "echo \">>> download package\"",
+              "aws s3 cp s3://${S3_BUCKET}/releases/webapp-${GITHUB_SHA}.zip \"$ZIP\"",
+
+              "echo \">>> prepare release dir\"",
+              "sudo mkdir -p ${APP_ROOT}/releases/${GITHUB_SHA} ${APP_ROOT}/current",
+
+              "echo \">>> unzip\"",
+              "sudo unzip -qo \"$ZIP\" -d ${APP_ROOT}/releases/${GITHUB_SHA}",
+              "sudo chown -R ssm-user:ssm-user ${APP_ROOT}/releases/${GITHUB_SHA}",
+              "sudo chmod +x ${APP_ROOT}/releases/${GITHUB_SHA}/start.sh",
+
+              "echo \">>> sanity checks\"",
+              "test -f ${APP_ROOT}/releases/${GITHUB_SHA}/server.js || { echo 'server.js missing'; ls -la ${APP_ROOT}/releases/${GITHUB_SHA}; exit 1; }",
+              "test -f ${APP_ROOT}/releases/${GITHUB_SHA}/.next/BUILD_ID || { echo '.next/BUILD_ID missing'; ls -la ${APP_ROOT}/releases/${GITHUB_SHA}/.next || true; exit 1; }",
+
+              "echo \">>> link current -> ${GITHUB_SHA}\"",
+              "sudo ln -sfn ${APP_ROOT}/releases/${GITHUB_SHA} ${APP_ROOT}/current",
+
+              "echo \">>> start via pm2\"",
+              "sudo -iu ssm-user bash -lc 'set -euo pipefail; \
+                APP=\"${APP_ROOT}/current\"; cd \"$APP\"; \
+                pm2 delete webapp >/dev/null 2>&1 || true; \
+                NODE_ENV=production PORT=${PORT} HOST=0.0.0.0 pm2 start ./start.sh --name webapp; \
+                pm2 save; \
+                pm2 describe webapp | egrep \"pm_exec_path|pm_cwd|status\" || true; \
+                ss -ltnp | egrep \":${PORT}|:3002\" || true; \
+                ip=$(hostname -I | awk \"{print \\$1}\"); \
+                echo Testing http://$ip:${PORT}/ ; \
+                curl -sS -I http://$ip:${PORT}/ | head -1 || true; \
+                pm2 logs webapp --lines 60 --timestamp --nostream || true'",
+
+              "rm -f \"$ZIP\"",
+              "echo \"✅ done\""
+            ]
+          }
+          JSON
+
+          # 2) Substitute ONLY runner-side vars into the template
+          envsubst '${GITHUB_SHA} ${S3_BUCKET} ${APP_ROOT} ${PORT}' \
+            < /tmp/ssm-params.tmpl > /tmp/ssm-params.json
+
+          # 3) Ship the command
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --instance-ids "${INSTANCE_ID}" \
+            --comment "Deploy webapp ${GITHUB_SHA}" \
+            --parameters file:///tmp/ssm-params.json \
+            --output text
+
+      - name: Deployment Summary
+        run: |
+          echo "🎉 Deployment completed for commit ${GITHUB_SHA}"
+          echo "🌐 Check via ALB: http://influmojo-alb-1717302406.ap-south-1.elb.amazonaws.com/"
