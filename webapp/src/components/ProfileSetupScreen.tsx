@@ -43,11 +43,13 @@ export default function ProfileSetupScreen() {
       const fromGoogle = sessionStorage.getItem('fromGoogle');
       const authProvider = sessionStorage.getItem('authProvider');
       const userEmail = sessionStorage.getItem('userEmail');
+      const existingEmail = sessionStorage.getItem('existingEmail');
       
       console.log('🔍 ProfileSetupScreen - SessionStorage check:', {
         fromGoogle,
         authProvider,
         userEmail,
+        existingEmail,
         userData: sessionStorage.getItem('userData')
       });
       
@@ -67,6 +69,17 @@ export default function ProfileSetupScreen() {
         console.log('📱 ProfileSetupScreen - User is mobile user');
         // User is mobile user - clear any Google-related data
         setIsGoogleUser(false);
+        
+        // Check if user already has an email associated with their account
+        if (existingEmail) {
+          console.log('📧 ProfileSetupScreen - User already has email associated:', existingEmail);
+          setEmail(existingEmail);
+          // Email is already verified since it's associated with their account
+          sessionStorage.setItem('emailVerified', 'true');
+          sessionStorage.setItem('verifiedEmail', existingEmail);
+          console.log('✅ ProfileSetupScreen - Existing email automatically verified:', existingEmail);
+        }
+        
         // Pre-fill phone if available (this would come from OTP verification)
         const userData = sessionStorage.getItem('userData');
         const verifiedPhone = sessionStorage.getItem('verifiedPhone');
@@ -640,7 +653,7 @@ export default function ProfileSetupScreen() {
       {/* Header Section */}
       <header className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
         {/* Logo */}
-        <div className="flex items-center gap-1">
+        <Link href="/" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
           <Image 
             src="/images/logo1.svg" 
             alt="im logo" 
@@ -655,7 +668,7 @@ export default function ProfileSetupScreen() {
             height={28}
             className="h-7 w-auto"
           />
-        </div>
+        </Link>
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center space-x-3 lg:space-x-6">
@@ -693,7 +706,7 @@ export default function ProfileSetupScreen() {
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row flex-1 w-full bg-white">
         {/* Left Side - Features */}
-        <div className="w-full lg:w-1/2 bg-[#FFF4ED] px-3 sm:px-6 lg:pl-12 lg:pr-3 xl:pl-16 xl:pr-6 py-12 sm:py-16 lg:py-24 flex flex-col justify-center items-center lg:items-center">
+        <div className="w-full lg:w-1/2 bg-[#FFF4ED] px-3 sm:px-6 lg:pl-12 lg:pr-3 xl:pl-16 xl:pr-6 py-12 sm:py-16 lg:py-24 flex flex-col justify-start items-center lg:items-center">
           <div className="max-w-sm lg:max-w-md xl:max-w-lg w-full space-y-4 sm:space-y-6">
             <Feature
               title="Get Started in Minutes"
@@ -862,7 +875,7 @@ export default function ProfileSetupScreen() {
                 </div>
               </div>
             ) : (
-              // Email for Phone users (verify via Google)
+              // Email for Phone users (verify via Google or use existing email)
               <div className="space-y-2">
                 <label className="block text-xs sm:text-sm font-poppins-semibold text-textDark">Email ID</label>
                 <div className="flex items-center gap-2">
@@ -906,12 +919,19 @@ export default function ProfileSetupScreen() {
                     <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-xs text-green-700 font-poppins-regular">Your email is verified via Google</span>
+                    <span className="text-xs text-green-700 font-poppins-regular">
+                      {sessionStorage.getItem('existingEmail') ? 'Your existing email is verified' : 'Your email is verified via Google'}
+                    </span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
                     <span className="w-4 h-4 text-blue-600 text-lg">ℹ️</span>
-                    <span className="text-xs text-blue-700 font-poppins-regular">Please verify your email address with Google</span>
+                    <span className="text-xs text-blue-700 font-poppins-regular">
+                      {sessionStorage.getItem('existingEmail') 
+                        ? 'Please verify your existing email address with Google' 
+                        : 'Please verify your email address with Google'
+                      }
+                    </span>
                   </div>
                 )}
               </div>

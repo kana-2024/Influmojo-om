@@ -60,7 +60,7 @@ export default function GoogleVerifiedScreen() {
       {/* Header Section */}
       <header className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
         {/* Logo */}
-        <div className="flex items-center gap-1">
+        <Link href="/" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
           <Image 
             src="/images/logo1.svg" 
             alt="im logo" 
@@ -75,7 +75,7 @@ export default function GoogleVerifiedScreen() {
             height={28}
             className="h-7 w-auto"
           />
-        </div>
+        </Link>
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center space-x-3 lg:space-x-6">

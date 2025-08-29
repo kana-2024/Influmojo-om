@@ -19,6 +19,7 @@ export default function GetStartedScreen() {
   const [warning, setWarning] = useState('');
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState<'creator' | 'brand' | null>(null);
+  const [showGoogleReset, setShowGoogleReset] = useState(false);
 
   // Store selectedUserType in sessionStorage whenever it changes
   useEffect(() => {
@@ -35,6 +36,66 @@ export default function GetStartedScreen() {
     }
   }, []);
 
+  // Cleanup effect to reset loading states when component unmounts
+  useEffect(() => {
+    return () => {
+      setGoogleLoading(false);
+      setLoading(false);
+    };
+  }, []);
+
+  // Add event listeners to detect if user navigates away during Google sign-in
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && googleLoading) {
+        console.log('🚫 Page hidden during Google sign-in - resetting loading state');
+        setGoogleLoading(false);
+        setWarning('Google sign-in was interrupted. Please try again.');
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      if (googleLoading) {
+        console.log('🚫 Page unload during Google sign-in - resetting loading state');
+        setGoogleLoading(false);
+      }
+    };
+
+    // Add focus/blur event listeners to detect when user switches tabs or windows
+    const handleFocus = () => {
+      // Reset loading state when user returns to the tab
+      if (googleLoading) {
+        console.log('🔄 Tab focused - checking if Google sign-in should be reset');
+        // Small delay to allow Google sign-in to complete if it's still processing
+        setTimeout(() => {
+          if (googleLoading) {
+            console.log('⏰ Google sign-in still loading after focus - resetting');
+            setGoogleLoading(false);
+            setWarning('Google sign-in was interrupted. Please try again.');
+          }
+        }, 2000);
+      }
+    };
+
+    const handleBlur = () => {
+      if (googleLoading) {
+        console.log('🚫 Tab blurred during Google sign-in');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, [googleLoading]);
+
   const handleGoogleSignUp = async () => {
     if (!selectedUserType) {
       setError('Please select whether you are signing up as a Creator or Brand');
@@ -44,9 +105,44 @@ export default function GetStartedScreen() {
     setWarning('');
     setGoogleLoading(true);
     setError('');
+    setShowGoogleReset(false);
+
+    // Reset any previous errors
+    setError('');
+    setWarning('');
+
+    // Add a timeout to prevent infinite loading state
+    let timeoutId: NodeJS.Timeout | null = null;
+    timeoutId = setTimeout(() => {
+      if (googleLoading) {
+        console.log('⏰ Google sign-in timeout - resetting loading state');
+        setGoogleLoading(false);
+        setWarning('Google sign-in timed out. Please try again.');
+      }
+    }, 10000); // 10 seconds timeout - more aggressive
+
+    // Add a shorter timeout for immediate feedback
+    const shortTimeoutId = setTimeout(() => {
+      if (googleLoading) {
+        console.log('⚠️ Google sign-in taking longer than expected...');
+        setWarning('Google sign-in is taking longer than expected. Please wait or try again.');
+        setShowGoogleReset(true);
+      }
+    }, 3000); // 3 seconds warning - faster feedback
 
     try {
       const result = await googleAuthService.signIn();
+      
+      // Check if the sign-in failed or was cancelled
+      if (!result || !result.success) {
+        console.log('🚫 Google sign-in failed or was cancelled:', result?.error || 'No result');
+        // Don't show error for cancellation, just reset loading state
+        if (result?.error && !result.error.includes('was not displayed') && !result.error.includes('was skipped')) {
+          setWarning(result.error);
+        }
+        setGoogleLoading(false);
+        return;
+      }
       
       if (result.success && result.user && result.idToken) {
         console.log('✅ Google OAuth successful:', result.user);
@@ -111,7 +207,14 @@ export default function GetStartedScreen() {
     } catch (error) {
       console.error('Google sign-in error:', error);
       setWarning(error instanceof Error ? error.message : 'Google sign-in failed. Please try again.');
+      setGoogleLoading(false);
     } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      if (shortTimeoutId) {
+        clearTimeout(shortTimeoutId);
+      }
       setGoogleLoading(false);
     }
   };
@@ -198,9 +301,10 @@ export default function GetStartedScreen() {
     
     // Store user data in sessionStorage for the next screen
     if (user && typeof user === 'object' && user !== null && 'phone' in user) {
-      const userObj = user as { phone?: string };
+      const userObj = user as { phone?: string; email?: string };
       console.log('💾 GetStartedScreen - Storing user data in sessionStorage:', user);
       console.log('📱 GetStartedScreen - User phone number:', userObj.phone);
+      console.log('📱 GetStartedScreen - User email:', userObj.email);
       console.log('📱 GetStartedScreen - Current phone state:', phone);
       
       sessionStorage.setItem('userData', JSON.stringify(user));
@@ -214,6 +318,12 @@ export default function GetStartedScreen() {
         // Fallback: store the phone number that was used for OTP
         sessionStorage.setItem('verifiedPhone', `+91${phone}`);
       }
+      
+      // Store email if it exists (user already has an email associated)
+      if (userObj.email) {
+        sessionStorage.setItem('existingEmail', userObj.email);
+        console.log('📧 GetStartedScreen - User already has email associated:', userObj.email);
+      }
     }
     
     // Navigate directly to the appropriate profile setup screen based on selected user type
@@ -225,12 +335,28 @@ export default function GetStartedScreen() {
     }
   };
 
+  const handleGoogleReset = () => {
+    console.log('🔄 Manual Google sign-in reset');
+    setGoogleLoading(false);
+    setShowGoogleReset(false);
+    setWarning('Google sign-in was reset. You can try again.');
+  };
+
+  // Add immediate reset function for when user cancels Google sign-in
+  const handleImmediateReset = () => {
+    console.log('🔄 Immediate Google sign-in reset');
+    setGoogleLoading(false);
+    setShowGoogleReset(false);
+    setWarning('');
+    setError('');
+  };
+
   return (
     <div className="min-h-screen bg-white font-poppins-regular flex flex-col">
       {/* Header Section */}
       <header className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
         {/* Logo */}
-        <div className="flex items-center gap-1">
+        <Link href="/" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
           <Image 
             src="/images/logo1.svg" 
             alt="im logo" 
@@ -245,7 +371,7 @@ export default function GetStartedScreen() {
             height={28}
             className="h-7 w-auto"
           />
-        </div>
+        </Link>
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center space-x-3 lg:space-x-6">
@@ -447,15 +573,19 @@ export default function GetStartedScreen() {
               </div>
             )}
 
-            {/* Social Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 sm:mb-4 w-full">
-              <div className="flex-1 w-full min-w-0">
-                <GoogleButton onClick={handleGoogleSignUp} loading={googleLoading} disabled={!selectedUserType} />
-              </div>
-              <div className="flex-1 w-full min-w-0">
-                <FacebookButton disabled={!selectedUserType} />
-              </div>
-            </div>
+                         {/* Social Buttons */}
+             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 sm:mb-4 w-full">
+                               <div className="flex-1 w-full min-w-0">
+                  <GoogleButton 
+                    onClick={handleGoogleSignUp} 
+                    loading={googleLoading} 
+                    disabled={!selectedUserType} 
+                  />
+                </div>
+               <div className="flex-1 w-full min-w-0">
+                 <FacebookButton disabled={!selectedUserType} />
+               </div>
+             </div>
 
             {/* Divider */}
             <div className="flex items-center gap-2 my-3 sm:my-4 w-full">
@@ -563,7 +693,11 @@ function GoogleButton({ onClick, loading, disabled }: { onClick: () => void; loa
       <button 
         onClick={onClick}
         disabled={loading || disabled}
-        className="flex items-center justify-center border border-gray-300 rounded-lg px-3 sm:px-4 py-2.5 hover:bg-gray-50 transition-colors bg-white w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        className={`flex items-center justify-center border border-gray-300 rounded-lg px-3 sm:px-4 py-2.5 transition-all duration-200 bg-white w-full ${
+          loading || disabled 
+            ? 'opacity-50 cursor-not-allowed' 
+            : 'hover:bg-gray-50 hover:border-gray-400 cursor-pointer'
+        }`}
       >
       {loading ? (
         <>

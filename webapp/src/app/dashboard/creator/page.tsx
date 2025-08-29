@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   HomeIcon,
   ListBulletIcon,
@@ -1834,7 +1835,7 @@ export default function CreatorDashboard() {
         {/* Left Sidebar */}
         <div className="w-64 bg-white border-r border-gray-200 min-h-screen">
           <div className="p-6">
-            <div className="flex items-center gap-2 mb-8">
+            <Link href="/" className="flex items-center gap-2 mb-8 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 flex items-center justify-center">
                 <Image 
                   src="/images/logo1.svg" 
@@ -1844,7 +1845,7 @@ export default function CreatorDashboard() {
                 />
               </div>
               <span className="text-xl font-bold text-gray-900">influmojo</span>
-            </div>
+            </Link>
             
             <nav className="space-y-2">
               {navigationItems.map((item) => (

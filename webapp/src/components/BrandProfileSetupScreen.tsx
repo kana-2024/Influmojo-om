@@ -106,6 +106,18 @@ export default function BrandProfileSetupScreen() {
           }
         } else if (authProvider === 'mobile') {
           setIsGoogleUser(false);
+          
+          // Check if user already has an email associated with their account
+          const existingEmail = sessionStorage.getItem('existingEmail');
+          if (existingEmail) {
+            console.log('📧 BrandProfileSetupScreen - User already has email associated:', existingEmail);
+            setEmail(existingEmail);
+            // Email is already verified since it's associated with their account
+            sessionStorage.setItem('emailVerified', 'true');
+            sessionStorage.setItem('verifiedEmail', existingEmail);
+            console.log('✅ BrandProfileSetupScreen - Existing email automatically verified:', existingEmail);
+          }
+          
           // Pre-fill phone if available (this would come from OTP verification)
           const userData = sessionStorage.getItem('userData');
           if (userData) {
@@ -155,6 +167,18 @@ export default function BrandProfileSetupScreen() {
         }
       } else if (authProvider === 'mobile') {
         setIsGoogleUser(false);
+        
+        // Check if user already has an email associated with their account
+        const existingEmail = sessionStorage.getItem('existingEmail');
+        if (existingEmail) {
+          console.log('📧 BrandProfileSetupScreen - User already has email associated:', existingEmail);
+          setEmail(existingEmail);
+          // Email is already verified since it's associated with their account
+          sessionStorage.setItem('emailVerified', 'true');
+          sessionStorage.setItem('verifiedEmail', existingEmail);
+          console.log('✅ BrandProfileSetupScreen - Existing email automatically verified:', existingEmail);
+        }
+        
         // Pre-fill phone if available (this would come from OTP verification)
         const userData = sessionStorage.getItem('userData');
         const verifiedPhone = sessionStorage.getItem('verifiedPhone');
@@ -591,7 +615,7 @@ export default function BrandProfileSetupScreen() {
       {/* Header Section */}
       <header className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
         {/* Logo */}
-        <div className="flex items-center gap-1">
+        <Link href="/" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
           <Image 
             src="/images/logo1.svg" 
             alt="im logo" 
@@ -606,7 +630,7 @@ export default function BrandProfileSetupScreen() {
             height={28}
             className="h-7 w-auto"
           />
-        </div>
+        </Link>
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center space-x-3 lg:space-x-6">
@@ -641,7 +665,7 @@ export default function BrandProfileSetupScreen() {
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row flex-1 w-full bg-white">
         {/* Left Side - Features */}
-        <div className="w-full lg:w-1/2 bg-[#FFF4ED] px-3 sm:px-6 lg:pl-12 lg:pr-3 xl:pl-16 xl:pr-6 py-12 sm:py-16 lg:py-24 flex flex-col justify-center items-center lg:items-center">
+        <div className="w-full lg:w-1/2 bg-[#FFF4ED] px-3 sm:px-6 lg:pl-12 lg:pr-3 xl:pl-16 xl:pr-6 py-12 sm:py-16 lg:py-24 flex flex-col justify-start items-center lg:items-center">
           <div className="max-w-sm lg:max-w-md xl:max-w-lg w-full space-y-4 sm:space-y-6">
             <Feature
               title="Get Started in Minutes"
@@ -833,14 +857,21 @@ export default function BrandProfileSetupScreen() {
                     <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-xs text-green-700 font-poppins-regular">Your email is verified via Google</span>
+                    <span className="text-xs text-green-700 font-poppins-regular">
+                      {sessionStorage.getItem('existingEmail') ? 'Your existing email is verified' : 'Your email is verified via Google'}
+                    </span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
                     <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-xs text-blue-700 font-poppins-regular">Please verify your email address with Google</span>
+                    <span className="text-xs text-blue-700 font-poppins-regular">
+                      {sessionStorage.getItem('existingEmail') 
+                        ? 'Please verify your existing email address with Google' 
+                        : 'Please verify your email address with Google'
+                      }
+                    </span>
                   </div>
                 )}
               </div>
@@ -867,7 +898,9 @@ export default function BrandProfileSetupScreen() {
                   <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-xs text-green-700 font-poppins-regular">Your email is verified via Google</span>
+                  <span className="text-xs text-green-700 font-poppins-regular">
+                    {sessionStorage.getItem('existingEmail') ? 'Your existing email is verified' : 'Your email is verified via Google'}
+                  </span>
                 </div>
               </div>
             )}
