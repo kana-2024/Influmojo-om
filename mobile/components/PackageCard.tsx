@@ -179,6 +179,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
           packageName: item.title || `${item.platform?.toUpperCase()} ${item.content_type?.toUpperCase()}`,
           packageDescription: item.description || `I craft eye-catching, scroll-stopping ${item.platform} ${item.content_type} designed to grab attention instantly, boost engagement, and turn viewers into loyal followers and customers.`,
           packagePrice: parseInt(item.price?.toString() || '0'),
+          packageCurrency: item.currency || 'INR', // Added to match webapp interface
           packageDuration: item.duration1 || '1-2 days',
           platform: item.platform || 'Unknown',
         });

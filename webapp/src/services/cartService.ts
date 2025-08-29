@@ -257,6 +257,70 @@ class CartService {
   init(): void {
     this.loadFromLocalStorage();
   }
+
+  // Sync cart with backend (for persistence across sessions)
+  async syncWithBackend(): Promise<void> {
+    try {
+      const cartItems = this.getCartState();
+      
+      // Call backend sync endpoint
+      const response = await fetch('/api/cart/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ cartItems })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to sync cart: ${response.statusText}`);
+      }
+
+      console.log('✅ Cart synced with backend successfully');
+    } catch (error) {
+      console.error('❌ Failed to sync cart with backend:', error);
+      // Don't throw - cart still works locally
+    }
+  }
+
+  // Load cart from backend (for login)
+  async loadFromBackend(): Promise<void> {
+    try {
+      const response = await fetch('/api/cart', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load cart: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.cartItems) {
+        // Restore cart state from backend
+        this.restoreCartState(data.cartItems);
+        // Also save to localStorage as backup
+        this.saveToLocalStorage();
+        console.log('✅ Cart loaded from backend successfully');
+      }
+    } catch (error) {
+      console.error('❌ Failed to load cart from backend:', error);
+      // Fallback to localStorage
+      console.log('🔄 Falling back to localStorage cart data');
+    }
+  }
+
+  // Auto-sync on cart changes (optional)
+  private async autoSync(): Promise<void> {
+    // Only sync if user is authenticated
+    const token = localStorage.getItem('token');
+    if (token) {
+      await this.syncWithBackend();
+    }
+  }
 }
 
 export default CartService.getInstance();

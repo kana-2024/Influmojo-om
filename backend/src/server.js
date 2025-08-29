@@ -111,24 +111,32 @@ express.response.json = function(data) {
   return originalJson.call(this, serializeData(data));
 };
 
-// Rate limiting
+// Enhanced rate limiting - per userId if authenticated, fallback to IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000, // Increased from 100 to 1000 for development
-  message: { error: 'Too many requests', message: 'Too many requests from this IP, please try again later.' }
+  keyGenerator: (req) => {
+    // Rate limit per userId if authenticated, fallback to IP
+    // This prevents one NAT'd office from throttling everyone while still protecting you
+    return req.user?.id ? `u:${req.user.id}` : `ip:${req.ip}`;
+  },
+  message: { error: 'Too many requests', message: 'Too many requests, please try again later.' }
 });
 
 // Trust proxy for ngrok
 app.set('trust proxy', 1);
 
-// Middleware (keep what you had, but swap cors(...) to use our origin fn)
+// Middleware - JWT-only, no cookies needed
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+
+// CORS - production allow-list from env, no cookies needed
 app.use(cors({
-  origin: corsOrigin,
-  credentials: true,
+  origin: corsOrigin,                // your dynamic allow-list fn is great
+  credentials: false,                // <- important: no cookies with Bearer JWT
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization','ngrok-skip-browser-warning'],
+  allowedHeaders: ['Content-Type','Authorization'], // removed ngrok-skip-browser-warning
 }));
+
 app.use(morgan('combined'));
 app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
@@ -214,6 +222,10 @@ app.use('/api/packages', packagesRoutes);
 app.use('/api/crm', crmRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/cart', require('./routes/cart')); // Cart persistence routes
+
+// Health check endpoint for load balancer
+app.get('/health', (_req, res) => res.status(200).send('ok'));
 
 // Catch-all 404 handler for unknown routes
 app.use((req, res, next) => {
@@ -247,7 +259,7 @@ async function startServer() {
     await awsParameterStore.loadProductionEnvVars();
 
     // 2) Now pull env values (these can come from SSM or .env)
-    PORT = parseInt(process.env.PORT || '3002', 10);
+    PORT = parseInt(process.env.PORT || '5000', 10);
 
     const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
     if (!awsParameterStore.validateRequiredVars(requiredEnvVars)) {
@@ -260,7 +272,7 @@ async function startServer() {
 
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📱 Health check: http://localhost:${PORT}/api/health`);
+      console.log(`📱 Health check: http://localhost:${PORT}/health`);
       console.log(`🔐 Environment: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (error) {

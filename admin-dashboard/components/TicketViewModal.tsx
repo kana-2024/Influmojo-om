@@ -46,7 +46,7 @@ export default function TicketViewModal({ ticket, isOpen, onClose }: TicketViewM
     refetch: refetchMessages
   } = useQuery({
     queryKey: ['ticket-messages', ticket?.id, activeTab],
-    queryFn: () => ticketsAPI.getMessages(ticket?.id || '', activeTab),
+    queryFn: () => ticketsAPI.getMessages(ticket?.id || '', activeTab === 'brand' ? 'brand_agent' : 'creator_agent'),
     enabled: !!ticket?.id,
   });
 
@@ -70,7 +70,7 @@ export default function TicketViewModal({ ticket, isOpen, onClose }: TicketViewM
         message,
         activeTab
       });
-      return ticketsAPI.sendMessage(ticket?.id || '', message, activeTab);
+      return ticketsAPI.sendMessage(ticket?.id || '', message, activeTab === 'brand' ? 'brand_agent' : 'creator_agent');
     },
     onSuccess: (data) => {
       console.log('✅ Message sent successfully:', data);

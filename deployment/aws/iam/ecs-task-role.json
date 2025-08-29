@@ -1,0 +1,48 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "rds-db:connect"
+      ],
+      "Resource": [
+        "arn:aws:rds-db:ap-south-1:424592696132:dbuser:influmojo-prod-db/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "rds-db:db-instance-id": "influmojo-prod-db"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::influmojo-uploads/*",
+        "arn:aws:s3:::influmojo-assets/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ses:SendEmail",
+        "ses:SendRawEmail"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": [
+        "arn:aws:sns:ap-south-1:424592696132:influmojo-notifications"
+      ]
+    }
+  ]
+}

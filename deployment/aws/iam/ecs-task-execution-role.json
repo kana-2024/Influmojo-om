@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters",
+        "ssm:GetParameter",
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": [
+        "arn:aws:ssm:ap-south-1:424592696132:parameter/influmojo/*",
+        "arn:aws:secretsmanager:ap-south-1:424592696132:secret:influmojo/*"
+      ]
+    }
+  ]
+}

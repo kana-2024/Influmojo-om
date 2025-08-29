@@ -1,8 +1,0 @@
-# Exclude these files/folders when creating production deployment
-node_modules\
-.git\
-*.md
-test-*.js
-*.log
-.DS_Store
-Thumbs.db

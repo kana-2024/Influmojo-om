@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { ApiResponse, PaginatedResponse, Agent, Ticket, Message, AgentStats, TicketStats, User } from '@/types';
 
-// Use relative URL to leverage Next.js proxy
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+// Use environment variable for API URL, fallback to localhost for development
+const API_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:3002';
 
 // Create axios instance with default config
 const api = axios.create({

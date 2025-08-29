@@ -36,30 +36,7 @@ export interface Ticket {
   created_at: string;
   updated_at: string;
   agent?: Agent;
-  order?: {
-    id: string;
-    package?: {
-      title: string;
-    };
-    brand?: {
-      company_name: string;
-      phone?: string;
-      user?: {
-        name: string;
-        email?: string;
-        phone?: string;
-      };
-    };
-    creator?: {
-      user?: {
-        name: string;
-        email?: string;
-        phone?: string;
-      };
-      phone?: string;
-      bio?: string;
-    };
-  };
+  order?: Order;
   messages?: Message[];
 }
 
@@ -70,9 +47,11 @@ export interface Order {
   creator_id: string;
   amount: number;
   quantity: number;
-  status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'refunded';
+  status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'refunded' | 'rejected' | 'review' | 'revision_requested' | 'price_revision_pending';
   created_at: string;
   updated_at: string;
+  rejection_message?: string;
+  price_revision_amount?: number;
   package?: Package;
   brand?: BrandProfile;
   creator?: CreatorProfile;

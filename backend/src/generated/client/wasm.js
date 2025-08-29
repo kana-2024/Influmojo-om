@@ -509,6 +509,18 @@ exports.Prisma.TicketScalarFieldEnum = {
   updated_at: 'updated_at'
 };
 
+exports.Prisma.CartItemScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  package_id: 'package_id',
+  quantity: 'quantity',
+  delivery_time: 'delivery_time',
+  additional_instructions: 'additional_instructions',
+  references: 'references',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -735,7 +747,8 @@ exports.Prisma.ModelName = {
   PhoneVerification: 'PhoneVerification',
   KYC: 'KYC',
   PortfolioItem: 'PortfolioItem',
-  Ticket: 'Ticket'
+  Ticket: 'Ticket',
+  CartItem: 'CartItem'
 };
 
 /**

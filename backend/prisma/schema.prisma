@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/client"
+  provider      = "prisma-client-js"
+  output        = "../src/generated/client"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -17,7 +18,6 @@ model User {
   first_name                String?
   last_name                 String?
   profile_image_url         String?
-  cover_image_url           String?
   phone                     String?                @unique
   timezone                  String?
   language                  String?                @default("en")
@@ -31,15 +31,17 @@ model User {
   onboarding_completed      Boolean                @default(false)
   onboarding_step           Int?                   @default(0)
   age                       Int?
-  // Agent status tracking
+  cover_image_url           String?
+  agent_status              AgentStatus            @default(available)
   is_online                 Boolean                @default(true)
   last_online_at            DateTime?
-  agent_status              AgentStatus            @default(available)
   brand_profiles            BrandProfile[]
+  cart_items                CartItem[]             @relation("UserCart")
   admin_channels            CollaborationChannel[] @relation("AdminChannels")
   content_reviews           ContentReview[]        @relation("ContentReviewers")
   admin_content_submissions ContentSubmission[]    @relation("AdminContentSubmissions")
   creator_profiles          CreatorProfile?
+  kyc_verifications         KYC[]                  @relation("KYCVerifier")
   sent_messages             Message[]              @relation("MessageSender")
   notifications             Notification[]
   admin_payments            Payment[]              @relation("AdminPayments")
@@ -48,7 +50,6 @@ model User {
   phone_verifications       PhoneVerification[]
   reviews_reviewed          Review[]               @relation("ReviewReviewed")
   reviews_reviewer          Review[]               @relation("ReviewReviewer")
-  kyc_verifications         KYC[]                  @relation("KYCVerifier")
   assigned_tickets          Ticket[]               @relation("TicketAgent")
 }
 
@@ -56,20 +57,20 @@ model BrandProfile {
   id                   BigInt          @id @default(autoincrement())
   user_id              BigInt
   company_name         String
-  industry             String? // Single primary industry
-  industries           Json? // Array of selected industries
+  industry             String?
+  industries           Json?
   role_in_organization String?
-  business_type        String? // SME, Startup, Enterprise
+  business_type        String?
   website_url          String?
   description          String?
   logo_url             String?
   location_country     String?
-  location_state       String? // Added for unified profile
+  location_state       String?
   location_city        String?
-  location_pincode     String? // Added for unified profile
-  languages            Json? // Array of selected languages
-  date_of_birth        DateTime? // Date of birth for brand
-  gender               String? // Added for unified profile
+  location_pincode     String?
+  languages            Json?
+  date_of_birth        DateTime?
+  gender               String?
   verified             Boolean         @default(false)
   created_at           DateTime        @default(now())
   updated_at           DateTime        @updatedAt
@@ -77,8 +78,8 @@ model BrandProfile {
   campaigns            Campaign[]
   collaborations       Collaboration[]
   invoices             Invoice[]
+  orders_placed        Order[]
   portfolio_items      PortfolioItem[]
-  orders_placed        Order[]         // Orders placed by this brand
 }
 
 model CreatorProfile {
@@ -101,18 +102,18 @@ model CreatorProfile {
   updated_at            DateTime              @updatedAt
   date_of_birth         DateTime?
   gender                String?
-  languages             Json? // Store as JSON array (languages selected during preferences)
-  platform              Json? // Store as JSON array (platforms selected during preferences)
-  packages              Json? // Store as JSON array (creator packages)
+  platform              Json?
+  languages             Json?
+  packages              Json?
   campaign_applications CampaignApplication[]
   collaborations        Collaboration[]
   user                  User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   invoices              Invoice[]
-  social_media_accounts SocialMediaAccount[]
   kyc                   KYC?
+  orders_received       Order[]
+  packages_created      Package[]
   portfolio_items       PortfolioItem[]
-  packages_created      Package[]             // Packages created by this creator
-  orders_received       Order[]               // Orders received by this creator
+  social_media_accounts SocialMediaAccount[]
 }
 
 model SocialMediaAccount {
@@ -238,33 +239,32 @@ model ContentReview {
 }
 
 model Payment {
-  id               BigInt        @id @default(autoincrement())
-  order_id         BigInt?       // For package orders
-  collaboration_id BigInt?       // For campaign collaborations
+  id               BigInt         @id @default(autoincrement())
+  collaboration_id BigInt?
   payer_id         BigInt
   payee_id         BigInt
   admin_id         BigInt
   amount           Decimal
-  currency         String        @default("USD")
-  platform_fee     Decimal       @default(0.00)
+  currency         String         @default("USD")
+  platform_fee     Decimal        @default(0.00)
   net_amount       Decimal
   payment_method   PaymentMethod
   transaction_id   String?
-  status           PaymentStatus @default(pending)
-  initiated_at     DateTime      @default(now())
+  status           PaymentStatus  @default(pending)
+  initiated_at     DateTime       @default(now())
   completed_at     DateTime?
   failure_reason   String?
-  admin            User          @relation("AdminPayments", fields: [admin_id], references: [id], onDelete: Cascade)
-  order            Order?        @relation(fields: [order_id], references: [id])
+  order_id         BigInt?
+  admin            User           @relation("AdminPayments", fields: [admin_id], references: [id], onDelete: Cascade)
   collaboration    Collaboration? @relation(fields: [collaboration_id], references: [id])
-  payee            User          @relation("PaymentPayee", fields: [payee_id], references: [id], onDelete: Cascade)
-  payer            User          @relation("PaymentPayer", fields: [payer_id], references: [id], onDelete: Cascade)
+  order            Order?         @relation(fields: [order_id], references: [id])
+  payee            User           @relation("PaymentPayee", fields: [payee_id], references: [id], onDelete: Cascade)
+  payer            User           @relation("PaymentPayer", fields: [payer_id], references: [id], onDelete: Cascade)
 }
 
 model Invoice {
   id               BigInt         @id @default(autoincrement())
-  order_id         BigInt?        // For package orders
-  collaboration_id BigInt?        // For campaign collaborations
+  collaboration_id BigInt?
   brand_id         BigInt
   creator_id       BigInt
   invoice_number   String         @unique
@@ -276,28 +276,28 @@ model Invoice {
   status           InvoiceStatus  @default(draft)
   issued_at        DateTime       @default(now())
   paid_at          DateTime?
+  order_id         BigInt?
   brand            BrandProfile   @relation(fields: [brand_id], references: [id], onDelete: Cascade)
-  order            Order?         @relation(fields: [order_id], references: [id])
   collaboration    Collaboration? @relation(fields: [collaboration_id], references: [id])
   creator          CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  order            Order?         @relation(fields: [order_id], references: [id])
 }
 
 model Message {
-  id           BigInt       @id @default(autoincrement())
-  ticket_id    BigInt
+  id           BigInt      @id @default(autoincrement())
   sender_id    BigInt
   message_text String
   message_type MessageType @default(text)
   file_url     String?
   file_name    String?
   read_at      DateTime?
-  sender_role  String?      // New: Explicit sender role (brand, creator, agent, system)
-  channel_type String?      // New: Which channel this message belongs to (brand_agent, creator_agent)
-  target_tab   String?      // Track which tab the agent was in when sending the message ('brand' or 'creator')
-  created_at   DateTime     @default(now())
-
-  ticket       Ticket       @relation(fields: [ticket_id], references: [id])
-  sender       User         @relation("MessageSender", fields: [sender_id], references: [id], onDelete: Cascade)
+  created_at   DateTime    @default(now())
+  ticket_id    BigInt
+  target_tab   String?
+  channel_type String?
+  sender_role  String?
+  sender       User        @relation("MessageSender", fields: [sender_id], references: [id], onDelete: Cascade)
+  ticket       Ticket      @relation(fields: [ticket_id], references: [id])
 }
 
 model Review {
@@ -387,46 +387,46 @@ model CollaborationChannel {
 }
 
 model Package {
-  id               BigInt        @id @default(autoincrement())
-  creator_id       BigInt        // Creator who created this package
-  type             PackageType
-  title            String
-  description      String?
-  price            Decimal
-  currency         String        @default("INR")
-  deliverables     Json?
-  is_active        Boolean       @default(true)
-  created_at       DateTime      @default(now())
-  updated_at       DateTime      @updatedAt
-  creator          CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
-  orders           Order[]       // Orders for this package
+  id           BigInt         @id @default(autoincrement())
+  type         PackageType
+  title        String
+  description  String?
+  price        Decimal
+  deliverables Json?
+  created_at   DateTime       @default(now())
+  creator_id   BigInt
+  currency     String         @default("INR")
+  is_active    Boolean        @default(true)
+  updated_at   DateTime       @updatedAt
+  cart_items   CartItem[]     @relation("PackageCart")
+  orders       Order[]
+  creator      CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
 }
 
 model Order {
-  id                    BigInt        @id @default(autoincrement())
-  package_id            BigInt
-  brand_id              BigInt
-  creator_id            BigInt
-  quantity              Int           @default(1)
-  total_amount          Decimal
-  currency              String        @default("USD")
-  status                OrderStatus   @default(pending)
-  order_date            DateTime      @default(now())
-  completed_at          DateTime?
-  rejection_message     String?       // Appealing message when order is rejected
-  delivery_time         Int?          // Delivery time in days (3-14)
-  additional_instructions String?     // Additional instructions from brand
-  references            Json?         // Array of reference file URLs
-  deliverables          Json?         // Array of submitted deliverable files
-  price_revision_amount Decimal?      // Additional amount requested by creator for revision
-  price_revision_reason String?       // Reason for price revision request
-
-  package               Package       @relation(fields: [package_id], references: [id])
-  brand                 BrandProfile  @relation(fields: [brand_id], references: [id], onDelete: Cascade)
-  creator               CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
-  payments              Payment[]
-  invoices              Invoice[]
-  ticket                Ticket?       // Optional if not always created
+  id                      BigInt         @id @default(autoincrement())
+  package_id              BigInt
+  brand_id                BigInt
+  creator_id              BigInt
+  quantity                Int            @default(1)
+  total_amount            Decimal
+  currency                String         @default("USD")
+  status                  OrderStatus    @default(pending)
+  order_date              DateTime       @default(now())
+  completed_at            DateTime?
+  rejection_message       String?
+  additional_instructions String?
+  delivery_time           Int?
+  references              Json?
+  deliverables            Json?
+  price_revision_amount   Decimal?
+  price_revision_reason   String?
+  invoices                Invoice[]
+  brand                   BrandProfile   @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  creator                 CreatorProfile @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  package                 Package        @relation(fields: [package_id], references: [id])
+  payments                Payment[]
+  ticket                  Ticket?
 
   @@index([package_id, brand_id, creator_id, status, order_date])
 }
@@ -449,7 +449,7 @@ model PhoneVerification {
 model KYC {
   id                  BigInt         @id @default(autoincrement())
   creator_id          BigInt         @unique
-  document_type       String // PAN, Aadhar, Passport, etc.
+  document_type       String
   document_number     String
   document_front_url  String?
   document_back_url   String?
@@ -473,7 +473,6 @@ model KYC {
 model PortfolioItem {
   id          BigInt             @id @default(autoincrement())
   creator_id  BigInt?
-  brand_id    BigInt?
   title       String
   description String?
   media_url   String
@@ -481,16 +480,49 @@ model PortfolioItem {
   file_size   BigInt?
   mime_type   String?
   platform    SocialPlatform?
-  tags        Json? // Store as JSON array
+  tags        Json?
   is_featured Boolean            @default(false)
   created_at  DateTime           @default(now())
   updated_at  DateTime           @updatedAt
-  creator     CreatorProfile?    @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  brand_id    BigInt?
   brand       BrandProfile?      @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  creator     CreatorProfile?    @relation(fields: [creator_id], references: [id], onDelete: Cascade)
 
   @@index([creator_id])
   @@index([brand_id])
   @@index([media_type])
+}
+
+model Ticket {
+  id                    BigInt         @id @default(autoincrement())
+  order_id              BigInt         @unique
+  agent_id              BigInt
+  stream_channel_id     String
+  status                TicketStatus   @default(open)
+  created_at            DateTime       @default(now())
+  updated_at            DateTime       @updatedAt
+  priority              TicketPriority @default(medium)
+  brand_agent_channel   String?
+  creator_agent_channel String?
+  messages              Message[]
+  agent                 User           @relation("TicketAgent", fields: [agent_id], references: [id])
+  order                 Order          @relation(fields: [order_id], references: [id])
+}
+
+model CartItem {
+  id                      BigInt   @id @default(autoincrement())
+  user_id                 BigInt
+  package_id              BigInt
+  quantity                Int      @default(1)
+  delivery_time           Int?
+  additional_instructions String?
+  references              Json?
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+  package                 Package  @relation("PackageCart", fields: [package_id], references: [id], onDelete: Cascade)
+  user                    User     @relation("UserCart", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, package_id])
 }
 
 enum UserType {
@@ -643,36 +675,17 @@ enum PortfolioMediaType {
 
 enum OrderStatus {
   pending
-  accepted
-  rejected
   confirmed
   in_progress
-  review
-  revision_requested
-  price_revision_pending
   completed
   cancelled
   refunded
+  accepted
+  rejected
+  review
+  revision_requested
+  price_revision_pending
 }
-
-model Ticket {
-  id                    BigInt     @id @default(autoincrement())
-  order_id              BigInt     @unique
-  agent_id              BigInt
-  stream_channel_id     String     // Legacy field - keeping for backward compatibility
-  brand_agent_channel   String?    // New: Separate channel for brand-agent communication
-  creator_agent_channel String?    // New: Separate channel for creator-agent communication
-  status                TicketStatus @default(open)
-  priority              TicketPriority @default(medium)
-  created_at            DateTime   @default(now())
-  updated_at            DateTime   @updatedAt
-
-  order                 Order      @relation(fields: [order_id], references: [id])
-  agent                 User       @relation("TicketAgent", fields: [agent_id], references: [id])
-  messages              Message[]
-}
-
-
 
 enum TicketStatus {
   open

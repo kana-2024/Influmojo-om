@@ -7,11 +7,12 @@ export interface CartItem {
   packageName: string;
   packageDescription: string;
   packagePrice: number;
+  packageCurrency: string; // Added to match webapp interface
   packageDuration: string;
   platform: string;
   quantity: number;
   addedAt: Date;
-  // New form data fields
+  // Form data fields
   deliveryTime?: number;
   additionalInstructions?: string;
   references?: string[];
@@ -74,6 +75,7 @@ class CartService {
 
     const summary = this.getCartSummary();
     this.notifyListeners(summary);
+    this.saveToAsyncStorage(); // Save to AsyncStorage
     return summary;
   }
 
@@ -83,6 +85,7 @@ class CartService {
     packageName: string;
     packageDescription: string;
     packagePrice: number;
+    packageCurrency: string; // Added to match webapp interface
     packageDuration: string;
     platform: string;
   }>): CartSummary {
@@ -103,6 +106,7 @@ class CartService {
     this.items = this.items.filter(item => item.id !== itemId);
     const summary = this.getCartSummary();
     this.notifyListeners(summary);
+    this.saveToAsyncStorage(); // Save to AsyncStorage
     return summary;
   }
 
@@ -119,6 +123,7 @@ class CartService {
     }
     const summary = this.getCartSummary();
     this.notifyListeners(summary);
+    this.saveToAsyncStorage(); // Save to AsyncStorage
     return summary;
   }
 
@@ -141,6 +146,7 @@ class CartService {
       }
       const summary = this.getCartSummary();
       this.notifyListeners(summary);
+      this.saveToAsyncStorage(); // Save to AsyncStorage
       return summary;
     }
     return this.getCartSummary();
@@ -151,6 +157,7 @@ class CartService {
     this.items = [];
     const summary = this.getCartSummary();
     this.notifyListeners(summary);
+    this.saveToAsyncStorage(); // Save to AsyncStorage
     return summary;
   }
 
@@ -159,6 +166,7 @@ class CartService {
     this.items = this.items.filter(item => item.creatorId !== creatorId);
     const summary = this.getCartSummary();
     this.notifyListeners(summary);
+    this.saveToAsyncStorage(); // Save to AsyncStorage
     return summary;
   }
 
@@ -221,6 +229,98 @@ class CartService {
     }));
     const summary = this.getCartSummary();
     this.notifyListeners(summary);
+  }
+
+  // Sync cart with backend (for persistence across sessions)
+  async syncWithBackend(): Promise<void> {
+    try {
+      const cartItems = this.getCartState();
+      
+      // Call backend sync endpoint
+      const response = await fetch('/api/cart/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await this.getAuthToken()}`
+        },
+        body: JSON.stringify({ cartItems })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to sync cart: ${response.statusText}`);
+      }
+
+      console.log('✅ Cart synced with backend successfully');
+    } catch (error) {
+      console.error('❌ Failed to sync cart with backend:', error);
+      // Don't throw - cart still works locally
+    }
+  }
+
+  // Load cart from backend (for login)
+  async loadFromBackend(): Promise<void> {
+    try {
+      const response = await fetch('/api/cart', {
+        headers: {
+          'Authorization': `Bearer ${await this.getAuthToken()}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load cart: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.cartItems) {
+        // Restore cart state from backend
+        this.restoreCartState(data.cartItems);
+        console.log('✅ Cart loaded from backend successfully');
+      }
+    } catch (error) {
+      console.error('❌ Failed to load cart from backend:', error);
+      console.log('🔄 Cart will continue with local data');
+    }
+  }
+
+  // Get auth token from AsyncStorage
+  private async getAuthToken(): Promise<string | null> {
+    try {
+      const AsyncStorage = require('@react-native-async-storage/async-storage');
+      return await AsyncStorage.getItem('authToken');
+    } catch (error) {
+      console.error('Failed to get auth token:', error);
+      return null;
+    }
+  }
+
+  // Save cart to AsyncStorage (mobile equivalent of localStorage)
+  private async saveToAsyncStorage(): Promise<void> {
+    try {
+      const AsyncStorage = require('@react-native-async-storage/async-storage');
+      await AsyncStorage.setItem('influmojo_cart', JSON.stringify(this.items));
+    } catch (error) {
+      console.error('Failed to save cart to AsyncStorage:', error);
+    }
+  }
+
+  // Load cart from AsyncStorage (mobile equivalent of localStorage)
+  async loadFromAsyncStorage(): Promise<void> {
+    try {
+      const AsyncStorage = require('@react-native-async-storage/async-storage');
+      const savedCart = await AsyncStorage.getItem('influmojo_cart');
+      if (savedCart) {
+        const items = JSON.parse(savedCart);
+        this.restoreCartState(items);
+      }
+    } catch (error) {
+      console.error('Failed to load cart from AsyncStorage:', error);
+    }
+  }
+
+  // Initialize cart service with AsyncStorage
+  async init(): Promise<void> {
+    await this.loadFromAsyncStorage();
   }
 }
 

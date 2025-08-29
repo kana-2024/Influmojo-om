@@ -71,7 +71,9 @@ export default function TicketChat({ ticketId, ticketTitle, onClose }: TicketCha
         
         console.log('🔄 Loading messages for ticket:', ticketId, 'channel:', activeChannel, 'activeTab:', activeTab, 'currentUser:', currentUser);
         
-        const response = await ticketsAPI.getMessages(ticketId, activeTab);
+        // Convert activeTab to the channel type expected by the API
+        const channelType = activeTab === 'brand' ? 'brand_agent' : 'creator_agent';
+        const response = await ticketsAPI.getMessages(ticketId, channelType);
         
         console.log('📥 Raw API response:', response);
         
@@ -162,7 +164,9 @@ export default function TicketChat({ ticketId, ticketTitle, onClose }: TicketCha
       // Convert channel type to activeTab format expected by API
       const activeTab = activeChannel === 'brand_agent' ? 'brand' : 'creator';
       
-      const response = await ticketsAPI.getMessages(ticketId, activeTab);
+      // Convert activeTab to the channel type expected by the API
+      const channelType = activeTab === 'brand' ? 'brand_agent' : 'creator_agent';
+      const response = await ticketsAPI.getMessages(ticketId, channelType);
       
       if (response.success && response.data?.messages) {
         const fetchedMessages: Message[] = response.data.messages.map((msg: any) => ({
@@ -294,7 +298,9 @@ export default function TicketChat({ ticketId, ticketTitle, onClose }: TicketCha
       // Convert channel type to activeTab format expected by API
       const activeTab = activeChannel === 'brand_agent' ? 'brand' : 'creator';
       
-      const response = await ticketsAPI.sendMessage(ticketId, messageText, activeTab);
+      // Convert activeTab to the channel type expected by the API
+      const channelType = activeTab === 'brand' ? 'brand_agent' : 'creator_agent';
+      const response = await ticketsAPI.sendMessage(ticketId, messageText, channelType);
       
       console.log('📤 Send message response:', response);
       

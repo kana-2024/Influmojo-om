@@ -25,8 +25,6 @@
     # Static assets + BUILD_ID required at runtime
     COPY --from=builder /app/.next/static ./.next/static
     COPY --from=builder /app/.next/BUILD_ID ./.next/BUILD_ID
-    # Public assets if you use them
-    COPY --from=builder /app/public ./public
     
     # Run as non-root (👍)
     RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs

@@ -19,54 +19,28 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const [streamApiKey, setStreamApiKey] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Get StreamChat API key on component mount and when authentication changes
+  // Get StreamChat API key from environment variables
   useEffect(() => {
-    const getStreamApiKey = async () => {
+    const getStreamApiKey = () => {
       try {
-        // Check if user is authenticated first
-        const token = localStorage.getItem('jwtToken');
-        if (!token) {
-          console.log('⚠️ No JWT token found, skipping StreamChat initialization');
-          setStreamApiKey('');
-          setIsLoading(false);
-          return;
-        }
-
-        console.log('🔑 Attempting to get StreamChat API key...');
-        const response = await streamChatAPI.getToken();
-        if (response.success && response.data.apiKey) {
-          setStreamApiKey(response.data.apiKey);
-          console.log('✅ StreamChat API key retrieved successfully');
+        // Get StreamChat API key from environment variable
+        const apiKey = process.env.NEXT_PUBLIC_ADMIN_STREAMCHAT_API_KEY;
+        if (apiKey) {
+          setStreamApiKey(apiKey);
+          console.log('✅ StreamChat API key loaded from environment');
         } else {
-          console.error('❌ Failed to get StreamChat API key:', response.message);
+          console.error('❌ StreamChat API key not found in environment');
           setStreamApiKey('');
         }
       } catch (error) {
         console.error('❌ Failed to get StreamChat API key:', error);
         setStreamApiKey('');
-        // Don't show error toast here as it might be expected when not authenticated
       } finally {
         setIsLoading(false);
       }
     };
 
     getStreamApiKey();
-
-    // Listen for authentication changes
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'jwtToken') {
-        if (e.newValue) {
-          // User logged in, try to get StreamChat API key
-          setTimeout(getStreamApiKey, 100);
-        } else {
-          // User logged out, clear StreamChat API key
-          setStreamApiKey('');
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Show loading state while checking authentication

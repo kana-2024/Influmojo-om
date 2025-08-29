@@ -79,17 +79,24 @@ class AWSParameterStore {
 
     console.log('🔐 Loading production environment variables from AWS Parameter Store...');
     
+    // Backend-specific parameters
     const parameters = [
-      '/influmojo/prod/jwt-secret',
-      '/influmojo/prod/session-secret',
-      '/influmojo/prod/database-url',
-      '/influmojo/prod/twilio-account-sid',
-      '/influmojo/prod/twilio-auth-token',
-      '/influmojo/prod/twilio-verify-service-sid',
-      '/influmojo/prod/google-client-secret',
-      '/influmojo/prod/facebook-app-secret',
-      '/influmojo/prod/sendgrid-api-key',
-      '/influmojo/prod/stream-api-secret'
+      '/influmojo/production/backend/JWT_SECRET',
+      '/influmojo/production/backend/JWT_SECRET_PREVIOUS',
+      '/influmojo/production/backend/DATABASE_URL',
+      '/influmojo/production/backend/GOOGLE_CLIENT_SECRET',
+      '/influmojo/production/backend/FACEBOOK_APP_SECRET',
+      '/influmojo/production/backend/STREAM_API_SECRET',
+      '/influmojo/production/backend/TWILIO_ACCOUNT_SID',
+      '/influmojo/production/backend/TWILIO_AUTH_TOKEN',
+      '/influmojo/production/backend/TWILIO_VERIFY_SERVICE_SID',
+      '/influmojo/production/backend/SENDGRID_API_KEY',
+      '/influmojo/production/backend/ZOHO_CLIENT_ID',
+      '/influmojo/production/backend/ZOHO_CLIENT_SECRET',
+      '/influmojo/production/backend/ZOHO_REFRESH_TOKEN',
+      '/influmojo/production/backend/CLOUDINARY_CLOUD_NAME',
+      '/influmojo/production/backend/CLOUDINARY_API_KEY',
+      '/influmojo/production/backend/CLOUDINARY_API_SECRET'
     ];
 
     const loadedVars = await this.getParameters(parameters);

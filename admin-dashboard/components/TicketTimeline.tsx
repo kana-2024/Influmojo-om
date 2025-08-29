@@ -49,7 +49,7 @@ export default function TicketTimeline({ ticket, messages }: TicketTimelineProps
       events.push({
         id: `order-created-${ticket.order.id}`,
         type: 'order_status',
-        timestamp: ticket.order.order_date || ticket.created_at,
+        timestamp: ticket.created_at,
         title: 'Order Created',
         description: `Package: ${ticket.order.package?.title || 'N/A'}`,
         actor: 'brand',
@@ -156,7 +156,7 @@ export default function TicketTimeline({ ticket, messages }: TicketTimelineProps
       events.push({
         id: `order-status-${order.status}`,
         type: 'order_status',
-        timestamp: order.updated_at || order.order_date || ticket.created_at,
+        timestamp: order.updated_at || ticket.created_at,
         title: config.title,
         description: config.description,
         actor: config.actor,
