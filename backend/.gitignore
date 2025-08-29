@@ -12,6 +12,15 @@ package-lock.json
 .env.test.local
 .env.production.local
 .env.*.local
+.env.development
+
+# Scripts, Tests, and Documentation
+scripts/
+tests/
+docs/
+**/scripts/
+**/tests/
+**/docs/
 
 # API Keys and Secrets
 *.key

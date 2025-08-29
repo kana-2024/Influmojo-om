@@ -9,7 +9,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 export const ENV = {
   // API Configuration - Use relative URLs for production (ALB routing), absolute for development
   API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 
-                 (isProduction ? '/api' : 'http://localhost:3002'),
+                 (isProduction ? '/api' : 'http://localhost:5000'),
   GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
   
   // App Configuration
@@ -106,7 +106,7 @@ if (typeof window !== 'undefined' && isDevelopment) {
   } else if (isDevelopment && !ENV.API_BASE_URL.includes('localhost')) {
     console.error('❌ WARNING: Development mode but API_BASE_URL is not using localhost!');
     console.error('Current URL:', ENV.API_BASE_URL);
-    console.error('Expected URL: http://localhost:3002');
+    console.error('Expected URL: http://localhost:5000');
   } else {
     console.log('✅ API_BASE_URL is correctly configured for', isProduction ? 'production (relative path)' : 'development');
   }

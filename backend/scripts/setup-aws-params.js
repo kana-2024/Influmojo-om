@@ -21,29 +21,47 @@ const region = process.env.AWS_REGION || 'us-east-1';
 const ssm = new AWS.SSM({ region });
 
 // Parameter Store path prefix
-const PARAM_PREFIX = '/influmojo/prod';
+const PARAM_PREFIX = '/influmojo/production';
 
 // Sensitive parameters to store in Parameter Store
 const SENSITIVE_PARAMS = {
   // JWT and Session
-  [`${PARAM_PREFIX}/jwt-secret`]: 'your-production-jwt-secret-here-minimum-32-characters',
-  [`${PARAM_PREFIX}/session-secret`]: 'your-production-session-secret-here-minimum-32-characters',
+  [`${PARAM_PREFIX}/JWT_SECRET`]: 'your-production-jwt-secret-here-minimum-32-characters',
+  [`${PARAM_PREFIX}/JWT_SECRET_PREVIOUS`]: 'your-production-jwt-secret-previous-here',
+  [`${PARAM_PREFIX}/SESSION_SECRET`]: 'your-production-session-secret-here-minimum-32-characters',
   
   // Database
-  [`${PARAM_PREFIX}/database-url`]: 'postgresql://username:password@your-aws-rds-endpoint:5432/influmojo-prod',
+  [`${PARAM_PREFIX}/DATABASE_URL`]: 'postgresql://username:password@your-aws-rds-endpoint:5432/influmojo-prod',
+  
+  // Google OAuth
+  [`${PARAM_PREFIX}/GOOGLE_CLIENT_ID`]: '401925027822-qndr5bi6p3co47b19rjdtnd5pbm3fd59.apps.googleusercontent.com',
+  [`${PARAM_PREFIX}/GOOGLE_CLIENT_SECRET`]: 'your-google-client-secret',
+  [`${PARAM_PREFIX}/GOOGLE_CALLBACK_URL`]: 'https://api.influmojo.com/api/auth/google/callback',
+  [`${PARAM_PREFIX}/NEXT_PUBLIC_WEBAPP_URL`]: 'https://staging.influmojo.com',
+  
+  // Facebook OAuth
+  [`${PARAM_PREFIX}/FACEBOOK_APP_SECRET`]: 'your-facebook-app-secret',
+  
+  // StreamChat
+  [`${PARAM_PREFIX}/STREAM_API_SECRET`]: 'your-stream-api-secret',
   
   // Twilio
-  [`${PARAM_PREFIX}/twilio-account-sid`]: 'your-twilio-account-sid',
-  [`${PARAM_PREFIX}/twilio-auth-token`]: 'your-twilio-auth-token',
-  [`${PARAM_PREFIX}/twilio-verify-service-sid`]: 'your-twilio-verify-service-sid',
-  
-  // OAuth Secrets
-  [`${PARAM_PREFIX}/google-client-secret`]: 'your-google-client-secret',
-  [`${PARAM_PREFIX}/facebook-app-secret`]: 'your-facebook-app-secret',
+  [`${PARAM_PREFIX}/TWILIO_ACCOUNT_SID`]: 'your-twilio-account-sid',
+  [`${PARAM_PREFIX}/TWILIO_AUTH_TOKEN`]: 'your-twilio-auth-token',
+  [`${PARAM_PREFIX}/TWILIO_VERIFY_SERVICE_SID`]: 'your-twilio-verify-service-sid',
   
   // API Keys
-  [`${PARAM_PREFIX}/sendgrid-api-key`]: 'your-sendgrid-api-key',
-  [`${PARAM_PREFIX}/stream-api-secret`]: 'your-stream-api-secret'
+  [`${PARAM_PREFIX}/SENDGRID_API_KEY`]: 'your-sendgrid-api-key',
+  
+  // Zoho CRM
+  [`${PARAM_PREFIX}/ZOHO_CLIENT_ID`]: 'your-zoho-client-id',
+  [`${PARAM_PREFIX}/ZOHO_CLIENT_SECRET`]: 'your-zoho-client-secret',
+  [`${PARAM_PREFIX}/ZOHO_REFRESH_TOKEN`]: 'your-zoho-refresh-token',
+  
+  // Cloudinary
+  [`${PARAM_PREFIX}/CLOUDINARY_CLOUD_NAME`]: 'your-cloudinary-cloud-name',
+  [`${PARAM_PREFIX}/CLOUDINARY_API_KEY`]: 'your-cloudinary-api-key',
+  [`${PARAM_PREFIX}/CLOUDINARY_API_SECRET`]: 'your-cloudinary-api-secret'
 };
 
 async function createParameter(paramName, paramValue, isSecure = true) {

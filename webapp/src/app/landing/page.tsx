@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { profileAPI } from '@/services/apiService';
+import EnvDebug from '@/components/EnvDebug';
 
 interface Creator {
   id: string;
@@ -225,6 +226,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <EnvDebug />
       {/* Header - Matching the screenshot */}
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

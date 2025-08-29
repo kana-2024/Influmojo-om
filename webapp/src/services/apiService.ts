@@ -137,7 +137,7 @@ export const getCurrentUser = () => {
 // Check if backend is accessible
 export const checkBackendHealth = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002'}/api/health`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000'}/api/health`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

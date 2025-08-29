@@ -1,5 +1,8 @@
-# Dependencies
-node_modules
+# Environment-specific configuration files
+android-env.json
+ios-env.json
+*.env.json
+*.config.json
 
 # Environment variables and secrets
 .env
@@ -70,49 +73,6 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# React Native
-.expo/
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-web-build/
-
-# Metro
-.metro-health-check*
-
-# Flipper
-ios/Pods/
-
-# Android
-android/app/build/
-android/build/
-android/gradle/
-android/local.properties
-android/.gradle
-android/captures/
-android/gradlew
-android/gradlew.bat
-android/release/
-android/app/release/
-
-# iOS
-ios/build/
-ios/Pods/
-ios/Podfile.lock
-ios/*.xcworkspace
-ios/*.xcodeproj
-
-# Expo
-.expo/
-dist/
-web-build/
-
-# EAS
-.easignore
 
 # Production
 build/

@@ -73,7 +73,7 @@ class StreamChatService {
     try {
       console.log('🔑 Getting StreamChat token from backend...');
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002'}/api/chat/token`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000'}/api/chat/token`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -1701,4 +1701,133 @@ router.get('/me', authenticateJWT, asyncHandler(async (req, res) => {
   }
 }));
 
+// ========================================
+// GOOGLE OAUTH WEB FLOW ROUTES
+// ========================================
+
+// Initiate Google OAuth flow (GET request)
+router.get('/google', asyncHandler(async (req, res) => {
+  try {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const redirectUri = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/auth/google/callback`;
+    
+    // Build Google OAuth URL
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${encodeURIComponent(clientId)}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code` +
+      `&scope=${encodeURIComponent('openid email profile')}` +
+      `&access_type=offline` +
+      `&prompt=consent`;
+
+    console.log('🔐 Redirecting to Google OAuth:', googleAuthUrl);
+    
+    // Redirect user to Google
+    res.redirect(googleAuthUrl);
+    
+  } catch (error) {
+    console.error('❌ Google OAuth initiation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to initiate Google OAuth',
+      message: error.message
+    });
+  }
+}));
+
+// Google OAuth callback (GET request)
+router.get('/google/callback', asyncHandler(async (req, res) => {
+  try {
+    const { code, error } = req.query;
+    
+    if (error) {
+      console.error('❌ Google OAuth error:', error);
+      return res.status(400).json({
+        success: false,
+        error: 'Google OAuth failed',
+        message: error
+      });
+    }
+
+    if (!code) {
+      return res.status(400).json({
+        success: false,
+        error: 'Authorization code missing',
+        message: 'No authorization code received from Google'
+      });
+    }
+
+    console.log('🔐 Google OAuth callback received, code:', code);
+
+    // Exchange code for tokens
+    const { tokens } = await googleClient.getToken({
+      code,
+      redirect_uri: process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/auth/google/callback`
+    });
+
+    // Get user info from Google
+    const ticket = await googleClient.verifyIdToken(tokens.id_token);
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub: googleId } = payload;
+
+    console.log('✅ Google user verified:', { email, name, googleId });
+
+    // Find or create user
+    let user = await prisma.user.findFirst({
+      where: { email: email }
+    });
+
+    if (!user) {
+      // Create new user
+      user = await prisma.user.create({
+        data: {
+          email,
+          name,
+          profile_image_url: picture,
+          auth_provider: 'google',
+          email_verified: true,
+          user_type: 'creator', // Default to creator, can be updated later
+          status: 'active'
+        }
+      });
+
+      // Create initial profile
+      await createInitialProfile(user.id, user.user_type);
+      
+      console.log('✅ Created new user via Google OAuth:', user.id.toString());
+    } else {
+      // Update existing user
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          profile_image_url: picture,
+          auth_provider: 'google',
+          email_verified: true,
+          last_login_at: new Date()
+        }
+      });
+      
+      console.log('✅ Updated existing user via Google OAuth:', user.id.toString());
+    }
+
+    // Generate JWT token
+    const token = generateToken(user.id, user.user_type);
+
+    // Redirect to frontend with token
+    const frontendUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+    const redirectUrl = `${frontendUrl}/auth/callback?token=${encodeURIComponent(token)}&user_type=${user.user_type}`;
+    
+    console.log('✅ Redirecting to frontend:', redirectUrl);
+    res.redirect(redirectUrl);
+
+  } catch (error) {
+    console.error('❌ Google OAuth callback error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Google OAuth callback failed',
+      message: error.message
+    });
+  }
+}));
+
 module.exports = { router }; 

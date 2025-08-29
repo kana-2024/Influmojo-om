@@ -669,8 +669,10 @@ export default function BrandProfileSetupScreen() {
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
-                    target.parentElement!.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-yellow-300 flex items-center justify-center flex-shrink-0';
-                    target.parentElement!.innerHTML = '<span class="text-white text-xs font-poppins-bold">👤</span>';
+                    if (target.parentElement) {
+                      target.parentElement.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-yellow-300 flex items-center justify-center flex-shrink-0';
+                      target.parentElement.innerHTML = '<span class="text-white text-xs font-poppins-bold">👤</span>';
+                    }
                   }}
                 />
               </div>
@@ -685,8 +687,10 @@ export default function BrandProfileSetupScreen() {
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
-                    target.parentElement!.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-yellow-300 flex items-center justify-center flex-shrink-0';
-                    target.parentElement!.innerHTML = '<span class="text-white text-xs font-poppins-bold">👤</span>';
+                    if (target.parentElement) {
+                      target.parentElement.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-yellow-300 flex items-center justify-center flex-shrink-0';
+                      target.parentElement.innerHTML = '<span class="text-white text-xs font-poppins-bold">👤</span>';
+                    }
                   }}
                 />
               </div>
@@ -701,8 +705,10 @@ export default function BrandProfileSetupScreen() {
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
-                    target.parentElement!.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-blue-300 flex items-center justify-center flex-shrink-0';
-                    target.parentElement!.innerHTML = '<span class="text-white text-xs font-poppins-bold">👤</span>';
+                    if (target.parentElement) {
+                      target.parentElement.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-blue-300 flex items-center justify-center flex-shrink-0';
+                      target.parentElement.innerHTML = '<span class="text-white text-xs font-poppins-bold">👤</span>';
+                    }
                   }}
                 />
               </div>
@@ -717,8 +723,10 @@ export default function BrandProfileSetupScreen() {
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
-                    target.parentElement!.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center flex-shrink-0';
-                    target.parentElement!.innerHTML = '<span class="text-white text-xs font-poppins-bold">👤</span>';
+                    if (target.parentElement) {
+                      target.parentElement.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center flex-shrink-0';
+                      target.parentElement.innerHTML = '<span class="text-white text-xs font-poppins-bold">👤</span>';
+                    }
                   }}
                 />
               </div>
